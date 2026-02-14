@@ -1,0 +1,5 @@
+# Copy to .dev.vars and fill in your values
+# wrangler dev loads .dev.vars automatically
+
+SUPABASE_URL=https://your-project.supabase.co
+SUPABASE_SERVICE_KEY=your-service-role-key

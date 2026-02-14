@@ -1,37 +1,96 @@
-import PostalMime from 'postal-mime';
+import PostalMime from "postal-mime";
+import { createClient } from "@supabase/supabase-js";
 
 export default {
-  // 1. THIS HANDLES REAL EMAILS
-  async email(message, env, ctx) {
-    const rawBody = await new Response(message.raw).arrayBuffer();
-    const parser = new PostalMime();
-    const email = await parser.parse(rawBody);
+  // 1. Handles real emails from Cloudflare Email Routing
+  async email(
+    message: ForwardableEmailMessage,
+    env: Env,
+    ctx: ExecutionContext
+  ): Promise<void> {
+    try {
+      const rawBody = await new Response(message.raw).arrayBuffer();
+      const parser = new PostalMime();
+      const email = await parser.parse(rawBody);
+      const body = email.text ?? email.html ?? "";
+      const from = email.from?.address ?? "unknown";
 
-    return await processLogic(email.subject, email.text, email.from.address, env);
+      await processLogic(email.subject ?? "", body, from, env);
+    } catch (err) {
+      console.error("Email processing failed:", err);
+      message.setReject("Processing failed");
+    }
   },
 
-  // 2. THIS HANDLES HTTP (CURL / BROWSER)
-  async fetch(request, env, ctx) {
+  // 2. Handles HTTP (curl / local dev testing)
+  async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     if (request.method === "POST") {
-      const { subject, body, from } = await request.json();
-      const result = await processLogic(subject, body, from, env);
-      return new Response(JSON.stringify(result), { headers: { "Content-Type": "application/json" } });
+      try {
+        const payload = (await request.json()) as { subject?: string; body?: string; from?: string };
+        const { subject = "", body = "", from = "test" } = payload;
+        const result = await processLogic(subject, body, from, env);
+        return new Response(JSON.stringify(result), {
+          headers: { "Content-Type": "application/json" },
+        });
+      } catch (err) {
+        console.error("Fetch processing failed:", err);
+        return new Response(
+          JSON.stringify({ success: false, error: String(err) }),
+          { status: 500, headers: { "Content-Type": "application/json" } }
+        );
+      }
     }
-    
+
     return new Response("Dad Agent is live. Send a POST request to test.");
-  }
+  },
 };
 
-// 3. SHARED LOGIC
-async function processLogic(subject, body, from, env) {
-  const logMessage = `Agent received: [${subject}] from [${from}]`;
-  console.log(logMessage);
+async function processLogic(
+  subject: string,
+  body: string,
+  from: string,
+  env: Env
+): Promise<{ success: boolean; taskId?: string; message?: string }> {
+  const supabaseUrl = env.SUPABASE_URL;
+  const supabaseKey = env.SUPABASE_SERVICE_KEY;
 
-  // Eventually, your OpenAI/Supabase logic goes here
-  
-  return { 
-    success: true, 
-    message: logMessage,
-    body_preview: body ? body.substring(0, 100) : "No body"
+  if (!supabaseUrl || !supabaseKey) {
+    throw new Error("SUPABASE_URL and SUPABASE_SERVICE_KEY must be set");
+  }
+
+  const supabase = createClient(supabaseUrl, supabaseKey);
+
+  const title = subject ? subject.substring(0, 200) : "Untitled";
+  const metadata = { from, receivedAt: new Date().toISOString() };
+
+  const { data: task, error: taskError } = await supabase
+    .from("tasks")
+    .insert({
+      title,
+      original_body: body,
+      metadata,
+      source: "email",
+    })
+    .select("id")
+    .single();
+
+  if (taskError) {
+    throw new Error(`Supabase insert failed: ${taskError.message}`);
+  }
+
+  const { error: bucketError } = await supabase
+    .from("later_tasks")
+    .insert({ task_id: task.id });
+
+  if (bucketError) {
+    throw new Error(`Supabase bucket insert failed: ${bucketError.message}`);
+  }
+
+  console.log(`Task created: ${task.id} from [${from}]`);
+
+  return {
+    success: true,
+    taskId: task.id,
+    message: `Agent received: [${subject}] from [${from}]`,
   };
 }
