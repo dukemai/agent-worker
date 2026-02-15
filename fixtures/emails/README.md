@@ -17,6 +17,7 @@ Test data for the Worker's fetch handler and email simulation.
 | File | Description |
 |------|-------------|
 | `vklass-utvecklingssamtal.json` | Vklass school notification: development talk times available for booking |
+| `xxl-promotion-helmet.json` | XXL promotion: kids helmets on sale (test promotion matching shopping_list) |
 
 ## Usage
 

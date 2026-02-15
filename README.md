@@ -49,6 +49,15 @@ curl -X POST http://localhost:8787 \
 
 Verify in Supabase Table Editor: new row in `tasks` and in the bucket table (today/this_week/later) based on Gemini's classification.
 
+**Promotion filtering:** Set `family_context` to match promotions:
+```sql
+INSERT INTO family_context (key, value) VALUES
+  ('shopping_list', 'helmet for kid, winter boots'),
+  ('seasonal_interests', 'garden, outdoor')
+ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value, last_updated = NOW();
+```
+Promotions from XXL, Stadium, Clas Ohlson are only saved when they match these interests.
+
 ### Deploy
 
 ```bash

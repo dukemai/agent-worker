@@ -75,14 +75,35 @@ async function processLogic(
 
   if (env.GEMINI_API_KEY && (subject || body)) {
     try {
+      let userInterests = "None configured";
+      try {
+        const { data: contextRows } = await supabase
+          .from("family_context")
+          .select("key, value")
+          .in("key", ["shopping_list", "seasonal_interests"]);
+        userInterests =
+          (contextRows ?? []).map((r) => `${r.key}: ${r.value}`).join("\n") || "None configured";
+      } catch {
+        // family_context table may not exist yet
+      }
+
       const currentDate = new Date().toISOString();
-      const systemPrompt = TASK_EXTRACTION.replace("{{currentDate}}", currentDate);
+      const systemPrompt = TASK_EXTRACTION.replace("{{currentDate}}", currentDate)
+        .replace("{{userInterests}}", userInterests);
+
       const extracted = await extractTaskFromEmail(
         env.GEMINI_API_KEY,
         subject,
         body,
+        from,
         systemPrompt
       );
+
+      if (extracted.email_type === "promotion" && !extracted.promotion_relevant) {
+        console.log(`Promotion dropped (not relevant): [${subject}] from [${from}]`);
+        return { success: true, message: "Promotion dropped (not relevant)" };
+      }
+
       title = extracted.title.substring(0, 200) || subject.substring(0, 200) || "Untitled";
       dueDate = extracted.due_date;
       targetBucket = extracted.target_bucket;

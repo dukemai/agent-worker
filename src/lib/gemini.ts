@@ -6,15 +6,23 @@ import {
 } from "@google/generative-ai";
 
 export interface TaskExtractionResult {
+  email_type: "task" | "promotion";
   title: string;
   due_date: string | null;
   target_bucket: "today" | "this_week" | "later";
   priority: number;
+  promotion_relevant: boolean;
 }
 
 const TASK_EXTRACTION_SCHEMA: ObjectSchema = {
   type: SchemaType.OBJECT,
   properties: {
+    email_type: {
+      type: SchemaType.STRING,
+      format: "enum",
+      enum: ["task", "promotion"],
+      description: "Type of email",
+    } as Schema,
     title: { type: SchemaType.STRING, description: "Short task title" } as Schema,
     due_date: {
       type: SchemaType.STRING,
@@ -32,14 +40,19 @@ const TASK_EXTRACTION_SCHEMA: ObjectSchema = {
       type: SchemaType.INTEGER,
       description: "Priority 1-5",
     } as Schema,
+    promotion_relevant: {
+      type: SchemaType.BOOLEAN,
+      description: "For promotions: true if email matches user interests",
+    } as Schema,
   },
-  required: ["title", "target_bucket", "priority"],
+  required: ["email_type", "title", "target_bucket", "priority", "promotion_relevant"],
 };
 
 export async function extractTaskFromEmail(
   apiKey: string,
   subject: string,
   body: string,
+  from: string,
   systemPrompt: string
 ): Promise<TaskExtractionResult> {
   const genAI = new GoogleGenerativeAI(apiKey);
@@ -51,7 +64,7 @@ export async function extractTaskFromEmail(
     },
   });
 
-  const userContent = `Subject: ${subject}\n\nBody:\n${body}`;
+  const userContent = `From: ${from}\nSubject: ${subject}\n\nBody:\n${body}`;
   const fullPrompt = `${systemPrompt}\n\n---\n\n${userContent}`;
 
   const result = await model.generateContent(fullPrompt);
@@ -66,6 +79,14 @@ export async function extractTaskFromEmail(
 
   if (!["today", "this_week", "later"].includes(parsed.target_bucket)) {
     parsed.target_bucket = "later";
+  }
+
+  if (!parsed.email_type) {
+    parsed.email_type = "task";
+  }
+
+  if (parsed.email_type === "promotion" && parsed.promotion_relevant === undefined) {
+    parsed.promotion_relevant = false;
   }
 
   return parsed;
