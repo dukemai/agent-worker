@@ -1,5 +1,13 @@
 import PostalMime from "postal-mime";
 import { createClient } from "@supabase/supabase-js";
+import { TASK_EXTRACTION } from "./prompts/task-extraction";
+import { extractTaskFromEmail } from "./lib/gemini";
+
+const BUCKET_TABLES = {
+  today: "today_tasks",
+  this_week: "this_week_tasks",
+  later: "later_tasks",
+} as const;
 
 export default {
   // 1. Handles real emails from Cloudflare Email Routing
@@ -59,15 +67,39 @@ async function processLogic(
   }
 
   const supabase = createClient(supabaseUrl, supabaseKey);
-
-  const title = subject ? subject.substring(0, 200) : "Untitled";
   const metadata = { from, receivedAt: new Date().toISOString() };
+
+  let title: string;
+  let dueDate: string | null = null;
+  let targetBucket: "today" | "this_week" | "later" = "later";
+
+  if (env.GEMINI_API_KEY && (subject || body)) {
+    try {
+      const currentDate = new Date().toISOString();
+      const systemPrompt = TASK_EXTRACTION.replace("{{currentDate}}", currentDate);
+      const extracted = await extractTaskFromEmail(
+        env.GEMINI_API_KEY,
+        subject,
+        body,
+        systemPrompt
+      );
+      title = extracted.title.substring(0, 200) || subject.substring(0, 200) || "Untitled";
+      dueDate = extracted.due_date;
+      targetBucket = extracted.target_bucket;
+    } catch (err) {
+      console.warn("Gemini extraction failed, using fallback:", err);
+      title = subject ? subject.substring(0, 200) : "Untitled";
+    }
+  } else {
+    title = subject ? subject.substring(0, 200) : "Untitled";
+  }
 
   const { data: task, error: taskError } = await supabase
     .from("tasks")
     .insert({
       title,
       original_body: body,
+      due_date: dueDate,
       metadata,
       source: "email",
     })
@@ -78,15 +110,16 @@ async function processLogic(
     throw new Error(`Supabase insert failed: ${taskError.message}`);
   }
 
+  const bucketTable = BUCKET_TABLES[targetBucket];
   const { error: bucketError } = await supabase
-    .from("later_tasks")
+    .from(bucketTable)
     .insert({ task_id: task.id });
 
   if (bucketError) {
     throw new Error(`Supabase bucket insert failed: ${bucketError.message}`);
   }
 
-  console.log(`Task created: ${task.id} from [${from}]`);
+  console.log(`Task created: ${task.id} in ${bucketTable} from [${from}]`);
 
   return {
     success: true,

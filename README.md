@@ -2,7 +2,11 @@
 
 A personal executive assistant that receives emails from Gmail, extracts tasks, and persists them to Supabase. Built with Cloudflare Workers and TypeScript.
 
-## Phase 1: Ingestion MVP (Current)
+## Phase 2: Intelligence (Current)
+
+Gemini 2.5 Flash extracts tasks from email content and classifies them into today/this_week/later. Without `GEMINI_API_KEY`, tasks default to `later_tasks` (Phase 1 behavior).
+
+## Phase 1: Ingestion MVP
 
 ### Setup
 
@@ -14,13 +18,15 @@ A personal executive assistant that receives emails from Gmail, extracts tasks, 
 2. **Local secrets**
    ```bash
    cp .dev.vars.example .dev.vars
-   # Edit .dev.vars with your SUPABASE_URL and SUPABASE_SERVICE_KEY
+   # Edit .dev.vars with SUPABASE_URL, SUPABASE_SERVICE_KEY, GEMINI_API_KEY
+   # Get GEMINI_API_KEY from https://aistudio.google.com/apikey
    ```
 
 3. **Deploy secrets** (for production)
    ```bash
    npx wrangler secret put SUPABASE_URL
    npx wrangler secret put SUPABASE_SERVICE_KEY
+   npx wrangler secret put GEMINI_API_KEY
    ```
 
 ### Run locally
@@ -32,11 +38,16 @@ npm run dev
 ### Test
 
 ```bash
-# HTTP (fetch handler)
+# With fixture (Vklass school email)
+./scripts/test-fixture.sh vklass-utvecklingssamtal
+
+# Or with curl directly
 curl -X POST http://localhost:8787 \
   -H "Content-Type: application/json" \
-  -d '{"subject":"Test task","body":"Hello","from":"test@example.com"}'
+  -d @fixtures/emails/vklass-utvecklingssamtal.json
 ```
+
+Verify in Supabase Table Editor: new row in `tasks` and in the bucket table (today/this_week/later) based on Gemini's classification.
 
 ### Deploy
 

@@ -3,4 +3,5 @@ interface Env {
   EMAIL: Fetcher;
   SUPABASE_URL: string;
   SUPABASE_SERVICE_KEY: string;
+  GEMINI_API_KEY: string;
 }

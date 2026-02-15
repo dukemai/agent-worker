@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "wrangler dev",
     "deploy": "wrangler deploy",
-    "types": "wrangler types"
+    "types": "wrangler types",
+    "test:fixture": "./scripts/test-fixture.sh"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20241127.0",
@@ -13,7 +14,8 @@
     "wrangler": "^3.91.0"
   },
   "dependencies": {
-    "postal-mime": "^2.7.3",
-    "@supabase/supabase-js": "^2.47.0"
+    "@google/generative-ai": "^0.24.1",
+    "@supabase/supabase-js": "^2.47.0",
+    "postal-mime": "^2.7.3"
   }
 }
