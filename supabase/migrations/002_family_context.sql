@@ -6,6 +6,7 @@ CREATE TABLE family_context (
   last_updated TIMESTAMPTZ DEFAULT NOW()
 );
 
--- Example keys: shopping_list, seasonal_interests
+-- Example keys:
 -- shopping_list: "helmet for kid, winter boots" (items you're looking for)
 -- seasonal_interests: "garden, outdoor" (categories that interest you)
+-- plants_at_home: "tomato, basil, roses" (for watering reminders; UI to manage in Phase 4)

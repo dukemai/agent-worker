@@ -34,16 +34,21 @@ The system utilizes Gemini 2.5 Flash for three distinct reasoning tasks:
 
 ### B. Daily Digest & Dashboard
 1.  **Schedule:** Cloudflare Cron Trigger (Scheduled Event) runs daily at 06:30 Stockholm time.
-2.  **Aggregation:** The worker fetches pending tasks, Stockholm weather, and the next learning nugget.
-3.  **Narrative Generation:** Gemini generates a "Daily Briefing" that prioritizes items based on weather (e.g., "It's freezing; make sure the kids have their winter overalls ready").
-4.  **Delivery:** A single structured email is sent via Resend. The Dashboard displays the same data in a Trello-style 3-column view.
+2.  **Aggregation:** The worker fetches pending tasks, Stockholm weather (OpenWeather), and the next learning nugget.
+3.  **Weather use:** Display today's weather; if rain forecast → remind "Tell kids to bring rain coat."
+4.  **Narrative Generation:** Gemini generates a "Daily Briefing" that prioritizes items (weather-aware for rain reminder).
+5.  **Delivery:** A single structured email is sent via Resend. The Dashboard displays the same data in a Trello-style 3-column view.
+
+### C. Gardening / Watering
+- **Watering:** Based on plants at home (from `family_context.plants_at_home`), not weather API.
+- **Later:** UI to specify which plants you have at home.
 
 ## 5. Data Schema (Supabase)
 *   **`tasks`**: `id, created_at, title, original_body, due_date, status, metadata(jsonb), source`.
 *   **`today_tasks`**, **`this_week_tasks`**, **`later_tasks`**: Each stores only `task_id` (FK to `tasks.id`). Bucket tables indicate which column a task belongs to.
 *   **`learning_profile`**: `id, topic, current_level, daily_goal, target_duration_minutes, status, curriculum_outline(jsonb), created_at, updated_at`. One row per learning topic.
 *   **`learning_log`**: `id, profile_id` (FK), `content` (AI-generated lesson), `feedback` (1–5 or "Too easy" | "Too hard" | "Irrelevant"), `created_at`.
-*   **`family_context`**: `id, key(e.g., 'shoe_size'), value, last_updated`.
+*   **`family_context`**: `id, key, value, last_updated`. Keys: `shoe_size`, `shopping_list`, `seasonal_interests`, `plants_at_home` (plants you have for watering reminders).
 
 ## 6. Implementation Roadmap
 
@@ -58,16 +63,18 @@ The system utilizes Gemini 2.5 Flash for three distinct reasoning tasks:
 *   [ ] Design the **Master System Prompt** for task extraction.
 *   [ ] Connect Supabase client to Worker and implement `POST /ingest` logic.
 
-### Phase 3: The Daily Loop
-*   [ ] Implement Cloudflare `scheduled` handler.
-*   [ ] Integrate OpenWeather API.
-*   [ ] Build the "Learning Loop" logic with feedback webhooks.
-*   [ ] Setup Resend for outbound email delivery.
-
-### Phase 4: Dashboard UI
+### Phase 3: Dashboard UI
 *   [ ] Next.js app with 3-column layout.
 *   [ ] "Done" button functionality (optimistic UI updates to Supabase).
 *   [ ] "Source" view to see original email bodies for context verification.
+*   [ ] Context UI: edit plants at home, shopping list, seasonal interests.
+
+### Phase 4: The Daily Loop
+*   [ ] Implement Cloudflare `scheduled` handler.
+*   [ ] Integrate OpenWeather API (for digest: display weather, rain → remind rain coat).
+*   [ ] Gardening/watering cron (based on `plants_at_home`, no weather dependency).
+*   [ ] Build the "Learning Loop" logic with feedback webhooks.
+*   [ ] Setup Resend for outbound email delivery.
 
 ---
 
