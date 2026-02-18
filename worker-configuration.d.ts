@@ -4,4 +4,7 @@ interface Env {
   SUPABASE_URL: string;
   SUPABASE_SERVICE_KEY: string;
   GEMINI_API_KEY: string;
+  RESEND_API_KEY: string;
+  DIGEST_RECIPIENT_EMAIL: string;
+  OPENWEATHER_API_KEY: string;
 }

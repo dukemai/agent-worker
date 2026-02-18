@@ -2,6 +2,7 @@ import PostalMime from "postal-mime";
 import { createClient } from "@supabase/supabase-js";
 import { TASK_EXTRACTION } from "./prompts/task-extraction";
 import { extractTaskFromEmail } from "./lib/gemini";
+import { runDailyDigest } from "./crons/daily-digest";
 
 const BUCKET_TABLES = {
   today: "today_tasks",
@@ -10,7 +11,21 @@ const BUCKET_TABLES = {
 } as const;
 
 export default {
-  // 1. Handles real emails from Cloudflare Email Routing
+  // 1. Handles scheduled cron triggers
+  async scheduled(event: ScheduledEvent, env: Env, ctx: ExecutionContext): Promise<void> {
+    ctx.waitUntil(
+      (async () => {
+        try {
+          // "30 5 * * *" — daily digest at 06:30 Stockholm (05:30 UTC winter)
+          await runDailyDigest(env);
+        } catch (err) {
+          console.error("Scheduled handler failed:", err);
+        }
+      })()
+    );
+  },
+
+  // 2. Handles real emails from Cloudflare Email Routing
   async email(
     message: ForwardableEmailMessage,
     env: Env,
