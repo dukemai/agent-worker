@@ -23,7 +23,9 @@ export async function GET(request: NextRequest) {
 
   let query = auth.supabase
     .from("learning_log")
-    .select("*", { count: "exact" })
+    .select("id, profile_id, content, feedback, created_at, profile:learning_profile(topic, profile_type)", {
+      count: "exact",
+    })
     .order("created_at", { ascending: false })
     .range(offset, offset + limit - 1);
 

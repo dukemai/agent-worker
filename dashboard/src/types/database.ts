@@ -2,6 +2,7 @@ export type TaskStatus = "pending" | "done";
 export type TaskSource = "email" | "manual";
 export type Bucket = "today" | "this_week" | "later";
 export type LearningStatus = "active" | "paused";
+export type LearningProfileType = "topic" | "category";
 
 export interface Task {
   id: string;
@@ -21,6 +22,7 @@ export interface TaskWithBucket extends Task {
 export interface LearningProfile {
   id: string;
   topic: string;
+  profile_type: LearningProfileType;
   current_level: string | null;
   daily_goal: string | null;
   target_duration_minutes: number;
@@ -36,6 +38,10 @@ export interface LearningLogEntry {
   content: string;
   feedback: string | null;
   created_at: string;
+  profile?: {
+    topic: string;
+    profile_type: LearningProfileType;
+  } | null;
 }
 
 export interface FamilyContext {

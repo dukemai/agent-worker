@@ -82,9 +82,10 @@ async function processLogic(
   }
 
   const supabase = createClient(supabaseUrl, supabaseKey);
-  const metadata = { from, receivedAt: new Date().toISOString() };
+  const metadata: Record<string, unknown> = { from, receivedAt: new Date().toISOString() };
 
   let title: string;
+  let originalBody = body;
   let dueDate: string | null = null;
   let targetBucket: "today" | "this_week" | "later" = "later";
 
@@ -119,9 +120,23 @@ async function processLogic(
         return { success: true, message: "Promotion dropped (not relevant)" };
       }
 
-      title = extracted.title.substring(0, 200) || subject.substring(0, 200) || "Untitled";
-      dueDate = extracted.due_date;
-      targetBucket = extracted.target_bucket;
+      if (extracted.email_type === "promotion" && extracted.promotion_relevant) {
+        const store = extracted.store?.trim() || "Promotion";
+        const summary = extracted.deal_summary?.trim() || extracted.title;
+        const link = extracted.store_link?.trim() || "";
+        title = `${store}: ${summary}`.substring(0, 200);
+        originalBody = `${summary}${link ? `\n\nSeller link: ${link}` : ""}`;
+        targetBucket = "today";
+        metadata.email_type = "promotion";
+        metadata.store = store;
+        metadata.deal_summary = summary;
+        metadata.store_link = link;
+      } else {
+        title = extracted.title.substring(0, 200) || subject.substring(0, 200) || "Untitled";
+        dueDate = extracted.due_date;
+        targetBucket = extracted.target_bucket;
+        metadata.email_type = extracted.email_type;
+      }
     } catch (err) {
       console.warn("Gemini extraction failed, using fallback:", err);
       title = subject ? subject.substring(0, 200) : "Untitled";
@@ -134,7 +149,7 @@ async function processLogic(
     .from("tasks")
     .insert({
       title,
-      original_body: body,
+      original_body: originalBody,
       due_date: dueDate,
       metadata,
       source: "email",

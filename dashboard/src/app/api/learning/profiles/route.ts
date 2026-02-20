@@ -5,6 +5,10 @@ function isLearningStatus(value: unknown): value is "active" | "paused" {
   return value === "active" || value === "paused";
 }
 
+function isLearningProfileType(value: unknown): value is "topic" | "category" {
+  return value === "topic" || value === "category";
+}
+
 export async function GET(request: NextRequest) {
   const auth = await getAuthedSupabase();
   if (auth.error || !auth.supabase) {
@@ -37,6 +41,7 @@ export async function POST(request: Request) {
 
   const payload = (await request.json()) as {
     topic?: unknown;
+    profile_type?: unknown;
     current_level?: unknown;
     daily_goal?: unknown;
     target_duration_minutes?: unknown;
@@ -46,6 +51,9 @@ export async function POST(request: Request) {
 
   if (typeof payload.topic !== "string" || payload.topic.trim().length === 0) {
     return errorResponse("topic is required");
+  }
+  if (payload.profile_type !== undefined && !isLearningProfileType(payload.profile_type)) {
+    return errorResponse("profile_type must be topic or category");
   }
 
   if (payload.status !== undefined && !isLearningStatus(payload.status)) {
@@ -63,6 +71,7 @@ export async function POST(request: Request) {
     .from("learning_profile")
     .insert({
       topic: payload.topic.trim(),
+      profile_type: isLearningProfileType(payload.profile_type) ? payload.profile_type : "topic",
       current_level: typeof payload.current_level === "string" ? payload.current_level : null,
       daily_goal: typeof payload.daily_goal === "string" ? payload.daily_goal : null,
       target_duration_minutes:

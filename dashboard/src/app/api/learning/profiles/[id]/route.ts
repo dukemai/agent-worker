@@ -7,6 +7,10 @@ function isLearningStatus(value: unknown): value is "active" | "paused" {
   return value === "active" || value === "paused";
 }
 
+function isLearningProfileType(value: unknown): value is "topic" | "category" {
+  return value === "topic" || value === "category";
+}
+
 export async function PATCH(request: Request, { params }: Params) {
   const auth = await getAuthedSupabase();
   if (auth.error || !auth.supabase) {
@@ -16,6 +20,7 @@ export async function PATCH(request: Request, { params }: Params) {
   const { id } = await params;
   const payload = (await request.json()) as {
     topic?: unknown;
+    profile_type?: unknown;
     current_level?: unknown;
     daily_goal?: unknown;
     target_duration_minutes?: unknown;
@@ -33,6 +38,12 @@ export async function PATCH(request: Request, { params }: Params) {
   }
   if (payload.current_level !== undefined) {
     updates.current_level = typeof payload.current_level === "string" ? payload.current_level : null;
+  }
+  if (payload.profile_type !== undefined) {
+    if (!isLearningProfileType(payload.profile_type)) {
+      return errorResponse("profile_type must be topic or category");
+    }
+    updates.profile_type = payload.profile_type;
   }
   if (payload.daily_goal !== undefined) {
     updates.daily_goal = typeof payload.daily_goal === "string" ? payload.daily_goal : null;

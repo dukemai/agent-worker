@@ -1,14 +1,18 @@
-import { createClient } from "@supabase/supabase-js";
+import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { DAILY_BRIEFING } from "../prompts/daily-briefing";
 import { getStockholmWeather } from "../lib/weather";
 import { sendEmail } from "../lib/resend";
+import { runLearningLoop, type GeneratedLesson } from "./learning-loop";
 
 interface Task {
   id: string;
   title: string;
+  original_body: string | null;
   due_date: string | null;
   status: string;
+  source: string;
+  metadata: Record<string, unknown> | null;
 }
 
 interface BucketRow {
@@ -16,7 +20,7 @@ interface BucketRow {
 }
 
 async function fetchPendingTasksForBucket(
-  supabase: ReturnType<typeof createClient>,
+  supabase: SupabaseClient,
   bucketTable: string
 ): Promise<Task[]> {
   const { data: bucketRows, error: bucketError } = await supabase
@@ -29,13 +33,62 @@ async function fetchPendingTasksForBucket(
 
   const { data: tasks, error: tasksError } = await supabase
     .from("tasks")
-    .select("id, title, due_date, status")
+    .select("id, title, original_body, due_date, status, source, metadata")
     .in("id", taskIds)
     .eq("status", "pending")
     .order("due_date", { ascending: true, nullsFirst: false });
 
   if (tasksError) return [];
   return (tasks as Task[]) ?? [];
+}
+
+interface PromotionDigestItem {
+  store: string;
+  summary: string;
+  link: string | null;
+}
+
+interface RenewalDigestItem {
+  title: string;
+  dueDate: string;
+  daysLeft: number;
+  link: string | null;
+}
+
+function extractPromotionItems(tasks: Task[]): PromotionDigestItem[] {
+  return tasks
+    .filter((task) => task.source === "email")
+    .filter((task) => task.metadata?.email_type === "promotion")
+    .map((task) => {
+      const metadata = task.metadata ?? {};
+      return {
+        store: typeof metadata.store === "string" && metadata.store.length > 0 ? metadata.store : "Promotion",
+        summary:
+          typeof metadata.deal_summary === "string" && metadata.deal_summary.length > 0
+            ? metadata.deal_summary
+            : task.title,
+        link: typeof metadata.store_link === "string" && metadata.store_link.length > 0 ? metadata.store_link : null,
+      };
+    });
+}
+
+function extractRenewalItems(tasks: Task[]): RenewalDigestItem[] {
+  return tasks
+    .filter((task) => task.metadata?.item_type === "renewal")
+    .filter((task) => task.due_date)
+    .map((task) => {
+      const dueDate = task.due_date as string;
+      const daysLeft = Math.floor((new Date(dueDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24));
+      return {
+        title: task.title,
+        dueDate,
+        daysLeft,
+        link: typeof task.metadata?.link === "string" && task.metadata.link.length > 0 ? task.metadata.link : null,
+      };
+    })
+    .filter((item) => item.daysLeft <= 30)
+    .sort((a, b) => a.daysLeft - b.daysLeft)
+    .slice(0, 8);
 }
 
 function formatTaskList(tasks: Task[]): string {
@@ -85,6 +138,9 @@ function buildEmailHtml(
   todayTasks: Task[],
   thisWeekTasks: Task[],
   laterTasks: Task[],
+  lessons: GeneratedLesson[],
+  promotionItems: PromotionDigestItem[],
+  renewalItems: RenewalDigestItem[],
   narrative: string,
   dashboardUrl: string
 ): string {
@@ -108,6 +164,55 @@ function buildEmailHtml(
     return `<h3>${label}</h3><ul>${items}</ul>`;
   };
 
+  const learningSection =
+    lessons.length === 0
+      ? ""
+      : `
+  <h2 style="font-size:16px">Today's Learning</h2>
+  ${lessons
+    .map(
+      (lesson) => `
+    <article style="border:1px solid #eee;border-radius:8px;padding:12px;margin-bottom:12px">
+      <p style="margin:0 0 6px 0;color:#666;font-size:12px">${lesson.profile_type === "category" ? "Category" : "Topic"}: ${lesson.topic}</p>
+      <p style="white-space:pre-wrap;margin:0">${lesson.content}</p>
+    </article>
+  `
+    )
+    .join("")}
+  `;
+
+  const dealSection =
+    promotionItems.length === 0
+      ? ""
+      : `
+  <h2 style="font-size:16px">Deals for You</h2>
+  <ul>
+    ${promotionItems
+      .map(
+        (item) =>
+          `<li><strong>${item.store}</strong>: ${item.summary}${item.link ? ` (<a href="${item.link}" style="color:#2563eb">Open deal</a>)` : ""}</li>`
+      )
+      .join("")}
+  </ul>
+  `;
+
+  const renewalSection =
+    renewalItems.length === 0
+      ? ""
+      : `
+  <h2 style="font-size:16px">Upcoming Renewals</h2>
+  <ul>
+    ${renewalItems
+      .map(
+        (item) =>
+          `<li>${item.title} — due in ${item.daysLeft} days (${new Date(item.dueDate).toLocaleDateString("sv-SE")})${
+            item.link ? ` (<a href="${item.link}" style="color:#2563eb">Open</a>)` : ""
+          }</li>`
+      )
+      .join("")}
+  </ul>
+  `;
+
   return `
 <!DOCTYPE html>
 <html>
@@ -130,6 +235,9 @@ function buildEmailHtml(
   ${taskSection("📅 Today", todayTasks)}
   ${taskSection("📆 This Week", thisWeekTasks)}
   ${taskSection("🗂 Later", laterTasks)}
+  ${renewalSection}
+  ${learningSection}
+  ${dealSection}
 
   <hr style="border:none;border-top:1px solid #eee;margin:24px 0">
   <p style="color:#888;font-size:12px;text-align:center">
@@ -153,6 +261,17 @@ export async function runDailyDigest(env: Env): Promise<void> {
     fetchPendingTasksForBucket(supabase, "this_week_tasks"),
     fetchPendingTasksForBucket(supabase, "later_tasks"),
   ]);
+  const allTasks = [...todayTasks, ...thisWeekTasks, ...laterTasks];
+  const promotionItems = extractPromotionItems(allTasks);
+  const renewalItems = extractRenewalItems(allTasks);
+
+  // Generate today's learning lessons first so digest can include them.
+  let lessons: GeneratedLesson[] = [];
+  try {
+    lessons = await runLearningLoop(env);
+  } catch (err) {
+    console.warn("Learning loop failed, continuing without lessons:", err);
+  }
 
   // Fetch weather (non-fatal if it fails)
   let weatherSummary = "Weather unavailable";
@@ -192,6 +311,9 @@ export async function runDailyDigest(env: Env): Promise<void> {
     todayTasks,
     thisWeekTasks,
     laterTasks,
+    lessons,
+    promotionItems,
+    renewalItems,
     narrative,
     dashboardUrl
   );

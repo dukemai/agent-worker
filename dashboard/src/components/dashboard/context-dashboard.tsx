@@ -84,7 +84,9 @@ export function ContextDashboard() {
               onChange={(event) => setValue(event.target.value)}
               required
             />
-            <Button type="submit">Save</Button>
+            <Button type="submit" className="min-h-11 w-full sm:w-auto">
+              Save
+            </Button>
           </form>
           {error ? <p className="mt-3 text-sm text-red-600">{error}</p> : null}
         </CardContent>
@@ -106,7 +108,7 @@ export function ContextDashboard() {
               <p className="mb-2 text-xs text-muted-foreground">
                 Updated: {new Date(item.last_updated).toLocaleString()}
               </p>
-              <Button size="sm" variant="outline" onClick={() => onDelete(item.key)}>
+              <Button size="sm" variant="outline" className="min-h-11" onClick={() => onDelete(item.key)}>
                 Delete
               </Button>
             </article>

@@ -1,7 +1,17 @@
 import { NextResponse } from "next/server";
 import { errorResponse, getAuthedSupabase } from "@/lib/api";
 
-const VALID_FEEDBACK = new Set(["1", "2", "3", "4", "5", "Too easy", "Too hard", "Irrelevant"]);
+const VALID_FEEDBACK = new Set([
+  "1",
+  "2",
+  "3",
+  "4",
+  "5",
+  "Too easy",
+  "Too hard",
+  "More like this",
+  "Less like this",
+]);
 
 export async function POST(request: Request) {
   const auth = await getAuthedSupabase();

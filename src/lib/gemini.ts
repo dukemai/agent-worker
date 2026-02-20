@@ -12,6 +12,9 @@ export interface TaskExtractionResult {
   target_bucket: "today" | "this_week" | "later";
   priority: number;
   promotion_relevant: boolean;
+  store?: string;
+  deal_summary?: string;
+  store_link?: string;
 }
 
 const TASK_EXTRACTION_SCHEMA: ObjectSchema = {
@@ -43,6 +46,21 @@ const TASK_EXTRACTION_SCHEMA: ObjectSchema = {
     promotion_relevant: {
       type: SchemaType.BOOLEAN,
       description: "For promotions: true if email matches user interests",
+    } as Schema,
+    store: {
+      type: SchemaType.STRING,
+      nullable: true,
+      description: "Store name for promotion emails",
+    } as Schema,
+    deal_summary: {
+      type: SchemaType.STRING,
+      nullable: true,
+      description: "Short summary of promotion highlights",
+    } as Schema,
+    store_link: {
+      type: SchemaType.STRING,
+      nullable: true,
+      description: "Primary seller/deal link in the email",
     } as Schema,
   },
   required: ["email_type", "title", "target_bucket", "priority", "promotion_relevant"],
@@ -87,6 +105,18 @@ export async function extractTaskFromEmail(
 
   if (parsed.email_type === "promotion" && parsed.promotion_relevant === undefined) {
     parsed.promotion_relevant = false;
+  }
+
+  if (parsed.email_type === "promotion") {
+    if (typeof parsed.store !== "string") {
+      parsed.store = "";
+    }
+    if (typeof parsed.deal_summary !== "string") {
+      parsed.deal_summary = "";
+    }
+    if (typeof parsed.store_link !== "string") {
+      parsed.store_link = "";
+    }
   }
 
   return parsed;

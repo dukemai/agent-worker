@@ -3,6 +3,13 @@
 ## 1. Executive Summary
 The **Dad-Ops Agent** is a personal executive assistant designed to offload the "mental load" of a busy senior developer and father in Stockholm. It consolidates fragmented information (school emails, BRF updates, seasonal gardening, and shopping deals) into a structured 3-column dashboard and a daily email digest. The system focuses on **Zero-Friction Capture** and **Context-Aware Reasoning**.
 
+Current direction is **Ops-first**:
+- Prioritize what to do **today**, **tomorrow**, and **this week**.
+- Support resumable state for interrupted work from mobile.
+- Keep morning email digest as the primary decision surface.
+
+Learning remains important, but advanced learning orchestration is deferred to later specialized agents.
+
 ## 2. Core Technical Stack
 *   **Infrastructure:** Cloudflare Workers (Serverless / ESM).
 *   **Intelligence:** **Google Gemini 2.5 Flash** (via `@google/generative-ai`).
@@ -43,6 +50,34 @@ The system utilizes Gemini 2.5 Flash for three distinct reasoning tasks:
 - **Watering:** Based on plants at home (from `family_context.plants_at_home`), not weather API.
 - **Later:** UI to specify which plants you have at home.
 
+### D. Ops-First Planning and Resume State (Now)
+1. **Planning:** Surface a clear list for today/tomorrow/this week.
+2. **Resume State:** Track `last_state_note`, `next_action`, and `resume_pointer` for in-progress work so context switching is cheap.
+3. **Mobile-first:** Fast updates from phone during fragmented time windows.
+
+### E. Renewal Reminders (Now)
+Primary use cases:
+- Passport renewals
+- Subscription renewals
+- Membership/permit renewals
+- Annual recurring admin checks
+
+Escalation windows:
+- **T-30 days:** Plan
+- **T-14 days:** Prepare docs/payment
+- **T-7 days:** Urgent
+- **T-1 day:** Critical
+
+Renewals should appear in both dashboard and daily digest.
+
+### F. Learning Scope Update (Later)
+Learning topics currently needed:
+- Economy
+- Deep AI
+- Growing things
+
+Each topic likely deserves a dedicated learning agent (content + schedule + progression). This is intentionally deferred until daily ops and reminders are solid.
+
 ## 5. Data Schema (Supabase)
 *   **`tasks`**: `id, created_at, title, original_body, due_date, status, metadata(jsonb), source`.
 *   **`today_tasks`**, **`this_week_tasks`**, **`later_tasks`**: Each stores only `task_id` (FK to `tasks.id`). Bucket tables indicate which column a task belongs to.
@@ -75,6 +110,18 @@ The system utilizes Gemini 2.5 Flash for three distinct reasoning tasks:
 *   [ ] Gardening/watering cron (based on `plants_at_home`, no weather dependency).
 *   [ ] Build the "Learning Loop" logic with feedback webhooks.
 *   [ ] Setup Resend for outbound email delivery.
+
+### Phase 5: Ops Extension (Current Focus)
+*   [ ] Renewal reminder flow (passport/subscriptions/memberships).
+*   [ ] Renewal escalation logic (T-30/T-14/T-7/T-1).
+*   [ ] Daily digest section for upcoming renewals.
+*   [ ] Resume-state capture for in-progress items.
+
+### Phase 6: Learning Agent Specialization (Later)
+*   [ ] Economy learning agent.
+*   [ ] Deep AI learning agent.
+*   [ ] Growing-things learning agent.
+*   [ ] Agent-specific cadence and progression memory.
 
 ---
 

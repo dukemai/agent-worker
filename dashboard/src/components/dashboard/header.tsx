@@ -16,7 +16,7 @@ export async function DashboardHeader() {
           <h1 className="text-lg font-semibold">Dad-Ops Agent</h1>
           <span className="text-sm text-muted-foreground">Dashboard</span>
         </div>
-        <nav className="flex items-center gap-2">
+        <nav className="hidden items-center gap-2 md:flex">
           <Button asChild variant="ghost">
             <Link href="/">Tasks</Link>
           </Button>
@@ -34,6 +34,31 @@ export async function DashboardHeader() {
             </Button>
           )}
         </nav>
+        <details className="relative md:hidden">
+          <summary className="flex h-11 min-w-11 cursor-pointer list-none items-center justify-center rounded-md border px-3 text-sm">
+            Menu
+          </summary>
+          <div className="absolute right-0 top-12 z-20 w-52 rounded-md border bg-background p-2 shadow-md">
+            <div className="flex flex-col gap-1">
+              <Button asChild variant="ghost" className="justify-start">
+                <Link href="/">Tasks</Link>
+              </Button>
+              <Button asChild variant="ghost" className="justify-start">
+                <Link href="/learning">Learning</Link>
+              </Button>
+              <Button asChild variant="ghost" className="justify-start">
+                <Link href="/context">Context</Link>
+              </Button>
+              {user ? (
+                <SignOutButton />
+              ) : (
+                <Button asChild variant="outline" className="justify-start">
+                  <Link href="/login">Sign in</Link>
+                </Button>
+              )}
+            </div>
+          </div>
+        </details>
       </div>
     </header>
   );
