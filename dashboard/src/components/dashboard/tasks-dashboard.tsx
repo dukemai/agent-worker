@@ -1,6 +1,7 @@
 "use client";
 
-import { FormEvent, useCallback, useEffect, useState } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { FormEvent, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -34,14 +35,36 @@ const EMPTY_TASKS: TasksByBucket = {
   later: [],
 };
 
+async function fetchBucket(bucket: Bucket): Promise<Task[]> {
+  const response = await fetch(`/api/tasks?bucket=${bucket}`, { cache: "no-store" });
+  if (!response.ok) {
+    throw new Error(`Failed to fetch ${bucket} tasks`);
+  }
+  const json = (await response.json()) as { tasks: Task[] };
+  return json.tasks;
+}
+
+async function fetchRenewals(): Promise<ReminderItem[]> {
+  const response = await fetch("/api/reminders", { cache: "no-store" });
+  if (!response.ok) {
+    throw new Error("Failed to fetch reminders");
+  }
+  const json = (await response.json()) as { reminders: ReminderItem[] };
+  return json.reminders ?? [];
+}
+
+async function readApiError(response: Response, fallback: string): Promise<never> {
+  const json = (await response.json().catch(() => ({}))) as { error?: string };
+  throw new Error(json.error ?? fallback);
+}
+
 export function TasksDashboard() {
-  const [tasks, setTasks] = useState<TasksByBucket>(EMPTY_TASKS);
-  const [loading, setLoading] = useState(true);
+  const queryClient = useQueryClient();
+
   const [newTitle, setNewTitle] = useState("");
   const [newDueDate, setNewDueDate] = useState("");
   const [newBucket, setNewBucket] = useState<Bucket>("later");
   const [activeBucket, setActiveBucket] = useState<Bucket>("today");
-  const [renewals, setRenewals] = useState<ReminderItem[]>([]);
   const [newReminderTitle, setNewReminderTitle] = useState("");
   const [newReminderType, setNewReminderType] = useState<ReminderType>("passport");
   const [newReminderOwner, setNewReminderOwner] = useState("");
@@ -52,71 +75,154 @@ export function TasksDashboard() {
   const [newReminderAction, setNewReminderAction] = useState("");
   const [error, setError] = useState<string | null>(null);
 
-  const fetchBucket = useCallback(async (bucket: Bucket): Promise<Task[]> => {
-    const response = await fetch(`/api/tasks?bucket=${bucket}`, { cache: "no-store" });
-    if (!response.ok) {
-      throw new Error(`Failed to fetch ${bucket} tasks`);
-    }
-    const json = (await response.json()) as { tasks: Task[] };
-    return json.tasks;
-  }, []);
+  const todayQuery = useQuery({ queryKey: ["tasks", "today"], queryFn: () => fetchBucket("today") });
+  const thisWeekQuery = useQuery({ queryKey: ["tasks", "this_week"], queryFn: () => fetchBucket("this_week") });
+  const laterQuery = useQuery({ queryKey: ["tasks", "later"], queryFn: () => fetchBucket("later") });
+  const renewalsQuery = useQuery({ queryKey: ["renewals"], queryFn: fetchRenewals });
 
-  const fetchRenewals = useCallback(async (): Promise<ReminderItem[]> => {
-    const response = await fetch("/api/reminders", { cache: "no-store" });
-    if (!response.ok) {
-      throw new Error("Failed to fetch reminders");
-    }
-    const json = (await response.json()) as { reminders: ReminderItem[] };
-    return json.reminders ?? [];
-  }, []);
+  const tasks: TasksByBucket = {
+    today: todayQuery.data ?? EMPTY_TASKS.today,
+    this_week: thisWeekQuery.data ?? EMPTY_TASKS.this_week,
+    later: laterQuery.data ?? EMPTY_TASKS.later,
+  };
+  const renewals = renewalsQuery.data ?? [];
+  const loading = todayQuery.isLoading || thisWeekQuery.isLoading || laterQuery.isLoading;
+  const queryError =
+    todayQuery.error instanceof Error
+      ? todayQuery.error.message
+      : thisWeekQuery.error instanceof Error
+        ? thisWeekQuery.error.message
+        : laterQuery.error instanceof Error
+          ? laterQuery.error.message
+          : renewalsQuery.error instanceof Error
+            ? renewalsQuery.error.message
+            : null;
+  const displayError = error ?? queryError;
 
-  const reloadAll = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const [today, thisWeek, later, reminders] = await Promise.all([
-        fetchBucket("today"),
-        fetchBucket("this_week"),
-        fetchBucket("later"),
-        fetchRenewals(),
-      ]);
-      setTasks({ today, this_week: thisWeek, later });
-      setRenewals(reminders);
-    } catch (err) {
-      setError(String(err));
-    } finally {
-      setLoading(false);
-    }
-  }, [fetchBucket, fetchRenewals]);
+  async function refreshDashboardQueries() {
+    await Promise.all([
+      queryClient.invalidateQueries({ queryKey: ["tasks"] }),
+      queryClient.invalidateQueries({ queryKey: ["renewals"] }),
+    ]);
+  }
 
-  useEffect(() => {
-    void reloadAll();
-  }, [reloadAll]);
+  const createTaskMutation = useMutation({
+    mutationFn: async (payload: { title: string; due_date: string | null; bucket: Bucket }) => {
+      const response = await fetch("/api/tasks", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      if (!response.ok) {
+        await readApiError(response, "Failed to create task");
+      }
+      return response.json();
+    },
+    onSuccess: async () => {
+      await refreshDashboardQueries();
+    },
+    onError: (mutationError) => {
+      setError(mutationError instanceof Error ? mutationError.message : "Failed to create task");
+    },
+  });
+
+  const moveTaskMutation = useMutation({
+    mutationFn: async ({ taskId, fromBucket, toBucket }: { taskId: string; fromBucket: Bucket; toBucket: Bucket }) => {
+      const response = await fetch(`/api/tasks/${taskId}/move`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ from_bucket: fromBucket, to_bucket: toBucket }),
+      });
+      if (!response.ok) {
+        await readApiError(response, "Failed to move task");
+      }
+      return response.json();
+    },
+    onSuccess: async () => {
+      await refreshDashboardQueries();
+    },
+    onError: (mutationError) => {
+      setError(mutationError instanceof Error ? mutationError.message : "Failed to move task");
+    },
+  });
+
+  const markDoneMutation = useMutation({
+    mutationFn: async ({ taskId, status }: { taskId: string; status: "pending" | "done" }) => {
+      const nextStatus = status === "pending" ? "done" : "pending";
+      const response = await fetch(`/api/tasks/${taskId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: nextStatus }),
+      });
+      if (!response.ok) {
+        await readApiError(response, "Failed to update task");
+      }
+      return response.json();
+    },
+    onSuccess: async () => {
+      await refreshDashboardQueries();
+    },
+    onError: (mutationError) => {
+      setError(mutationError instanceof Error ? mutationError.message : "Failed to update task");
+    },
+  });
+
+  const createReminderMutation = useMutation({
+    mutationFn: async (payload: Record<string, unknown>) => {
+      const response = await fetch("/api/reminders", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      if (!response.ok) {
+        await readApiError(response, "Failed to create reminder");
+      }
+      return response.json();
+    },
+    onSuccess: async () => {
+      await refreshDashboardQueries();
+    },
+    onError: (mutationError) => {
+      setError(mutationError instanceof Error ? mutationError.message : "Failed to create reminder");
+    },
+  });
+
+  const reminderActionMutation = useMutation({
+    mutationFn: async ({ reminderId, action }: { reminderId: string; action: "complete" | "snooze" }) => {
+      const response = await fetch(`/api/reminders/${reminderId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(action === "snooze" ? { action, days: 7 } : { action }),
+      });
+      if (!response.ok) {
+        await readApiError(response, `Failed to ${action} reminder`);
+      }
+      return response.json();
+    },
+    onSuccess: async () => {
+      await refreshDashboardQueries();
+    },
+    onError: (mutationError) => {
+      setError(mutationError instanceof Error ? mutationError.message : "Failed to update reminder");
+    },
+  });
 
   async function onCreateTask(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError(null);
-
-    const response = await fetch("/api/tasks", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
+    try {
+      await createTaskMutation.mutateAsync({
         title: newTitle,
         due_date: newDueDate ? new Date(newDueDate).toISOString() : null,
         bucket: newBucket,
-      }),
-    });
-
-    if (!response.ok) {
-      const json = (await response.json()) as { error?: string };
-      setError(json.error ?? "Failed to create task");
+      });
+    } catch {
       return;
     }
 
     setNewTitle("");
     setNewDueDate("");
     setNewBucket("later");
-    await reloadAll();
   }
 
   async function onMove(taskId: string, fromBucket: Bucket, toBucket: Bucket) {
@@ -124,37 +230,20 @@ export function TasksDashboard() {
       return;
     }
     setError(null);
-
-    const response = await fetch(`/api/tasks/${taskId}/move`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ from_bucket: fromBucket, to_bucket: toBucket }),
-    });
-
-    if (!response.ok) {
-      const json = (await response.json()) as { error?: string };
-      setError(json.error ?? "Failed to move task");
+    try {
+      await moveTaskMutation.mutateAsync({ taskId, fromBucket, toBucket });
+    } catch {
       return;
     }
-
-    await reloadAll();
   }
 
   async function onMarkDone(taskId: string, status: "pending" | "done") {
-    const nextStatus = status === "pending" ? "done" : "pending";
-    const response = await fetch(`/api/tasks/${taskId}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ status: nextStatus }),
-    });
-
-    if (!response.ok) {
-      const json = (await response.json()) as { error?: string };
-      setError(json.error ?? "Failed to update task");
+    setError(null);
+    try {
+      await markDoneMutation.mutateAsync({ taskId, status });
+    } catch {
       return;
     }
-
-    await reloadAll();
   }
 
   async function onCreateReminder(event: FormEvent<HTMLFormElement>) {
@@ -162,10 +251,8 @@ export function TasksDashboard() {
     setError(null);
 
     const leadDaysNum = Number(newReminderLeadDays);
-    const response = await fetch("/api/reminders", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
+    try {
+      await createReminderMutation.mutateAsync({
         title: newReminderTitle,
         reminder_type: newReminderType,
         owner: newReminderOwner,
@@ -174,12 +261,8 @@ export function TasksDashboard() {
         recurrence: newReminderRecurrence,
         link: newReminderLink,
         next_action: newReminderAction || "Review and renew",
-      }),
-    });
-
-    if (!response.ok) {
-      const json = (await response.json()) as { error?: string };
-      setError(json.error ?? "Failed to create reminder");
+      });
+    } catch {
       return;
     }
 
@@ -191,22 +274,15 @@ export function TasksDashboard() {
     setNewReminderRecurrence("none");
     setNewReminderLink("");
     setNewReminderAction("");
-    await reloadAll();
   }
 
   async function onReminderAction(reminderId: string, action: "complete" | "snooze") {
     setError(null);
-    const response = await fetch(`/api/reminders/${reminderId}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(action === "snooze" ? { action, days: 7 } : { action }),
-    });
-    if (!response.ok) {
-      const json = (await response.json()) as { error?: string };
-      setError(json.error ?? `Failed to ${action} reminder`);
+    try {
+      await reminderActionMutation.mutateAsync({ reminderId, action });
+    } catch {
       return;
     }
-    await reloadAll();
   }
 
   function getGroupLabel(group: ReminderItem["group"]) {
@@ -408,7 +484,7 @@ export function TasksDashboard() {
               Add Task
             </Button>
           </form>
-          {error ? <p className="mt-3 text-sm text-red-600">{error}</p> : null}
+          {displayError ? <p className="mt-3 text-sm text-red-600">{displayError}</p> : null}
         </CardContent>
       </Card>
 

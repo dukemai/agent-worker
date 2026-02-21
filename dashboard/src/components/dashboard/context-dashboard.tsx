@@ -1,68 +1,99 @@
 "use client";
 
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useState } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import type { FamilyContext } from "@/types/database";
 
+async function fetchContext(): Promise<FamilyContext[]> {
+  const response = await fetch("/api/context", { cache: "no-store" });
+  if (!response.ok) {
+    throw new Error("Failed to fetch context");
+  }
+  const json = (await response.json()) as { context: FamilyContext[] };
+  return json.context;
+}
+
+async function throwApiError(response: Response, fallback: string): Promise<never> {
+  const json = (await response.json().catch(() => ({}))) as { error?: string };
+  throw new Error(json.error ?? fallback);
+}
+
 export function ContextDashboard() {
-  const [items, setItems] = useState<FamilyContext[]>([]);
   const [key, setKey] = useState("");
   const [value, setValue] = useState("");
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
+  const queryClient = useQueryClient();
 
-  useEffect(() => {
-    void reload();
-  }, []);
+  const contextQuery = useQuery({
+    queryKey: ["context"],
+    queryFn: fetchContext,
+  });
 
-  async function reload() {
-    setLoading(true);
-    setError(null);
-    try {
-      const response = await fetch("/api/context", { cache: "no-store" });
+  const upsertMutation = useMutation({
+    mutationFn: async ({ itemKey, itemValue }: { itemKey: string; itemValue: string }) => {
+      const response = await fetch(`/api/context/${encodeURIComponent(itemKey)}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ value: itemValue }),
+      });
       if (!response.ok) {
-        throw new Error("Failed to fetch context");
+        await throwApiError(response, "Failed to save context");
       }
-      const json = (await response.json()) as { context: FamilyContext[] };
-      setItems(json.context);
-    } catch (err) {
-      setError(String(err));
-    } finally {
-      setLoading(false);
-    }
-  }
+      return response.json();
+    },
+    onSuccess: async () => {
+      setKey("");
+      setValue("");
+      await queryClient.invalidateQueries({ queryKey: ["context"] });
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: async (itemKey: string) => {
+      const response = await fetch(`/api/context/${encodeURIComponent(itemKey)}`, {
+        method: "DELETE",
+      });
+      if (!response.ok) {
+        await throwApiError(response, "Failed to delete context");
+      }
+      return response.json();
+    },
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["context"] });
+    },
+  });
 
   async function onUpsert(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const response = await fetch(`/api/context/${encodeURIComponent(key)}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ value }),
-    });
-    if (!response.ok) {
-      const json = (await response.json()) as { error?: string };
-      setError(json.error ?? "Failed to save context");
+    try {
+      await upsertMutation.mutateAsync({ itemKey: key, itemValue: value });
+    } catch {
       return;
     }
-    setKey("");
-    setValue("");
-    await reload();
   }
 
   async function onDelete(itemKey: string) {
-    const response = await fetch(`/api/context/${encodeURIComponent(itemKey)}`, {
-      method: "DELETE",
-    });
-    if (!response.ok) {
-      const json = (await response.json()) as { error?: string };
-      setError(json.error ?? "Failed to delete context");
+    try {
+      await deleteMutation.mutateAsync(itemKey);
+    } catch {
       return;
     }
-    await reload();
   }
+
+  const error =
+    contextQuery.error instanceof Error
+      ? contextQuery.error.message
+      : upsertMutation.error instanceof Error
+        ? upsertMutation.error.message
+        : deleteMutation.error instanceof Error
+          ? deleteMutation.error.message
+          : null;
+  const loading = contextQuery.isLoading;
+  const items = contextQuery.data ?? [];
+  const isBusy = upsertMutation.isPending || deleteMutation.isPending;
 
   return (
     <main className="mx-auto w-full max-w-5xl space-y-6 px-4 py-6">
@@ -108,7 +139,13 @@ export function ContextDashboard() {
               <p className="mb-2 text-xs text-muted-foreground">
                 Updated: {new Date(item.last_updated).toLocaleString()}
               </p>
-              <Button size="sm" variant="outline" className="min-h-11" onClick={() => onDelete(item.key)}>
+              <Button
+                size="sm"
+                variant="outline"
+                className="min-h-11"
+                onClick={() => onDelete(item.key)}
+                disabled={isBusy}
+              >
                 Delete
               </Button>
             </article>

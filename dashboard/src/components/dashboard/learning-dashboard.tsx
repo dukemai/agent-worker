@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,9 +10,31 @@ import type { LearningLogEntry, LearningProfile, LearningProfileType } from "@/t
 
 const FEEDBACK_OPTIONS = ["Too easy", "Too hard", "More like this", "Less like this"] as const;
 
+async function fetchProfiles(): Promise<LearningProfile[]> {
+  const response = await fetch("/api/learning/profiles", { cache: "no-store" });
+  if (!response.ok) {
+    throw new Error("Failed to load learning profiles");
+  }
+  const json = (await response.json()) as { profiles: LearningProfile[] };
+  return json.profiles;
+}
+
+async function fetchLearningLog(): Promise<LearningLogEntry[]> {
+  const response = await fetch("/api/learning/log?limit=20", { cache: "no-store" });
+  if (!response.ok) {
+    throw new Error("Failed to load learning log");
+  }
+  const json = (await response.json()) as { entries: LearningLogEntry[] };
+  return json.entries;
+}
+
+async function readApiError(response: Response, fallback: string): Promise<never> {
+  const json = (await response.json().catch(() => ({}))) as { error?: string };
+  throw new Error(json.error ?? fallback);
+}
+
 export function LearningDashboard() {
-  const [profiles, setProfiles] = useState<LearningProfile[]>([]);
-  const [entries, setEntries] = useState<LearningLogEntry[]>([]);
+  const queryClient = useQueryClient();
 
   const [directIntentType, setDirectIntentType] = useState<LearningProfileType>("topic");
   const [directIntent, setDirectIntent] = useState("");
@@ -21,33 +44,89 @@ export function LearningDashboard() {
 
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
+  const profilesQuery = useQuery({ queryKey: ["learning", "profiles"], queryFn: fetchProfiles });
+  const entriesQuery = useQuery({ queryKey: ["learning", "log"], queryFn: fetchLearningLog });
 
-  useEffect(() => {
-    void reload();
-  }, []);
+  const profiles = profilesQuery.data ?? [];
+  const entries = entriesQuery.data ?? [];
+  const loading = profilesQuery.isLoading || entriesQuery.isLoading;
 
-  async function reload() {
-    setLoading(true);
-    setError(null);
-    try {
-      const [profilesRes, logRes] = await Promise.all([
-        fetch("/api/learning/profiles", { cache: "no-store" }),
-        fetch("/api/learning/log?limit=20", { cache: "no-store" }),
-      ]);
-      if (!profilesRes.ok || !logRes.ok) {
-        throw new Error("Failed to load learning data");
-      }
-      const profilesJson = (await profilesRes.json()) as { profiles: LearningProfile[] };
-      const logJson = (await logRes.json()) as { entries: LearningLogEntry[] };
-      setProfiles(profilesJson.profiles);
-      setEntries(logJson.entries);
-    } catch (err) {
-      setError(String(err));
-    } finally {
-      setLoading(false);
-    }
+  async function refreshLearningQueries() {
+    await Promise.all([
+      queryClient.invalidateQueries({ queryKey: ["learning", "profiles"] }),
+      queryClient.invalidateQueries({ queryKey: ["learning", "log"] }),
+    ]);
   }
+
+  const createProfileMutation = useMutation({
+    mutationFn: async (payload: {
+      topic: string;
+      profile_type: LearningProfileType;
+      current_level: string;
+      daily_goal: string;
+      target_duration_minutes: number;
+    }) => {
+      const response = await fetch("/api/learning/profiles", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...payload,
+          status: "active",
+        }),
+      });
+      if (!response.ok) {
+        await readApiError(response, "Failed to create profile");
+      }
+      return response.json();
+    },
+    onSuccess: async () => {
+      setSuccess("Learning profile created.");
+      await refreshLearningQueries();
+    },
+    onError: (mutationError) => {
+      setError(mutationError instanceof Error ? mutationError.message : "Failed to create profile");
+    },
+  });
+
+  const setStatusMutation = useMutation({
+    mutationFn: async ({ id, status }: { id: string; status: "active" | "paused" }) => {
+      const response = await fetch(`/api/learning/profiles/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status }),
+      });
+      if (!response.ok) {
+        await readApiError(response, "Failed to update profile");
+      }
+      return response.json();
+    },
+    onSuccess: async () => {
+      await refreshLearningQueries();
+    },
+    onError: (mutationError) => {
+      setError(mutationError instanceof Error ? mutationError.message : "Failed to update profile");
+    },
+  });
+
+  const feedbackMutation = useMutation({
+    mutationFn: async ({ logId, feedback }: { logId: string; feedback: string }) => {
+      const response = await fetch("/api/learning/feedback", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ log_id: logId, feedback }),
+      });
+      if (!response.ok) {
+        await readApiError(response, "Failed to submit feedback");
+      }
+      return response.json();
+    },
+    onSuccess: async () => {
+      await refreshLearningQueries();
+    },
+    onError: (mutationError) => {
+      setError(mutationError instanceof Error ? mutationError.message : "Failed to submit feedback");
+    },
+  });
 
   async function createProfile(payload: {
     topic: string;
@@ -58,21 +137,11 @@ export function LearningDashboard() {
   }) {
     setError(null);
     setSuccess(null);
-    const response = await fetch("/api/learning/profiles", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        ...payload,
-        status: "active",
-      }),
-    });
-    if (!response.ok) {
-      const json = (await response.json()) as { error?: string };
-      setError(json.error ?? "Failed to create profile");
+    try {
+      await createProfileMutation.mutateAsync(payload);
+    } catch {
       return;
     }
-    setSuccess("Learning profile created.");
-    await reload();
   }
 
   async function submitDirectProfile() {
@@ -103,32 +172,30 @@ export function LearningDashboard() {
   }
 
   async function setProfileStatus(profile: LearningProfile, status: "active" | "paused") {
-    const response = await fetch(`/api/learning/profiles/${profile.id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ status }),
-    });
-    if (!response.ok) {
-      const json = (await response.json()) as { error?: string };
-      setError(json.error ?? "Failed to update profile");
+    setError(null);
+    try {
+      await setStatusMutation.mutateAsync({ id: profile.id, status });
+    } catch {
       return;
     }
-    await reload();
   }
 
   async function submitFeedback(logId: string, feedback: string) {
-    const response = await fetch("/api/learning/feedback", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ log_id: logId, feedback }),
-    });
-    if (!response.ok) {
-      const json = (await response.json()) as { error?: string };
-      setError(json.error ?? "Failed to submit feedback");
+    setError(null);
+    try {
+      await feedbackMutation.mutateAsync({ logId, feedback });
+    } catch {
       return;
     }
-    await reload();
   }
+
+  const queryError =
+    profilesQuery.error instanceof Error
+      ? profilesQuery.error.message
+      : entriesQuery.error instanceof Error
+        ? entriesQuery.error.message
+        : null;
+  const displayError = error ?? queryError;
 
   return (
     <main className="mx-auto w-full max-w-7xl space-y-6 px-4 py-6">
@@ -194,7 +261,7 @@ export function LearningDashboard() {
             </Button>
           </div>
 
-          {error ? <p className="mt-3 text-sm text-red-600">{error}</p> : null}
+          {displayError ? <p className="mt-3 text-sm text-red-600">{displayError}</p> : null}
           {success ? <p className="mt-3 text-sm text-green-600">{success}</p> : null}
         </CardContent>
       </Card>

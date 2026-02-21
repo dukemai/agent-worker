@@ -26,6 +26,9 @@ export async function DashboardHeader() {
           <Button asChild variant="ghost">
             <Link href="/context">Context</Link>
           </Button>
+          <Button asChild variant="ghost">
+            <Link href="/growing">Growing</Link>
+          </Button>
           {user ? (
             <SignOutButton />
           ) : (
@@ -48,6 +51,9 @@ export async function DashboardHeader() {
               </Button>
               <Button asChild variant="ghost" className="justify-start">
                 <Link href="/context">Context</Link>
+              </Button>
+              <Button asChild variant="ghost" className="justify-start">
+                <Link href="/growing">Growing</Link>
               </Button>
               {user ? (
                 <SignOutButton />

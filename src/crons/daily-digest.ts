@@ -55,6 +55,16 @@ interface RenewalDigestItem {
   link: string | null;
 }
 
+interface GrowingTaskDigestItem {
+  title: string;
+  dueDate: string | null;
+}
+
+interface GrowingSuggestionDigestItem {
+  title: string;
+  details: string;
+}
+
 function extractPromotionItems(tasks: Task[]): PromotionDigestItem[] {
   return tasks
     .filter((task) => task.source === "email")
@@ -89,6 +99,40 @@ function extractRenewalItems(tasks: Task[]): RenewalDigestItem[] {
     .filter((item) => item.daysLeft <= 30)
     .sort((a, b) => a.daysLeft - b.daysLeft)
     .slice(0, 8);
+}
+
+function extractGrowingTaskItems(tasks: Task[]): GrowingTaskDigestItem[] {
+  return tasks
+    .filter((task) => task.metadata?.item_type === "growing")
+    .map((task) => ({
+      title: task.title,
+      dueDate: task.due_date,
+    }))
+    .slice(0, 5);
+}
+
+function getWeekStartDate(now = new Date()): string {
+  const date = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+  const day = date.getUTCDay();
+  const diff = day === 0 ? -6 : 1 - day;
+  date.setUTCDate(date.getUTCDate() + diff);
+  return date.toISOString().slice(0, 10);
+}
+
+async function fetchPendingGrowingSuggestions(supabase: SupabaseClient): Promise<GrowingSuggestionDigestItem[]> {
+  const { data, error } = await supabase
+    .from("growing_suggestions_log")
+    .select("title, details")
+    .eq("week_start_date", getWeekStartDate())
+    .eq("status", "pending")
+    .order("created_at", { ascending: true })
+    .limit(3);
+
+  if (error) return [];
+  return ((data ?? []) as GrowingSuggestionDigestItem[]).map((row) => ({
+    title: row.title,
+    details: row.details,
+  }));
 }
 
 function formatTaskList(tasks: Task[]): string {
@@ -141,6 +185,8 @@ function buildEmailHtml(
   lessons: GeneratedLesson[],
   promotionItems: PromotionDigestItem[],
   renewalItems: RenewalDigestItem[],
+  growingTasks: GrowingTaskDigestItem[],
+  growingSuggestions: GrowingSuggestionDigestItem[],
   narrative: string,
   dashboardUrl: string
 ): string {
@@ -213,6 +259,30 @@ function buildEmailHtml(
   </ul>
   `;
 
+  const gardenSection =
+    growingTasks.length === 0 && growingSuggestions.length === 0
+      ? ""
+      : `
+  <h2 style="font-size:16px">Garden This Week</h2>
+  ${growingTasks.length === 0 ? "" : `
+  <h3>Converted Tasks</h3>
+  <ul>
+    ${growingTasks
+      .map(
+        (item) =>
+          `<li>${item.title}${item.dueDate ? ` <span style="color:#888;font-size:12px">— due ${new Date(item.dueDate).toLocaleDateString("sv-SE")}</span>` : ""}</li>`
+      )
+      .join("")}
+  </ul>`}
+  ${growingSuggestions.length === 0 ? "" : `
+  <h3>Ideas</h3>
+  <ul>
+    ${growingSuggestions
+      .map((item) => `<li><strong>${item.title}</strong>: ${item.details}</li>`)
+      .join("")}
+  </ul>`}
+  `;
+
   return `
 <!DOCTYPE html>
 <html>
@@ -235,6 +305,7 @@ function buildEmailHtml(
   ${taskSection("📅 Today", todayTasks)}
   ${taskSection("📆 This Week", thisWeekTasks)}
   ${taskSection("🗂 Later", laterTasks)}
+  ${gardenSection}
   ${renewalSection}
   ${learningSection}
   ${dealSection}
@@ -264,6 +335,8 @@ export async function runDailyDigest(env: Env): Promise<void> {
   const allTasks = [...todayTasks, ...thisWeekTasks, ...laterTasks];
   const promotionItems = extractPromotionItems(allTasks);
   const renewalItems = extractRenewalItems(allTasks);
+  const growingTasks = extractGrowingTaskItems(allTasks);
+  const growingSuggestions = await fetchPendingGrowingSuggestions(supabase);
 
   // Generate today's learning lessons first so digest can include them.
   let lessons: GeneratedLesson[] = [];
@@ -314,6 +387,8 @@ export async function runDailyDigest(env: Env): Promise<void> {
     lessons,
     promotionItems,
     renewalItems,
+    growingTasks,
+    growingSuggestions,
     narrative,
     dashboardUrl
   );

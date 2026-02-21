@@ -3,6 +3,8 @@ export type TaskSource = "email" | "manual";
 export type Bucket = "today" | "this_week" | "later";
 export type LearningStatus = "active" | "paused";
 export type LearningProfileType = "topic" | "category";
+export type GrowingSuggestionKind = "action" | "inspiration";
+export type GrowingSuggestionStatus = "pending" | "dismissed" | "converted" | "done";
 
 export interface Task {
   id: string;
@@ -48,4 +50,24 @@ export interface FamilyContext {
   key: string;
   value: string;
   last_updated: string;
+}
+
+export interface GrowingProfile {
+  id: string;
+  city: string;
+  country_code: string;
+  space_type: "balcony" | "indoor" | "yard" | "mixed";
+  experience_level: "beginner" | "intermediate" | "advanced";
+  interests: string[];
+}
+
+export interface GrowingSuggestion {
+  id: string;
+  title: string;
+  details: string;
+  suggestion_kind: GrowingSuggestionKind;
+  suggested_bucket: Bucket;
+  status: GrowingSuggestionStatus;
+  week_start_date: string;
+  converted_task_id: string | null;
 }
