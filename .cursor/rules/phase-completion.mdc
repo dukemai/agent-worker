@@ -1,0 +1,19 @@
+---
+description: Trigger retrospective when a project phase is completed
+globs:
+alwaysApply: true
+---
+
+# Phase Completion Protocol
+
+When the user signals that a phase is done — by any of these:
+
+- Saying the phase is done ("phase X is done", "that's complete", "let's wrap up")
+- Asking to move to the next phase ("let's start phase N", "what's next", "continue to the next phase")
+- Confirming all deliverables of a phase are shipped
+
+**You MUST run the [retrospective](.cursor/skills/retrospective/SKILL.md) skill BEFORE starting any new work.**
+
+Do not skip this step. Do not start the next phase without completing the retro.
+
+After the retro is done, proceed to the Phase 7 (Review Before Each Phase) step from the [project-plan](.cursor/skills/project-plan/SKILL.md) skill to review the upcoming phase's scope.
