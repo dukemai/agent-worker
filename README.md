@@ -1,75 +1,79 @@
 # Dad-Ops Agent
 
-A personal executive assistant that receives emails from Gmail, extracts tasks, and persists them to Supabase. Built with Cloudflare Workers and TypeScript.
+Personal executive assistant that captures emails, extracts tasks, and delivers a daily digest. Built for a busy dad in Stockholm.
 
-## Phase 2: Intelligence (Current)
+**Stack**: Cloudflare Workers · Gemini 2.5 Flash · Supabase · Next.js · Resend
 
-Gemini 2.5 Flash extracts tasks from email content and classifies them into today/this_week/later. Without `GEMINI_API_KEY`, tasks default to `later_tasks` (Phase 1 behavior).
+## Quick Start
 
-## Phase 1: Ingestion MVP
-
-### Setup
-
-1. **Supabase**
-   - Create a project at [supabase.com](https://supabase.com)
-   - Run the migration: `supabase/migrations/001_initial.sql` (via Supabase SQL Editor or CLI)
-   - Copy Project URL and `service_role` key from Settings → API
-
-2. **Local secrets**
-   ```bash
-   cp .dev.vars.example .dev.vars
-   # Edit .dev.vars with SUPABASE_URL, SUPABASE_SERVICE_KEY, GEMINI_API_KEY
-   # Get GEMINI_API_KEY from https://aistudio.google.com/apikey
-   ```
-
-3. **Deploy secrets** (for production)
-   ```bash
-   npx wrangler secret put SUPABASE_URL
-   npx wrangler secret put SUPABASE_SERVICE_KEY
-   npx wrangler secret put GEMINI_API_KEY
-   ```
-
-### Run locally
+### Worker (email processing + daily digest)
 
 ```bash
+cp .dev.vars.example .dev.vars
+# Fill in: SUPABASE_URL, SUPABASE_SERVICE_KEY, GEMINI_API_KEY, RESEND_API_KEY, OPENWEATHER_API_KEY
+npm install
 npm run dev
 ```
 
-### Test
+Test with a fixture:
 
 ```bash
-# With fixture (Vklass school email)
 ./scripts/test-fixture.sh vklass-utvecklingssamtal
-
-# Or with curl directly
-curl -X POST http://localhost:8787 \
-  -H "Content-Type: application/json" \
-  -d @fixtures/emails/vklass-utvecklingssamtal.json
 ```
 
-Verify in Supabase Table Editor: new row in `tasks` and in the bucket table (today/this_week/later) based on Gemini's classification.
-
-**Promotion filtering:** Set `family_context` to match promotions:
-```sql
-INSERT INTO family_context (key, value) VALUES
-  ('shopping_list', 'helmet for kid, winter boots'),
-  ('seasonal_interests', 'garden, outdoor')
-ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value, last_updated = NOW();
-```
-Promotions from XXL, Stadium, Clas Ohlson are only saved when they match these interests.
-
-### Deploy
+Deploy:
 
 ```bash
+npx wrangler secret put SUPABASE_URL
+npx wrangler secret put SUPABASE_SERVICE_KEY
+npx wrangler secret put GEMINI_API_KEY
+npx wrangler secret put RESEND_API_KEY
+npx wrangler secret put OPENWEATHER_API_KEY
 npm run deploy
 ```
 
-Then in Cloudflare Dashboard → Email Routing: create custom address `agent@yourdomain.com` → Action: "Send to a Worker" → select this Worker.
+### Dashboard (Next.js)
 
-## Project structure
+```bash
+cd dashboard
+cp env.local.example .env.local
+# Fill in: NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY
+npm install
+npm run dev
+```
 
-- `src/index.ts` – Worker entry (email + fetch handlers)
-- `src/prompts/` – System prompts for Phase 2+ (Gemini)
-- `supabase/migrations/` – SQL schema
-- `plan/` – Project spec
-- `.cursor/plans/` – Implementation plan
+### Database
+
+Run migrations in order via Supabase SQL Editor or CLI:
+
+```
+supabase/migrations/001_initial.sql
+supabase/migrations/002_family_context.sql
+supabase/migrations/003_rls_policies.sql
+supabase/migrations/004_learning_profile_type.sql
+supabase/migrations/005_growing_ops.sql
+```
+
+## Project Structure
+
+```
+src/              Worker source (email + cron handlers)
+src/prompts/      Gemini system prompts
+dashboard/        Next.js dashboard app
+supabase/         Database migrations
+fixtures/         Test email fixtures
+docs/             Project documentation
+  SPEC.md         Product specification
+  ARCHITECTURE.md System design and tech stack
+  ROADMAP.md      Phase status overview
+  DECISIONS.md    Decision log
+  phases/         Per-phase scope and retrospectives
+```
+
+## Docs
+
+Full documentation lives in [`docs/`](docs/):
+- [Spec](docs/SPEC.md) — what this project does and why
+- [Architecture](docs/ARCHITECTURE.md) — how it's built
+- [Roadmap](docs/ROADMAP.md) — what's done and what's next
+- [Decisions](docs/DECISIONS.md) — why we chose X over Y
