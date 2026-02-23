@@ -3,6 +3,7 @@ import { createClient } from "@supabase/supabase-js";
 import { TASK_EXTRACTION } from "./prompts/task-extraction";
 import { extractTaskFromEmail } from "./lib/gemini";
 import { runDailyDigest } from "./crons/daily-digest";
+import { processSingleGrowingSource, runGrowingIngest } from "./crons/growing-ingest";
 
 const BUCKET_TABLES = {
   today: "today_tasks",
@@ -17,6 +18,7 @@ export default {
       (async () => {
         try {
           // "30 5 * * *" — daily digest at 06:30 Stockholm (05:30 UTC winter)
+          await runGrowingIngest(env);
           await runDailyDigest(env);
         } catch (err) {
           console.error("Scheduled handler failed:", err);
@@ -45,8 +47,34 @@ export default {
     }
   },
 
-  // 2. Handles HTTP (curl / local dev testing)
+  // 2. Handles HTTP (curl / local dev testing + manual growing extract)
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
+    const url = new URL(request.url);
+
+    if (url.pathname === "/process-growing" && request.method === "POST") {
+      try {
+        const payload = (await request.json()) as { source_id?: string };
+        const sourceId = payload?.source_id;
+        if (typeof sourceId !== "string" || !sourceId) {
+          return new Response(
+            JSON.stringify({ success: false, error: "source_id is required" }),
+            { status: 400, headers: { "Content-Type": "application/json" } }
+          );
+        }
+        const result = await processSingleGrowingSource(env, sourceId);
+        return new Response(JSON.stringify(result), {
+          headers: { "Content-Type": "application/json" },
+          status: result.success ? 200 : 400,
+        });
+      } catch (err) {
+        console.error("Process growing failed:", err);
+        return new Response(
+          JSON.stringify({ success: false, error: String(err) }),
+          { status: 500, headers: { "Content-Type": "application/json" } }
+        );
+      }
+    }
+
     if (request.method === "POST") {
       try {
         const payload = (await request.json()) as { subject?: string; body?: string; from?: string };

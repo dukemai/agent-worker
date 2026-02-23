@@ -17,6 +17,40 @@ export interface TaskExtractionResult {
   store_link?: string;
 }
 
+export interface GrowingActionableTip {
+  item_key: string;
+  item_name: string;
+  suggestion_kind: "action";
+  action_type: "seed" | "transplant" | "prune" | "harvest" | "protect" | "plan" | "inspire";
+  start_month: number;
+  end_month: number;
+  priority: number;
+  suggested_bucket: "today" | "this_week" | "later";
+  stockholm_note: string;
+  tags: string[];
+}
+
+export interface GrowingKnowledgeNugget {
+  title: string;
+  content: string;
+  category:
+    | "technique"
+    | "plant-profile"
+    | "soil"
+    | "pest-control"
+    | "companion-planting"
+    | "preservation"
+    | "general";
+  tags: string[];
+  season_relevance: Array<"spring" | "summer" | "autumn" | "winter">;
+  stockholm_relevant: boolean;
+}
+
+export interface GrowingKnowledgeExtractionResult {
+  actionable_tips: GrowingActionableTip[];
+  knowledge_nuggets: GrowingKnowledgeNugget[];
+}
+
 const TASK_EXTRACTION_SCHEMA: ObjectSchema = {
   type: SchemaType.OBJECT,
   properties: {
@@ -64,6 +98,95 @@ const TASK_EXTRACTION_SCHEMA: ObjectSchema = {
     } as Schema,
   },
   required: ["email_type", "title", "target_bucket", "priority", "promotion_relevant"],
+};
+
+const GROWING_KNOWLEDGE_SCHEMA: ObjectSchema = {
+  type: SchemaType.OBJECT,
+  properties: {
+    actionable_tips: {
+      type: SchemaType.ARRAY,
+      items: {
+        type: SchemaType.OBJECT,
+        properties: {
+          item_key: { type: SchemaType.STRING } as Schema,
+          item_name: { type: SchemaType.STRING } as Schema,
+          suggestion_kind: {
+            type: SchemaType.STRING,
+            format: "enum",
+            enum: ["action"],
+          } as Schema,
+          action_type: {
+            type: SchemaType.STRING,
+            format: "enum",
+            enum: ["seed", "transplant", "prune", "harvest", "protect", "plan", "inspire"],
+          } as Schema,
+          start_month: { type: SchemaType.INTEGER } as Schema,
+          end_month: { type: SchemaType.INTEGER } as Schema,
+          priority: { type: SchemaType.INTEGER } as Schema,
+          suggested_bucket: {
+            type: SchemaType.STRING,
+            format: "enum",
+            enum: ["today", "this_week", "later"],
+          } as Schema,
+          stockholm_note: { type: SchemaType.STRING } as Schema,
+          tags: {
+            type: SchemaType.ARRAY,
+            items: { type: SchemaType.STRING } as Schema,
+          } as Schema,
+        },
+        required: [
+          "item_key",
+          "item_name",
+          "suggestion_kind",
+          "action_type",
+          "start_month",
+          "end_month",
+          "priority",
+          "suggested_bucket",
+          "stockholm_note",
+          "tags",
+        ],
+      } as Schema,
+    } as Schema,
+    knowledge_nuggets: {
+      type: SchemaType.ARRAY,
+      items: {
+        type: SchemaType.OBJECT,
+        properties: {
+          title: { type: SchemaType.STRING } as Schema,
+          content: { type: SchemaType.STRING } as Schema,
+          category: {
+            type: SchemaType.STRING,
+            format: "enum",
+            enum: [
+              "technique",
+              "plant-profile",
+              "soil",
+              "pest-control",
+              "companion-planting",
+              "preservation",
+              "general",
+            ],
+          } as Schema,
+          tags: {
+            type: SchemaType.ARRAY,
+            items: { type: SchemaType.STRING } as Schema,
+          } as Schema,
+          season_relevance: {
+            type: SchemaType.ARRAY,
+            items: {
+              type: SchemaType.STRING,
+              format: "enum",
+              enum: ["spring", "summer", "autumn", "winter"],
+            } as Schema,
+          } as Schema,
+          stockholm_relevant: { type: SchemaType.BOOLEAN } as Schema,
+        },
+        required: ["title", "content", "category", "tags", "season_relevance", "stockholm_relevant"],
+      } as Schema,
+    } as Schema,
+  },
+  required: ["actionable_tips", "knowledge_nuggets"],
 };
 
 export async function extractTaskFromEmail(
@@ -120,4 +243,51 @@ export async function extractTaskFromEmail(
   }
 
   return parsed;
+}
+
+export async function extractGrowingKnowledge(
+  apiKey: string,
+  fullPrompt: string
+): Promise<GrowingKnowledgeExtractionResult> {
+  const genAI = new GoogleGenerativeAI(apiKey);
+  const model = genAI.getGenerativeModel({
+    model: "gemini-2.5-flash",
+    generationConfig: {
+      responseMimeType: "application/json",
+      responseSchema: GROWING_KNOWLEDGE_SCHEMA,
+    },
+  });
+
+  const result = await model.generateContent(fullPrompt);
+  const parsed = JSON.parse(result.response.text()) as GrowingKnowledgeExtractionResult;
+
+  const actionable_tips = (parsed.actionable_tips ?? [])
+    .filter((tip) => tip && typeof tip.item_name === "string")
+    .map((tip) => ({
+      ...tip,
+      suggestion_kind: "action" as const,
+      start_month: Math.min(12, Math.max(1, Number(tip.start_month) || 1)),
+      end_month: Math.min(12, Math.max(1, Number(tip.end_month) || 12)),
+      priority: Math.min(10, Math.max(1, Number(tip.priority) || 5)),
+      suggested_bucket:
+        tip.suggested_bucket === "today" || tip.suggested_bucket === "this_week" || tip.suggested_bucket === "later"
+          ? tip.suggested_bucket
+          : "this_week",
+      tags: Array.isArray(tip.tags) ? tip.tags.filter((tag) => typeof tag === "string").slice(0, 8) : [],
+    }));
+
+  const knowledge_nuggets = (parsed.knowledge_nuggets ?? [])
+    .filter((nugget) => nugget && typeof nugget.title === "string" && typeof nugget.content === "string")
+    .map((nugget) => ({
+      ...nugget,
+      tags: Array.isArray(nugget.tags) ? nugget.tags.filter((tag) => typeof tag === "string").slice(0, 10) : [],
+      season_relevance: Array.isArray(nugget.season_relevance)
+        ? nugget.season_relevance.filter((season) =>
+            season === "spring" || season === "summer" || season === "autumn" || season === "winter"
+          )
+        : [],
+      stockholm_relevant: Boolean(nugget.stockholm_relevant),
+    }));
+
+  return { actionable_tips, knowledge_nuggets };
 }

@@ -65,6 +65,33 @@ interface GrowingSuggestionDigestItem {
   details: string;
 }
 
+interface RecentGrowingKnowledgeItem {
+  title: string;
+  content: string;
+  category: string;
+  sourceUrl: string | null;
+}
+
+interface RecentGrowingWindowItem {
+  title: string;
+  note: string;
+  sourceUrl: string | null;
+}
+
+function resolveRelatedSourceUrl(value: unknown): string | null {
+  if (!value) {
+    return null;
+  }
+
+  if (Array.isArray(value)) {
+    const first = value[0] as { url?: unknown } | undefined;
+    return typeof first?.url === "string" ? first.url : null;
+  }
+
+  const objectValue = value as { url?: unknown };
+  return typeof objectValue.url === "string" ? objectValue.url : null;
+}
+
 function extractPromotionItems(tasks: Task[]): PromotionDigestItem[] {
   return tasks
     .filter((task) => task.source === "email")
@@ -135,6 +162,49 @@ async function fetchPendingGrowingSuggestions(supabase: SupabaseClient): Promise
   }));
 }
 
+async function fetchRecentGrowingKnowledge(
+  supabase: SupabaseClient
+): Promise<{ knowledge: RecentGrowingKnowledgeItem[]; windows: RecentGrowingWindowItem[] }> {
+  const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+
+  const [knowledgeResult, windowsResult] = await Promise.all([
+    supabase
+      .from("growing_knowledge")
+      .select("title, content, category, source:growing_sources(url)")
+      .gte("created_at", since)
+      .order("created_at", { ascending: false })
+      .limit(6),
+    supabase
+      .from("growing_windows")
+      .select("item_name, stockholm_note, source:growing_sources(url)")
+      .not("source_id", "is", null)
+      .gte("created_at", since)
+      .order("created_at", { ascending: false })
+      .limit(4),
+  ]);
+
+  const knowledge =
+    knowledgeResult.error || !knowledgeResult.data
+      ? []
+      : knowledgeResult.data.map((row) => ({
+          title: row.title,
+          content: row.content,
+          category: row.category,
+          sourceUrl: resolveRelatedSourceUrl(row.source),
+        }));
+
+  const windows =
+    windowsResult.error || !windowsResult.data
+      ? []
+      : windowsResult.data.map((row) => ({
+          title: row.item_name,
+          note: row.stockholm_note,
+          sourceUrl: resolveRelatedSourceUrl(row.source),
+        }));
+
+  return { knowledge, windows };
+}
+
 function formatTaskList(tasks: Task[]): string {
   if (tasks.length === 0) return "  (none)";
   return tasks
@@ -187,6 +257,8 @@ function buildEmailHtml(
   renewalItems: RenewalDigestItem[],
   growingTasks: GrowingTaskDigestItem[],
   growingSuggestions: GrowingSuggestionDigestItem[],
+  recentGrowingKnowledge: RecentGrowingKnowledgeItem[],
+  recentGrowingWindows: RecentGrowingWindowItem[],
   narrative: string,
   dashboardUrl: string
 ): string {
@@ -283,6 +355,33 @@ function buildEmailHtml(
   </ul>`}
   `;
 
+  const newKnowledgeSection =
+    recentGrowingKnowledge.length === 0 && recentGrowingWindows.length === 0
+      ? ""
+      : `
+  <h2 style="font-size:16px">New Growing Knowledge</h2>
+  ${recentGrowingWindows.length === 0 ? "" : `
+  <h3>Actionable Tips from Videos</h3>
+  <ul>
+    ${recentGrowingWindows
+      .map(
+        (item) =>
+          `<li><strong>${item.title}</strong>: ${item.note}${item.sourceUrl ? ` (<a href="${item.sourceUrl}" style="color:#2563eb">Source</a>)` : ""}</li>`
+      )
+      .join("")}
+  </ul>`}
+  ${recentGrowingKnowledge.length === 0 ? "" : `
+  <h3>Reference Knowledge</h3>
+  <ul>
+    ${recentGrowingKnowledge
+      .map(
+        (item) =>
+          `<li><strong>${item.title}</strong> (${item.category}): ${item.content.slice(0, 220)}${item.content.length > 220 ? "..." : ""}${item.sourceUrl ? ` (<a href="${item.sourceUrl}" style="color:#2563eb">Source</a>)` : ""}</li>`
+      )
+      .join("")}
+  </ul>`}
+  `;
+
   return `
 <!DOCTYPE html>
 <html>
@@ -306,6 +405,7 @@ function buildEmailHtml(
   ${taskSection("📆 This Week", thisWeekTasks)}
   ${taskSection("🗂 Later", laterTasks)}
   ${gardenSection}
+  ${newKnowledgeSection}
   ${renewalSection}
   ${learningSection}
   ${dealSection}
@@ -337,6 +437,7 @@ export async function runDailyDigest(env: Env): Promise<void> {
   const renewalItems = extractRenewalItems(allTasks);
   const growingTasks = extractGrowingTaskItems(allTasks);
   const growingSuggestions = await fetchPendingGrowingSuggestions(supabase);
+  const recentGrowing = await fetchRecentGrowingKnowledge(supabase);
 
   // Generate today's learning lessons first so digest can include them.
   let lessons: GeneratedLesson[] = [];
@@ -389,6 +490,8 @@ export async function runDailyDigest(env: Env): Promise<void> {
     renewalItems,
     growingTasks,
     growingSuggestions,
+    recentGrowing.knowledge,
+    recentGrowing.windows,
     narrative,
     dashboardUrl
   );

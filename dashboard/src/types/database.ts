@@ -5,6 +5,15 @@ export type LearningStatus = "active" | "paused";
 export type LearningProfileType = "topic" | "category";
 export type GrowingSuggestionKind = "action" | "inspiration";
 export type GrowingSuggestionStatus = "pending" | "dismissed" | "converted" | "done";
+export type GrowingSourceStatus = "queued" | "processing" | "done" | "failed";
+export type GrowingKnowledgeCategory =
+  | "technique"
+  | "plant-profile"
+  | "soil"
+  | "pest-control"
+  | "companion-planting"
+  | "preservation"
+  | "general";
 
 export interface Task {
   id: string;
@@ -70,4 +79,28 @@ export interface GrowingSuggestion {
   status: GrowingSuggestionStatus;
   week_start_date: string;
   converted_task_id: string | null;
+}
+
+export interface GrowingSource {
+  id: string;
+  url: string;
+  title: string | null;
+  channel: string | null;
+  status: GrowingSourceStatus;
+  error_message: string | null;
+  tips_extracted: number;
+  created_at: string;
+  processed_at: string | null;
+}
+
+export interface GrowingKnowledge {
+  id: string;
+  source_id: string;
+  title: string;
+  content: string;
+  category: GrowingKnowledgeCategory;
+  tags: string[];
+  season_relevance: string[];
+  stockholm_relevant: boolean;
+  created_at: string;
 }

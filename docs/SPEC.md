@@ -41,6 +41,7 @@ One user: a busy dad in Stockholm who checks email every morning and has fragmen
 
 ### Growing Season Tracker
 - Stockholm-specific seasonal growing windows (seed, transplant, prune, harvest, protect).
+- **Growing context is editable** and persisted in Supabase (`growing_profiles`): city, country code, space type, experience level, and interests. The dashboard exposes a form to edit and save this profile; weekly suggestions and knowledge scoring use the saved values.
 - Weekly suggestions generated from a catalog, scored by user interests.
 - One-tap conversion of suggestions into planner tasks.
 - Inspiration ideas alongside actionable items.

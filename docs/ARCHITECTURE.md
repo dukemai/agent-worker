@@ -77,6 +77,10 @@ Gmail
 | `NEXT_PUBLIC_SUPABASE_URL` | Supabase project URL (public) |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase anon key (RLS-aware) |
 
+## Dashboard App
+
+For the dashboard’s architecture (directory layout, routing, auth, data flow, feature areas), see **[Dashboard architecture](DASHBOARD-ARCHITECTURE.md)**. For setup and run instructions, see [Dashboard README](../dashboard/README.md).
+
 ## Key Design Decisions
 
 - **Stateless Worker**: No in-memory state between requests. All persistence via Supabase.

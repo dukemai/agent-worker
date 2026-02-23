@@ -1,52 +1,76 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import type { Bucket, GrowingProfile, GrowingSuggestion } from "@/types/database";
-
-type WeeklyGrowingResponse = {
-  week_start_date: string;
-  profile: GrowingProfile;
-  actions: GrowingSuggestion[];
-  inspirations: GrowingSuggestion[];
-};
-
-async function fetchWeeklyGrowing(): Promise<WeeklyGrowingResponse> {
-  const response = await fetch("/api/growing/weekly", { cache: "no-store" });
-  if (!response.ok) {
-    throw new Error("Failed to load weekly growing suggestions");
-  }
-  return (await response.json()) as WeeklyGrowingResponse;
-}
-
-async function readApiError(response: Response, fallback: string): Promise<never> {
-  const json = (await response.json().catch(() => ({}))) as { error?: string };
-  throw new Error(json.error ?? fallback);
-}
+import { useState, type FormEvent } from "react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  addGrowingSource,
+  convertGrowingSuggestion,
+  createTask,
+  deleteGrowingSource,
+  fetchGrowingKnowledge,
+  fetchGrowingSources,
+  fetchWeeklyGrowing,
+  processGrowingSource,
+  updateGrowingProfile,
+  updateSuggestionStatus,
+} from "@/lib/growing-api";
+import type { Bucket, GrowingKnowledgeCategory } from "@/types/database";
+import { GrowingContextCard } from "./growing-context-card";
+import { GrowingKnowledgeTab } from "./growing-knowledge-tab";
+import { GrowingSourcesTab } from "./growing-sources-tab";
+import { GrowingWeeklyTab } from "./growing-weekly-tab";
+import type { GrowingKnowledgeItem, GrowingProfileForm } from "./growing-dashboard.types";
+import { toFormState } from "./growing-dashboard.types";
 
 export function GrowingDashboard() {
   const queryClient = useQueryClient();
+  const [youtubeUrl, setYoutubeUrl] = useState("");
+  const [knowledgeCategory, setKnowledgeCategory] = useState<"all" | GrowingKnowledgeCategory>("all");
+  const [knowledgeSeason, setKnowledgeSeason] = useState<"all" | "spring" | "summer" | "autumn" | "winter">("all");
+  const [knowledgeTags, setKnowledgeTags] = useState("");
+  const [profileFormDirty, setProfileFormDirty] = useState<GrowingProfileForm | null>(null);
+
   const weeklyQuery = useQuery({
     queryKey: ["growing", "weekly"],
     queryFn: fetchWeeklyGrowing,
   });
+  const sourcesQuery = useQuery({
+    queryKey: ["growing", "sources"],
+    queryFn: fetchGrowingSources,
+  });
+  const knowledgeQuery = useQuery({
+    queryKey: ["growing", "knowledge", knowledgeCategory, knowledgeSeason, knowledgeTags.trim().toLowerCase()],
+    queryFn: () =>
+      fetchGrowingKnowledge({
+        category: knowledgeCategory,
+        season: knowledgeSeason,
+        tags: knowledgeTags.trim().toLowerCase(),
+      }),
+  });
+
+  const data = weeklyQuery.data;
+  const profileForm: GrowingProfileForm = profileFormDirty ?? (data?.profile ? toFormState(data.profile) : {
+    city: "",
+    country_code: "SE",
+    space_type: "balcony",
+    experience_level: "beginner",
+    interestsStr: "",
+  });
+
+  const updateProfileMutation = useMutation({
+    mutationFn: updateGrowingProfile,
+    onSuccess: async () => {
+      setProfileFormDirty(null);
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["growing", "weekly"] }),
+      ]);
+    },
+  });
 
   const convertMutation = useMutation({
-    mutationFn: async ({ suggestionId, bucket }: { suggestionId: string; bucket: Bucket }) => {
-      const response = await fetch("/api/growing/convert", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          suggestion_id: suggestionId,
-          bucket,
-        }),
-      });
-      if (!response.ok) {
-        await readApiError(response, "Failed to convert growing suggestion");
-      }
-      return response.json();
-    },
+    mutationFn: ({ suggestionId, bucket }: { suggestionId: string; bucket: Bucket }) =>
+      convertGrowingSuggestion(suggestionId, bucket),
     onSuccess: async () => {
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ["growing", "weekly"] }),
@@ -56,23 +80,54 @@ export function GrowingDashboard() {
   });
 
   const statusMutation = useMutation({
-    mutationFn: async ({ suggestionId, status }: { suggestionId: string; status: "dismissed" | "done" }) => {
-      const response = await fetch(`/api/growing/suggestions/${suggestionId}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status }),
-      });
-      if (!response.ok) {
-        await readApiError(response, "Failed to update suggestion status");
-      }
-      return response.json();
-    },
+    mutationFn: ({ suggestionId, status }: { suggestionId: string; status: "dismissed" | "done" }) =>
+      updateSuggestionStatus(suggestionId, status),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["growing", "weekly"] });
     },
   });
 
+  const addSourceMutation = useMutation({
+    mutationFn: addGrowingSource,
+    onSuccess: async () => {
+      setYoutubeUrl("");
+      await queryClient.invalidateQueries({ queryKey: ["growing", "sources"] });
+    },
+  });
+
+  const deleteSourceMutation = useMutation({
+    mutationFn: deleteGrowingSource,
+    onSuccess: async () => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["growing", "sources"] }),
+        queryClient.invalidateQueries({ queryKey: ["growing", "knowledge"] }),
+        queryClient.invalidateQueries({ queryKey: ["growing", "weekly"] }),
+      ]);
+    },
+  });
+
+  const processSourceMutation = useMutation({
+    mutationFn: processGrowingSource,
+    onSuccess: async () => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["growing", "sources"] }),
+        queryClient.invalidateQueries({ queryKey: ["growing", "knowledge"] }),
+        queryClient.invalidateQueries({ queryKey: ["growing", "weekly"] }),
+      ]);
+    },
+  });
+
+  const knowledgeToTaskMutation = useMutation({
+    mutationFn: createTask,
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["tasks"] });
+    },
+  });
+
   const isBusy = convertMutation.isPending || statusMutation.isPending;
+  const isSourceBusy = addSourceMutation.isPending || deleteSourceMutation.isPending;
+  const isKnowledgeBusy = knowledgeToTaskMutation.isPending;
+  const isProfileBusy = updateProfileMutation.isPending;
   const error =
     weeklyQuery.error instanceof Error
       ? weeklyQuery.error.message
@@ -80,6 +135,18 @@ export function GrowingDashboard() {
         ? convertMutation.error.message
         : statusMutation.error instanceof Error
           ? statusMutation.error.message
+          : sourcesQuery.error instanceof Error
+            ? sourcesQuery.error.message
+            : addSourceMutation.error instanceof Error
+              ? addSourceMutation.error.message
+              : deleteSourceMutation.error instanceof Error
+                ? deleteSourceMutation.error.message
+                  : knowledgeQuery.error instanceof Error
+                    ? knowledgeQuery.error.message
+                    : knowledgeToTaskMutation.error instanceof Error
+                      ? knowledgeToTaskMutation.error.message
+                      : updateProfileMutation.error instanceof Error
+                        ? updateProfileMutation.error.message
           : null;
 
   async function addToBucket(suggestionId: string, bucket: Bucket) {
@@ -98,121 +165,118 @@ export function GrowingDashboard() {
     }
   }
 
+  async function submitSource(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const nextUrl = youtubeUrl.trim();
+    if (!nextUrl) {
+      return;
+    }
+    try {
+      await addSourceMutation.mutateAsync(nextUrl);
+    } catch {
+      return;
+    }
+  }
+
+  async function removeSource(id: string) {
+    try {
+      await deleteSourceMutation.mutateAsync(id);
+    } catch {
+      return;
+    }
+  }
+
+  async function addKnowledgeToTasks(item: GrowingKnowledgeItem) {
+    try {
+      await knowledgeToTaskMutation.mutateAsync({
+        title: `Growing: ${item.title}`,
+        bucket: "this_week",
+      });
+    } catch {
+      return;
+    }
+  }
+
+  async function submitProfileForm(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    try {
+      await updateProfileMutation.mutateAsync(profileForm);
+    } catch {
+      return;
+    }
+  }
+
   if (weeklyQuery.isLoading) {
     return <main className="mx-auto w-full max-w-7xl px-4 py-6">Loading growing suggestions...</main>;
   }
 
-  const data = weeklyQuery.data;
+  const sources = sourcesQuery.data?.sources ?? [];
+  const knowledge = knowledgeQuery.data?.knowledge ?? [];
+
   if (!data) {
     return <main className="mx-auto w-full max-w-7xl px-4 py-6">No growing suggestions available.</main>;
   }
 
   return (
     <main className="mx-auto w-full max-w-7xl space-y-6 px-4 py-6">
-      <Card>
-        <CardHeader>
-          <CardTitle>Growing This Week</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-2 text-sm text-muted-foreground">
-          <p>
-            Location: {data.profile.city}, {data.profile.country_code}
-          </p>
-          <p>
-            Setup: {data.profile.space_type} · Experience: {data.profile.experience_level}
-          </p>
-          <p>
-            Week starting: {new Date(`${data.week_start_date}T00:00:00Z`).toLocaleDateString()}
-          </p>
-          {data.profile.interests.length > 0 ? <p>Interests: {data.profile.interests.join(", ")}</p> : null}
-          {error ? <p className="text-sm text-red-600">{error}</p> : null}
-        </CardContent>
-      </Card>
+      <GrowingContextCard
+        profileForm={profileForm}
+        onFormChange={setProfileFormDirty}
+        onSave={submitProfileForm}
+        isSaving={isProfileBusy}
+        weekStartDate={data?.week_start_date ?? null}
+        error={error}
+      />
 
-      <section className="grid gap-4 md:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <CardTitle>This Week in Stockholm</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            {data.actions.length === 0 ? (
-              <p className="text-sm text-muted-foreground">No actions this week.</p>
-            ) : (
-              data.actions.map((item) => (
-                <article key={item.id} className="rounded-md border p-3">
-                  <h3 className="font-medium">{item.title}</h3>
-                  <p className="mb-3 mt-1 text-sm text-muted-foreground">{item.details}</p>
-                  <div className="flex flex-wrap gap-1">
-                    <Button
-                      size="sm"
-                      className="min-h-11"
-                      onClick={() => addToBucket(item.id, "today")}
-                      disabled={isBusy}
-                    >
-                      Add to Today
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="min-h-11"
-                      onClick={() => addToBucket(item.id, "this_week")}
-                      disabled={isBusy}
-                    >
-                      Add to This Week
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="min-h-11"
-                      onClick={() => dismissSuggestion(item.id)}
-                      disabled={isBusy}
-                    >
-                      Dismiss
-                    </Button>
-                  </div>
-                </article>
-              ))
-            )}
-          </CardContent>
-        </Card>
+      <Tabs defaultValue="weekly" className="space-y-4">
+        <TabsList className="w-full justify-start overflow-x-auto">
+          <TabsTrigger value="weekly">This Week</TabsTrigger>
+          <TabsTrigger value="sources">Sources</TabsTrigger>
+          <TabsTrigger value="knowledge">Knowledge</TabsTrigger>
+        </TabsList>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Inspiration</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            {data.inspirations.length === 0 ? (
-              <p className="text-sm text-muted-foreground">No inspirations this week.</p>
-            ) : (
-              data.inspirations.map((item) => (
-                <article key={item.id} className="rounded-md border p-3">
-                  <h3 className="font-medium">{item.title}</h3>
-                  <p className="mb-3 mt-1 text-sm text-muted-foreground">{item.details}</p>
-                  <div className="flex flex-wrap gap-1">
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="min-h-11"
-                      onClick={() => addToBucket(item.id, "this_week")}
-                      disabled={isBusy}
-                    >
-                      Turn into task
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="min-h-11"
-                      onClick={() => dismissSuggestion(item.id)}
-                      disabled={isBusy}
-                    >
-                      Dismiss
-                    </Button>
-                  </div>
-                </article>
-              ))
-            )}
-          </CardContent>
-        </Card>
-      </section>
+        <TabsContent value="weekly">
+          <GrowingWeeklyTab
+            data={data}
+            onAddToBucket={addToBucket}
+            onDismiss={dismissSuggestion}
+            isBusy={isBusy}
+          />
+        </TabsContent>
+
+        <TabsContent value="sources" className="space-y-4">
+          <GrowingSourcesTab
+            sources={sources}
+            isLoading={sourcesQuery.isLoading}
+            youtubeUrl={youtubeUrl}
+            onYoutubeUrlChange={setYoutubeUrl}
+            onSubmitSource={submitSource}
+            onRemoveSource={removeSource}
+            onProcessSource={(id) => processSourceMutation.mutate(id)}
+            isSourceBusy={isSourceBusy}
+            processSourcePendingId={
+              processSourceMutation.isPending && processSourceMutation.variables
+                ? processSourceMutation.variables
+                : undefined
+            }
+          />
+        </TabsContent>
+
+        <TabsContent value="knowledge" className="space-y-4">
+          <GrowingKnowledgeTab
+            category={knowledgeCategory}
+            season={knowledgeSeason}
+            tags={knowledgeTags}
+            onCategoryChange={setKnowledgeCategory}
+            onSeasonChange={setKnowledgeSeason}
+            onTagsChange={setKnowledgeTags}
+            knowledge={knowledge}
+            isLoading={knowledgeQuery.isLoading}
+            onAddAsTask={addKnowledgeToTasks}
+            isBusy={isKnowledgeBusy}
+          />
+        </TabsContent>
+      </Tabs>
     </main>
   );
 }
