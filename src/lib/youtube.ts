@@ -1,3 +1,14 @@
+/**
+ * YouTube transcript fetching.
+ *
+ * Uses YouTube's internal Innertube API (undocumented, can change):
+ * POST https://www.youtube.com/youtubei/v1/player with { context: { client: { clientName, clientVersion } }, videoId }
+ * → response.captions.playerCaptionsTracklistRenderer.captionTracks[].baseUrl
+ * Then GET baseUrl&fmt=json3 → JSON with .events[].segs[].utf8
+ *
+ * See: https://nadimtuhin.com/blog/ytranscript-how-it-works
+ * Fallback: parse ytInitialPlayerResponse from watch page HTML (often empty for captions now).
+ */
 export interface YouTubeTranscriptResult {
   videoId: string;
   title: string | null;
@@ -15,6 +26,7 @@ type PlayerResponse = {
   videoDetails?: {
     title?: string;
     author?: string;
+    shortDescription?: string;
   };
   captions?: {
     playerCaptionsTracklistRenderer?: {
@@ -115,29 +127,59 @@ function parseCaptionJson(json: unknown): string {
   return chunks.join("\n");
 }
 
+const INNERTUBE_USER_AGENT =
+  "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36";
+
+/** Fetch player data (including caption tracks) via Innertube API. More reliable than HTML scrape. */
+async function fetchPlayerResponseFromInnertube(videoId: string): Promise<PlayerResponse | null> {
+  const response = await fetch(
+    "https://www.youtube.com/youtubei/v1/player?prettyPrint=false",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "User-Agent": INNERTUBE_USER_AGENT,
+      },
+      body: JSON.stringify({
+        context: {
+          client: { clientName: "WEB", clientVersion: "2.20240101.00.00" },
+        },
+        videoId,
+      }),
+    }
+  );
+  if (!response.ok) {
+    return null;
+  }
+  const data = (await response.json()) as PlayerResponse;
+  return data ?? null;
+}
+
 export async function fetchYouTubeTranscript(url: string): Promise<YouTubeTranscriptResult> {
   const videoId = extractYouTubeVideoId(url);
   if (!videoId) {
     throw new Error("Invalid YouTube URL");
   }
 
-  const watchUrl = `https://www.youtube.com/watch?v=${videoId}`;
-  const watchResponse = await fetch(watchUrl, {
-    headers: {
-      "user-agent":
-        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
-      "accept-language": "en-US,en;q=0.9,sv;q=0.8",
-    },
-  });
+  let player: PlayerResponse | null = await fetchPlayerResponseFromInnertube(videoId);
 
-  if (!watchResponse.ok) {
-    throw new Error(`Failed to fetch YouTube page (${watchResponse.status})`);
+  if (!player) {
+    const watchUrl = `https://www.youtube.com/watch?v=${videoId}`;
+    const watchResponse = await fetch(watchUrl, {
+      headers: {
+        "user-agent": INNERTUBE_USER_AGENT,
+        "accept-language": "en-US,en;q=0.9,sv;q=0.8",
+      },
+    });
+    if (!watchResponse.ok) {
+      throw new Error(`Failed to fetch YouTube page (${watchResponse.status})`);
+    }
+    const html = await watchResponse.text();
+    player = parsePlayerResponseFromHtml(html);
   }
 
-  const html = await watchResponse.text();
-  const player = parsePlayerResponseFromHtml(html);
   if (!player) {
-    throw new Error("Unable to parse YouTube player response");
+    throw new Error("Unable to get YouTube player response (tried Innertube API and watch page)");
   }
 
   const tracks = player.captions?.playerCaptionsTracklistRenderer?.captionTracks ?? [];
@@ -147,12 +189,24 @@ export async function fetchYouTubeTranscript(url: string): Promise<YouTubeTransc
   }
 
   const captionUrl = `${selectedTrack.baseUrl}&fmt=json3`;
-  const captionResponse = await fetch(captionUrl);
+  const captionResponse = await fetch(captionUrl, {
+    headers: { "User-Agent": INNERTUBE_USER_AGENT },
+  });
   if (!captionResponse.ok) {
     throw new Error(`Failed to fetch captions (${captionResponse.status})`);
   }
 
-  const captionJson = (await captionResponse.json()) as unknown;
+  const captionText = await captionResponse.text();
+  if (!captionText?.trim()) {
+    throw new Error("Caption response is empty");
+  }
+  let captionJson: unknown;
+  try {
+    captionJson = JSON.parse(captionText);
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e);
+    throw new Error(`Caption response is not valid JSON: ${msg}`);
+  }
   const transcript = parseCaptionJson(captionJson);
   if (!transcript) {
     throw new Error("Caption transcript is empty");

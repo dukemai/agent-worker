@@ -14,26 +14,34 @@ export type GrowingKnowledgeTabProps = {
   category: "all" | GrowingKnowledgeCategory;
   season: KnowledgeSeason;
   tags: string;
+  locationFilter: string;
   onCategoryChange: (value: "all" | GrowingKnowledgeCategory) => void;
   onSeasonChange: (value: KnowledgeSeason) => void;
   onTagsChange: (value: string) => void;
+  onLocationFilterChange: (value: string) => void;
   knowledge: GrowingKnowledgeItem[];
   isLoading: boolean;
   onAddAsTask: (item: GrowingKnowledgeItem) => void;
+  onDelete: (item: GrowingKnowledgeItem) => void;
   isBusy: boolean;
+  deletingId: string | undefined;
 };
 
 export function GrowingKnowledgeTab({
   category,
   season,
   tags,
+  locationFilter,
   onCategoryChange,
   onSeasonChange,
   onTagsChange,
+  onLocationFilterChange,
   knowledge,
   isLoading,
   onAddAsTask,
+  onDelete,
   isBusy,
+  deletingId,
 }: GrowingKnowledgeTabProps) {
   return (
     <div className="space-y-4">
@@ -41,7 +49,7 @@ export function GrowingKnowledgeTab({
         <CardHeader>
           <CardTitle>Filters</CardTitle>
         </CardHeader>
-        <CardContent className="grid gap-3 md:grid-cols-3">
+        <CardContent className="grid gap-3 md:grid-cols-2 lg:grid-cols-4">
           <Select value={category} onValueChange={(value) => onCategoryChange(value as typeof category)}>
             <SelectTrigger className="w-full">
               <SelectValue placeholder="Category" />
@@ -72,6 +80,7 @@ export function GrowingKnowledgeTab({
           </Select>
 
           <Input value={tags} onChange={(event) => onTagsChange(event.target.value)} placeholder="Tags (comma separated)" />
+          <Input value={locationFilter} onChange={(event) => onLocationFilterChange(event.target.value)} placeholder="Location (e.g. Stockholm, general)" />
         </CardContent>
       </Card>
 
@@ -90,6 +99,11 @@ export function GrowingKnowledgeTab({
                 <div className="mb-2 flex flex-wrap items-center gap-2">
                   <h3 className="font-medium">{item.title}</h3>
                   <Badge variant="outline">{item.category}</Badge>
+                  {item.location_note ? (
+                    <Badge variant="secondary" title="Location-specific">
+                      {item.location_note}
+                    </Badge>
+                  ) : null}
                   {!item.stockholm_relevant ? <Badge variant="secondary">Low Stockholm relevance</Badge> : null}
                 </div>
                 <p className="mb-3 text-sm text-muted-foreground">{item.content}</p>
@@ -112,9 +126,18 @@ export function GrowingKnowledgeTab({
                     <span>Season: year-round</span>
                   )}
                 </div>
-                <div className="mt-3">
+                <div className="mt-3 flex flex-wrap gap-2">
                   <Button size="sm" variant="outline" onClick={() => onAddAsTask(item)} disabled={isBusy}>
                     Add as task
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="text-destructive hover:bg-destructive/10"
+                    onClick={() => onDelete(item)}
+                    disabled={isBusy || deletingId === item.id}
+                  >
+                    {deletingId === item.id ? "Deleting…" : "Delete"}
                   </Button>
                 </div>
               </article>

@@ -27,10 +27,19 @@ export async function fetchGrowingSources(): Promise<GrowingSourcesResponse> {
   return (await response.json()) as GrowingSourcesResponse;
 }
 
+export async function fetchGrowingSource(sourceId: string): Promise<{ id: string; url: string; title: string | null; channel: string | null; description: string | null; status: string; error_message: string | null; tips_extracted: number; created_at: string; processed_at: string | null; transcript: string | null }> {
+  const response = await fetch(`/api/growing/sources/${sourceId}`, { cache: "no-store" });
+  if (!response.ok) {
+    await readApiError(response, "Failed to load source");
+  }
+  return response.json();
+}
+
 export type GrowingKnowledgeFilters = {
   category: string;
   tags: string;
   season: string;
+  location: string;
 };
 
 export async function fetchGrowingKnowledge(
@@ -45,6 +54,9 @@ export async function fetchGrowingKnowledge(
   }
   if (filters.season && filters.season !== "all") {
     params.set("season_relevance", filters.season);
+  }
+  if (filters.location.trim()) {
+    params.set("location", filters.location.trim());
   }
 
   const response = await fetch(`/api/growing/knowledge?${params.toString()}`, { cache: "no-store" });
@@ -102,14 +114,26 @@ export async function updateSuggestionStatus(
   return response.json();
 }
 
-export async function addGrowingSource(url: string): Promise<{ source: unknown }> {
+export async function addGrowingSource(url: string, transcript?: string | null): Promise<{ source: unknown }> {
   const response = await fetch("/api/growing/sources", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ url }),
+    body: JSON.stringify({ url, transcript: transcript ?? null }),
   });
   if (!response.ok) {
     await readApiError(response, "Failed to add YouTube source");
+  }
+  return response.json();
+}
+
+export async function updateSourceTranscript(sourceId: string, transcript: string | null): Promise<{ success: boolean }> {
+  const response = await fetch(`/api/growing/sources/${sourceId}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ transcript }),
+  });
+  if (!response.ok) {
+    await readApiError(response, "Failed to update transcript");
   }
   return response.json();
 }
@@ -128,6 +152,20 @@ export type ProcessGrowingSourceResult = {
   error?: string;
 };
 
+export async function cleanSourceExtraction(sourceId: string): Promise<{ success: boolean }> {
+  const response = await fetch(`/api/growing/sources/${sourceId}/clean`, { method: "POST" });
+  if (!response.ok) {
+    await readApiError(response, "Failed to clean source extraction");
+  }
+  return response.json();
+}
+
+/** Clean extracted knowledge/windows from a source and re-run extraction. */
+export async function cleanSourceAndReextract(sourceId: string): Promise<ProcessGrowingSourceResult> {
+  await cleanSourceExtraction(sourceId);
+  return processGrowingSource(sourceId);
+}
+
 export async function processGrowingSource(sourceId: string): Promise<ProcessGrowingSourceResult> {
   const response = await fetch(`/api/growing/sources/${sourceId}`, { method: "POST" });
   const result = (await response.json()) as ProcessGrowingSourceResult;
@@ -135,6 +173,31 @@ export async function processGrowingSource(sourceId: string): Promise<ProcessGro
     throw new Error(result.error);
   }
   return result;
+}
+
+export type FetchSourceVideoInfoResult = {
+  success: boolean;
+  title?: string | null;
+  channel?: string | null;
+  description?: string | null;
+  error?: string;
+};
+
+export async function fetchSourceVideoInfo(sourceId: string): Promise<FetchSourceVideoInfoResult> {
+  const response = await fetch(`/api/growing/sources/${sourceId}/fetch-info`, { method: "POST" });
+  const result = (await response.json()) as FetchSourceVideoInfoResult;
+  if (!response.ok) {
+    throw new Error(result.error ?? "Failed to fetch video info");
+  }
+  return result;
+}
+
+export async function deleteGrowingKnowledge(id: string): Promise<{ success: boolean }> {
+  const response = await fetch(`/api/growing/knowledge/${id}`, { method: "DELETE" });
+  if (!response.ok) {
+    await readApiError(response, "Failed to delete knowledge");
+  }
+  return response.json();
 }
 
 export async function createTask(payload: {

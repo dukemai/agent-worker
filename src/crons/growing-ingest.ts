@@ -1,12 +1,17 @@
-import { createClient } from "@supabase/supabase-js";
+import { createClient, type SupabaseClient } from "@supabase/supabase-js";
+import type { Database } from "../types/database";
 import { extractGrowingKnowledge } from "../lib/gemini";
-import { fetchYouTubeTranscript } from "../lib/youtube";
+import { extractYouTubeVideoId } from "../lib/youtube";
 import { GROWING_KNOWLEDGE_EXTRACTION } from "../prompts/growing-knowledge";
 
 type GrowingSourceRow = {
   id: string;
   url: string;
+  title: string | null;
+  channel: string | null;
+  description: string | null;
   status: "queued" | "processing" | "done" | "failed";
+  transcript: string | null;
 };
 
 function toItemKey(videoId: string, rawKey: string): string {
@@ -24,10 +29,10 @@ export async function runGrowingIngest(env: Env): Promise<void> {
     return;
   }
 
-  const supabase = createClient(env.SUPABASE_URL, env.SUPABASE_SERVICE_KEY);
+  const supabase = createClient<Database>(env.SUPABASE_URL, env.SUPABASE_SERVICE_KEY);
   const { data, error } = await supabase
     .from("growing_sources")
-    .select("id, url, status")
+    .select("id, url, title, channel, description, status, transcript")
     .eq("status", "queued")
     .order("created_at", { ascending: true })
     .limit(5);
@@ -37,11 +42,12 @@ export async function runGrowingIngest(env: Env): Promise<void> {
   }
 
   const sources = (data ?? []) as GrowingSourceRow[];
-  if (sources.length === 0) {
+  const withTranscript = sources.filter((s) => (s.transcript?.trim() ?? "").length > 0);
+  if (withTranscript.length === 0) {
     return;
   }
 
-  for (const source of sources) {
+  for (const source of withTranscript) {
     try {
       await processOneSource(env, supabase, source);
     } catch (err) {
@@ -55,20 +61,32 @@ export async function processSingleGrowingSource(env: Env, sourceId: string): Pr
     return { success: false, error: "GEMINI_API_KEY not configured" };
   }
 
-  const supabase = createClient(env.SUPABASE_URL, env.SUPABASE_SERVICE_KEY);
+  const supabase = createClient<Database>(env.SUPABASE_URL, env.SUPABASE_SERVICE_KEY);
   const { data: row, error: fetchError } = await supabase
     .from("growing_sources")
-    .select("id, url, status")
-    .eq("id", sourceId)
+    .select("id, url, title, channel, description, status, transcript")
+    .eq("id", sourceId.trim())
     .maybeSingle();
 
-  if (fetchError || !row) {
-    return { success: false, error: fetchError?.message ?? "Source not found" };
+  if (fetchError) {
+    return { success: false, error: fetchError.message };
+  }
+  if (!row) {
+    return { success: false, error: "Source not found" };
   }
 
   const source = row as GrowingSourceRow;
   if (source.status !== "queued" && source.status !== "failed") {
     return { success: false, error: "Source is not queued or failed (cannot extract)" };
+  }
+
+  const transcriptText = source.transcript?.trim();
+  if (!transcriptText) {
+    return {
+      success: false,
+      error:
+        "Transcript is missing. Add a transcript for this source in the dashboard (e.g. get one from https://notegpt.io/), then try Extract now again.",
+    };
   }
 
   try {
@@ -82,27 +100,32 @@ export async function processSingleGrowingSource(env: Env, sourceId: string): Pr
 
 async function processOneSource(
   env: Env,
-  supabase: ReturnType<typeof createClient>,
+  supabase: SupabaseClient<Database>,
   source: GrowingSourceRow
 ): Promise<number> {
-  try {
-    await supabase
-      .from("growing_sources")
-      .update({ status: "processing", error_message: null })
-      .eq("id", source.id);
+  const transcriptText = source.transcript?.trim();
+  if (!transcriptText) {
+    throw new Error(
+      "Transcript is missing. Add a transcript in the dashboard (e.g. from https://notegpt.io/)."
+    );
+  }
 
-    const transcript = await fetchYouTubeTranscript(source.url);
+  try {
+    await supabase.from("growing_sources").update({ status: "processing", error_message: null } as never).eq("id", source.id);
+
+    const videoId = extractYouTubeVideoId(source.url) ?? source.id.slice(0, 11);
     const prompt = GROWING_KNOWLEDGE_EXTRACTION
-    .replace("{{currentDate}}", new Date().toISOString())
-    .replace("{{videoTitle}}", transcript.title ?? "Unknown title")
-    .replace("{{channelName}}", transcript.channel ?? "Unknown channel")
-    .replace("{{transcript}}", transcript.transcript.slice(0, 100_000));
+      .replace("{{currentDate}}", new Date().toISOString())
+      .replace("{{videoTitle}}", source.title ?? "Unknown title")
+      .replace("{{channelName}}", source.channel ?? "Unknown channel")
+      .replace("{{description}}", (source.description ?? "").trim() || "(No description)")
+      .replace("{{transcript}}", transcriptText.slice(0, 100_000));
 
   const extracted = await extractGrowingKnowledge(env.GEMINI_API_KEY, prompt);
 
   const windowsPayload = extracted.actionable_tips.map((tip) => ({
     source_id: source.id,
-    item_key: toItemKey(transcript.videoId, tip.item_key),
+    item_key: toItemKey(videoId, tip.item_key),
     item_name: tip.item_name.slice(0, 180),
     suggestion_kind: "action" as const,
     action_type: tip.action_type,
@@ -117,7 +140,7 @@ async function processOneSource(
   if (windowsPayload.length > 0) {
     const { error: windowsError } = await supabase
       .from("growing_windows")
-      .upsert(windowsPayload, { onConflict: "item_key" });
+      .upsert(windowsPayload as never, { onConflict: "item_key" });
 
     if (windowsError) {
       throw new Error(`Failed to insert growing windows: ${windowsError.message}`);
@@ -132,10 +155,11 @@ async function processOneSource(
     tags: nugget.tags,
     season_relevance: nugget.season_relevance,
     stockholm_relevant: nugget.stockholm_relevant,
+    location_note: nugget.location_note ?? null,
   }));
 
   if (knowledgePayload.length > 0) {
-    const { error: knowledgeError } = await supabase.from("growing_knowledge").insert(knowledgePayload);
+    const { error: knowledgeError } = await supabase.from("growing_knowledge").insert(knowledgePayload as never);
     if (knowledgeError) {
       throw new Error(`Failed to insert growing knowledge: ${knowledgeError.message}`);
     }
@@ -145,13 +169,11 @@ async function processOneSource(
   const { error: doneError } = await supabase
     .from("growing_sources")
     .update({
-      title: transcript.title,
-      channel: transcript.channel,
       status: "done",
       tips_extracted: tipsExtracted,
       processed_at: new Date().toISOString(),
       error_message: null,
-    })
+    } as never)
     .eq("id", source.id);
 
   if (doneError) {
@@ -164,11 +186,7 @@ async function processOneSource(
     console.warn(`Growing source processing failed (${source.id}):`, message);
     await supabase
       .from("growing_sources")
-      .update({
-        status: "failed",
-        error_message: message.slice(0, 800),
-        processed_at: new Date().toISOString(),
-      })
+      .update({ status: "failed", error_message: message.slice(0, 800), processed_at: new Date().toISOString() } as never)
       .eq("id", source.id);
     throw error;
   }

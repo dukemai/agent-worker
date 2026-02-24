@@ -5,14 +5,18 @@ import { useState, type FormEvent } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   addGrowingSource,
+  cleanSourceAndReextract,
   convertGrowingSuggestion,
   createTask,
+  deleteGrowingKnowledge,
   deleteGrowingSource,
   fetchGrowingKnowledge,
   fetchGrowingSources,
+  fetchSourceVideoInfo,
   fetchWeeklyGrowing,
   processGrowingSource,
   updateGrowingProfile,
+  updateSourceTranscript,
   updateSuggestionStatus,
 } from "@/lib/growing-api";
 import type { Bucket, GrowingKnowledgeCategory } from "@/types/database";
@@ -26,9 +30,11 @@ import { toFormState } from "./growing-dashboard.types";
 export function GrowingDashboard() {
   const queryClient = useQueryClient();
   const [youtubeUrl, setYoutubeUrl] = useState("");
+  const [youtubeTranscript, setYoutubeTranscript] = useState("");
   const [knowledgeCategory, setKnowledgeCategory] = useState<"all" | GrowingKnowledgeCategory>("all");
   const [knowledgeSeason, setKnowledgeSeason] = useState<"all" | "spring" | "summer" | "autumn" | "winter">("all");
   const [knowledgeTags, setKnowledgeTags] = useState("");
+  const [knowledgeLocation, setKnowledgeLocation] = useState("");
   const [profileFormDirty, setProfileFormDirty] = useState<GrowingProfileForm | null>(null);
 
   const weeklyQuery = useQuery({
@@ -40,12 +46,13 @@ export function GrowingDashboard() {
     queryFn: fetchGrowingSources,
   });
   const knowledgeQuery = useQuery({
-    queryKey: ["growing", "knowledge", knowledgeCategory, knowledgeSeason, knowledgeTags.trim().toLowerCase()],
+    queryKey: ["growing", "knowledge", knowledgeCategory, knowledgeSeason, knowledgeTags.trim().toLowerCase(), knowledgeLocation.trim().toLowerCase()],
     queryFn: () =>
       fetchGrowingKnowledge({
         category: knowledgeCategory,
         season: knowledgeSeason,
         tags: knowledgeTags.trim().toLowerCase(),
+        location: knowledgeLocation.trim(),
       }),
   });
 
@@ -88,9 +95,19 @@ export function GrowingDashboard() {
   });
 
   const addSourceMutation = useMutation({
-    mutationFn: addGrowingSource,
+    mutationFn: ({ url, transcript }: { url: string; transcript?: string | null }) =>
+      addGrowingSource(url, transcript),
     onSuccess: async () => {
       setYoutubeUrl("");
+      setYoutubeTranscript("");
+      await queryClient.invalidateQueries({ queryKey: ["growing", "sources"] });
+    },
+  });
+
+  const saveTranscriptMutation = useMutation({
+    mutationFn: ({ sourceId, transcript }: { sourceId: string; transcript: string | null }) =>
+      updateSourceTranscript(sourceId, transcript),
+    onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["growing", "sources"] });
     },
   });
@@ -117,6 +134,24 @@ export function GrowingDashboard() {
     },
   });
 
+  const cleanAndReextractMutation = useMutation({
+    mutationFn: cleanSourceAndReextract,
+    onSuccess: async () => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["growing", "sources"] }),
+        queryClient.invalidateQueries({ queryKey: ["growing", "knowledge"] }),
+        queryClient.invalidateQueries({ queryKey: ["growing", "weekly"] }),
+      ]);
+    },
+  });
+
+  const fetchVideoInfoMutation = useMutation({
+    mutationFn: fetchSourceVideoInfo,
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["growing", "sources"] });
+    },
+  });
+
   const knowledgeToTaskMutation = useMutation({
     mutationFn: createTask,
     onSuccess: async () => {
@@ -124,9 +159,24 @@ export function GrowingDashboard() {
     },
   });
 
+  const deleteKnowledgeMutation = useMutation({
+    mutationFn: deleteGrowingKnowledge,
+    onSuccess: async () => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["growing", "knowledge"] }),
+        queryClient.invalidateQueries({ queryKey: ["growing", "weekly"] }),
+      ]);
+    },
+  });
+
   const isBusy = convertMutation.isPending || statusMutation.isPending;
-  const isSourceBusy = addSourceMutation.isPending || deleteSourceMutation.isPending;
-  const isKnowledgeBusy = knowledgeToTaskMutation.isPending;
+  const isSourceBusy =
+    addSourceMutation.isPending ||
+    deleteSourceMutation.isPending ||
+    fetchVideoInfoMutation.isPending ||
+    processSourceMutation.isPending ||
+    cleanAndReextractMutation.isPending;
+  const isKnowledgeBusy = knowledgeToTaskMutation.isPending || deleteKnowledgeMutation.isPending;
   const isProfileBusy = updateProfileMutation.isPending;
   const error =
     weeklyQuery.error instanceof Error
@@ -172,7 +222,18 @@ export function GrowingDashboard() {
       return;
     }
     try {
-      await addSourceMutation.mutateAsync(nextUrl);
+      await addSourceMutation.mutateAsync({
+        url: nextUrl,
+        transcript: youtubeTranscript.trim() || null,
+      });
+    } catch {
+      return;
+    }
+  }
+
+  async function saveTranscript(sourceId: string, transcript: string | null) {
+    try {
+      await saveTranscriptMutation.mutateAsync({ sourceId, transcript });
     } catch {
       return;
     }
@@ -186,12 +247,28 @@ export function GrowingDashboard() {
     }
   }
 
+  async function handleCleanAndReextract(id: string) {
+    try {
+      await cleanAndReextractMutation.mutateAsync(id);
+    } catch {
+      return;
+    }
+  }
+
   async function addKnowledgeToTasks(item: GrowingKnowledgeItem) {
     try {
       await knowledgeToTaskMutation.mutateAsync({
         title: `Growing: ${item.title}`,
         bucket: "this_week",
       });
+    } catch {
+      return;
+    }
+  }
+
+  async function deleteKnowledge(item: GrowingKnowledgeItem) {
+    try {
+      await deleteKnowledgeMutation.mutateAsync(item.id);
     } catch {
       return;
     }
@@ -249,14 +326,34 @@ export function GrowingDashboard() {
             sources={sources}
             isLoading={sourcesQuery.isLoading}
             youtubeUrl={youtubeUrl}
+            youtubeTranscript={youtubeTranscript}
             onYoutubeUrlChange={setYoutubeUrl}
+            onYoutubeTranscriptChange={setYoutubeTranscript}
             onSubmitSource={submitSource}
             onRemoveSource={removeSource}
             onProcessSource={(id) => processSourceMutation.mutate(id)}
+            onCleanAndReextract={handleCleanAndReextract}
+            onFetchVideoInfo={(id: string) => fetchVideoInfoMutation.mutate(id)}
+            onSaveTranscript={saveTranscript}
             isSourceBusy={isSourceBusy}
             processSourcePendingId={
               processSourceMutation.isPending && processSourceMutation.variables
                 ? processSourceMutation.variables
+                : undefined
+            }
+            cleanAndReextractPendingId={
+              cleanAndReextractMutation.isPending && cleanAndReextractMutation.variables
+                ? cleanAndReextractMutation.variables
+                : undefined
+            }
+            fetchVideoInfoPendingId={
+              fetchVideoInfoMutation.isPending && fetchVideoInfoMutation.variables
+                ? fetchVideoInfoMutation.variables
+                : undefined
+            }
+            savingTranscriptId={
+              saveTranscriptMutation.isPending && saveTranscriptMutation.variables
+                ? saveTranscriptMutation.variables.sourceId
                 : undefined
             }
           />
@@ -267,13 +364,21 @@ export function GrowingDashboard() {
             category={knowledgeCategory}
             season={knowledgeSeason}
             tags={knowledgeTags}
+            locationFilter={knowledgeLocation}
             onCategoryChange={setKnowledgeCategory}
             onSeasonChange={setKnowledgeSeason}
             onTagsChange={setKnowledgeTags}
+            onLocationFilterChange={setKnowledgeLocation}
             knowledge={knowledge}
             isLoading={knowledgeQuery.isLoading}
             onAddAsTask={addKnowledgeToTasks}
+            onDelete={deleteKnowledge}
             isBusy={isKnowledgeBusy}
+            deletingId={
+              deleteKnowledgeMutation.isPending && deleteKnowledgeMutation.variables
+                ? deleteKnowledgeMutation.variables
+                : undefined
+            }
           />
         </TabsContent>
       </Tabs>

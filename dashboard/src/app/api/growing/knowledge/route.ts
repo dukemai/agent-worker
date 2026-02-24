@@ -36,6 +36,7 @@ export async function GET(request: Request) {
   const seasons = parseCsv(url.searchParams.get("season_relevance")).filter((item): item is (typeof SEASONS)[number] =>
     SEASONS.includes(item as (typeof SEASONS)[number])
   );
+  const location = url.searchParams.get("location")?.trim() || null;
 
   if (category && !CATEGORIES.includes(category as GrowingKnowledgeCategory)) {
     return errorResponse("Invalid category");
@@ -44,7 +45,7 @@ export async function GET(request: Request) {
   let query = auth.supabase
     .from("growing_knowledge")
     .select(
-      "id, source_id, title, content, category, tags, season_relevance, stockholm_relevant, created_at, source:growing_sources(url, title, channel)"
+      "id, source_id, title, content, category, tags, season_relevance, stockholm_relevant, location_note, created_at, source:growing_sources(url, title, channel)"
     )
     .order("created_at", { ascending: false })
     .limit(200);
@@ -59,6 +60,10 @@ export async function GET(request: Request) {
 
   for (const tag of tags) {
     query = query.contains("tags", [tag]);
+  }
+
+  if (location) {
+    query = query.ilike("location_note", `%${location}%`);
   }
 
   const { data, error } = await query;
@@ -90,6 +95,7 @@ export async function GET(request: Request) {
       category: category ?? null,
       tags,
       season_relevance: seasons,
+      location: location ?? null,
     },
   });
 }

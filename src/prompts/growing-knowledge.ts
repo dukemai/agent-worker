@@ -1,5 +1,6 @@
 export const GROWING_KNOWLEDGE_EXTRACTION = `
-You are an assistant that extracts practical growing knowledge from YouTube transcripts.
+You are an assistant that extracts practical growing knowledge from YouTube videos.
+Use the video title, description, and transcript together to identify accurate, useful tips and knowledge.
 
 Context:
 - Primary location: Stockholm, Sweden.
@@ -29,13 +30,14 @@ Return strict JSON with this shape:
       "category": "technique|plant-profile|soil|pest-control|companion-planting|preservation|general",
       "tags": ["string"],
       "season_relevance": ["spring|summer|autumn|winter"],
-      "stockholm_relevant": true
+      "stockholm_relevant": true,
+      "location_note": "string - which location/climate this applies to (e.g. Stockholm, Nordic, temperate, Mediterranean, general). Use 'general' if universal."
     }
   ]
 }
 
 Rules:
-1) Extract only tips actually supported by the transcript.
+1) Extract only tips supported by the title, description, or transcript.
 2) Keep actionable_tips seasonal and concrete (something to do).
 3) Use Stockholm-adapted timing in start_month/end_month.
 4) If a tip is not seasonal action, put it in knowledge_nuggets instead.
@@ -43,10 +45,14 @@ Rules:
 6) Keep stockholm_note practical, 1-2 sentences max.
 7) Return up to 8 actionable_tips and up to 12 knowledge_nuggets.
 8) Avoid duplicates. Merge overlapping advice.
+9) Set location_note to the specific location/climate when the tip is location-specific (e.g. Stockholm, Nordic, temperate, Mediterranean). Use "general" when the advice applies broadly.
 
 Current date: {{currentDate}}
 Video title: {{videoTitle}}
 Channel: {{channelName}}
+
+Video description:
+{{description}}
 
 Transcript:
 {{transcript}}

@@ -44,6 +44,7 @@ export interface GrowingKnowledgeNugget {
   tags: string[];
   season_relevance: Array<"spring" | "summer" | "autumn" | "winter">;
   stockholm_relevant: boolean;
+  location_note?: string;
 }
 
 export interface GrowingKnowledgeExtractionResult {
@@ -181,6 +182,11 @@ const GROWING_KNOWLEDGE_SCHEMA: ObjectSchema = {
             } as Schema,
           } as Schema,
           stockholm_relevant: { type: SchemaType.BOOLEAN } as Schema,
+          location_note: {
+            type: SchemaType.STRING,
+            nullable: true,
+            description: "Which location/climate this applies to (e.g. Stockholm, Nordic, temperate, Mediterranean, general)",
+          } as Schema,
         },
         required: ["title", "content", "category", "tags", "season_relevance", "stockholm_relevant"],
       } as Schema,
@@ -259,7 +265,17 @@ export async function extractGrowingKnowledge(
   });
 
   const result = await model.generateContent(fullPrompt);
-  const parsed = JSON.parse(result.response.text()) as GrowingKnowledgeExtractionResult;
+  const text = result.response.text();
+  if (!text?.trim()) {
+    throw new Error("Gemini returned empty response");
+  }
+  let parsed: GrowingKnowledgeExtractionResult;
+  try {
+    parsed = JSON.parse(text) as GrowingKnowledgeExtractionResult;
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e);
+    throw new Error(`Gemini returned invalid JSON: ${msg}. First 200 chars: ${text.slice(0, 200)}`);
+  }
 
   const actionable_tips = (parsed.actionable_tips ?? [])
     .filter((tip) => tip && typeof tip.item_name === "string")
@@ -287,6 +303,10 @@ export async function extractGrowingKnowledge(
           )
         : [],
       stockholm_relevant: Boolean(nugget.stockholm_relevant),
+      location_note:
+        typeof nugget.location_note === "string" && nugget.location_note.trim()
+          ? nugget.location_note.trim().slice(0, 120)
+          : null,
     }));
 
   return { actionable_tips, knowledge_nuggets };

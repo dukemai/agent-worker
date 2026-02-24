@@ -31,6 +31,7 @@ export type GrowingKnowledgeResponse = {
     category: string | null;
     tags: string[];
     season_relevance: string[];
+    location: string | null;
   };
 };
 

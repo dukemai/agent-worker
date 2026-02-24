@@ -86,11 +86,13 @@ export interface GrowingSource {
   url: string;
   title: string | null;
   channel: string | null;
+  description: string | null;
   status: GrowingSourceStatus;
   error_message: string | null;
   tips_extracted: number;
   created_at: string;
   processed_at: string | null;
+  transcript: string | null;
 }
 
 export interface GrowingKnowledge {
@@ -102,5 +104,6 @@ export interface GrowingKnowledge {
   tags: string[];
   season_relevance: string[];
   stockholm_relevant: boolean;
+  location_note: string | null;
   created_at: string;
 }
