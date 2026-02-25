@@ -10,12 +10,16 @@ import {
   createTask,
   deleteGrowingKnowledge,
   deleteGrowingSource,
+  deleteGrowingWindow,
   fetchGrowingKnowledge,
   fetchGrowingSources,
+  fetchGrowingWindows,
   fetchSourceVideoInfo,
   fetchWeeklyGrowing,
   processGrowingSource,
   updateGrowingProfile,
+  updateGrowingWindowMonths,
+  updateGrowingWindowVerified,
   updateSourceTranscript,
   updateSuggestionStatus,
 } from "@/lib/growing-api";
@@ -24,6 +28,7 @@ import { GrowingContextCard } from "./growing-context-card";
 import { GrowingKnowledgeTab } from "./growing-knowledge-tab";
 import { GrowingSourcesTab } from "./growing-sources-tab";
 import { GrowingWeeklyTab } from "./growing-weekly-tab";
+import { GrowingWindowsTab } from "./growing-windows-tab";
 import type { GrowingKnowledgeItem, GrowingProfileForm } from "./growing-dashboard.types";
 import { toFormState } from "./growing-dashboard.types";
 
@@ -54,6 +59,10 @@ export function GrowingDashboard() {
         tags: knowledgeTags.trim().toLowerCase(),
         location: knowledgeLocation.trim(),
       }),
+  });
+  const windowsQuery = useQuery({
+    queryKey: ["growing", "windows"],
+    queryFn: fetchGrowingWindows,
   });
 
   const data = weeklyQuery.data;
@@ -169,6 +178,37 @@ export function GrowingDashboard() {
     },
   });
 
+  const updateWindowVerifiedMutation = useMutation({
+    mutationFn: ({ id, verified }: { id: string; verified: boolean }) => updateGrowingWindowVerified(id, verified),
+    onSuccess: async () => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["growing", "windows"] }),
+        queryClient.invalidateQueries({ queryKey: ["growing", "weekly"] }),
+      ]);
+    },
+  });
+
+  const updateWindowMonthsMutation = useMutation({
+    mutationFn: ({ id, start_month, end_month }: { id: string; start_month: number; end_month: number }) =>
+      updateGrowingWindowMonths(id, start_month, end_month),
+    onSuccess: async () => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["growing", "windows"] }),
+        queryClient.invalidateQueries({ queryKey: ["growing", "weekly"] }),
+      ]);
+    },
+  });
+
+  const deleteWindowMutation = useMutation({
+    mutationFn: deleteGrowingWindow,
+    onSuccess: async () => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["growing", "windows"] }),
+        queryClient.invalidateQueries({ queryKey: ["growing", "weekly"] }),
+      ]);
+    },
+  });
+
   const isBusy = convertMutation.isPending || statusMutation.isPending;
   const isSourceBusy =
     addSourceMutation.isPending ||
@@ -274,6 +314,30 @@ export function GrowingDashboard() {
     }
   }
 
+  async function handleToggleWindowVerified(id: string, verified: boolean) {
+    try {
+      await updateWindowVerifiedMutation.mutateAsync({ id, verified });
+    } catch {
+      return;
+    }
+  }
+
+  async function handleUpdateWindowMonths(id: string, start_month: number, end_month: number) {
+    try {
+      await updateWindowMonthsMutation.mutateAsync({ id, start_month, end_month });
+    } catch {
+      return;
+    }
+  }
+
+  async function deleteWindow(id: string) {
+    try {
+      await deleteWindowMutation.mutateAsync(id);
+    } catch {
+      return;
+    }
+  }
+
   async function submitProfileForm(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     try {
@@ -289,6 +353,7 @@ export function GrowingDashboard() {
 
   const sources = sourcesQuery.data?.sources ?? [];
   const knowledge = knowledgeQuery.data?.knowledge ?? [];
+  const windows = windowsQuery.data?.windows ?? [];
 
   if (!data) {
     return <main className="mx-auto w-full max-w-7xl px-4 py-6">No growing suggestions available.</main>;
@@ -309,6 +374,7 @@ export function GrowingDashboard() {
         <TabsList className="w-full justify-start overflow-x-auto">
           <TabsTrigger value="weekly">This Week</TabsTrigger>
           <TabsTrigger value="sources">Sources</TabsTrigger>
+          <TabsTrigger value="windows">Windows</TabsTrigger>
           <TabsTrigger value="knowledge">Knowledge</TabsTrigger>
         </TabsList>
 
@@ -354,6 +420,33 @@ export function GrowingDashboard() {
             savingTranscriptId={
               saveTranscriptMutation.isPending && saveTranscriptMutation.variables
                 ? saveTranscriptMutation.variables.sourceId
+                : undefined
+            }
+          />
+        </TabsContent>
+
+        <TabsContent value="windows" className="space-y-4">
+          <GrowingWindowsTab
+            windows={windows}
+            isLoading={windowsQuery.isLoading}
+            onToggleVerified={handleToggleWindowVerified}
+            onUpdateMonths={handleUpdateWindowMonths}
+            onDelete={deleteWindow}
+            isBusy={
+              updateWindowVerifiedMutation.isPending ||
+              updateWindowMonthsMutation.isPending ||
+              deleteWindowMutation.isPending
+            }
+            updatingId={
+              updateWindowVerifiedMutation.isPending && updateWindowVerifiedMutation.variables
+                ? updateWindowVerifiedMutation.variables.id
+                : updateWindowMonthsMutation.isPending && updateWindowMonthsMutation.variables
+                  ? updateWindowMonthsMutation.variables.id
+                  : undefined
+            }
+            deletingId={
+              deleteWindowMutation.isPending && deleteWindowMutation.variables
+                ? deleteWindowMutation.variables
                 : undefined
             }
           />

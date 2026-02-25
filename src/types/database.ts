@@ -70,6 +70,7 @@ export interface Database {
           suggested_bucket: string;
           stockholm_note: string;
           tags: string[];
+          verified: boolean;
           created_at: string;
         };
         Insert: {
@@ -85,6 +86,7 @@ export interface Database {
           suggested_bucket?: string;
           stockholm_note: string;
           tags?: string[];
+          verified?: boolean;
           created_at?: string;
         };
         Update: Partial<Database["public"]["Tables"]["growing_windows"]["Insert"]>;

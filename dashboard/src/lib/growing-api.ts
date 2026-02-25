@@ -192,6 +192,68 @@ export async function fetchSourceVideoInfo(sourceId: string): Promise<FetchSourc
   return result;
 }
 
+export async function fetchGrowingWindows(): Promise<{ windows: GrowingWindowItem[] }> {
+  const response = await fetch("/api/growing/windows", { cache: "no-store" });
+  if (!response.ok) {
+    throw new Error("Failed to load growing windows");
+  }
+  return (await response.json()) as { windows: GrowingWindowItem[] };
+}
+
+export type GrowingWindowItem = {
+  id: string;
+  source_id: string | null;
+  item_key: string;
+  item_name: string;
+  suggestion_kind: string;
+  action_type: string | null;
+  start_month: number;
+  end_month: number;
+  priority: number;
+  suggested_bucket: string;
+  stockholm_note: string;
+  tags: string[];
+  verified: boolean;
+  created_at: string;
+  source: { id: string; url: string | null; title: string | null; channel: string | null } | null;
+};
+
+export async function updateGrowingWindowVerified(id: string, verified: boolean): Promise<{ success: boolean }> {
+  const response = await fetch(`/api/growing/windows/${id}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ verified }),
+  });
+  if (!response.ok) {
+    await readApiError(response, "Failed to update window");
+  }
+  return response.json();
+}
+
+export async function updateGrowingWindowMonths(
+  id: string,
+  start_month: number,
+  end_month: number
+): Promise<{ success: boolean }> {
+  const response = await fetch(`/api/growing/windows/${id}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ start_month, end_month }),
+  });
+  if (!response.ok) {
+    await readApiError(response, "Failed to update window months");
+  }
+  return response.json();
+}
+
+export async function deleteGrowingWindow(id: string): Promise<{ success: boolean }> {
+  const response = await fetch(`/api/growing/windows/${id}`, { method: "DELETE" });
+  if (!response.ok) {
+    await readApiError(response, "Failed to delete window");
+  }
+  return response.json();
+}
+
 export async function deleteGrowingKnowledge(id: string): Promise<{ success: boolean }> {
   const response = await fetch(`/api/growing/knowledge/${id}`, { method: "DELETE" });
   if (!response.ok) {

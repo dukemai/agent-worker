@@ -95,6 +95,30 @@ export interface GrowingSource {
   transcript: string | null;
 }
 
+export interface GrowingWindow {
+  id: string;
+  source_id: string | null;
+  item_key: string;
+  item_name: string;
+  suggestion_kind: string;
+  action_type: string | null;
+  start_month: number;
+  end_month: number;
+  priority: number;
+  suggested_bucket: Bucket;
+  stockholm_note: string;
+  tags: string[];
+  verified: boolean;
+  created_at: string;
+}
+
+export interface GrowingWindowSource {
+  id: string;
+  url: string | null;
+  title: string | null;
+  channel: string | null;
+}
+
 export interface GrowingKnowledge {
   id: string;
   source_id: string;
