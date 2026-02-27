@@ -1,5 +1,5 @@
 name = "email-worker"
-main = "src/index.ts"
+main = "apps/worker/src/index.ts"
 compatibility_date = "2024-08-01"
 
 # Email Worker binding - required for sending emails from the worker
