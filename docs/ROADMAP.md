@@ -24,7 +24,7 @@
 - [x] Setup Resend for outbound daily digest email
 - [x] Promotion deal extraction and digest section
 
-### Phase 5: Ops Extension — done
+### Phase 5: Ops Extension — in progress
 - [x] Mobile-first dashboard (tabs on mobile, grid on desktop)
 - [x] Responsive header with hamburger menu
 - [x] Category-based "surprise me" learning profiles
@@ -36,6 +36,7 @@
 - [x] Growing season tracker (Stockholm seasonal windows)
 - [x] Growing suggestions with one-tap task conversion
 - [x] Daily digest section for garden this week
+- [ ] Growing sources: blog URL support (extract from blog posts alongside YouTube)
 
 ### Phase 6: Learning Agent Specialization — deferred
 - [ ] Economy learning agent

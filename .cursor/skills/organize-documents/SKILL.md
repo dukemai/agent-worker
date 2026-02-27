@@ -13,13 +13,24 @@ All project documentation follows this layout:
 repo-root/
 ├── README.md                    # Quick start: what this is, how to run it, how to deploy
 ├── docs/
-│   ├── SPEC.md                  # Single source of truth for product specification
+│   ├── GLOSSARY.md              # Short term definitions + doc routing for AI navigation
+│   ├── SPEC.md                  # Executive summary, schema overview, links to requirements/
+│   ├── requirements/            # Feature-specific specs (ingestion, digest, dashboard, etc.)
+│   │   ├── INDEX.md             # Requirement routing
+│   │   ├── ingestion.md
+│   │   ├── daily-digest.md
+│   │   ├── dashboard.md
+│   │   ├── renewals.md
+│   │   ├── growing.md
+│   │   ├── promotions.md
+│   │   └── learning.md
 │   ├── ARCHITECTURE.md          # System design, data flow, tech stack rationale
 │   ├── DECISIONS.md             # Append-only log of key decisions (tagged by phase)
 │   ├── ROADMAP.md               # Current and future phases with status markers
 │   └── phases/                  # Phase-specific artifacts (scope + retro)
 │       ├── 01-ingestion-mvp/
 │       │   ├── SCOPE.md
+│       │   ├── TASKS.md         # Optional: time-boxed task list (from phase-planning skill)
 │       │   └── RETRO.md
 │       ├── 02-intelligence/
 │       │   ├── SCOPE.md
@@ -47,18 +58,45 @@ Required sections:
 
 Do NOT put product spec, roadmap, or architecture here.
 
+### docs/GLOSSARY.md
+
+Purpose: **AI navigation aid** — short, concise term definitions and doc routing to help find the correct requirements quickly.
+
+Contains:
+- **Doc routing**: What each doc holds (SPEC = what/why, ARCHITECTURE = how, ROADMAP = status, phases = scope/retro)
+- **Domain terms**: Key concepts (bucket, renewal, growing, family context, etc.) with one-line definitions
+- **Schema quick ref**: Table names and purpose (→ full schema in SPEC.md)
+- **Phase quick ref**: Phase names and focus (→ SCOPE.md for details)
+
+Rules:
+- Keep entries to 1–2 lines. Full details live in the linked docs.
+- Update when new domain terms or docs are added.
+- Use this first when unsure where to look; it routes to the canonical source.
+
 ### docs/SPEC.md
 
 Purpose: single source of truth for **what the product does and why**.
 
 Contains:
 - Executive summary
-- User personas and use cases
-- Core workflows (step-by-step)
+- User personas
+- Links to feature specs in `docs/requirements/`
 - Data schema overview (table names, key columns, relationships)
 - Environment and constraints (city, timezone, language)
 
-Update this when product direction changes. Previous versions live in git history.
+Update this when product direction changes. Feature details live in `docs/requirements/*.md`. Previous versions live in git history.
+
+### docs/requirements/
+
+Purpose: **feature-specific specs** — detailed workflows, data, and acceptance criteria per area.
+
+Structure:
+- `INDEX.md` — routing table (which doc holds what)
+- `ingestion.md`, `daily-digest.md`, `dashboard.md`, `renewals.md`, `growing.md`, `promotions.md`, `learning.md`
+
+Each spec: overview, workflow, data (tables used), related specs. Keep each under ~50 lines; split if a feature grows.
+
+Update when a feature changes. Link from SPEC.md.
 
 ### docs/ARCHITECTURE.md
 
@@ -105,7 +143,7 @@ Keep this in sync with `.cursor/plans/` but at a higher level (phases, not file-
 
 ### docs/phases/ — Phase Archives
 
-Each phase gets a numbered folder under `docs/phases/`. A phase folder contains exactly two files.
+Each phase gets a numbered folder under `docs/phases/`. A phase folder contains SCOPE.md and RETRO.md; TASKS.md is optional (created by the phase-planning skill).
 
 #### Naming convention
 
@@ -152,6 +190,19 @@ Rules:
 - Keep it under 40 lines. If it's longer, the phase is too big — split it.
 - Do not update SCOPE.md during the phase. It's a snapshot of the plan at the start.
 
+#### TASKS.md — written when planning implementation (optional)
+
+Purpose: time-boxed, actionable task list for implementing the phase. Created by the [phase-planning](.cursor/skills/phase-planning/SKILL.md) skill after the previous phase retro and Phase 7 review.
+
+Contains:
+- Ordered list of tasks with estimates (15 min, 30 min, 1h, 2h)
+- Per-task steps, files, and "done when" criteria
+- Total estimate for the phase
+
+Rules:
+- Write TASKS.md after Phase 7 review and before implementation.
+- Each task should be executable by anyone without guessing.
+
 #### RETRO.md — written when a phase ends
 
 Purpose: record what actually shipped vs. what was planned, and capture lessons.
@@ -182,8 +233,9 @@ Rules:
 #### Phase lifecycle
 
 1. **Starting a phase**: Create `docs/phases/NN-name/SCOPE.md`. Update `docs/ROADMAP.md` status to `in progress`.
-2. **During a phase**: Update living docs (`SPEC.md`, `ARCHITECTURE.md`) as features ship. Log decisions in `DECISIONS.md` tagged with `[Phase N]`.
-3. **Completing a phase**: Write `docs/phases/NN-name/RETRO.md`. Update `docs/ROADMAP.md` status to `done`.
+2. **Planning implementation**: After Phase 7 review, run the [phase-planning](.cursor/skills/phase-planning/SKILL.md) skill to create `docs/phases/NN-name/TASKS.md`.
+3. **During a phase**: Update living docs (`SPEC.md`, `ARCHITECTURE.md`) as features ship. Log decisions in `DECISIONS.md` tagged with `[Phase N]`.
+4. **Completing a phase**: Write `docs/phases/NN-name/RETRO.md`. Update `docs/ROADMAP.md` status to `done`.
 
 #### Linking phases to decisions
 
@@ -225,7 +277,9 @@ Replace boilerplate (e.g., create-next-app default) with project-specific conten
 
 | Situation | Action |
 |-----------|--------|
-| New feature changes product direction | Update `docs/SPEC.md` |
+| New domain term or doc added | Update `docs/GLOSSARY.md` |
+| New feature changes product direction | Update `docs/SPEC.md` and/or `docs/requirements/<area>.md` |
+| New feature area added | Create `docs/requirements/<area>.md`, add to INDEX.md and SPEC.md |
 | New tech choice or integration | Update `docs/ARCHITECTURE.md`, add `docs/DECISIONS.md` entry |
 | Starting a new phase | Create `docs/phases/NN-name/SCOPE.md`, update `docs/ROADMAP.md` to `in progress` |
 | Completing a phase | Write `docs/phases/NN-name/RETRO.md`, update `docs/ROADMAP.md` to `done` |

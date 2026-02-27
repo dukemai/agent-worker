@@ -158,9 +158,9 @@ Before starting implementation of any phase (including the first one), run a rev
    - Are there new requirements from conversations since the plan was created?
 
 3. **Decide: proceed, adjust, or re-scope.**
-   - **Proceed**: Scope is still accurate. Start implementation.
-   - **Adjust**: Minor updates needed. Update SCOPE.md with a `## Adjustments` section (do not rewrite the original scope — append to it so the history is visible).
-   - **Re-scope**: Scope is significantly wrong. Discuss with the user, rewrite SCOPE.md, and log the reason in `docs/DECISIONS.md`.
+   - **Proceed**: Scope is still accurate. Run the [phase-planning](.cursor/skills/phase-planning/SKILL.md) skill to produce `TASKS.md`, then start implementation.
+   - **Adjust**: Minor updates needed. Update SCOPE.md with a `## Adjustments` section (do not rewrite the original scope — append to it so the history is visible). Then run phase-planning and start implementation.
+   - **Re-scope**: Scope is significantly wrong. Discuss with the user, rewrite SCOPE.md, and log the reason in `docs/DECISIONS.md`. Then run phase-planning and start implementation.
 
 ### Adjustments format
 

@@ -106,7 +106,7 @@ Wait for user confirmation before proceeding to the next phase.
 
 ## Step 6: Feed into next phase
 
-Deferred items, lessons, and user feedback from this retro should be reviewed during the Phase 7 (Review Before Each Phase) step of the [project-plan](.cursor/skills/project-plan/SKILL.md) skill. Specifically:
+Deferred items, lessons, and user feedback from this retro should be reviewed during the Phase 7 (Review Before Each Phase) step of the [project-plan](.cursor/skills/project-plan/SKILL.md) skill. After Phase 7 review, run the [phase-planning](.cursor/skills/phase-planning/SKILL.md) skill to produce the task list for the next phase. Specifically:
 
 - Deferred items may need to be added to the next phase's SCOPE.md.
 - Lessons may change how the next phase is approached.

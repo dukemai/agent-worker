@@ -1,5 +1,12 @@
 # Dad-Ops Agent — Decision Log
 
+## 2026-02-25: [Phase 5] Growing suggestions: generate Sun/Wed, show in digest Mon/Fri
+
+**Context**: Growing suggestions were generated on-demand when the weekly API was first called. With frequent knowledge updates, we needed a predictable schedule and fresh generation.
+**Decision**: Cron generates suggestions on **Sundays** and **Wednesdays**. Daily digest includes the growing section only on **Mondays** and **Fridays** (Monday shows Sunday's generation, Friday shows Wednesday's).
+**Alternatives considered**: Daily generation (too frequent), on-demand only (stale when digest runs before user opens dashboard), separate growing email (rejected: prefer single digest with conditional sections).
+**Status**: accepted
+
 ## 2026-02-17: [Phase 5] Use tasks metadata for renewals instead of new table
 
 **Context**: Needed to store renewal reminders (passport, subscriptions) without a schema migration for a new table.

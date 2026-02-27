@@ -4,6 +4,7 @@ import { TASK_EXTRACTION } from "./prompts/task-extraction";
 import { extractTaskFromEmail } from "./lib/gemini";
 import { runDailyDigest } from "./crons/daily-digest";
 import { processSingleGrowingSource, runGrowingIngest } from "./crons/growing-ingest";
+import { runGrowingSuggestions } from "./crons/growing-suggestions";
 
 const BUCKET_TABLES = {
   today: "today_tasks",
@@ -17,9 +18,15 @@ export default {
     ctx.waitUntil(
       (async () => {
         try {
-          // "30 5 * * *" — daily digest at 06:30 Stockholm (05:30 UTC winter)
-          await runGrowingIngest(env);
-          await runDailyDigest(env);
+          const cron = event.cron ?? "";
+          if (cron === "30 5 * * 0,3") {
+            // Sun/Wed: generate growing suggestions for the week
+            await runGrowingSuggestions(env);
+          } else {
+            // Daily: growing ingest + daily digest
+            await runGrowingIngest(env);
+            await runDailyDigest(env);
+          }
         } catch (err) {
           console.error("Scheduled handler failed:", err);
         }
@@ -50,6 +57,38 @@ export default {
   // 2. Handles HTTP (curl / local dev testing + manual growing extract)
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     const url = new URL(request.url);
+
+    if (url.pathname === "/run-growing-suggestions" && request.method === "POST") {
+      try {
+        await runGrowingSuggestions(env);
+        return new Response(
+          JSON.stringify({ success: true, message: "Growing suggestions generated" }),
+          { headers: { "Content-Type": "application/json" } }
+        );
+      } catch (err) {
+        console.error("Growing suggestions failed:", err);
+        return new Response(
+          JSON.stringify({ success: false, error: String(err) }),
+          { status: 500, headers: { "Content-Type": "application/json" } }
+        );
+      }
+    }
+
+    if (url.pathname === "/run-digest" && request.method === "POST") {
+      try {
+        await runDailyDigest(env);
+        return new Response(
+          JSON.stringify({ success: true, message: "Daily digest sent" }),
+          { headers: { "Content-Type": "application/json" } }
+        );
+      } catch (err) {
+        console.error("Daily digest failed:", err);
+        return new Response(
+          JSON.stringify({ success: false, error: String(err) }),
+          { status: 500, headers: { "Content-Type": "application/json" } }
+        );
+      }
+    }
 
     if (url.pathname === "/process-growing" && request.method === "POST") {
       try {

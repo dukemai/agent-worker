@@ -55,6 +55,7 @@ Gmail
 | Worker → Gemini | Task extraction, lesson generation, digest narrative | Request/Response |
 | Worker → OpenWeather | Daily digest cron | Request/Response |
 | Worker → Resend | Daily digest cron | Outbound email |
+| Worker → Supabase | Growing suggestions cron (Sun, Wed) | Write `growing_suggestions_log` |
 | Dashboard → Supabase | Every API route | Read/Write |
 
 ## Environment Variables

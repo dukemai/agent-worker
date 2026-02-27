@@ -16,4 +16,6 @@ When the user signals that a phase is done — by any of these:
 
 Do not skip this step. Do not start the next phase without completing the retro.
 
-After the retro is done, proceed to the Phase 7 (Review Before Each Phase) step from the [project-plan](.cursor/skills/project-plan/SKILL.md) skill to review the upcoming phase's scope.
+After the retro is done:
+1. Proceed to the Phase 7 (Review Before Each Phase) step from the [project-plan](.cursor/skills/project-plan/SKILL.md) skill to review the upcoming phase's scope.
+2. Run the [phase-planning](.cursor/skills/phase-planning/SKILL.md) skill to produce a time-boxed task list for the next phase.

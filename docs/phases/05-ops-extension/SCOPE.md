@@ -33,3 +33,17 @@ Extend the platform with mobile-first UX, renewal reminders, growing season trac
 ### Category-Based Learning
 - Learning profiles with `profile_type` (topic or category)
 - Category-based "surprise me" lesson generation
+
+---
+
+## Adjustments (2026-02-25)
+
+**Trigger**: New user requirement — extend Growing Season Tracker sources beyond YouTube.
+
+### Added
+
+**Growing Season Tracker — Blog source support**
+- Add blog URLs as a source type alongside YouTube
+- Fetch blog content (HTML → text extraction) for processing, or allow manual paste
+- Reuse existing extraction pipeline (tips → growing_knowledge, growing_windows) for blog text
+- UI: support blog URL input in Sources tab; detect source type (YouTube vs blog) and route accordingly
