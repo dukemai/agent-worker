@@ -10,8 +10,10 @@ type GrowingSourceRow = {
   title: string | null;
   channel: string | null;
   description: string | null;
+  source_type: string | null;
   status: "queued" | "processing" | "done" | "failed";
   transcript: string | null;
+  source_language: string | null;
 };
 
 function toItemKey(videoId: string, rawKey: string): string {
@@ -85,7 +87,7 @@ export async function processSingleGrowingSource(env: Env, sourceId: string): Pr
     return {
       success: false,
       error:
-        "Transcript is missing. Add a transcript for this source in the dashboard (e.g. get one from https://notegpt.io/), then try Extract now again.",
+        "Transcript or article content is missing. Add it for this source in the dashboard (for example, paste a YouTube transcript from https://notegpt.io/ or Markdown from https://give-me-markdown.com/), then try Extract now again.",
     };
   }
 
@@ -106,7 +108,7 @@ async function processOneSource(
   const transcriptText = source.transcript?.trim();
   if (!transcriptText) {
     throw new Error(
-      "Transcript is missing. Add a transcript in the dashboard (e.g. from https://notegpt.io/)."
+      "Transcript or article content is missing. Add it in the dashboard (for example, paste a YouTube transcript from https://notegpt.io/ or Markdown from https://give-me-markdown.com/)."
     );
   }
 
@@ -114,12 +116,14 @@ async function processOneSource(
     await supabase.from("growing_sources").update({ status: "processing", error_message: null } as never).eq("id", source.id);
 
     const videoId = extractYouTubeVideoId(source.url) ?? source.id.slice(0, 11);
+    const sourceLanguage = (source.source_language ?? "").trim().toLowerCase() || "en";
     const prompt = GROWING_KNOWLEDGE_EXTRACTION
       .replace("{{currentDate}}", new Date().toISOString())
       .replace("{{videoTitle}}", source.title ?? "Unknown title")
       .replace("{{channelName}}", source.channel ?? "Unknown channel")
       .replace("{{description}}", (source.description ?? "").trim() || "(No description)")
-      .replace("{{transcript}}", transcriptText.slice(0, 100_000));
+      .replace("{{transcript}}", transcriptText.slice(0, 100_000))
+      .replace("{{sourceLanguage}}", sourceLanguage);
 
   const extracted = await extractGrowingKnowledge(env.GEMINI_API_KEY, prompt);
 
@@ -156,6 +160,7 @@ async function processOneSource(
     season_relevance: nugget.season_relevance,
     stockholm_relevant: nugget.stockholm_relevant,
     location_note: nugget.location_note ?? null,
+    language: sourceLanguage,
   }));
 
   if (knowledgePayload.length > 0) {

@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import type { GrowingSource } from "@/types/database";
 import { fetchGrowingSource } from "@/lib/growing-api";
+import { extractYouTubeVideoId } from "@/lib/youtube";
 
 const SOURCE_STATUS_VARIANT = {
   queued: "secondary",
@@ -89,10 +90,10 @@ export function GrowingSourcesTab({
     <div className="space-y-4">
       <Card>
         <CardHeader>
-          <CardTitle>Get transcript from a video</CardTitle>
+          <CardTitle>Get transcript or article content</CardTitle>
           <p className="text-sm text-muted-foreground">
-            Paste a transcript below for each source. To get a transcript from a YouTube video, use an external tool
-            such as{" "}
+            Paste a transcript or article content below for each source. To get a transcript from a YouTube video, use
+            an external tool such as{" "}
             <a
               href="https://notegpt.io/"
               target="_blank"
@@ -101,14 +102,23 @@ export function GrowingSourcesTab({
             >
               NoteGPT
             </a>{" "}
-            (YouTube Transcript Generator), then paste the result here.
+            (YouTube Transcript Generator). For blog posts, you can use{" "}
+            <a
+              href="https://give-me-markdown.com/"
+              target="_blank"
+              rel="noreferrer"
+              className="font-medium text-primary underline"
+            >
+              give-me-markdown.com
+            </a>{" "}
+            to convert a page into Markdown, then paste the result here.
           </p>
         </CardHeader>
       </Card>
 
       <Card>
         <CardHeader>
-          <CardTitle>Add YouTube Source</CardTitle>
+          <CardTitle>Add Source (YouTube or blog)</CardTitle>
         </CardHeader>
         <CardContent>
           <form className="flex flex-col gap-3" onSubmit={onSubmitSource}>
@@ -116,12 +126,12 @@ export function GrowingSourcesTab({
               type="url"
               value={youtubeUrl}
               onChange={(e) => onYoutubeUrlChange(e.target.value)}
-              placeholder="https://www.youtube.com/watch?v=..."
+              placeholder="https://www.youtube.com/watch?v=... or https://example.com/article"
             />
             <Textarea
               value={youtubeTranscript}
               onChange={(e) => onYoutubeTranscriptChange(e.target.value)}
-              placeholder="Optional: paste transcript when adding (or add it below after saving)"
+              placeholder="Optional: paste transcript or article content when adding (or add it below after saving)"
               rows={4}
               className="resize-y"
             />
@@ -140,7 +150,7 @@ export function GrowingSourcesTab({
           {isLoading ? (
             <p className="text-sm text-muted-foreground">Loading sources...</p>
           ) : sources.length === 0 ? (
-            <p className="text-sm text-muted-foreground">No videos added yet.</p>
+            <p className="text-sm text-muted-foreground">No sources added yet.</p>
           ) : (
             sources.map((source) => {
               const isExpanded = expandedSourceId === source.id;
@@ -148,6 +158,13 @@ export function GrowingSourcesTab({
               const hasTranscript = (source.transcript?.trim() ?? "").length > 0;
               const preview = (source.transcript ?? "").slice(0, PREVIEW_CHARS);
               const hasMore = (source.transcript?.length ?? 0) > PREVIEW_CHARS;
+              const isYouTube = extractYouTubeVideoId(source.url) !== null;
+              const sourceTypeLabel =
+                source.source_type === "blog"
+                  ? "Blog"
+                  : isYouTube
+                    ? "Video"
+                    : "Source";
 
               return (
                 <article key={source.id} className="rounded-md border p-3">
@@ -156,7 +173,12 @@ export function GrowingSourcesTab({
                       <h3 className="font-medium">{source.title ?? "Pending title"}</h3>
                       <p className="text-xs text-muted-foreground">{source.channel ?? "Channel unknown"}</p>
                     </div>
-                    <Badge variant={SOURCE_STATUS_VARIANT[source.status]}>{source.status}</Badge>
+                    <div className="flex items-center gap-2">
+                      <Badge variant="outline" className="text-[10px] uppercase tracking-wide">
+                        {sourceTypeLabel}
+                      </Badge>
+                      <Badge variant={SOURCE_STATUS_VARIANT[source.status]}>{source.status}</Badge>
+                    </div>
                   </div>
                   <p className="mb-3 break-all text-xs text-muted-foreground">{source.url}</p>
                   {source.description ? (
@@ -195,7 +217,7 @@ export function GrowingSourcesTab({
                         <Textarea
                           value={draftValue}
                           onChange={(e) => setTranscriptDrafts((prev) => ({ ...prev, [source.id]: e.target.value }))}
-                          placeholder="Paste transcript (e.g. from NoteGPT)…"
+                          placeholder="Paste transcript or article content (e.g. from NoteGPT or give-me-markdown.com)…"
                           rows={8}
                           className="resize-y text-sm"
                         />
@@ -221,8 +243,12 @@ export function GrowingSourcesTab({
                       size="sm"
                       variant="outline"
                       onClick={() => onFetchVideoInfo(source.id)}
-                      disabled={fetchVideoInfoPendingId === source.id || isSourceBusy}
-                      title="Fetch title, channel, and description from YouTube"
+                      disabled={fetchVideoInfoPendingId === source.id || isSourceBusy || !isYouTube}
+                      title={
+                        isYouTube
+                          ? "Fetch title, channel, and description from YouTube"
+                          : "Automatic metadata fetch is only available for YouTube sources"
+                      }
                     >
                       {fetchVideoInfoPendingId === source.id ? "Fetching…" : "Fetch video info"}
                     </Button>

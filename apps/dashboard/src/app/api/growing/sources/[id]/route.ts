@@ -16,7 +16,9 @@ export async function GET(_request: Request, { params }: Params) {
 
   const { data, error } = await auth.supabase
     .from("growing_sources")
-    .select("id, url, title, channel, description, status, error_message, tips_extracted, created_at, processed_at, transcript")
+    .select(
+      "id, url, title, channel, description, source_type, status, error_message, tips_extracted, created_at, processed_at, transcript"
+    )
     .eq("id", id)
     .maybeSingle();
 

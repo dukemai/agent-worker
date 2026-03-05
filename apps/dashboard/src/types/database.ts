@@ -87,6 +87,7 @@ export interface GrowingSource {
   title: string | null;
   channel: string | null;
   description: string | null;
+  source_type: string | null;
   status: GrowingSourceStatus;
   error_message: string | null;
   tips_extracted: number;

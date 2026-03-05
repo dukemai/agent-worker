@@ -27,7 +27,22 @@ export async function fetchGrowingSources(): Promise<GrowingSourcesResponse> {
   return (await response.json()) as GrowingSourcesResponse;
 }
 
-export async function fetchGrowingSource(sourceId: string): Promise<{ id: string; url: string; title: string | null; channel: string | null; description: string | null; status: string; error_message: string | null; tips_extracted: number; created_at: string; processed_at: string | null; transcript: string | null }> {
+export async function fetchGrowingSource(
+  sourceId: string
+): Promise<{
+  id: string;
+  url: string;
+  title: string | null;
+  channel: string | null;
+  description: string | null;
+  source_type: string | null;
+  status: string;
+  error_message: string | null;
+  tips_extracted: number;
+  created_at: string;
+  processed_at: string | null;
+  transcript: string | null;
+}> {
   const response = await fetch(`/api/growing/sources/${sourceId}`, { cache: "no-store" });
   if (!response.ok) {
     await readApiError(response, "Failed to load source");
