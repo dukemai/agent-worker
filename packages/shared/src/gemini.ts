@@ -44,7 +44,7 @@ export interface GrowingKnowledgeNugget {
   tags: string[];
   season_relevance: Array<"spring" | "summer" | "autumn" | "winter">;
   stockholm_relevant: boolean;
-  location_note?: string;
+  location_note?: string | null;
 }
 
 export interface GrowingKnowledgeExtractionResult {
@@ -185,7 +185,8 @@ const GROWING_KNOWLEDGE_SCHEMA: ObjectSchema = {
           location_note: {
             type: SchemaType.STRING,
             nullable: true,
-            description: "Which location/climate this applies to (e.g. Stockholm, Nordic, temperate, Mediterranean, general)",
+            description:
+              "Which location/climate this applies to (e.g. Stockholm, Nordic, temperate, Mediterranean, general)",
           } as Schema,
         },
         required: ["title", "content", "category", "tags", "season_relevance", "stockholm_relevant"],
@@ -195,7 +196,7 @@ const GROWING_KNOWLEDGE_SCHEMA: ObjectSchema = {
   required: ["actionable_tips", "knowledge_nuggets"],
 };
 
-export async function extractTaskFromEmail(
+export async function getTaskExtractionFromEmail(
   apiKey: string,
   subject: string,
   body: string,
@@ -286,7 +287,9 @@ export async function extractGrowingKnowledge(
       end_month: Math.min(12, Math.max(1, Number(tip.end_month) || 12)),
       priority: Math.min(10, Math.max(1, Number(tip.priority) || 5)),
       suggested_bucket:
-        tip.suggested_bucket === "today" || tip.suggested_bucket === "this_week" || tip.suggested_bucket === "later"
+        tip.suggested_bucket === "today" ||
+        tip.suggested_bucket === "this_week" ||
+        tip.suggested_bucket === "later"
           ? tip.suggested_bucket
           : "this_week",
       tags: Array.isArray(tip.tags) ? tip.tags.filter((tag) => typeof tag === "string").slice(0, 8) : [],

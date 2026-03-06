@@ -165,13 +165,24 @@ export function GrowingSourcesTab({
                   : isYouTube
                     ? "Video"
                     : "Source";
+              let secondaryLine = source.channel ?? "Channel unknown";
+              if (source.source_type === "blog") {
+                try {
+                  const hostname = new URL(source.url).hostname.replace(/^www\./, "");
+                  if (hostname) {
+                    secondaryLine = hostname;
+                  }
+                } catch {
+                  // ignore URL parse errors and fall back to channel
+                }
+              }
 
               return (
                 <article key={source.id} className="rounded-md border p-3">
                   <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
                     <div className="space-y-1">
                       <h3 className="font-medium">{source.title ?? "Pending title"}</h3>
-                      <p className="text-xs text-muted-foreground">{source.channel ?? "Channel unknown"}</p>
+                      <p className="text-xs text-muted-foreground">{secondaryLine}</p>
                     </div>
                     <div className="flex items-center gap-2">
                       <Badge variant="outline" className="text-[10px] uppercase tracking-wide">

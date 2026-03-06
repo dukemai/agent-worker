@@ -1,82 +1,18 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import { DAILY_BRIEFING } from "../prompts/daily-briefing";
+import { DAILY_BRIEFING, fetchPendingTasksForBucket } from "@agent/shared";
 import { getStockholmWeather } from "../lib/weather";
 import { sendEmail } from "../lib/resend";
 import { runLearningLoop, type GeneratedLesson } from "./learning-loop";
-
-interface Task {
-  id: string;
-  title: string;
-  original_body: string | null;
-  due_date: string | null;
-  status: string;
-  source: string;
-  metadata: Record<string, unknown> | null;
-}
-
-interface BucketRow {
-  task_id: string;
-}
-
-async function fetchPendingTasksForBucket(
-  supabase: SupabaseClient,
-  bucketTable: string
-): Promise<Task[]> {
-  const { data: bucketRows, error: bucketError } = await supabase
-    .from(bucketTable)
-    .select("task_id");
-
-  if (bucketError || !bucketRows?.length) return [];
-
-  const taskIds = (bucketRows as BucketRow[]).map((r) => r.task_id);
-
-  const { data: tasks, error: tasksError } = await supabase
-    .from("tasks")
-    .select("id, title, original_body, due_date, status, source, metadata")
-    .in("id", taskIds)
-    .eq("status", "pending")
-    .order("due_date", { ascending: true, nullsFirst: false });
-
-  if (tasksError) return [];
-  return (tasks as Task[]) ?? [];
-}
-
-interface PromotionDigestItem {
-  store: string;
-  summary: string;
-  link: string | null;
-}
-
-interface RenewalDigestItem {
-  title: string;
-  dueDate: string;
-  daysLeft: number;
-  link: string | null;
-}
-
-interface GrowingTaskDigestItem {
-  title: string;
-  dueDate: string | null;
-}
-
-interface GrowingSuggestionDigestItem {
-  title: string;
-  details: string;
-}
-
-interface RecentGrowingKnowledgeItem {
-  title: string;
-  content: string;
-  category: string;
-  sourceUrl: string | null;
-}
-
-interface RecentGrowingWindowItem {
-  title: string;
-  note: string;
-  sourceUrl: string | null;
-}
+import type {
+  Task,
+  PromotionDigestItem,
+  RenewalDigestItem,
+  GrowingTaskDigestItem,
+  GrowingSuggestionDigestItem,
+  RecentGrowingKnowledgeItem,
+  RecentGrowingWindowItem,
+} from "@agent/shared";
 
 function resolveRelatedSourceUrl(value: unknown): string | null {
   if (!value) {

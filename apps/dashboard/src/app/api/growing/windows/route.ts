@@ -10,7 +10,7 @@ export async function GET() {
   const { data, error } = await auth.supabase
     .from("growing_windows")
     .select(
-      "id, source_id, item_key, item_name, suggestion_kind, action_type, start_month, end_month, priority, suggested_bucket, stockholm_note, tags, verified, created_at, source:growing_sources(id, url, title, channel)"
+      "id, source_id, item_key, item_name, suggestion_kind, action_type, start_month, end_month, priority, suggested_bucket, stockholm_note, tags, verified, created_at, source:growing_sources(id, url, title, channel, source_type)"
     )
     .order("created_at", { ascending: false })
     .limit(300);
@@ -24,9 +24,9 @@ export async function GET() {
     const sourceValue = raw.source;
     const sourceObj =
       sourceValue && typeof sourceValue === "object" && !Array.isArray(sourceValue)
-        ? (sourceValue as { id?: string; url?: string | null; title?: string | null; channel?: string | null })
+        ? (sourceValue as { id?: string; url?: string | null; title?: string | null; channel?: string | null; source_type?: string | null })
         : Array.isArray(sourceValue) && sourceValue[0]
-          ? (sourceValue[0] as { id?: string; url?: string | null; title?: string | null; channel?: string | null })
+          ? (sourceValue[0] as { id?: string; url?: string | null; title?: string | null; channel?: string | null; source_type?: string | null })
           : null;
     const { source: _s, ...rest } = raw;
     return {
@@ -37,6 +37,7 @@ export async function GET() {
             url: sourceObj.url ?? null,
             title: sourceObj.title ?? null,
             channel: sourceObj.channel ?? null,
+            source_type: sourceObj.source_type ?? null,
           }
         : null,
     };

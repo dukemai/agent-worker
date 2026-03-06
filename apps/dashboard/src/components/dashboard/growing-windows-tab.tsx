@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import type { GrowingWindowItem } from "@/lib/growing-api";
+import { extractYouTubeVideoId } from "@/lib/youtube";
 
 export type GrowingWindowsTabProps = {
   windows: GrowingWindowItem[];
@@ -68,8 +69,8 @@ export function GrowingWindowsTab({
         <CardHeader>
           <CardTitle>Actionable Windows</CardTitle>
           <p className="text-sm text-muted-foreground">
-            Seasonal tips extracted from video sources. Mark as verified when you&apos;ve confirmed they work for your
-            location.
+            Seasonal tips extracted from your sources (YouTube or blogs). Mark as verified when you&apos;ve confirmed
+            they work for your location.
           </p>
           {!isLoading && total > 0 ? (
             <p className="text-sm font-medium">
@@ -81,9 +82,33 @@ export function GrowingWindowsTab({
           {isLoading ? (
             <p className="text-sm text-muted-foreground">Loading windows...</p>
           ) : windows.length === 0 ? (
-            <p className="text-sm text-muted-foreground">No actionable windows yet. Extract from a video source first.</p>
+            <p className="text-sm text-muted-foreground">
+              No actionable windows yet. Extract knowledge from a source first.
+            </p>
           ) : (
-            windows.map((window) => (
+            windows.map((window) => {
+              const isBlog = window.source?.source_type === "blog";
+              const isYouTube = window.source?.url ? extractYouTubeVideoId(window.source.url) !== null : false;
+              let sourceLabel: string | null = null;
+              let sourceHref: string | null = window.source?.url ?? null;
+              if (window.source) {
+                if (isBlog && window.source.url) {
+                  try {
+                    const hostname = new URL(window.source.url).hostname.replace(/^www\./, "");
+                    sourceLabel = `Source: ${hostname || "Article"}`;
+                  } catch {
+                    sourceLabel = window.source.title ? `Source: ${window.source.title}` : "Source";
+                  }
+                } else if (window.source.title) {
+                  sourceLabel = `Source: ${window.source.title}`;
+                } else if (isYouTube) {
+                  sourceLabel = "Source: Video";
+                } else {
+                  sourceLabel = "Source";
+                }
+              }
+
+              return (
               <article key={window.id} className="rounded-md border p-3">
                 <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
                   <div className="flex flex-wrap items-center gap-2">
@@ -186,21 +211,16 @@ export function GrowingWindowsTab({
                     </>
                   )}
                   <span>Priority: {window.priority}</span>
-                  {window.source ? (
-                    <a
-                      className="text-blue-600 underline"
-                      href={window.source.url ?? "#"}
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                      Source: {window.source.title ?? "Video"}
+                  {window.source && sourceLabel && sourceHref ? (
+                    <a className="text-blue-600 underline" href={sourceHref} target="_blank" rel="noreferrer">
+                      {sourceLabel}
                     </a>
                   ) : (
                     <span className="italic">No source</span>
                   )}
                 </div>
               </article>
-            ))
+            )})
           )}
         </CardContent>
       </Card>

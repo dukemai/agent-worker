@@ -23,6 +23,7 @@
     "wrangler": "^3.91.0"
   },
   "dependencies": {
+    "@agent/shared": "workspace:*",
     "@google/generative-ai": "^0.24.1",
     "@supabase/supabase-js": "^2.47.0",
     "postal-mime": "^2.7.3"

@@ -1,20 +1,33 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "../types/database";
-import { extractGrowingKnowledge } from "../lib/gemini";
+import { extractGrowingKnowledge } from "@agent/shared";
 import { extractYouTubeVideoId } from "../lib/youtube";
-import { GROWING_KNOWLEDGE_EXTRACTION } from "../prompts/growing-knowledge";
+import { GROWING_KNOWLEDGE_EXTRACTION } from "@agent/shared";
+import type { GrowingSourceRow } from "@agent/shared";
 
-type GrowingSourceRow = {
-  id: string;
-  url: string;
-  title: string | null;
-  channel: string | null;
-  description: string | null;
-  source_type: string | null;
-  status: "queued" | "processing" | "done" | "failed";
-  transcript: string | null;
-  source_language: string | null;
-};
+function getDomainFromUrl(url: string): string | null {
+  try {
+    const parsed = new URL(url);
+    return parsed.hostname.replace(/^www\./, "");
+  } catch {
+    return null;
+  }
+}
+
+function deriveTitleFromTranscript(transcript: string): string | null {
+  const lines = transcript.split(/\r?\n/);
+  for (const raw of lines) {
+    const line = raw.trim();
+    if (!line) continue;
+    const headingMatch = /^#{1,6}\s+(.+)$/.exec(line);
+    if (headingMatch) {
+      return headingMatch[1].trim().slice(0, 200);
+    }
+  }
+
+  const firstNonEmpty = lines.find((raw) => raw.trim().length > 0);
+  return firstNonEmpty ? firstNonEmpty.trim().slice(0, 200) : null;
+}
 
 function toItemKey(videoId: string, rawKey: string): string {
   const safe = rawKey
@@ -34,7 +47,7 @@ export async function runGrowingIngest(env: Env): Promise<void> {
   const supabase = createClient<Database>(env.SUPABASE_URL, env.SUPABASE_SERVICE_KEY);
   const { data, error } = await supabase
     .from("growing_sources")
-    .select("id, url, title, channel, description, status, transcript")
+    .select("id, url, title, channel, description, source_type, status, transcript, source_language")
     .eq("status", "queued")
     .order("created_at", { ascending: true })
     .limit(5);
@@ -66,7 +79,7 @@ export async function processSingleGrowingSource(env: Env, sourceId: string): Pr
   const supabase = createClient<Database>(env.SUPABASE_URL, env.SUPABASE_SERVICE_KEY);
   const { data: row, error: fetchError } = await supabase
     .from("growing_sources")
-    .select("id, url, title, channel, description, status, transcript")
+    .select("id, url, title, channel, description, source_type, status, transcript, source_language")
     .eq("id", sourceId.trim())
     .maybeSingle();
 
@@ -115,12 +128,20 @@ async function processOneSource(
   try {
     await supabase.from("growing_sources").update({ status: "processing", error_message: null } as never).eq("id", source.id);
 
+    const isBlog = (source.source_type ?? "").toLowerCase() === "blog";
+    const domain = getDomainFromUrl(source.url);
     const videoId = extractYouTubeVideoId(source.url) ?? source.id.slice(0, 11);
     const sourceLanguage = (source.source_language ?? "").trim().toLowerCase() || "en";
+    let effectiveTitle = (source.title ?? "").trim();
+    if (isBlog && !effectiveTitle) {
+      effectiveTitle = deriveTitleFromTranscript(transcriptText) ?? (domain ? `Article from ${domain}` : "Article");
+    }
+    const effectiveChannel = isBlog ? domain ?? source.channel : source.channel;
+
     const prompt = GROWING_KNOWLEDGE_EXTRACTION
       .replace("{{currentDate}}", new Date().toISOString())
-      .replace("{{videoTitle}}", source.title ?? "Unknown title")
-      .replace("{{channelName}}", source.channel ?? "Unknown channel")
+      .replace("{{videoTitle}}", effectiveTitle || "Unknown title")
+      .replace("{{channelName}}", effectiveChannel ?? "Unknown channel")
       .replace("{{description}}", (source.description ?? "").trim() || "(No description)")
       .replace("{{transcript}}", transcriptText.slice(0, 100_000))
       .replace("{{sourceLanguage}}", sourceLanguage);
@@ -178,6 +199,8 @@ async function processOneSource(
       tips_extracted: tipsExtracted,
       processed_at: new Date().toISOString(),
       error_message: null,
+      ...(effectiveTitle && effectiveTitle !== source.title ? { title: effectiveTitle } : null),
+      ...(effectiveChannel && effectiveChannel !== source.channel ? { channel: effectiveChannel } : null),
     } as never)
     .eq("id", source.id);
 

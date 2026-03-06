@@ -230,7 +230,7 @@ export type GrowingWindowItem = {
   tags: string[];
   verified: boolean;
   created_at: string;
-  source: { id: string; url: string | null; title: string | null; channel: string | null } | null;
+  source: { id: string; url: string | null; title: string | null; channel: string | null; source_type: string | null } | null;
 };
 
 export async function updateGrowingWindowVerified(id: string, verified: boolean): Promise<{ success: boolean }> {

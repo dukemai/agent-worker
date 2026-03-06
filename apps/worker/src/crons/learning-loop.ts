@@ -1,6 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import { LEARNING_LESSON } from "../prompts/learning-lesson";
+import { LEARNING_LESSON } from "@agent/shared";
 
 type ProfileType = "topic" | "category";
 
