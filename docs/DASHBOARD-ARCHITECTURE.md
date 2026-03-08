@@ -2,7 +2,7 @@
 
 The dashboard is the main UI for Dad-Ops: tasks, renewals, learning, family context, and growing season suggestions. It talks to Supabase only; the Cloudflare Worker is a separate service (email, cron, optional HTTP for manual triggers).
 
-See the [top-level architecture](ARCHITECTURE.md) for how the dashboard fits into the full system.
+See the [top-level architecture](ARCHITECTURE.md) for how the dashboard fits into the full system and for the **monorepo layout** and **@agent/shared** package (types, prompts, Gemini helpers, email/promotion content). The dashboard can depend on `@agent/shared` for shared types and logic (e.g. digest types, `fetchPendingTasksForBucket`, `buildTaskContentFromExtraction` for email preview).
 
 ## Stack
 

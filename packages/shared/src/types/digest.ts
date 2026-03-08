@@ -51,3 +51,10 @@ export interface RecentGrowingWindowItem {
   note: string;
   sourceUrl: string | null;
 }
+
+/** Minimal lesson shape for digest email (profile_type, topic, content). */
+export interface DigestLessonItem {
+  profile_type: string;
+  topic: string;
+  content: string;
+}

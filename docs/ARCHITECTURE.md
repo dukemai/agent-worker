@@ -13,6 +13,72 @@
 | Email Delivery | Resend | Simple API, good deliverability, no SMTP setup |
 | Weather | OpenWeather API | Free tier covers daily forecast for single city |
 
+## Monorepo and shared package
+
+The repo is an npm workspace monorepo. Shared types and logic live in a single internal package so the Worker and the Dashboard stay in sync and can reuse the same prompts, Gemini helpers, and task/digest types.
+
+### Repo layout
+
+```
+agent-worker/
+├── apps/
+│   ├── worker/          # Cloudflare Worker (wrangler, cron, email, fetch)
+│   └── dashboard/       # Next.js app (Vercel)
+├── packages/
+│   └── shared/          # @agent/shared — types, prompts, Gemini, email/task logic
+├── supabase/            # Migrations
+├── docs/                 # This doc, decisions, requirements
+├── package.json          # Workspace root, dev/deploy scripts
+├── tsconfig.json         # Paths: @agent/shared → packages/shared/src
+├── turbo.json
+└── wrangler.toml
+```
+
+### Shared package (`@agent/shared`)
+
+Consumed by both the Worker and the Dashboard via the workspace dependency and TypeScript path `@agent/shared` → `packages/shared/src`.
+
+| Area | Contents | Used by |
+|------|----------|---------|
+| **types/** | `digest`, `growing`, `email-content` — Task, BucketRow, PromotionDigestItem, GrowingSourceRow, BuiltEmailContent, etc. | Worker crons/handlers, Dashboard (when building digest/growing UI or email preview) |
+| **prompts/** | `TASK_EXTRACTION`, `DAILY_BRIEFING`, `LEARNING_LESSON`, `GROWING_KNOWLEDGE_EXTRACTION` | Worker (process-email-task, daily-digest, learning-loop, growing-ingest) |
+| **email/** | `promotion-content` — `buildTaskContentFromExtraction`, `buildFallbackTaskContent` (promotion vs normal task from extraction) | Worker process-email-task; Dashboard (e.g. email preview) |
+| **gemini.ts** | `getTaskExtractionFromEmail`, `extractGrowingKnowledge` + extraction result types | Worker process-email-task, growing-ingest |
+| **fetch-pending-tasks.ts** | `fetchPendingTasksForBucket(supabase, bucketTable)` | Worker daily-digest; Dashboard (e.g. digest preview) |
+
+All of the above are re-exported from `packages/shared/src/index.ts`. The Worker imports from `@agent/shared`; the Dashboard can do the same once wired (e.g. for email-preview or digest helpers).
+
+### Worker app layout
+
+```
+apps/worker/src/
+├── index.ts              # Entry: scheduled, email, fetch → delegates to handlers
+├── handlers/
+│   ├── scheduled.ts      # Cron: growing suggestions (Sun/Wed) or ingest + digest (daily)
+│   ├── email.ts          # Parse incoming email → processEmailTask
+│   └── fetch/
+│       ├── index.ts       # Route by path/method
+│       ├── run-growing-suggestions.ts
+│       ├── run-digest.ts
+│       ├── process-growing.ts
+│       └── post-task.ts   # Generic POST { subject, body, from } → processEmailTask
+├── crons/
+│   ├── daily-digest.ts   # Fetch tasks, weather, runLearningLoop, build email, Resend
+│   ├── growing-ingest.ts # Queued growing_sources → Gemini → growing_knowledge + windows
+│   ├── growing-suggestions.ts
+│   └── learning-loop.ts
+├── lib/
+│   ├── process-email-task.ts  # Orchestrates Gemini extraction + @agent/shared promotion-content + Supabase insert
+│   ├── weather.ts
+│   ├── resend.ts
+│   └── youtube.ts
+└── types/
+    ├── env.ts            # Env (EMAIL, Supabase, Gemini, Resend, etc.)
+    └── database.ts       # Supabase table types for worker-only tables
+```
+
+Routing is split by handler (scheduled, email, fetch); fetch routes live in `handlers/fetch/` and are dispatched from `handlers/fetch/index.ts`.
+
 ## System Diagram
 
 ```
@@ -23,27 +89,28 @@ Gmail
                   Cloudflare Email Routing
                            │
                            ▼
-                  Cloudflare Worker (src/index.ts)
-                    ├─ email handler (SMTP parse)
-                    ├─ fetch handler (POST for testing)
-                    └─ scheduled handler (cron)
+                  Cloudflare Worker (apps/worker)
+                    ├─ handlers/scheduled  (cron)
+                    ├─ handlers/email      (SMTP parse → processEmailTask)
+                    └─ handlers/fetch      (POST routes: digest, growing, task)
                            │
                ┌───────────┼───────────┐
                ▼           ▼           ▼
-          postal-mime   Gemini AI   OpenWeather
-          (parse)      (extract)    (forecast)
+     @agent/shared      postal-mime   OpenWeather
+     (prompts, gemini,  (parse)       (forecast)
+      email, types)
                │           │           │
                └─────┬─────┘           │
                      ▼                 │
                   Supabase             │
               (tasks, buckets,         │
-               learning, context,      │
+               learning, context,     │
                growing)                │
                      │                 │
           ┌──────────┴──────────┐      │
           ▼                     ▼      ▼
     Next.js Dashboard      Daily Digest Email
-    (Vercel)               (Resend)
+    (apps/dashboard)       (Resend)
 ```
 
 ## Integration Points
@@ -85,6 +152,7 @@ For the dashboard’s architecture (directory layout, routing, auth, data flow, 
 ## Key Design Decisions
 
 - **Stateless Worker**: No in-memory state between requests. All persistence via Supabase.
+- **Single shared package**: All cross-app types, prompts, Gemini calls, and email/task content logic live in `@agent/shared`. Worker and Dashboard depend on it; no separate “tasks” package.
 - **Bucket tables**: Separate `today_tasks` / `this_week_tasks` / `later_tasks` tables with FK to `tasks`, not a column. Enables fast bucket queries without filtering.
 - **Metadata convention**: Features like renewals and growing use `tasks.metadata` JSONB instead of separate tables. Reduces schema surface while keeping task-centric ops.
 - **RLS everywhere**: All tables have Row Level Security enabled with authenticated full-access policies.
