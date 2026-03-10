@@ -1,13 +1,18 @@
 import { NextResponse } from "next/server";
 import { errorResponse, getAuthedSupabase } from "@/lib/api";
 
-export async function GET() {
+export async function GET(request: Request) {
   const auth = await getAuthedSupabase();
   if (auth.error || !auth.supabase) {
     return auth.error;
   }
 
-  const { data, error } = await auth.supabase
+  const url = new URL(request.url);
+  const verifiedParam = url.searchParams.get("verified");
+  const verified =
+    verifiedParam === null ? null : verifiedParam === "true" ? true : verifiedParam === "false" ? false : null;
+
+  let query = auth.supabase
     .from("growing_windows")
     .select(
       "id, source_id, item_key, item_name, suggestion_kind, action_type, start_month, end_month, priority, suggested_bucket, stockholm_note, tags, verified, created_at, source:growing_sources(id, url, title, channel, source_type)"
@@ -15,20 +20,37 @@ export async function GET() {
     .order("created_at", { ascending: false })
     .limit(300);
 
+  if (verified !== null) {
+    query = query.eq("verified", verified);
+  }
+
+  const { data, error } = await query;
+
   if (error) {
     return errorResponse(error.message, 500);
   }
 
   const windows = (data ?? []).map((row) => {
     const raw = row as Record<string, unknown> & { source?: unknown };
-    const sourceValue = raw.source;
+    const { source: sourceValue, ...rest } = raw;
     const sourceObj =
       sourceValue && typeof sourceValue === "object" && !Array.isArray(sourceValue)
-        ? (sourceValue as { id?: string; url?: string | null; title?: string | null; channel?: string | null; source_type?: string | null })
+        ? (sourceValue as {
+            id?: string;
+            url?: string | null;
+            title?: string | null;
+            channel?: string | null;
+            source_type?: string | null;
+          })
         : Array.isArray(sourceValue) && sourceValue[0]
-          ? (sourceValue[0] as { id?: string; url?: string | null; title?: string | null; channel?: string | null; source_type?: string | null })
+          ? (sourceValue[0] as {
+              id?: string;
+              url?: string | null;
+              title?: string | null;
+              channel?: string | null;
+              source_type?: string | null;
+            })
           : null;
-    const { source: _s, ...rest } = raw;
     return {
       ...rest,
       source: sourceObj

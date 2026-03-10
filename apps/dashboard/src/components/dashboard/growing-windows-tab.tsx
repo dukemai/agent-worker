@@ -18,6 +18,8 @@ import { extractYouTubeVideoId } from "@/lib/youtube";
 const MONTH_NAMES = ["", "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 const MONTH_OPTIONS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] as const;
 
+type WindowVerificationFilter = "all" | "verified" | "unverified";
+
 function formatMonthRange(start: number, end: number): string {
   if (start === end) return MONTH_NAMES[start] ?? "";
   return `${MONTH_NAMES[start] ?? start}–${MONTH_NAMES[end] ?? end}`;
@@ -25,9 +27,13 @@ function formatMonthRange(start: number, end: number): string {
 
 export function GrowingWindowsTab() {
   const queryClient = useQueryClient();
+  const [verification, setVerification] = useState<WindowVerificationFilter>("all");
   const windowsQuery = useQuery({
-    queryKey: ["growing", "windows"],
-    queryFn: fetchGrowingWindows,
+    queryKey: ["growing", "windows", verification],
+    queryFn: () =>
+      fetchGrowingWindows({
+        verification,
+      }),
   });
   const windows = windowsQuery.data?.windows ?? [];
   const isLoading = windowsQuery.isLoading;
@@ -136,6 +142,18 @@ export function GrowingWindowsTab() {
               {total} total · {verifiedCount} verified
             </p>
           ) : null}
+          <div className="mt-2 flex flex-wrap gap-2">
+            <Select value={verification} onValueChange={(value) => setVerification(value as WindowVerificationFilter)}>
+              <SelectTrigger className="w-[200px]">
+                <SelectValue placeholder="Verification" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All windows</SelectItem>
+                <SelectItem value="verified">Verified only</SelectItem>
+                <SelectItem value="unverified">Unverified only</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </CardHeader>
         <CardContent className="space-y-3">
           {error ? <p className="text-sm text-red-600">{error}</p> : null}

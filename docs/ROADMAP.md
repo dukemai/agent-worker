@@ -38,12 +38,18 @@
 - [x] Daily digest section for garden this week
 - [ ] Growing sources: blog URL support (extract from blog posts alongside YouTube)
 
-### Phase 6: Learning Agent Specialization — deferred
-- [ ] Economy learning agent
-- [ ] Deep AI learning agent
-- [ ] Growing-things learning agent
-- [ ] Agent-specific cadence and progression memory
+### Phase 6: Digest Preview in Dashboard — planned
+- [ ] Backend endpoint to generate the next daily digest payload without sending email
+- [ ] Dashboard UI to render a faithful preview of the digest email
+- [ ] Reuse as much email template rendering logic as possible
+- [ ] Show when the preview was generated and for which date
 
 ### Phase 7: State Tracker App — planned
 - [ ] Separate mobile app for recording and resuming work/learning states
 - [ ] Optimized for fragmented mobile access while looking after kids
+
+### Phase 8: Learning Agent Specialization — deferred
+- [ ] Economy learning agent
+- [ ] Deep AI learning agent
+- [ ] Growing-things learning agent
+- [ ] Agent-specific cadence and progression memory

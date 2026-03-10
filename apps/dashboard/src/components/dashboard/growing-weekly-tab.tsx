@@ -5,7 +5,12 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { Bucket } from "@/types/database";
-import { convertGrowingSuggestion, fetchWeeklyGrowing, updateSuggestionStatus } from "@/lib/growing-api";
+import {
+  convertGrowingSuggestion,
+  fetchWeeklyGrowing,
+  refreshWeeklyInspirations,
+  updateSuggestionStatus,
+} from "@/lib/growing-api";
 
 export function GrowingWeeklyTab() {
   const queryClient = useQueryClient();
@@ -33,7 +38,14 @@ export function GrowingWeeklyTab() {
     },
   });
 
-  const isBusy = convertMutation.isPending || statusMutation.isPending;
+  const refreshMutation = useMutation({
+    mutationFn: refreshWeeklyInspirations,
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["growing", "weekly"] });
+    },
+  });
+
+  const isBusy = convertMutation.isPending || statusMutation.isPending || refreshMutation.isPending;
 
   async function onAddToBucket(suggestionId: string, bucket: Bucket) {
     try {
@@ -51,6 +63,14 @@ export function GrowingWeeklyTab() {
     }
   }
 
+  async function onRefreshInspirations() {
+    try {
+      await refreshMutation.mutateAsync();
+    } catch {
+      return;
+    }
+  }
+
   const error =
     weeklyQuery.error instanceof Error
       ? weeklyQuery.error.message
@@ -58,7 +78,9 @@ export function GrowingWeeklyTab() {
       ? convertMutation.error.message
       : statusMutation.error instanceof Error
         ? statusMutation.error.message
-        : null;
+        : refreshMutation.error instanceof Error
+          ? refreshMutation.error.message
+          : null;
 
   if (weeklyQuery.isLoading) {
     return <p className="text-sm text-muted-foreground">Loading weekly growing suggestions...</p>;
@@ -101,7 +123,18 @@ export function GrowingWeeklyTab() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Inspiration</CardTitle>
+            <div className="flex items-center justify-between gap-2">
+              <CardTitle>Inspiration</CardTitle>
+              <Button
+                size="sm"
+                variant="outline"
+                className="min-h-9"
+                onClick={onRefreshInspirations}
+                disabled={isBusy}
+              >
+                Refresh inspirations
+              </Button>
+            </div>
           </CardHeader>
           <CardContent className="space-y-3">
             {data.inspirations.length === 0 ? (

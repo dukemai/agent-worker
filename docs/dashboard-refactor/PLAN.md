@@ -4,8 +4,12 @@
 Refactor the dashboard app page-by-page into smaller, focused, testable modules with clearer boundaries for data orchestration and UI presentation.
 
 ## Phases
-- **Phase 1 (current):** Tasks page (`TasksDashboard`) decomposition.
-- **Phase 2+:** Remaining dashboard pages (context, learning, growing) to be scoped after Phase 1 validation.
+- **Phase 1:** Tasks page (`TasksDashboard`) decomposition. (completed)
+- **Phase 2–4:** Worker refactor, shared package, and initial dashboard restructuring. (completed)
+- **Phase 5 (current):** Growing dashboard and suggestions/logs experience.
+- **Phase 6 (next):** Preview daily digest email in the dashboard.
+- **Phase 7:** State tracker UX.
+- **Phase 8:** Learning experience.
 
 ## Phase 1 Scope: Tasks Page
 Break the large tasks dashboard component into a `tasks/` module where:
@@ -28,3 +32,8 @@ Break the large tasks dashboard component into a `tasks/` module where:
 - Keep mobile tabs / desktop 3-column layout in the tasks board.
 - Update page wiring to import `TasksDashboard` from `@/components/dashboard/tasks`.
 - Remove legacy `tasks-dashboard.tsx` after migration is complete.
+
+## Phase 5 Notes: Growing Dashboard (current)
+
+- Focus: connect `growing_windows` → `growing_suggestions_log` → weekly dashboard (actions + inspirations), plus verification flows.
+- Open TODO: **stabilize inspiration refresh ordering** — the "Refresh inspirations" button currently yields a somewhat random-looking order on each click; keep the existing behavior for now but revisit to make ordering deterministic and clearly prioritized. 

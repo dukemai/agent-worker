@@ -19,6 +19,16 @@ export async function fetchWeeklyGrowing(): Promise<WeeklyGrowingResponse> {
   return (await response.json()) as WeeklyGrowingResponse;
 }
 
+export async function refreshWeeklyInspirations(): Promise<{ success: boolean; created?: number }> {
+  const response = await fetch("/api/growing/weekly/inspirations/refresh", {
+    method: "POST",
+  });
+  if (!response.ok) {
+    await readApiError(response, "Failed to refresh inspirations");
+  }
+  return response.json() as Promise<{ success: boolean; created?: number }>;
+}
+
 export async function createGrowingProfile(form?: Partial<GrowingProfileForm>): Promise<{ profile: unknown }> {
   const response = await fetch("/api/growing/profile", {
     method: "POST",
@@ -75,6 +85,10 @@ export type GrowingKnowledgeFilters = {
   tags: string;
   season: string;
   location: string;
+  verification: "all" | "verified" | "unverified";
+};
+
+export type GrowingWindowFilters = {
   verification: "all" | "verified" | "unverified";
 };
 
@@ -233,8 +247,16 @@ export async function fetchSourceVideoInfo(sourceId: string): Promise<FetchSourc
   return result;
 }
 
-export async function fetchGrowingWindows(): Promise<{ windows: GrowingWindowItem[] }> {
-  const response = await fetch("/api/growing/windows", { cache: "no-store" });
+export async function fetchGrowingWindows(filters?: GrowingWindowFilters): Promise<{ windows: GrowingWindowItem[] }> {
+  const params = new URLSearchParams();
+  if (filters?.verification === "verified") {
+    params.set("verified", "true");
+  } else if (filters?.verification === "unverified") {
+    params.set("verified", "false");
+  }
+
+  const queryString = params.toString();
+  const response = await fetch(`/api/growing/windows${queryString ? `?${queryString}` : ""}`, { cache: "no-store" });
   if (!response.ok) {
     throw new Error("Failed to load growing windows");
   }
