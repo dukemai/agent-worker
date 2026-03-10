@@ -14,9 +14,29 @@ async function readApiError(response: Response, fallback: string): Promise<never
 export async function fetchWeeklyGrowing(): Promise<WeeklyGrowingResponse> {
   const response = await fetch("/api/growing/weekly", { cache: "no-store" });
   if (!response.ok) {
-    throw new Error("Failed to load weekly growing suggestions");
+    await readApiError(response, "Failed to load weekly growing suggestions");
   }
   return (await response.json()) as WeeklyGrowingResponse;
+}
+
+export async function createGrowingProfile(form?: Partial<GrowingProfileForm>): Promise<{ profile: unknown }> {
+  const response = await fetch("/api/growing/profile", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      city: form?.city,
+      country_code: form?.country_code,
+      space_type: form?.space_type,
+      experience_level: form?.experience_level,
+      interests: form?.interestsStr
+        ? form.interestsStr.split(",").map((s) => s.trim()).filter(Boolean)
+        : undefined,
+    }),
+  });
+  if (!response.ok) {
+    await readApiError(response, "Failed to create growing profile");
+  }
+  return response.json();
 }
 
 export async function fetchGrowingSources(): Promise<GrowingSourcesResponse> {
@@ -55,6 +75,7 @@ export type GrowingKnowledgeFilters = {
   tags: string;
   season: string;
   location: string;
+  verification: "all" | "verified" | "unverified";
 };
 
 export async function fetchGrowingKnowledge(
@@ -72,6 +93,11 @@ export async function fetchGrowingKnowledge(
   }
   if (filters.location.trim()) {
     params.set("location", filters.location.trim());
+  }
+  if (filters.verification === "verified") {
+    params.set("verified", "true");
+  } else if (filters.verification === "unverified") {
+    params.set("verified", "false");
   }
 
   const response = await fetch(`/api/growing/knowledge?${params.toString()}`, { cache: "no-store" });
@@ -273,6 +299,18 @@ export async function deleteGrowingKnowledge(id: string): Promise<{ success: boo
   const response = await fetch(`/api/growing/knowledge/${id}`, { method: "DELETE" });
   if (!response.ok) {
     await readApiError(response, "Failed to delete knowledge");
+  }
+  return response.json();
+}
+
+export async function updateGrowingKnowledgeVerified(id: string, verified: boolean): Promise<{ success: boolean }> {
+  const response = await fetch(`/api/growing/knowledge/${id}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ verified }),
+  });
+  if (!response.ok) {
+    await readApiError(response, "Failed to update knowledge");
   }
   return response.json();
 }

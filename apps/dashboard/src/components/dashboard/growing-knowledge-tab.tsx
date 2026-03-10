@@ -1,56 +1,142 @@
 "use client";
 
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  createTask,
+  deleteGrowingKnowledge,
+  fetchGrowingKnowledge,
+  updateGrowingKnowledgeVerified,
+} from "@/lib/growing-api";
 import type { GrowingKnowledgeCategory } from "@/types/database";
-import type { GrowingKnowledgeItem } from "./growing-dashboard.types";
 
 export type KnowledgeSeason = "all" | "spring" | "summer" | "autumn" | "winter";
+export type KnowledgeVerificationFilter = "all" | "verified" | "unverified";
 
-export type GrowingKnowledgeTabProps = {
-  category: "all" | GrowingKnowledgeCategory;
-  season: KnowledgeSeason;
-  tags: string;
-  locationFilter: string;
-  onCategoryChange: (value: "all" | GrowingKnowledgeCategory) => void;
-  onSeasonChange: (value: KnowledgeSeason) => void;
-  onTagsChange: (value: string) => void;
-  onLocationFilterChange: (value: string) => void;
-  knowledge: GrowingKnowledgeItem[];
-  isLoading: boolean;
-  onAddAsTask: (item: GrowingKnowledgeItem) => void;
-  onDelete: (item: GrowingKnowledgeItem) => void;
-  isBusy: boolean;
-  deletingId: string | undefined;
-};
+export function GrowingKnowledgeTab() {
+  const queryClient = useQueryClient();
+  const [category, setCategory] = useState<"all" | GrowingKnowledgeCategory>("all");
+  const [season, setSeason] = useState<KnowledgeSeason>("all");
+  const [tags, setTags] = useState("");
+  const [locationFilter, setLocationFilter] = useState("");
+  const [verification, setVerification] = useState<KnowledgeVerificationFilter>("all");
 
-export function GrowingKnowledgeTab({
-  category,
-  season,
-  tags,
-  locationFilter,
-  onCategoryChange,
-  onSeasonChange,
-  onTagsChange,
-  onLocationFilterChange,
-  knowledge,
-  isLoading,
-  onAddAsTask,
-  onDelete,
-  isBusy,
-  deletingId,
-}: GrowingKnowledgeTabProps) {
+  const knowledgeQuery = useQuery({
+    queryKey: [
+      "growing",
+      "knowledge",
+      category,
+      season,
+      tags.trim().toLowerCase(),
+      locationFilter.trim().toLowerCase(),
+      verification,
+    ],
+    queryFn: () =>
+      fetchGrowingKnowledge({
+        category,
+        season,
+        tags: tags.trim().toLowerCase(),
+        location: locationFilter.trim(),
+        verification,
+      }),
+  });
+
+  const knowledgeToTaskMutation = useMutation({
+    mutationFn: createTask,
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["tasks"] });
+    },
+  });
+
+  const deleteKnowledgeMutation = useMutation({
+    mutationFn: deleteGrowingKnowledge,
+    onSuccess: async () => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["growing", "knowledge"] }),
+        queryClient.invalidateQueries({ queryKey: ["growing", "weekly"] }),
+      ]);
+    },
+  });
+
+  const updateKnowledgeVerifiedMutation = useMutation({
+    mutationFn: ({ id, verified }: { id: string; verified: boolean }) =>
+      updateGrowingKnowledgeVerified(id, verified),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["growing", "knowledge"] });
+    },
+  });
+
+  const isLoading = knowledgeQuery.isLoading;
+  const knowledge = knowledgeQuery.data?.knowledge ?? [];
+  const verifiedCount = knowledge.filter((item) => item.verified).length;
+  const unverifiedCount = knowledge.length - verifiedCount;
+  const isBusy =
+    knowledgeToTaskMutation.isPending ||
+    deleteKnowledgeMutation.isPending ||
+    updateKnowledgeVerifiedMutation.isPending;
+  const deletingId =
+    deleteKnowledgeMutation.isPending && deleteKnowledgeMutation.variables
+      ? deleteKnowledgeMutation.variables
+      : undefined;
+  const verifyingId =
+    updateKnowledgeVerifiedMutation.isPending && updateKnowledgeVerifiedMutation.variables
+      ? updateKnowledgeVerifiedMutation.variables.id
+      : undefined;
+  const error =
+    knowledgeQuery.error instanceof Error
+      ? knowledgeQuery.error.message
+      : knowledgeToTaskMutation.error instanceof Error
+        ? knowledgeToTaskMutation.error.message
+        : deleteKnowledgeMutation.error instanceof Error
+          ? deleteKnowledgeMutation.error.message
+          : updateKnowledgeVerifiedMutation.error instanceof Error
+            ? updateKnowledgeVerifiedMutation.error.message
+          : null;
+
+  async function onAddAsTask(item: (typeof knowledge)[number]) {
+    try {
+      await knowledgeToTaskMutation.mutateAsync({
+        title: `Growing: ${item.title}`,
+        bucket: "this_week",
+      });
+    } catch {
+      return;
+    }
+  }
+
+  async function onDelete(item: (typeof knowledge)[number]) {
+    try {
+      await deleteKnowledgeMutation.mutateAsync(item.id);
+    } catch {
+      return;
+    }
+  }
+
+  async function onToggleVerified(item: (typeof knowledge)[number]) {
+    try {
+      await updateKnowledgeVerifiedMutation.mutateAsync({
+        id: item.id,
+        verified: !item.verified,
+      });
+    } catch {
+      return;
+    }
+  }
+
   return (
     <div className="space-y-4">
+      {error ? <p className="text-sm text-red-600">{error}</p> : null}
       <Card>
         <CardHeader>
           <CardTitle>Filters</CardTitle>
         </CardHeader>
-        <CardContent className="grid gap-3 md:grid-cols-2 lg:grid-cols-4">
-          <Select value={category} onValueChange={(value) => onCategoryChange(value as typeof category)}>
+        <CardContent className="grid gap-3 md:grid-cols-2 lg:grid-cols-5">
+          <Select value={category} onValueChange={(value) => setCategory(value as typeof category)}>
             <SelectTrigger className="w-full">
               <SelectValue placeholder="Category" />
             </SelectTrigger>
@@ -66,7 +152,7 @@ export function GrowingKnowledgeTab({
             </SelectContent>
           </Select>
 
-          <Select value={season} onValueChange={(value) => onSeasonChange(value as KnowledgeSeason)}>
+          <Select value={season} onValueChange={(value) => setSeason(value as KnowledgeSeason)}>
             <SelectTrigger className="w-full">
               <SelectValue placeholder="Season" />
             </SelectTrigger>
@@ -79,14 +165,31 @@ export function GrowingKnowledgeTab({
             </SelectContent>
           </Select>
 
-          <Input value={tags} onChange={(event) => onTagsChange(event.target.value)} placeholder="Tags (comma separated)" />
-          <Input value={locationFilter} onChange={(event) => onLocationFilterChange(event.target.value)} placeholder="Location (e.g. Stockholm, general)" />
+          <Input value={tags} onChange={(event) => setTags(event.target.value)} placeholder="Tags (comma separated)" />
+          <Input value={locationFilter} onChange={(event) => setLocationFilter(event.target.value)} placeholder="Location (e.g. Stockholm, general)" />
+          <Select value={verification} onValueChange={(value) => setVerification(value as KnowledgeVerificationFilter)}>
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Verification" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All</SelectItem>
+              <SelectItem value="verified">Verified only</SelectItem>
+              <SelectItem value="unverified">Unverified only</SelectItem>
+            </SelectContent>
+          </Select>
         </CardContent>
       </Card>
 
       <Card>
         <CardHeader>
-          <CardTitle>Knowledge Library</CardTitle>
+          <CardTitle>
+            Knowledge Library
+            {knowledge.length > 0 ? (
+              <span className="ml-2 text-sm font-normal text-muted-foreground">
+                {verifiedCount} verified · {unverifiedCount} unverified
+              </span>
+            ) : null}
+          </CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
           {isLoading ? (
@@ -105,6 +208,11 @@ export function GrowingKnowledgeTab({
                     </Badge>
                   ) : null}
                   {!item.stockholm_relevant ? <Badge variant="secondary">Low Stockholm relevance</Badge> : null}
+                  {item.verified ? (
+                    <Badge variant="default">Verified</Badge>
+                  ) : (
+                    <Badge variant="outline">Unverified</Badge>
+                  )}
                 </div>
                 <p className="mb-3 text-sm text-muted-foreground">{item.content}</p>
                 <div className="mb-3 flex flex-wrap gap-1">
@@ -129,6 +237,14 @@ export function GrowingKnowledgeTab({
                 <div className="mt-3 flex flex-wrap gap-2">
                   <Button size="sm" variant="outline" onClick={() => onAddAsTask(item)} disabled={isBusy}>
                     Add as task
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => onToggleVerified(item)}
+                    disabled={isBusy || verifyingId === item.id}
+                  >
+                    {verifyingId === item.id ? "Updating…" : item.verified ? "Mark unverified" : "Mark verified"}
                   </Button>
                   <Button
                     size="sm"

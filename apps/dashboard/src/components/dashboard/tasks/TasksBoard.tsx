@@ -82,6 +82,27 @@ export function TasksBoard() {
     },
   });
 
+  const deleteTaskMutation = useMutation({
+    mutationFn: async ({ taskId }: { taskId: string }) => {
+      const response = await fetch(`/api/tasks/${taskId}`, {
+        method: "DELETE",
+      });
+      if (!response.ok) {
+        await readApiError(response, "Failed to delete task");
+      }
+      return response.json();
+    },
+    onSuccess: async () => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["tasks"] }),
+        queryClient.invalidateQueries({ queryKey: ["renewals"] }),
+      ]);
+    },
+    onError: (mutationError) => {
+      setError(mutationError instanceof Error ? mutationError.message : "Failed to delete task");
+    },
+  });
+
   async function onMove(taskId: string, fromBucket: Bucket, toBucket: Bucket) {
     if (fromBucket === toBucket) {
       return;
@@ -93,6 +114,11 @@ export function TasksBoard() {
   async function onMarkDone(taskId: string, status: Task["status"]) {
     setError(null);
     await markDoneMutation.mutateAsync({ taskId, status });
+  }
+
+  async function onDelete(taskId: string) {
+    setError(null);
+    await deleteTaskMutation.mutateAsync({ taskId });
   }
 
   return (
@@ -111,7 +137,13 @@ export function TasksBoard() {
           </TabsList>
           {BUCKETS.map((bucket) => (
             <TabsContent key={bucket} value={bucket} className="mt-3">
-              <BucketCard bucket={bucket} tasks={tasks} onMove={onMove} onMarkDone={onMarkDone} />
+              <BucketCard
+                bucket={bucket}
+                tasks={tasks}
+                onMove={onMove}
+                onMarkDone={onMarkDone}
+                onDelete={onDelete}
+              />
             </TabsContent>
           ))}
         </Tabs>
@@ -119,7 +151,14 @@ export function TasksBoard() {
 
       <section className="hidden gap-4 md:grid md:grid-cols-3">
         {BUCKETS.map((bucket) => (
-          <BucketCard key={bucket} bucket={bucket} tasks={tasks} onMove={onMove} onMarkDone={onMarkDone} />
+          <BucketCard
+            key={bucket}
+            bucket={bucket}
+            tasks={tasks}
+            onMove={onMove}
+            onMarkDone={onMarkDone}
+            onDelete={onDelete}
+          />
         ))}
       </section>
     </>

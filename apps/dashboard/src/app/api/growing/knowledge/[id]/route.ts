@@ -3,6 +3,34 @@ import { errorResponse, getAuthedSupabase } from "@/lib/api";
 
 type Params = { params: Promise<{ id: string }> };
 
+export async function PATCH(request: Request, { params }: Params) {
+  const auth = await getAuthedSupabase();
+  if (auth.error || !auth.supabase) {
+    return auth.error;
+  }
+
+  const { id } = await params;
+  if (!id) {
+    return errorResponse("Knowledge id is required");
+  }
+
+  const payload = (await request.json()) as { verified?: unknown };
+  if (typeof payload.verified !== "boolean") {
+    return errorResponse("verified must be a boolean");
+  }
+
+  const { error } = await auth.supabase
+    .from("growing_knowledge")
+    .update({ verified: payload.verified })
+    .eq("id", id);
+
+  if (error) {
+    return errorResponse(error.message, 500);
+  }
+
+  return NextResponse.json({ success: true });
+}
+
 export async function DELETE(_request: Request, { params }: Params) {
   const auth = await getAuthedSupabase();
   if (auth.error || !auth.supabase) {

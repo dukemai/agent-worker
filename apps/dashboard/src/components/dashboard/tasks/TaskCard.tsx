@@ -10,9 +10,10 @@ type TaskCardProps = {
   bucket: Bucket;
   onMove: (taskId: string, fromBucket: Bucket, toBucket: Bucket) => Promise<void> | void;
   onMarkDone: (taskId: string, status: Task["status"]) => Promise<void> | void;
+  onDelete: (taskId: string) => Promise<void> | void;
 };
 
-export function TaskCard({ task, bucket, onMove, onMarkDone }: TaskCardProps) {
+export function TaskCard({ task, bucket, onMove, onMarkDone, onDelete }: TaskCardProps) {
   return (
     <article className="rounded-md border bg-muted/30 p-3">
       {task.metadata?.item_type === "renewal" ? (
@@ -64,6 +65,14 @@ export function TaskCard({ task, bucket, onMove, onMarkDone }: TaskCardProps) {
             Open
           </Button>
         ) : null}
+        <Button
+          size="sm"
+          variant="destructive"
+          className="ml-2 min-h-11"
+          onClick={() => onDelete(task.id)}
+        >
+          Delete
+        </Button>
       </div>
       {task.original_body ? (
         <details className="text-xs">

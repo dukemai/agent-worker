@@ -21,13 +21,13 @@ export async function DashboardHeader() {
             <Link href="/">Tasks</Link>
           </Button>
           <Button asChild variant="ghost">
+            <Link href="/growing">Growing</Link>
+          </Button>
+          <Button asChild variant="ghost">
             <Link href="/learning">Learning</Link>
           </Button>
           <Button asChild variant="ghost">
             <Link href="/context">Context</Link>
-          </Button>
-          <Button asChild variant="ghost">
-            <Link href="/growing">Growing</Link>
           </Button>
           {user ? (
             <SignOutButton />
@@ -47,13 +47,13 @@ export async function DashboardHeader() {
                 <Link href="/">Tasks</Link>
               </Button>
               <Button asChild variant="ghost" className="justify-start">
+                <Link href="/growing">Growing</Link>
+              </Button>
+              <Button asChild variant="ghost" className="justify-start">
                 <Link href="/learning">Learning</Link>
               </Button>
               <Button asChild variant="ghost" className="justify-start">
                 <Link href="/context">Context</Link>
-              </Button>
-              <Button asChild variant="ghost" className="justify-start">
-                <Link href="/growing">Growing</Link>
               </Button>
               {user ? (
                 <SignOutButton />

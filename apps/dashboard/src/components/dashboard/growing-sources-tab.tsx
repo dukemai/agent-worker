@@ -1,13 +1,22 @@
 "use client";
 
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState, type FormEvent } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import type { GrowingSource } from "@/types/database";
-import { fetchGrowingSource } from "@/lib/growing-api";
+import {
+  addGrowingSource,
+  cleanSourceAndReextract,
+  fetchGrowingSource,
+  fetchGrowingSources,
+  fetchSourceVideoInfo,
+  processGrowingSource,
+  deleteGrowingSource,
+  updateSourceTranscript,
+} from "@/lib/growing-api";
 import { extractYouTubeVideoId } from "@/lib/youtube";
 
 const SOURCE_STATUS_VARIANT = {
@@ -20,49 +29,137 @@ const SOURCE_STATUS_VARIANT = {
 const PREVIEW_CHARS = 200;
 const DESCRIPTION_PREVIEW_CHARS = 150;
 
-export type GrowingSourcesTabProps = {
-  sources: GrowingSource[];
-  isLoading: boolean;
-  youtubeUrl: string;
-  youtubeTranscript: string;
-  onYoutubeUrlChange: (value: string) => void;
-  onYoutubeTranscriptChange: (value: string) => void;
-  onSubmitSource: (event: FormEvent<HTMLFormElement>) => void;
-  onRemoveSource: (id: string) => void;
-  onProcessSource: (id: string) => void;
-  onCleanAndReextract: (id: string) => void;
-  onFetchVideoInfo: (id: string) => void;
-  onSaveTranscript: (sourceId: string, transcript: string | null) => void;
-  isSourceBusy: boolean;
-  processSourcePendingId: string | undefined;
-  cleanAndReextractPendingId: string | undefined;
-  fetchVideoInfoPendingId: string | undefined;
-  savingTranscriptId: string | undefined;
-};
-
-export function GrowingSourcesTab({
-  sources,
-  isLoading,
-  youtubeUrl,
-  youtubeTranscript,
-  onYoutubeUrlChange,
-  onYoutubeTranscriptChange,
-  onSubmitSource,
-  onRemoveSource,
-  onProcessSource,
-  onCleanAndReextract,
-  onFetchVideoInfo,
-  onSaveTranscript,
-  isSourceBusy,
-  processSourcePendingId,
-  cleanAndReextractPendingId,
-  fetchVideoInfoPendingId,
-  savingTranscriptId,
-}: GrowingSourcesTabProps) {
+export function GrowingSourcesTab() {
+  const queryClient = useQueryClient();
+  const [youtubeUrl, setYoutubeUrl] = useState("");
+  const [youtubeTranscript, setYoutubeTranscript] = useState("");
   const [transcriptDrafts, setTranscriptDrafts] = useState<Record<string, string>>({});
   const [expandedSourceId, setExpandedSourceId] = useState<string | null>(null);
   const [fullTranscriptCache, setFullTranscriptCache] = useState<Record<string, string>>({});
   const [loadingFullId, setLoadingFullId] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  const sourcesQuery = useQuery({
+    queryKey: ["growing", "sources"],
+    queryFn: fetchGrowingSources,
+  });
+  const sources = sourcesQuery.data?.sources ?? [];
+  const isLoading = sourcesQuery.isLoading;
+
+  const addSourceMutation = useMutation({
+    mutationFn: ({ url, transcript }: { url: string; transcript?: string | null }) =>
+      addGrowingSource(url, transcript),
+    onSuccess: async () => {
+      setYoutubeUrl("");
+      setYoutubeTranscript("");
+      await queryClient.invalidateQueries({ queryKey: ["growing", "sources"] });
+    },
+    onError: (mutationError) => {
+      setError(mutationError instanceof Error ? mutationError.message : "Failed to add source");
+    },
+  });
+
+  const saveTranscriptMutation = useMutation({
+    mutationFn: ({ sourceId, transcript }: { sourceId: string; transcript: string | null }) =>
+      updateSourceTranscript(sourceId, transcript),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["growing", "sources"] });
+    },
+    onError: (mutationError) => {
+      setError(mutationError instanceof Error ? mutationError.message : "Failed to save transcript");
+    },
+  });
+
+  const deleteSourceMutation = useMutation({
+    mutationFn: deleteGrowingSource,
+    onSuccess: async () => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["growing", "sources"] }),
+        queryClient.invalidateQueries({ queryKey: ["growing", "knowledge"] }),
+        queryClient.invalidateQueries({ queryKey: ["growing", "weekly"] }),
+      ]);
+    },
+    onError: (mutationError) => {
+      setError(mutationError instanceof Error ? mutationError.message : "Failed to delete source");
+    },
+  });
+
+  const processSourceMutation = useMutation({
+    mutationFn: processGrowingSource,
+    onSuccess: async () => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["growing", "sources"] }),
+        queryClient.invalidateQueries({ queryKey: ["growing", "knowledge"] }),
+        queryClient.invalidateQueries({ queryKey: ["growing", "weekly"] }),
+      ]);
+    },
+    onError: (mutationError) => {
+      setError(mutationError instanceof Error ? mutationError.message : "Failed to process source");
+    },
+  });
+
+  const cleanAndReextractMutation = useMutation({
+    mutationFn: cleanSourceAndReextract,
+    onSuccess: async () => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["growing", "sources"] }),
+        queryClient.invalidateQueries({ queryKey: ["growing", "knowledge"] }),
+        queryClient.invalidateQueries({ queryKey: ["growing", "weekly"] }),
+      ]);
+    },
+    onError: (mutationError) => {
+      setError(mutationError instanceof Error ? mutationError.message : "Failed to clean and re-extract source");
+    },
+  });
+
+  const fetchVideoInfoMutation = useMutation({
+    mutationFn: fetchSourceVideoInfo,
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["growing", "sources"] });
+    },
+    onError: (mutationError) => {
+      setError(mutationError instanceof Error ? mutationError.message : "Failed to fetch video info");
+    },
+  });
+
+  const isSourceBusy =
+    addSourceMutation.isPending ||
+    deleteSourceMutation.isPending ||
+    fetchVideoInfoMutation.isPending ||
+    processSourceMutation.isPending ||
+    cleanAndReextractMutation.isPending;
+
+  const processSourcePendingId =
+    processSourceMutation.isPending && processSourceMutation.variables
+      ? processSourceMutation.variables
+      : undefined;
+  const cleanAndReextractPendingId =
+    cleanAndReextractMutation.isPending && cleanAndReextractMutation.variables
+      ? cleanAndReextractMutation.variables
+      : undefined;
+  const fetchVideoInfoPendingId =
+    fetchVideoInfoMutation.isPending && fetchVideoInfoMutation.variables
+      ? fetchVideoInfoMutation.variables
+      : undefined;
+  const savingTranscriptId =
+    saveTranscriptMutation.isPending && saveTranscriptMutation.variables
+      ? saveTranscriptMutation.variables.sourceId
+      : undefined;
+
+  async function onSubmitSource(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setError(null);
+    const nextUrl = youtubeUrl.trim();
+    if (!nextUrl) return;
+    try {
+      await addSourceMutation.mutateAsync({
+        url: nextUrl,
+        transcript: youtubeTranscript.trim() || null,
+      });
+    } catch {
+      return;
+    }
+  }
 
   async function handleEditTranscript(sourceId: string) {
     if (expandedSourceId === sourceId) {
@@ -81,7 +178,8 @@ export function GrowingSourcesTab({
   }
 
   async function handleSaveTranscript(sourceId: string, transcript: string | null) {
-    await onSaveTranscript(sourceId, transcript);
+    setError(null);
+    await saveTranscriptMutation.mutateAsync({ sourceId, transcript });
     setFullTranscriptCache((prev) => ({ ...prev, [sourceId]: transcript ?? "" }));
     setExpandedSourceId(null);
   }
@@ -125,12 +223,12 @@ export function GrowingSourcesTab({
             <Input
               type="url"
               value={youtubeUrl}
-              onChange={(e) => onYoutubeUrlChange(e.target.value)}
+              onChange={(e) => setYoutubeUrl(e.target.value)}
               placeholder="https://www.youtube.com/watch?v=... or https://example.com/article"
             />
             <Textarea
               value={youtubeTranscript}
-              onChange={(e) => onYoutubeTranscriptChange(e.target.value)}
+              onChange={(e) => setYoutubeTranscript(e.target.value)}
               placeholder="Optional: paste transcript or article content when adding (or add it below after saving)"
               rows={4}
               className="resize-y"
@@ -147,6 +245,7 @@ export function GrowingSourcesTab({
           <CardTitle>Saved Sources</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
+          {error ? <p className="text-sm text-red-600">{error}</p> : null}
           {isLoading ? (
             <p className="text-sm text-muted-foreground">Loading sources...</p>
           ) : sources.length === 0 ? (
@@ -253,7 +352,7 @@ export function GrowingSourcesTab({
                     <Button
                       size="sm"
                       variant="outline"
-                      onClick={() => onFetchVideoInfo(source.id)}
+                      onClick={() => fetchVideoInfoMutation.mutate(source.id)}
                       disabled={fetchVideoInfoPendingId === source.id || isSourceBusy || !isYouTube}
                       title={
                         isYouTube
@@ -267,7 +366,7 @@ export function GrowingSourcesTab({
                       <Button
                         size="sm"
                         variant="outline"
-                        onClick={() => onProcessSource(source.id)}
+                        onClick={() => processSourceMutation.mutate(source.id)}
                         disabled={processSourcePendingId === source.id || !hasTranscript}
                         title={!hasTranscript ? "Save a transcript first" : undefined}
                       >
@@ -278,7 +377,7 @@ export function GrowingSourcesTab({
                       <Button
                         size="sm"
                         variant="outline"
-                        onClick={() => onCleanAndReextract(source.id)}
+                        onClick={() => cleanAndReextractMutation.mutate(source.id)}
                         disabled={cleanAndReextractPendingId === source.id || !hasTranscript}
                         title="Delete extracted knowledge and re-run extraction"
                       >
@@ -288,7 +387,7 @@ export function GrowingSourcesTab({
                     <Button
                       size="sm"
                       variant="outline"
-                      onClick={() => onRemoveSource(source.id)}
+                      onClick={() => deleteSourceMutation.mutate(source.id)}
                       disabled={isSourceBusy}
                     >
                       Delete

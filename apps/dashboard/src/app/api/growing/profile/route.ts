@@ -21,27 +21,84 @@ export async function GET() {
     return errorResponse(error.message, 500);
   }
 
-  let profile = (rows?.[0] as GrowingProfile | undefined) ?? null;
+  const profile = (rows?.[0] as GrowingProfile | undefined) ?? null;
   if (!profile) {
-    const { data: created, error: createError } = await auth.supabase
-      .from("growing_profiles")
-      .insert({
-        city: "Stockholm",
-        country_code: "SE",
-        space_type: "balcony",
-        experience_level: "beginner",
-        interests: ["herb", "tomato", "berry"],
-      })
-      .select("id, city, country_code, space_type, experience_level, interests")
-      .single();
-
-    if (createError || !created) {
-      return errorResponse(createError?.message ?? "Failed to create growing profile", 500);
-    }
-    profile = created as GrowingProfile;
+    return errorResponse("No growing profile found", 404);
   }
 
   return NextResponse.json({ profile });
+}
+
+export async function POST(request: Request) {
+  const auth = await getAuthedSupabase();
+  if (auth.error || !auth.supabase) {
+    return auth.error;
+  }
+
+  const { data: rows, error: existingError } = await auth.supabase
+    .from("growing_profiles")
+    .select("id")
+    .order("created_at", { ascending: false })
+    .limit(1);
+
+  if (existingError) {
+    return errorResponse(existingError.message, 500);
+  }
+
+  if ((rows ?? []).length > 0) {
+    return errorResponse("Growing profile already exists", 409);
+  }
+
+  const body = (await request.json().catch(() => ({}))) as {
+    city?: unknown;
+    country_code?: unknown;
+    space_type?: unknown;
+    experience_level?: unknown;
+    interests?: unknown;
+  };
+
+  const city = typeof body.city === "string" && body.city.trim().length > 0
+    ? body.city.trim().slice(0, 100)
+    : "Stockholm";
+  const countryCode = typeof body.country_code === "string" && body.country_code.trim().length > 0
+    ? body.country_code.trim().slice(0, 10).toUpperCase()
+    : "SE";
+
+  const spaceTypeRaw = body.space_type;
+  if (spaceTypeRaw !== undefined && !SPACE_TYPES.includes(spaceTypeRaw as (typeof SPACE_TYPES)[number])) {
+    return errorResponse("Invalid space_type");
+  }
+  const spaceType = (spaceTypeRaw as (typeof SPACE_TYPES)[number] | undefined) ?? "balcony";
+
+  const experienceRaw = body.experience_level;
+  if (experienceRaw !== undefined && !EXPERIENCE_LEVELS.includes(experienceRaw as (typeof EXPERIENCE_LEVELS)[number])) {
+    return errorResponse("Invalid experience_level");
+  }
+  const experience = (experienceRaw as (typeof EXPERIENCE_LEVELS)[number] | undefined) ?? "beginner";
+
+  const interests = Array.isArray(body.interests)
+    ? body.interests.slice(0, 20).map((s) => String(s).slice(0, 50))
+    : typeof body.interests === "string"
+      ? body.interests.split(",").map((s) => s.trim()).filter(Boolean).slice(0, 20).map((s) => s.slice(0, 50))
+      : ["herb", "tomato", "berry"];
+
+  const { data: created, error: createError } = await auth.supabase
+    .from("growing_profiles")
+    .insert({
+      city,
+      country_code: countryCode,
+      space_type: spaceType,
+      experience_level: experience,
+      interests,
+    })
+    .select("id, city, country_code, space_type, experience_level, interests")
+    .single();
+
+  if (createError || !created) {
+    return errorResponse(createError?.message ?? "Failed to create growing profile", 500);
+  }
+
+  return NextResponse.json({ profile: created as GrowingProfile }, { status: 201 });
 }
 
 export async function PATCH(request: Request) {

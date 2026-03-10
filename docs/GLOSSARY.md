@@ -12,6 +12,7 @@ Short definitions and doc routing. Use this to find the correct requirements qui
 | **requirements/** | Feature-specific specs — ingestion, digest, dashboard, renewals, growing, promotions, learning |
 | **requirements/INDEX.md** | Requirement routing — which doc holds what |
 | **ARCHITECTURE.md** | How it's built — tech stack, system diagram, integrations, env vars |
+| **DATABASE-ARCHITECTURE.md** | Supabase schema, relationships, RLS, and migration evolution |
 | **DASHBOARD-ARCHITECTURE.md** | Dashboard app layout, routing, auth, feature areas |
 | **DECISIONS.md** | Why we chose X over Y — append-only, tagged by phase |
 | **ROADMAP.md** | Phase status — done, in progress, planned, deferred |

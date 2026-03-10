@@ -108,6 +108,7 @@ export interface Database {
           season_relevance: string[];
           stockholm_relevant: boolean;
           location_note: string | null;
+          verified: boolean;
           created_at: string;
           language: string | null;
         };
@@ -121,6 +122,7 @@ export interface Database {
           season_relevance?: string[];
           stockholm_relevant?: boolean;
           location_note?: string | null;
+          verified?: boolean;
           created_at?: string;
           language?: string | null;
         };

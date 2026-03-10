@@ -130,5 +130,6 @@ export interface GrowingKnowledge {
   season_relevance: string[];
   stockholm_relevant: boolean;
   location_note: string | null;
+  verified: boolean;
   created_at: string;
 }

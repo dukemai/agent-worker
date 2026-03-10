@@ -74,31 +74,15 @@ export async function GET() {
     return errorResponse(profileError.message, 500);
   }
 
-  let profile = (profileRows?.[0] as GrowingProfile | undefined) ?? null;
+  const profile = (profileRows?.[0] as GrowingProfile | undefined) ?? null;
   if (!profile) {
-    const { data: createdProfile, error: createProfileError } = await auth.supabase
-      .from("growing_profiles")
-      .insert({
-        city: "Stockholm",
-        country_code: "SE",
-        space_type: "balcony",
-        experience_level: "beginner",
-        interests: ["herb", "tomato", "berry"],
-      })
-      .select("id, city, country_code, space_type, experience_level, interests")
-      .single();
-
-    if (createProfileError || !createdProfile) {
-      return errorResponse(createProfileError?.message ?? "Failed to initialize growing profile", 500);
-    }
-    profile = createdProfile as GrowingProfile;
+    return errorResponse("No growing profile found. Create a profile first.", 404);
   }
 
   const { data: existingRows, error: existingError } = await auth.supabase
     .from("growing_suggestions_log")
     .select("id, title, details, suggestion_kind, suggested_bucket, status, week_start_date, converted_task_id")
     .eq("week_start_date", weekStartDate)
-    .eq("status", "pending")
     .order("created_at", { ascending: true });
 
   if (existingError) {
@@ -110,7 +94,8 @@ export async function GET() {
   if (suggestions.length === 0) {
     const { data: windowsRows, error: windowsError } = await auth.supabase
       .from("growing_windows")
-      .select("id, item_name, suggestion_kind, suggested_bucket, priority, start_month, end_month, stockholm_note, tags");
+      .select("id, item_name, suggestion_kind, suggested_bucket, priority, start_month, end_month, stockholm_note, tags")
+      .eq("verified", true);
 
     if (windowsError) {
       return errorResponse(windowsError.message, 500);
@@ -121,15 +106,9 @@ export async function GET() {
     );
 
     const interests = profile.interests ?? [];
-    const actions = windows
-      .filter((window) => window.suggestion_kind === "action")
+    const selected = windows
       .sort((a, b) => scoreWindow(b, interests) - scoreWindow(a, interests))
-      .slice(0, 5);
-    const inspirations = windows
-      .filter((window) => window.suggestion_kind === "inspiration")
-      .sort((a, b) => scoreWindow(b, interests) - scoreWindow(a, interests))
-      .slice(0, 2);
-    const selected = [...actions, ...inspirations];
+      .slice(0, 7);
 
     if (selected.length > 0) {
       const insertPayload = selected.map((window) => ({
@@ -137,7 +116,7 @@ export async function GET() {
         window_id: window.id,
         title: window.item_name,
         details: window.stockholm_note,
-        suggestion_kind: window.suggestion_kind,
+        suggestion_kind: "action" as const,
         suggested_bucket: window.suggested_bucket,
         week_start_date: weekStartDate,
         status: "pending" as const,
@@ -156,8 +135,20 @@ export async function GET() {
     }
   }
 
-  const actions = suggestions.filter((item) => item.suggestion_kind === "action");
-  const inspirations = suggestions.filter((item) => item.suggestion_kind === "inspiration");
+  const { data: inspirationRows, error: inspirationError } = await auth.supabase
+    .from("growing_suggestions_log")
+    .select("id, title, details, suggestion_kind, suggested_bucket, status, week_start_date, converted_task_id")
+    .eq("status", "pending")
+    .is("converted_task_id", null)
+    .order("updated_at", { ascending: false })
+    .limit(6);
+
+  if (inspirationError) {
+    return errorResponse(inspirationError.message, 500);
+  }
+
+  const actions = suggestions.filter((item) => item.converted_task_id !== null);
+  const inspirations = (inspirationRows ?? []) as GrowingSuggestion[];
 
   return NextResponse.json({
     week_start_date: weekStartDate,

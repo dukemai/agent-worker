@@ -10,9 +10,10 @@ type BucketCardProps = {
   tasks: TasksByBucket;
   onMove: (taskId: string, fromBucket: Bucket, toBucket: Bucket) => Promise<void> | void;
   onMarkDone: (taskId: string, status: Task["status"]) => Promise<void> | void;
+  onDelete: (taskId: string) => Promise<void> | void;
 };
 
-export function BucketCard({ bucket, tasks, onMove, onMarkDone }: BucketCardProps) {
+export function BucketCard({ bucket, tasks, onMove, onMarkDone, onDelete }: BucketCardProps) {
   return (
     <Card>
       <CardHeader>
@@ -23,7 +24,14 @@ export function BucketCard({ bucket, tasks, onMove, onMarkDone }: BucketCardProp
           <p className="text-sm text-muted-foreground">No tasks</p>
         ) : (
           tasks[bucket].map((task) => (
-            <TaskCard key={task.id} task={task} bucket={bucket} onMove={onMove} onMarkDone={onMarkDone} />
+            <TaskCard
+              key={task.id}
+              task={task}
+              bucket={bucket}
+              onMove={onMove}
+              onMarkDone={onMarkDone}
+              onDelete={onDelete}
+            />
           ))
         )}
       </CardContent>

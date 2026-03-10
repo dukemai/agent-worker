@@ -9,5 +9,6 @@ Doc routing for feature-specific specs. Use [GLOSSARY.md](../GLOSSARY.md) for do
 | [dashboard.md](dashboard.md) | App layout, sections, interactions |
 | [renewals.md](renewals.md) | Dual-date, escalation, recurrence |
 | [growing.md](growing.md) | Sources, windows, suggestions, profile |
+| [growing-api.md](growing-api.md) | API contract for `/api/growing/*` routes |
 | [promotions.md](promotions.md) | Deal extraction, matching |
 | [learning.md](learning.md) | Profiles, lessons, feedback (deferred items) |
