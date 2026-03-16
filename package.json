@@ -12,9 +12,10 @@
     "deploy": "wrangler deploy",
     "types": "wrangler types",
     "test:fixture": "./scripts/test-fixture.sh",
-    "dev:all": "turbo run dev --parallel",
-    "build:all": "turbo run build",
-    "lint:all": "turbo run lint --parallel"
+    "dashboard:dev": "pnpm --filter dashboard dev",
+    "dev:all": "pnpm turbo run dev --parallel",
+    "build:all": "pnpm turbo run build",
+    "lint:all": "pnpm turbo run lint --parallel"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20241127.0",

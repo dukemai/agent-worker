@@ -1,5 +1,4 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { GoogleGenerativeAI } from "@google/generative-ai";
 import type {
   DigestLessonItem,
   GrowingSuggestionDigestItem,
@@ -161,39 +160,75 @@ export function formatTaskList(tasks: Task[]): string {
 }
 
 /**
- * Generates the daily briefing narrative with Gemini using DAILY_BRIEFING prompt.
- * Injects current date (sv-SE), weather summary, and formatted task lists (today / this week / later).
- * Optionally appends a rain reminder. Returns the model's plain-text response.
+ * Generates the daily briefing narrative using a simple template (no AI calls).
+ * Injects current date (sv-SE), weather summary, and task counts (today / this week / later).
+ * Optionally appends a rain reminder. Returns plain-text paragraphs separated by newlines.
+ *
+ * NOTE: `apiKey` is kept for backward compatibility with existing callers but is not used.
  */
 export async function generateBriefingNarrative(
-  apiKey: string,
+  // kept for signature compatibility; not used
+  _apiKey: string,
   weatherSummary: string,
   todayTasks: Task[],
   thisWeekTasks: Task[],
   laterTasks: Task[],
   rainForecast: boolean
 ): Promise<string> {
-  const genAI = new GoogleGenerativeAI(apiKey);
-  const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+  const now = new Date();
+  const dateLabel = now.toLocaleDateString("sv-SE", {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
 
-  const taskContext = `
-TODAY:
-${formatTaskList(todayTasks)}
+  const todayCount = todayTasks.length;
+  const weekCount = thisWeekTasks.length;
+  const laterCount = laterTasks.length;
+  const totalCount = todayCount + weekCount + laterCount;
 
-THIS WEEK:
-${formatTaskList(thisWeekTasks)}
+  const lines: string[] = [];
 
-LATER:
-${formatTaskList(laterTasks)}
-${rainForecast ? "\n⚠️ Rain is forecast — remind the kids to bring their rain coats!" : ""}
-  `.trim();
+  lines.push(`God morgon! Idag är det ${dateLabel}.`);
+  lines.push(`Vädret i Stockholm: ${weatherSummary}`);
 
-  const prompt = DAILY_BRIEFING
-    .replace("{{currentDate}}", new Date().toLocaleDateString("sv-SE", { weekday: "long", year: "numeric", month: "long", day: "numeric" }))
-    .replace("{{weather}}", weatherSummary);
+  if (rainForecast) {
+    lines.push("Det ser ut att kunna bli regn – påminn barnen om regnjackor och stövlar.");
+  }
 
-  const result = await model.generateContent(`${prompt}\n\n${taskContext}`);
-  return result.response.text().trim();
+  if (totalCount === 0) {
+    lines.push(
+      "Du har inga öppna uppgifter just nu. Använd tiden till återhämtning eller något du varit nyfiken på länge."
+    );
+  } else {
+    const todayPart =
+      todayCount === 0
+        ? "Inga uppgifter är markerade för idag."
+        : todayCount === 1
+          ? "Du har 1 uppgift för idag."
+          : `Du har ${todayCount} uppgifter för idag.`;
+
+    const weekPart =
+      weekCount === 0
+        ? ""
+        : weekCount === 1
+          ? "Det finns 1 uppgift senare den här veckan."
+          : `Det finns ${weekCount} uppgifter senare den här veckan.`;
+
+    const laterPart =
+      laterCount === 0
+        ? ""
+        : laterCount === 1
+          ? "Du har 1 uppgift parkerad för senare."
+          : `Du har ${laterCount} uppgifter parkerade för senare.`;
+
+    lines.push([todayPart, weekPart, laterPart].filter(Boolean).join(" "));
+  }
+
+  lines.push("Scrolla igenom listorna nedan och välj 1–3 saker som verkligen spelar roll idag.");
+
+  return lines.join("\n\n");
 }
 
 /**

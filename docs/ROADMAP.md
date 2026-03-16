@@ -24,7 +24,7 @@
 - [x] Setup Resend for outbound daily digest email
 - [x] Promotion deal extraction and digest section
 
-### Phase 5: Ops Extension — in progress
+### Phase 5: Ops Extension — done
 - [x] Mobile-first dashboard (tabs on mobile, grid on desktop)
 - [x] Responsive header with hamburger menu
 - [x] Category-based "surprise me" learning profiles
@@ -36,7 +36,7 @@
 - [x] Growing season tracker (Stockholm seasonal windows)
 - [x] Growing suggestions with one-tap task conversion
 - [x] Daily digest section for garden this week
-- [ ] Growing sources: blog URL support (extract from blog posts alongside YouTube)
+- [ ] Growing sources: blog URL support (extract from blog posts alongside YouTube) — deferred to a later phase
 
 ### Phase 6: Digest Preview in Dashboard — planned
 - [ ] Backend endpoint to generate the next daily digest payload without sending email

@@ -24,6 +24,9 @@ export async function DashboardHeader() {
             <Link href="/growing">Growing</Link>
           </Button>
           <Button asChild variant="ghost">
+            <Link href="/digest">Preview email</Link>
+          </Button>
+          <Button asChild variant="ghost">
             <Link href="/learning">Learning</Link>
           </Button>
           <Button asChild variant="ghost">
@@ -48,6 +51,9 @@ export async function DashboardHeader() {
               </Button>
               <Button asChild variant="ghost" className="justify-start">
                 <Link href="/growing">Growing</Link>
+              </Button>
+              <Button asChild variant="ghost" className="justify-start">
+                <Link href="/digest">Preview email</Link>
               </Button>
               <Button asChild variant="ghost" className="justify-start">
                 <Link href="/learning">Learning</Link>

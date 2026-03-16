@@ -55,3 +55,13 @@
 **Decision**: Separate `today_tasks`, `this_week_tasks`, `later_tasks` tables with FK to `tasks.id`.
 **Alternatives considered**: `bucket` column on tasks (rejected: requires filtered queries on every read, separate tables allow direct fast lookups).
 **Status**: accepted
+
+## 2026-03-05: [Phase 5] Component size and refactor guardrails
+
+**Context**: Phase 5 involved substantial dashboard refactors (tasks, growing, learning). Some components had grown very large, making refactors risky and hard to review.
+**Decision**: Introduce informal guardrails for UI complexity:
+- Prefer React components under ~400 lines of code.
+- When a component grows beyond this, treat it as a signal to break it into smaller, focused pieces (subcomponents, hooks, or modules).
+- Time-box refactors to avoid open-ended, multi-phase rewrites.
+**Alternatives considered**: Relying only on subjective “too big” judgment (rejected: hard to enforce and reason about in reviews).
+**Status**: accepted
