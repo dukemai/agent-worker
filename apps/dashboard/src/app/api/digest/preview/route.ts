@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import {
+  buildEmailHtml,
   extractGrowingTaskItems,
   extractPromotionItems,
   extractRenewalItems,
@@ -18,7 +19,7 @@ import type {
   RenewalDigestItem,
   Task as DigestTask,
 } from "@agent/shared";
-import { errorResponse, getAuthedSupabase } from "@/lib/api";
+import { getAuthedSupabase } from "@/lib/api";
 import type { Bucket } from "@/types/database";
 
 type DigestTaskPreviewItem = {
@@ -39,6 +40,7 @@ type DigestPreviewResponse = {
   generated_at: string;
   weather: DigestWeatherPreview;
   narrative: string;
+  html: string;
   tasks: {
     today: DigestTaskPreviewItem[];
     this_week: DigestTaskPreviewItem[];
@@ -61,7 +63,7 @@ function getPreviewDate(): string {
   return now.toISOString().slice(0, 10);
 }
 
-export async function GET() {
+export async function GET(request: Request) {
   const auth = await getAuthedSupabase();
   if (auth.error || !auth.supabase) {
     return auth.error;
@@ -81,33 +83,31 @@ export async function GET() {
   const promotionItems = extractPromotionItems(allTasks);
   const renewalItems = extractRenewalItems(allTasks);
 
-  const dayOfWeek = new Date().getUTCDay();
-  const includeGrowing = dayOfWeek === 1 || dayOfWeek === 5;
+  // For preview, always include the growing section so the user can see
+  // how "Growing this week" and "Inspirations for growing this week" will look,
+  // regardless of which weekday they open the dashboard.
+  const growingTasks = extractGrowingTaskItems(allTasks);
+  const growingSuggestions = await fetchPendingGrowingSuggestions(supabase);
+  const recentGrowing = await fetchRecentGrowingKnowledge(supabase);
 
-  const growingTasks = includeGrowing ? extractGrowingTaskItems(allTasks) : [];
-  const growingSuggestions = includeGrowing ? await fetchPendingGrowingSuggestions(supabase) : [];
-  const recentGrowing = includeGrowing ? await fetchRecentGrowingKnowledge(supabase) : { knowledge: [], windows: [] };
-
-  // For preview, keep weather simple and avoid external API calls for now.
-  const weatherSummary = "Preview: weather will be included in the actual email.";
+  // For preview, keep weather simple and avoid external API calls.
+  const weatherSummary = "Väderförhandsvisning: se faktiska detaljer i den skickade digesten.";
   const rainForecast = false;
 
-  // Generate narrative with Gemini if configured; otherwise use a fallback.
-  let narrative = "Preview of your daily briefing. Weather and AI narrative will be included in the actual email.";
-  const apiKey = process.env.GEMINI_API_KEY;
-  if (apiKey) {
-    try {
-      narrative = await generateBriefingNarrative(
-        apiKey,
-        weatherSummary,
-        todayTasks,
-        thisWeekTasks,
-        laterTasks,
-        rainForecast
-      );
-    } catch (err) {
-      console.warn("Digest preview: Gemini briefing failed, using fallback:", err);
-    }
+  // Generate narrative using shared template-based implementation (no AI).
+  let narrative =
+    "Förhandsvisning av dagens briefing. Vädret och uppgifterna nedan speglar hur e-postdigesten kommer se ut.";
+  try {
+    narrative = await generateBriefingNarrative(
+      "",
+      weatherSummary,
+      todayTasks,
+      thisWeekTasks,
+      laterTasks,
+      rainForecast
+    );
+  } catch (err) {
+    console.warn("Digest preview: narrative generation failed, using fallback:", err);
   }
 
   const mapTasks = (tasks: DigestTask[], bucket: Bucket): DigestTaskPreviewItem[] =>
@@ -119,6 +119,25 @@ export async function GET() {
       bucket,
     }));
 
+  const url = new URL(request.url);
+  const dashboardUrl = process.env.NEXT_PUBLIC_DASHBOARD_URL ?? url.origin;
+
+  const html = await buildEmailHtml(
+    weatherSummary,
+    rainForecast,
+    todayTasks,
+    thisWeekTasks,
+    laterTasks,
+    [], // lessons omitted in preview
+    promotionItems,
+    renewalItems,
+    growingSuggestions,
+    recentGrowing.knowledge,
+    recentGrowing.windows,
+    narrative,
+    dashboardUrl
+  );
+
   const response: DigestPreviewResponse = {
     date: previewDate,
     generated_at: new Date().toISOString(),
@@ -127,6 +146,7 @@ export async function GET() {
       rainForecast,
     },
     narrative,
+    html,
     tasks: {
       today: mapTasks(todayTasks, "today"),
       this_week: mapTasks(thisWeekTasks, "this_week"),

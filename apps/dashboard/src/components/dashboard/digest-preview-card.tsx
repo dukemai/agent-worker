@@ -36,15 +36,7 @@ export function DigestPreviewCard() {
         </CardHeader>
         <CardContent className="space-y-4">
           <section>
-            <h2 className="text-base font-semibold">Weather &amp; Briefing</h2>
-            <p className="text-sm text-muted-foreground">{data.weather.summary}</p>
-            <div className="mt-2 rounded-md border bg-muted/40 p-3 text-sm whitespace-pre-wrap">
-              {data.narrative}
-            </div>
-          </section>
-
-          <section>
-            <h2 className="text-base font-semibold">Tasks</h2>
+            <h2 className="text-base font-semibold">Tasks (preview)</h2>
             <div className="mt-2 grid gap-3 md:grid-cols-3">
               <div className="space-y-1">
                 <h3 className="text-sm font-medium">Today</h3>
@@ -53,14 +45,17 @@ export function DigestPreviewCard() {
                 ) : (
                   <ul className="space-y-1 text-xs">
                     {data.tasks.today.map((task) => (
-                      <li key={task.id}>
-                        {task.title}
-                        {task.due_date ? (
-                          <span className="text-muted-foreground">
-                            {" "}
-                            — due {new Date(task.due_date).toLocaleDateString()}
-                          </span>
-                        ) : null}
+                      <li key={task.id} className="flex items-start gap-2">
+                        <input type="checkbox" className="mt-0.5 h-3 w-3 rounded border" />
+                        <span>
+                          {task.title}
+                          {task.due_date ? (
+                            <span className="text-muted-foreground">
+                              {" "}
+                              — due {new Date(task.due_date).toLocaleDateString()}
+                            </span>
+                          ) : null}
+                        </span>
                       </li>
                     ))}
                   </ul>
@@ -73,14 +68,17 @@ export function DigestPreviewCard() {
                 ) : (
                   <ul className="space-y-1 text-xs">
                     {data.tasks.this_week.map((task) => (
-                      <li key={task.id}>
-                        {task.title}
-                        {task.due_date ? (
-                          <span className="text-muted-foreground">
-                            {" "}
-                            — due {new Date(task.due_date).toLocaleDateString()}
-                          </span>
-                        ) : null}
+                      <li key={task.id} className="flex items-start gap-2">
+                        <input type="checkbox" className="mt-0.5 h-3 w-3 rounded border" />
+                        <span>
+                          {task.title}
+                          {task.due_date ? (
+                            <span className="text-muted-foreground">
+                              {" "}
+                              — due {new Date(task.due_date).toLocaleDateString()}
+                            </span>
+                          ) : null}
+                        </span>
                       </li>
                     ))}
                   </ul>
@@ -93,14 +91,17 @@ export function DigestPreviewCard() {
                 ) : (
                   <ul className="space-y-1 text-xs">
                     {data.tasks.later.map((task) => (
-                      <li key={task.id}>
-                        {task.title}
-                        {task.due_date ? (
-                          <span className="text-muted-foreground">
-                            {" "}
-                            — due {new Date(task.due_date).toLocaleDateString()}
-                          </span>
-                        ) : null}
+                      <li key={task.id} className="flex items-start gap-2">
+                        <input type="checkbox" className="mt-0.5 h-3 w-3 rounded border" />
+                        <span>
+                          {task.title}
+                          {task.due_date ? (
+                            <span className="text-muted-foreground">
+                              {" "}
+                              — due {new Date(task.due_date).toLocaleDateString()}
+                            </span>
+                          ) : null}
+                        </span>
                       </li>
                     ))}
                   </ul>
@@ -108,76 +109,14 @@ export function DigestPreviewCard() {
               </div>
             </div>
           </section>
-
-          <section>
-            <h2 className="text-base font-semibold">Upcoming Renewals</h2>
-            {data.renewals.length === 0 ? (
-              <p className="text-sm text-muted-foreground">No renewals in the next 30 days.</p>
-            ) : (
-              <ul className="mt-1 space-y-1 text-sm">
-                {data.renewals.map((item, index) => (
-                  <li key={`${item.title}-${index}`}>
-                    {item.title} — in {item.daysLeft} days ({new Date(item.dueDate).toLocaleDateString()})
-                  </li>
-                ))}
-              </ul>
-            )}
-          </section>
-
-          <section>
-            <h2 className="text-base font-semibold">Garden This Week</h2>
-            {data.growing.tasks.length === 0 && data.growing.suggestions.length === 0 ? (
-              <p className="text-sm text-muted-foreground">No garden items in this preview.</p>
-            ) : (
-              <div className="mt-1 space-y-3 text-sm">
-                {data.growing.tasks.length > 0 ? (
-                  <div>
-                    <h3 className="text-sm font-medium">Converted tasks</h3>
-                    <ul className="mt-1 space-y-1 text-xs">
-                      {data.growing.tasks.map((item, index) => (
-                        <li key={`${item.title}-${index}`}>
-                          {item.title}
-                          {item.dueDate ? (
-                            <span className="text-muted-foreground">
-                              {" "}
-                              — due {new Date(item.dueDate).toLocaleDateString()}
-                            </span>
-                          ) : null}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                ) : null}
-                {data.growing.suggestions.length > 0 ? (
-                  <div>
-                    <h3 className="text-sm font-medium">Ideas</h3>
-                    <ul className="mt-1 space-y-1 text-xs">
-                      {data.growing.suggestions.map((item, index) => (
-                        <li key={`${item.title}-${index}`}>
-                          <strong>{item.title}</strong>: {item.details}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                ) : null}
-              </div>
-            )}
-          </section>
-
-          <section>
-            <h2 className="text-base font-semibold">Deals for You</h2>
-            {data.promotions.length === 0 ? (
-              <p className="text-sm text-muted-foreground">No promotions in this preview.</p>
-            ) : (
-              <ul className="mt-1 space-y-1 text-sm">
-                {data.promotions.map((item, index) => (
-                  <li key={`${item.store}-${index}`}>
-                    <strong>{item.store}</strong>: {item.summary}
-                  </li>
-                ))}
-              </ul>
-            )}
-          </section>
+          <div className="overflow-hidden rounded-md border bg-white">
+            <iframe
+              title="Daily Digest Preview"
+              srcDoc={data.html}
+              className="h-[800px] w-full border-0"
+              sandbox="allow-same-origin allow-popups allow-popups-to-escape-sandbox"
+            />
+          </div>
         </CardContent>
       </Card>
     </main>

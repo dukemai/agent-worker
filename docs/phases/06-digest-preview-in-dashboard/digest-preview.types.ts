@@ -36,6 +36,9 @@ export interface DigestPreviewResponse {
   /** When this preview payload was generated (ISO timestamp). */
   generated_at: string;
 
+  /** Full HTML email body, built via shared email template. */
+  html: string;
+
   /** Weather block used in the digest. */
   weather: DigestWeatherPreview;
 

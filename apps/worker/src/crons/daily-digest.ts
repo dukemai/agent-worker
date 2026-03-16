@@ -77,7 +77,7 @@ export async function runDailyDigest(env: Env): Promise<void> {
 
   const dashboardUrl = "https://your-dashboard.vercel.app";
 
-  const html = buildEmailHtml(
+  const html = await buildEmailHtml(
     weatherSummary,
     rainForecast,
     todayTasks,
@@ -86,7 +86,6 @@ export async function runDailyDigest(env: Env): Promise<void> {
     lessons,
     promotionItems,
     renewalItems,
-    growingTasks,
     growingSuggestions,
     recentGrowing.knowledge,
     recentGrowing.windows,

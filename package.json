@@ -27,6 +27,10 @@
     "@agent/shared": "workspace:*",
     "@google/generative-ai": "^0.24.1",
     "@supabase/supabase-js": "^2.47.0",
-    "postal-mime": "^2.7.3"
+    "@react-email/components": "^1.0.9",
+    "@react-email/render": "^2.0.4",
+    "postal-mime": "^2.7.3",
+    "react": "19.2.3",
+    "react-dom": "19.2.3"
   }
 }
