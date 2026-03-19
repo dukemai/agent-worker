@@ -77,8 +77,7 @@ function TaskSection({ label, tasks }: { label: string; tasks: Task[] }) {
             : "";
           return (
             <li key={t.id}>
-              {/* Visual checkbox to mirror dashboard */}
-              ☐ {t.title}{" "}
+              {t.title}{" "}
               {dueText && (
                 <span style={{ color: "#888", fontSize: 12 }}>{dueText}</span>
               )}
@@ -119,7 +118,7 @@ export function DailyDigestEmail(props: Props) {
           fontFamily: "sans-serif",
           maxWidth: "600px",
           margin: "0 auto",
-          padding: "20px",
+          padding: "10px",
           color: "#1a1a1a",
         }}
       >
@@ -297,40 +296,6 @@ export function DailyDigestEmail(props: Props) {
             </>
           )}
 
-          {/* Learning */}
-          {lessons.length > 0 && (
-            <>
-              <Heading as="h2" style={sectionHeadingStyle}>
-                Today&apos;s Learning
-              </Heading>
-              {lessons.map((lesson, idx) => (
-                <Section
-                  // eslint-disable-next-line react/no-array-index-key
-                  key={idx}
-                  style={{
-                    border: "1px solid #eee",
-                    borderRadius: 8,
-                    padding: 12,
-                    marginBottom: 12,
-                  }}
-                >
-                  <Text
-                    style={{
-                      margin: "0 0 6px 0",
-                      color: "#666",
-                      fontSize: 12,
-                    }}
-                  >
-                    {lesson.profile_type === "category" ? "Category" : "Topic"}:{" "}
-                    {lesson.topic}
-                  </Text>
-                  <Text style={{ whiteSpace: "pre-wrap", margin: 0 }}>
-                    {lesson.content}
-                  </Text>
-                </Section>
-              ))}
-            </>
-          )}
 
           {/* Deals */}
           {promotionItems.length > 0 && (

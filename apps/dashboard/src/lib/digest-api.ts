@@ -1,4 +1,4 @@
-import type { DigestPreviewResponse } from "@/../docs/phases/06-digest-preview-in-dashboard/digest-preview.types";
+import type { DigestPreviewResponse } from "@/app/api/digest/preview/route";
 
 async function readApiError(response: Response, fallback: string): Promise<never> {
   const json = (await response.json().catch(() => ({}))) as { error?: string };

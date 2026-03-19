@@ -162,6 +162,37 @@ export function formatTaskList(tasks: Task[]): string {
 }
 
 /**
+ * List of upcoming major Swedish public holidays for countdown.
+ */
+const SWEDISH_HOLIDAYS = [
+  { name: "Långfredagen", date: "2026-04-03" },
+  { name: "Påskdagen", date: "2026-04-05" },
+  { name: "Annandag påsk", date: "2026-04-06" },
+  { name: "Valborg", date: "2026-04-30" },
+  { name: "Första maj", date: "2026-05-01" },
+  { name: "Kristi himmelsfärds dag", date: "2026-05-14" },
+  { name: "Sveriges nationaldag", date: "2026-06-06" },
+  { name: "Midsommarafton", date: "2026-06-19" },
+  { name: "Allhelgonadagen", date: "2026-10-31" },
+  { name: "Julafton", date: "2026-12-24" },
+  { name: "Juldagen", date: "2026-12-25" },
+  { name: "Annandag jul", date: "2026-12-26" },
+  { name: "Nyårsafton", date: "2026-12-31" },
+  { name: "Nyårsdagen", date: "2027-01-01" },
+];
+
+function getNextHoliday() {
+  const now = new Date();
+  for (const h of SWEDISH_HOLIDAYS) {
+    const holidayDate = new Date(h.date);
+    if (holidayDate >= now) {
+      return { name: h.name, date: holidayDate };
+    }
+  }
+  return null;
+}
+
+/**
  * Generates the daily briefing narrative using a simple template (no AI calls).
  * Injects current date (sv-SE), weather summary, and task counts (today / this week / later).
  * Optionally appends a rain reminder. Returns plain-text paragraphs separated by newlines.
@@ -192,7 +223,18 @@ export async function generateBriefingNarrative(
 
   const lines: string[] = [];
 
-  lines.push(`God morgon! Idag är det ${dateLabel}.`);
+  // 1) Countdown to Swedish Holiday
+  const nextHoliday = getNextHoliday();
+  if (nextHoliday) {
+    const diff = nextHoliday.date.getTime() - now.getTime();
+    const days = Math.ceil(diff / (1000 * 60 * 60 * 24));
+    if (days === 0) {
+      lines.push(`Idag är det ${nextHoliday.name}! Hoppas du får en fantastisk dag.`);
+    } else {
+      lines.push(`Det är ${days} ${days === 1 ? "dag" : "dagar"} kvar till ${nextHoliday.name}.`);
+    }
+  }
+
   lines.push(`Vädret i Stockholm: ${weatherSummary}`);
 
   if (rainForecast) {

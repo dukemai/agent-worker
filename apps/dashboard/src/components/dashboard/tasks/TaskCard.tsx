@@ -60,7 +60,7 @@ export function TaskCard({ task, bucket, onMove, onMarkDone, onDelete }: TaskCar
             size="sm"
             variant="outline"
             className="ml-2 min-h-11"
-            onClick={() => window.open(task.metadata.link as string, "_blank", "noopener,noreferrer")}
+            onClick={() => window.open(task.metadata?.link as string, "_blank", "noopener,noreferrer")}
           >
             Open
           </Button>

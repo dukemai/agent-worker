@@ -13,7 +13,7 @@ export async function handleScheduled(
     (async () => {
       try {
         const cron = event.cron ?? "";
-        if (cron === "30 5 * * 0,3") {
+        if (cron === "30 5 * * Sun,Wed") {
           await runGrowingSuggestions(env);
         } else {
           await runGrowingIngest(env);

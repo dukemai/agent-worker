@@ -15,10 +15,15 @@ Editable context persisted in `growing_profiles`: city, country code, space type
 
 ## Weekly Suggestions
 
-- Generated from `growing_windows` catalog, filtered by current month
-- Scored by profile interests and priority
-- Stored in `growing_suggestions_log` per week
-- One-tap conversion to planner tasks (`metadata.item_type = "growing"`)
+- Generated from `growing_windows` catalog, filtered by current month (`start_month` to `end_month`).
+- Scored by base priority + interest bonus:
+  - **Base Priority**: Uses the raw `priority` integer from the `growing_windows` record.
+  - **Interest Bonus**: Adds +3 points if any tag on the window matches the user's defined `interests` in their `growing_profiles`.
+- Selected suggestions are split into two groups based on `suggestion_kind`:
+  - **Actions**: The top 5 highest-scored `action` windows.
+  - **Inspirations**: The top 2 highest-scored `inspiration` windows.
+- Stored in `growing_suggestions_log` per week with `status = "pending"`.
+- One-tap conversion to planner tasks (`metadata.item_type = "growing"`), which updates their status to `"converted"`. Pending suggestions are displayed in the dashboard and daily digest.
 
 ### Generation Schedule
 

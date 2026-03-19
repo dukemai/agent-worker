@@ -38,12 +38,7 @@ export async function runDailyDigest(env: Env): Promise<void> {
   const recentGrowing = includeGrowing ? await fetchRecentGrowingKnowledge(supabase) : { knowledge: [], windows: [] };
 
   // Generate today's learning lessons first so digest can include them.
-  let lessons: GeneratedLesson[] = [];
-  try {
-    lessons = await runLearningLoop(env);
-  } catch (err) {
-    console.warn("Learning loop failed, continuing without lessons:", err);
-  }
+  const lessons: GeneratedLesson[] = [];
 
   // Fetch weather (non-fatal if it fails)
   let weatherSummary = "Weather unavailable";

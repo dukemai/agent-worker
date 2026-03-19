@@ -35,7 +35,7 @@ type DigestWeatherPreview = {
   rainForecast: boolean;
 };
 
-type DigestPreviewResponse = {
+export type DigestPreviewResponse = {
   date: string;
   generated_at: string;
   weather: DigestWeatherPreview;
