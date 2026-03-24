@@ -6,7 +6,13 @@ import {
   Html,
   Section,
   Text,
+  Hr,
+  Row,
+  Column,
+  Tailwind,
+  Preview,
 } from "@react-email/components";
+import React, { Fragment } from "react";
 import type {
   DigestLessonItem,
   GrowingSuggestionDigestItem,
@@ -34,57 +40,52 @@ type Props = {
   dashboardUrl: string;
 };
 
-const sectionHeadingStyle: React.CSSProperties = {
-  fontSize: 16,
-  margin: "24px 0 8px 0",
-  fontWeight: 600,
-};
-
-const smallHeadingStyle: React.CSSProperties = {
-  fontSize: 14,
-  margin: "12px 0 4px 0",
-  fontWeight: 600,
-};
-
-const listStyle: React.CSSProperties = {
-  margin: "0 0 12px 18px",
-  padding: 0,
-};
-
-function TaskSection({ label, tasks }: { label: string; tasks: Task[] }) {
+function TaskList({ tasks }: { tasks: Task[] }) {
   if (tasks.length === 0) {
     return (
-      <>
-        <Heading as="h3" style={{ fontSize: 14, margin: "8px 0 4px 0" }}>
-          {label}
-        </Heading>
-        <Text style={{ color: "#888", fontSize: 12, margin: "0 0 8px 0" }}>
-          No pending tasks
-        </Text>
-      </>
+      <Text className="text-gray-400 text-[14px] italic m-0">
+        No pending tasks
+      </Text>
     );
   }
 
   return (
     <>
-      <Heading as="h3" style={{ fontSize: 14, margin: "8px 0 4px 0" }}>
-        {label}
-      </Heading>
-      <ul style={{ ...listStyle }}>
-        {tasks.map((t) => {
-          const dueText = t.due_date
-            ? `— due ${new Date(t.due_date).toLocaleDateString("sv-SE")}`
-            : "";
-          return (
-            <li key={t.id}>
-              {t.title}{" "}
-              {dueText && (
-                <span style={{ color: "#888", fontSize: 12 }}>{dueText}</span>
-              )}
-            </li>
-          );
-        })}
-      </ul>
+      {tasks.map((task, index) => (
+        <Fragment key={task.id}>
+          {index > 0 && <Hr className="border-gray-100 my-[12px]" />}
+          <Section>
+            <Row>
+              <Column
+                width="32"
+                className="pr-[12px]"
+                valign="top"
+              >
+                <Section className="w-[28px] h-[28px] rounded-full bg-indigo-50 border border-solid border-indigo-100 flex items-center justify-center">
+                  <Text className="m-0 text-indigo-600 font-bold text-[13px] text-center w-full leading-[28px]">
+                    {index + 1}
+                  </Text>
+                </Section>
+              </Column>
+              <Column>
+                <Text className="m-0 font-semibold text-[16px] text-gray-900">
+                  {task.title}
+                </Text>
+                {task.due_date && (
+                   <Text className="m-0 text-[12px] text-gray-400 uppercase tracking-wider font-medium mt-[2px]">
+                     Due: {new Date(task.due_date).toLocaleDateString("sv-SE")}
+                   </Text>
+                )}
+                {task.original_body && (
+                  <Text className="m-0 mt-[6px] text-[14px] text-gray-500 leading-[20px]">
+                    {task.original_body}
+                  </Text>
+                )}
+              </Column>
+            </Row>
+          </Section>
+        </Fragment>
+      ))}
     </>
   );
 }
@@ -112,240 +113,231 @@ export function DailyDigestEmail(props: Props) {
 
   return (
     <Html>
-      <Head />
-      <Body
-        style={{
-          fontFamily: "sans-serif",
-          maxWidth: "600px",
-          margin: "0 auto",
-          padding: "10px",
-          color: "#1a1a1a",
-        }}
-      >
-        <Container>
-          <Heading as="h1" style={{ fontSize: 20, marginBottom: 4 }}>
-            Dad-Ops Daily Digest
-          </Heading>
-          <Text style={{ color: "#888", marginTop: 0 }}>{date}</Text>
-
-          {/* Weather */}
-          <Section
-            style={{
-              background: "#f0f4ff",
-              borderRadius: 8,
-              padding: "12px 16px",
-              marginBottom: 24,
-            }}
-          >
-            <Text style={{ margin: 0 }}>
-              <strong>🌤 Stockholm Weather:</strong> {weatherSummary}
-              {rainForecast ? (
-                <>
-                  <br />
-                  <strong style={{ color: "#2563eb" }}>
-                    ☔ Remind kids to bring rain coats today!
-                  </strong>
-                </>
-              ) : null}
-            </Text>
-          </Section>
-
-          {/* Briefing */}
-          <Section
-            style={{
-              background: "#f9f9f9",
-              borderRadius: 8,
-              padding: 16,
-              marginBottom: 24,
-              lineHeight: 1.6,
-            }}
-          >
-            <Heading
-              as="h2"
-              style={{ marginTop: 0, fontSize: 16, fontWeight: 600 }}
-            >
-              Today&apos;s Briefing
-            </Heading>
-            {narrative.split("\n").map((p, idx) => (
-              <Text key={idx} style={{ margin: "8px 0" }}>
-                {p}
+      <Tailwind>
+        <Head />
+        <Preview>Your Daily Dad-Ops Digest for {date}</Preview>
+        <Body className="bg-white font-sans text-gray-900">
+          <Container className="mx-auto py-[20px] px-[10px] max-w-[600px]">
+            <Section className="mb-[32px]">
+              <Heading className="m-0 text-[28px] font-bold text-gray-950 tracking-tight leading-tight">
+                Dad-Ops Daily
+              </Heading>
+              <Text className="m-0 mt-[4px] text-[14px] text-gray-500 font-medium tracking-wide uppercase">
+                {date}
               </Text>
-            ))}
-          </Section>
+            </Section>
 
-          {/* Tasks */}
-          <Heading as="h2" style={sectionHeadingStyle}>
-            Your Tasks
-          </Heading>
-          <TaskSection label="📅 Today" tasks={todayTasks} />
-          <TaskSection label="📆 This Week" tasks={thisWeekTasks} />
-          <TaskSection label="🗂 Later" tasks={laterTasks} />
+            {/* Weather Block */}
+            <Section className="bg-blue-50/50 rounded-xl p-[20px] mb-[32px] border border-solid border-blue-100/50">
+              <Row>
+                <Column width="40" valign="top" className="pr-[12px]">
+                   <Text className="m-0 text-[24px]">🌤</Text>
+                </Column>
+                <Column>
+                  <Text className="m-0 text-gray-700 leading-[24px]">
+                    <strong>Stockholm Weather:</strong> {weatherSummary}
+                  </Text>
+                  {rainForecast && (
+                    <Text className="m-0 mt-[8px] text-blue-700 font-semibold">
+                      ☔ Remind kids to bring rain coats today!
+                    </Text>
+                  )}
+                </Column>
+              </Row>
+            </Section>
 
-          {/* Growing inspirations */}
-          {growingSuggestions.length > 0 && (
-            <>
-              <Heading as="h2" style={sectionHeadingStyle}>
-                Inspirations for growing this week
+            {/* Today's Briefing */}
+            <Section className="mb-[40px]">
+              <Heading className="m-0 text-[14px] font-bold text-indigo-600 uppercase tracking-[0.1em] mb-[12px]">
+                Today&apos;s Briefing
               </Heading>
-              <ul style={listStyle}>
-                {growingSuggestions.map((item) => (
-                  <li key={item.title}>
-                    <strong>{item.title}</strong>: {item.details}
-                  </li>
+              <Section className="bg-gray-50 rounded-xl p-[24px] border border-solid border-gray-100">
+                {narrative.split("\n\n").map((p, idx, arr) => (
+                  <Text key={idx} className={`m-0 text-[16px] text-gray-700 leading-[26px] ${idx === arr.length - 1 ? "" : "mb-[16px]"}`}>
+                    {p}
+                  </Text>
                 ))}
-              </ul>
-            </>
-          )}
+              </Section>
+            </Section>
 
-          {/* New Growing Knowledge */}
-          {hasNewKnowledge && (
-            <>
-              <Heading as="h2" style={sectionHeadingStyle}>
-                New Growing Knowledge
+            {/* Tasks Section */}
+            <Section className="mb-[48px]">
+              <Heading className="m-0 text-[22px] font-bold text-gray-950 mb-[24px]">
+                Targeted Tasks
               </Heading>
+              
+              <Section className="mb-[32px]">
+                 <Heading className="m-0 text-[12px] font-bold text-gray-400 uppercase tracking-widest mb-[16px] border-b border-solid border-gray-100 pb-[8px]">
+                   📅 High Priority
+                 </Heading>
+                 <TaskList tasks={todayTasks} />
+              </Section>
 
-              {recentGrowingWindows.length > 0 && (
-                <>
-                  <Heading as="h3" style={smallHeadingStyle}>
-                    Actionable Tips from Videos
-                  </Heading>
-                  <ul style={listStyle}>
-                    {recentGrowingWindows.map((item) => (
-                      <li key={item.title}>
-                        <strong>{item.title}</strong>: {item.note}
-                        {item.sourceUrl ? (
-                          <>
-                            {" "}
-                            (
-                            <a
-                              href={item.sourceUrl}
-                              style={{ color: "#2563eb" }}
-                            >
-                              Source
-                            </a>
-                            )
-                          </>
-                        ) : null}
-                      </li>
+              {thisWeekTasks.length > 0 && (
+                <Section className="mb-[32px]">
+                   <Heading className="m-0 text-[12px] font-bold text-gray-400 uppercase tracking-widest mb-[16px] border-b border-solid border-gray-100 pb-[8px]">
+                     📆 Upcoming this Week
+                   </Heading>
+                   <TaskList tasks={thisWeekTasks} />
+                </Section>
+              )}
+            </Section>
+
+            {/* Growing inspirations */}
+            {growingSuggestions.length > 0 && (
+              <Section className="mb-[48px]">
+                <Heading className="m-0 text-[22px] font-bold text-gray-950 mb-[16px]">
+                  Growing Inspirations
+                </Heading>
+                <Section className="bg-emerald-50/50 rounded-xl p-[20px] border border-solid border-emerald-100">
+                  {growingSuggestions.map((item, index) => (
+                    <Fragment key={item.title}>
+                      {index > 0 && <Hr className="border-emerald-100/50 my-[16px]" />}
+                      <Row>
+                        <Column width="32" valign="top" className="pr-[12px]">
+                          <Text className="m-0 text-emerald-600 font-bold text-[16px]">🌿</Text>
+                        </Column>
+                        <Column>
+                          <Text className="m-0 font-semibold text-[16px] text-gray-900">
+                            {item.title}
+                          </Text>
+                          <Text className="m-0 mt-[4px] text-[14px] text-gray-600 leading-[22px]">
+                            {item.details}
+                          </Text>
+                        </Column>
+                      </Row>
+                    </Fragment>
+                  ))}
+                </Section>
+              </Section>
+            )}
+
+            {/* New Growing Knowledge */}
+            {hasNewKnowledge && (
+              <Section className="mb-[48px]">
+                <Heading className="m-0 text-[22px] font-bold text-gray-950 mb-[24px]">
+                  Garden Intelligence
+                </Heading>
+
+                {recentGrowingWindows.length > 0 && (
+                  <Section className="mb-[24px]">
+                    <Heading className="m-0 text-[14px] font-bold text-indigo-600 uppercase tracking-wider mb-[16px]">
+                      Actionable Tips
+                    </Heading>
+                    {recentGrowingWindows.map((item, idx, arr) => (
+                      <Section key={item.title} className={`${idx === arr.length - 1 ? "" : "mb-[16px]"}`}>
+                        <Text className="m-0 font-semibold text-[15px] text-gray-900 border-l-[3px] border-solid border-indigo-200 pl-[12px]">
+                          {item.title}
+                          {item.sourceUrl && (
+                             <a href={item.sourceUrl} className="ml-[8px] text-[12px] text-indigo-500 font-medium underline">
+                               Watch source
+                             </a>
+                          )}
+                        </Text>
+                        <Text className="m-0 mt-[6px] text-[14px] text-gray-600 leading-[22px] pl-[15px]">
+                          {item.note}
+                        </Text>
+                      </Section>
                     ))}
-                  </ul>
-                </>
-              )}
+                  </Section>
+                )}
 
-              {recentGrowingKnowledge.length > 0 && (
-                <>
-                  <Heading as="h3" style={smallHeadingStyle}>
-                    Reference Knowledge
-                  </Heading>
-                  <ul style={listStyle}>
-                    {recentGrowingKnowledge.map((item) => {
-                      const snippet =
-                        item.content.length > 220
-                          ? `${item.content.slice(0, 220)}...`
-                          : item.content;
-                      return (
-                        <li key={item.title}>
-                          <strong>{item.title}</strong> ({item.category}):{" "}
-                          {snippet}
-                          {item.sourceUrl ? (
-                            <>
-                              {" "}
-                              (
-                              <a
-                                href={item.sourceUrl}
-                                style={{ color: "#2563eb" }}
-                              >
-                                Source
-                              </a>
-                              )
-                            </>
-                          ) : null}
-                        </li>
-                      );
-                    })}
-                  </ul>
-                </>
-              )}
-            </>
-          )}
+                {recentGrowingKnowledge.length > 0 && (
+                  <Section className="mt-[32px]">
+                    <Heading className="m-0 text-[14px] font-bold text-gray-400 uppercase tracking-wider mb-[16px]">
+                      Reference Updates
+                    </Heading>
+                    {recentGrowingKnowledge.map((item, idx, arr) => (
+                      <Section key={item.title} className={`${idx === arr.length - 1 ? "" : "mb-[16px]"}`}>
+                         <Text className="m-0 font-semibold text-[15px] text-gray-900">
+                           {item.title} <span className="text-gray-400 font-normal text-[13px] ml-[4px]">#{item.category}</span>
+                         </Text>
+                         <Text className="m-0 mt-[4px] text-[14px] text-gray-600 leading-[22px]">
+                           {item.content.length > 200 ? `${item.content.slice(0, 200)}...` : item.content}
+                           {item.sourceUrl && (
+                             <a href={item.sourceUrl} className="ml-[6px] text-indigo-500 underline">
+                               Read more
+                             </a>
+                           )}
+                         </Text>
+                      </Section>
+                    ))}
+                  </Section>
+                )}
+              </Section>
+            )}
 
-          {/* Upcoming Renewals */}
-          {renewalItems.length > 0 && (
-            <>
-              <Heading as="h2" style={sectionHeadingStyle}>
-                Upcoming Renewals
-              </Heading>
-              <ul style={listStyle}>
-                {renewalItems.map((item) => (
-                  <li key={item.title}>
-                    {item.title} — due in {item.daysLeft} days (
-                    {new Date(item.dueDate).toLocaleDateString("sv-SE")})
-                    {item.link ? (
-                      <>
-                        {" "}
-                        (
-                        <a href={item.link} style={{ color: "#2563eb" }}>
-                          Open
-                        </a>
-                        )
-                      </>
-                    ) : null}
-                  </li>
+            {/* Upcoming Renewals */}
+            {renewalItems.length > 0 && (
+              <Section className="mb-[48px]">
+                <Heading className="m-0 text-[22px] font-bold text-gray-950 mb-[16px]">
+                  Upcoming Renewals
+                </Heading>
+                <Section className="bg-amber-50/50 rounded-xl p-[20px] border border-solid border-amber-100">
+                  {renewalItems.map((item, index) => (
+                    <Fragment key={item.title}>
+                      {index > 0 && <Hr className="border-amber-100/50 my-[12px]" />}
+                      <Row>
+                         <Column width="24" valign="top">
+                           <Text className="m-0 text-[14px]">🔔</Text>
+                         </Column>
+                         <Column>
+                            <Text className="m-0 font-semibold text-[15px] text-amber-900">
+                              {item.title}
+                            </Text>
+                            <Text className="m-0 text-[13px] text-amber-700 mt-[2px]">
+                              Due in <strong>{item.daysLeft} days</strong> ({new Date(item.dueDate).toLocaleDateString("sv-SE")})
+                              {item.link && (
+                                <a href={item.link} className="ml-[8px] underline italic">
+                                  Go to renewal
+                                </a>
+                              )}
+                            </Text>
+                         </Column>
+                      </Row>
+                    </Fragment>
+                  ))}
+                </Section>
+              </Section>
+            )}
+
+            {/* Deals */}
+            {promotionItems.length > 0 && (
+              <Section className="mb-[48px]">
+                <Heading className="m-0 text-[22px] font-bold text-gray-950 mb-[16px]">
+                  Handpicked Deals
+                </Heading>
+                {promotionItems.map((item, idx, arr) => (
+                  <Section key={`${item.store}-${idx}`} className={`${idx === arr.length - 1 ? "" : "mb-[12px]"} border border-solid border-gray-100 rounded-lg p-[16px]`}>
+                    <Text className="m-0 font-bold text-[14px] text-indigo-600 uppercase tracking-tight">
+                      {item.store}
+                    </Text>
+                    <Text className="m-0 mt-[4px] font-semibold text-[16px] text-gray-900">
+                      {item.summary}
+                    </Text>
+                    {item.link && (
+                      <a href={item.link} className="inline-block mt-[8px] text-[13px] font-semibold text-white bg-indigo-600 px-[12px] py-[6px] rounded-md no-underline">
+                        View Deal
+                      </a>
+                    )}
+                  </Section>
                 ))}
-              </ul>
-            </>
-          )}
+              </Section>
+            )}
 
-
-          {/* Deals */}
-          {promotionItems.length > 0 && (
-            <>
-              <Heading as="h2" style={sectionHeadingStyle}>
-                Deals for You
-              </Heading>
-              <ul style={listStyle}>
-                {promotionItems.map((item, idx) => (
-                  // eslint-disable-next-line react/no-array-index-key
-                  <li key={`${item.store}-${idx}`}>
-                    <strong>{item.store}</strong>: {item.summary}
-                    {item.link ? (
-                      <>
-                        {" "}
-                        (
-                        <a href={item.link} style={{ color: "#2563eb" }}>
-                          Open deal
-                        </a>
-                        )
-                      </>
-                    ) : null}
-                  </li>
-                ))}
-              </ul>
-            </>
-          )}
-
-          <hr
-            style={{
-              border: "none",
-              borderTop: "1px solid #eee",
-              margin: "24px 0",
-            }}
-          />
-          <Text
-            style={{
-              color: "#888",
-              fontSize: 12,
-              textAlign: "center",
-              margin: 0,
-            }}
-          >
-            <a href={dashboardUrl} style={{ color: "#2563eb" }}>
-              Open Dashboard
-            </a>{" "}
-            · Dad-Ops Agent
-          </Text>
-        </Container>
-      </Body>
+            <Hr className="border-gray-100 mt-[48px] mb-[24px]" />
+            
+            <Section className="text-center">
+              <a href={dashboardUrl} className="inline-block px-[24px] py-[12px] bg-gray-950 text-white rounded-lg font-bold text-[15px] no-underline">
+                 Open Dashboard
+              </a>
+              <Text className="m-0 mt-[24px] text-[12px] text-gray-400 font-medium uppercase tracking-[0.2em]">
+                Dad-Ops Agent · Personal Efficiency
+              </Text>
+            </Section>
+          </Container>
+        </Body>
+      </Tailwind>
     </Html>
   );
 }

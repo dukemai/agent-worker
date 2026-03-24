@@ -144,26 +144,37 @@ export function GrowingWeeklyTab() {
                 <article key={item.id} className="rounded-md border p-3">
                   <h3 className="font-medium">{item.title}</h3>
                   <p className="mb-3 mt-1 text-sm text-muted-foreground">{item.details}</p>
-                  <div className="flex flex-wrap gap-1">
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="min-h-11"
-                      onClick={() => onAddToBucket(item.id, "this_week")}
-                      disabled={isBusy}
-                    >
-                      Turn into task
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="min-h-11"
-                      onClick={() => onDismiss(item.id)}
-                      disabled={isBusy}
-                    >
-                      Dismiss
-                    </Button>
-                  </div>
+                  {item.converted_task_id ? (
+                    <>
+                      <p className="mb-3 text-xs text-muted-foreground">Linked task: {item.converted_task_id}</p>
+                      <div className="flex flex-wrap gap-1">
+                        <Button size="sm" variant="outline" className="min-h-11" asChild>
+                          <Link href="/">Open Tasks</Link>
+                        </Button>
+                      </div>
+                    </>
+                  ) : (
+                    <div className="flex flex-wrap gap-1">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="min-h-11"
+                        onClick={() => onAddToBucket(item.id, "this_week")}
+                        disabled={isBusy}
+                      >
+                        Turn into task
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="min-h-11"
+                        onClick={() => onDismiss(item.id)}
+                        disabled={isBusy}
+                      >
+                        Dismiss
+                      </Button>
+                    </div>
+                  )}
                 </article>
               ))
             )}

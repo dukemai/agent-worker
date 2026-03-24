@@ -118,7 +118,11 @@ export async function POST() {
 
   const interests = profile.interests ?? [];
   const selected = windows
-    .sort((a, b) => scoreWindow(b, interests) - scoreWindow(a, interests))
+    .sort((a, b) => {
+      const scoreDiff = scoreWindow(b, interests) - scoreWindow(a, interests);
+      if (scoreDiff !== 0) return scoreDiff;
+      return a.item_name.localeCompare(b.item_name);
+    })
     .slice(0, 6);
 
   if (selected.length === 0) {

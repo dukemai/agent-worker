@@ -82,8 +82,7 @@ export async function GET() {
   const { data: existingRows, error: existingError } = await auth.supabase
     .from("growing_suggestions_log")
     .select("id, title, details, suggestion_kind, suggested_bucket, status, week_start_date, converted_task_id")
-    .eq("week_start_date", weekStartDate)
-    .order("created_at", { ascending: true });
+    .eq("week_start_date", weekStartDate);
 
   if (existingError) {
     return errorResponse(existingError.message, 500);
@@ -107,7 +106,11 @@ export async function GET() {
 
     const interests = profile.interests ?? [];
     const selected = windows
-      .sort((a, b) => scoreWindow(b, interests) - scoreWindow(a, interests))
+      .sort((a, b) => {
+        const scoreDiff = scoreWindow(b, interests) - scoreWindow(a, interests);
+        if (scoreDiff !== 0) return scoreDiff;
+        return a.item_name.localeCompare(b.item_name);
+      })
       .slice(0, 7);
 
     if (selected.length > 0) {
@@ -116,7 +119,7 @@ export async function GET() {
         window_id: window.id,
         title: window.item_name,
         details: window.stockholm_note,
-        suggestion_kind: "action" as const,
+        suggestion_kind: window.suggestion_kind,
         suggested_bucket: window.suggested_bucket,
         week_start_date: weekStartDate,
         status: "pending" as const,
@@ -135,20 +138,11 @@ export async function GET() {
     }
   }
 
-  const { data: inspirationRows, error: inspirationError } = await auth.supabase
-    .from("growing_suggestions_log")
-    .select("id, title, details, suggestion_kind, suggested_bucket, status, week_start_date, converted_task_id")
-    .eq("status", "pending")
-    .is("converted_task_id", null)
-    .order("updated_at", { ascending: false })
-    .limit(6);
+  // Sort suggestions deterministically: priority (implied by score/initial order) then title
+  const sortedSuggestions = [...suggestions].sort((a, b) => a.title.localeCompare(b.title));
 
-  if (inspirationError) {
-    return errorResponse(inspirationError.message, 500);
-  }
-
-  const actions = suggestions.filter((item) => item.converted_task_id !== null);
-  const inspirations = (inspirationRows ?? []) as GrowingSuggestion[];
+  const actions = sortedSuggestions.filter((item) => item.suggestion_kind === "action");
+  const inspirations = sortedSuggestions.filter((item) => item.suggestion_kind === "inspiration");
 
   return NextResponse.json({
     week_start_date: weekStartDate,

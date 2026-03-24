@@ -32,6 +32,7 @@ export interface RenewalDigestItem {
 export interface GrowingTaskDigestItem {
   title: string;
   dueDate: string | null;
+  body: string | null;
 }
 
 export interface GrowingSuggestionDigestItem {

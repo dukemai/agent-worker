@@ -89,6 +89,23 @@ export async function runGrowingSuggestions(env: Env): Promise<void> {
     throw new Error(`Failed to clear pending suggestions: ${deleteError.message}`);
   }
 
+  // Collect existing window_ids for this week to avoid unique constraint violations
+  // if some suggestions were already converted or dismissed (and thus not deleted above).
+  const { data: existingRows, error: existingError } = await supabase
+    .from("growing_suggestions_log")
+    .select("window_id")
+    .eq("week_start_date", weekStartDate);
+
+  if (existingError) {
+    throw new Error(`Failed to load existing suggestions: ${existingError.message}`);
+  }
+
+  const existingWindowIds = new Set(
+    (existingRows ?? [])
+      .map((row) => (row as { window_id: string }).window_id)
+      .filter(Boolean)
+  );
+
   const { data: windowsRows, error: windowsError } = await supabase
     .from("growing_windows")
     .select("id, item_name, suggestion_kind, suggested_bucket, priority, start_month, end_month, stockholm_note, tags");
@@ -98,17 +115,25 @@ export async function runGrowingSuggestions(env: Env): Promise<void> {
   }
 
   const windows = ((windowsRows ?? []) as GrowingWindow[]).filter((window) =>
-    isMonthInRange(currentMonth, window.start_month, window.end_month)
+    isMonthInRange(currentMonth, window.start_month, window.end_month) && !existingWindowIds.has(window.id)
   );
 
   const interests = profile.interests ?? [];
   const actions = windows
     .filter((window) => window.suggestion_kind === "action")
-    .sort((a, b) => scoreWindow(b, interests) - scoreWindow(a, interests))
+    .sort((a, b) => {
+      const scoreDiff = scoreWindow(b, interests) - scoreWindow(a, interests);
+      if (scoreDiff !== 0) return scoreDiff;
+      return a.item_name.localeCompare(b.item_name);
+    })
     .slice(0, 5);
   const inspirations = windows
     .filter((window) => window.suggestion_kind === "inspiration")
-    .sort((a, b) => scoreWindow(b, interests) - scoreWindow(a, interests))
+    .sort((a, b) => {
+      const scoreDiff = scoreWindow(b, interests) - scoreWindow(a, interests);
+      if (scoreDiff !== 0) return scoreDiff;
+      return a.item_name.localeCompare(b.item_name);
+    })
     .slice(0, 2);
   const selected = [...actions, ...inspirations];
 

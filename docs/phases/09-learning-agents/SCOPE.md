@@ -1,4 +1,4 @@
-# Phase 8: Learning Agent Specialization — Scope
+# Phase 09: Learning Agent Specialization — Scope
 
 **Status**: deferred
 

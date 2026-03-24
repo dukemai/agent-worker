@@ -1,4 +1,4 @@
-# Phase 7: State Tracker App — Scope
+# Phase 08: State Tracker App — Scope
 
 **Status**: planned
 

@@ -70,6 +70,7 @@ export function extractGrowingTaskItems(tasks: Task[]): GrowingTaskDigestItem[] 
     .map((task) => ({
       title: task.title,
       dueDate: task.due_date,
+      body: task.original_body,
     }))
     .slice(0, 5);
 }
