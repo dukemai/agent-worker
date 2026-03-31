@@ -24,6 +24,7 @@ export interface Task {
   status: TaskStatus;
   metadata: Record<string, unknown> | null;
   source: TaskSource;
+  window_id: string | null;
 }
 
 export interface TaskWithBucket extends Task {
@@ -79,6 +80,7 @@ export interface GrowingSuggestion {
   status: GrowingSuggestionStatus;
   week_start_date: string;
   converted_task_id: string | null;
+  window_id: string;
 }
 
 export interface GrowingSource {

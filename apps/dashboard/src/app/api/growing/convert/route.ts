@@ -28,7 +28,7 @@ export async function POST(request: Request) {
 
   const { data: suggestion, error: suggestionError } = await auth.supabase
     .from("growing_suggestions_log")
-    .select("id, title, details, suggestion_kind, status")
+    .select("id, title, details, suggestion_kind, status, window_id")
     .eq("id", payload.suggestion_id)
     .maybeSingle();
 
@@ -48,12 +48,14 @@ export async function POST(request: Request) {
       title: suggestion.title,
       original_body: suggestion.details,
       due_date: dueDate ?? null,
-      source: "manual",
+      source: "growing",
       status: "pending",
+      window_id: suggestion.window_id,
       metadata: {
         item_type: "growing",
         suggestion_id: suggestion.id,
         suggestion_kind: suggestion.suggestion_kind,
+        window_id: suggestion.window_id,
       },
     })
     .select("*")

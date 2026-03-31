@@ -76,25 +76,33 @@ export function extractGrowingTaskItems(tasks: Task[]): GrowingTaskDigestItem[] 
 }
 
 /**
- * Loads pending growing suggestions for the current week from growing_suggestions_log.
- * Uses the Monday of the current week (UTC) as week_start_date, filters by status = "pending",
- * orders by created_at ascending, returns at most 3 rows as { title, details }.
+ * Loads growing suggestions for the current week from growing_suggestions_log.
+ * Always includes all "inspirations" for the week, plus up to 3 pending "actions".
+ * Uses the Monday of the current week (UTC) as week_start_date.
  */
-export async function fetchPendingGrowingSuggestions(
+export async function fetchWeeklyGrowingSuggestions(
   supabase: SupabaseClient
 ): Promise<GrowingSuggestionDigestItem[]> {
+  const weekStart = getWeekStartDate();
+
+  // Fetch all inspirations for the week (to ensure they are "always included")
+  // and pending actions.
   const { data, error } = await supabase
     .from("growing_suggestions_log")
-    .select("title, details")
-    .eq("week_start_date", getWeekStartDate())
-    .eq("status", "pending")
-    .order("created_at", { ascending: true })
-    .limit(3);
+    .select("title, details, suggestion_kind, status")
+    .eq("week_start_date", weekStart)
+    .or("suggestion_kind.eq.inspiration,status.eq.pending")
+    .order("suggestion_kind", { ascending: false }) // inspirations first
+    .order("created_at", { ascending: true });
 
   if (error) return [];
-  return ((data ?? []) as GrowingSuggestionDigestItem[]).map((row) => ({
+
+  // Map to the digest item shape, including status for inspirations
+  return ((data ?? []) as any[]).map((row) => ({
     title: row.title,
     details: row.details,
+    status: row.status,
+    suggestion_kind: row.suggestion_kind,
   }));
 }
 

@@ -4,9 +4,9 @@ import {
   extractGrowingTaskItems,
   extractPromotionItems,
   extractRenewalItems,
-  fetchPendingGrowingSuggestions,
-  fetchPendingTasksForBucket,
   fetchRecentGrowingKnowledge,
+  fetchWeeklyGrowingSuggestions,
+  fetchPendingTasksForBucket,
   generateBriefingNarrative,
 } from "@agent/shared";
 import type {
@@ -48,7 +48,6 @@ export type DigestPreviewResponse = {
   };
   renewals: RenewalDigestItem[];
   growing: {
-    tasks: GrowingTaskDigestItem[];
     suggestions: GrowingSuggestionDigestItem[];
     recentKnowledge: RecentGrowingKnowledgeItem[];
     recentWindows: RecentGrowingWindowItem[];
@@ -83,11 +82,9 @@ export async function GET(request: Request) {
   const promotionItems = extractPromotionItems(allTasks);
   const renewalItems = extractRenewalItems(allTasks);
 
-  // For preview, always include the growing section so the user can see
   // how "Growing this week" and "Inspirations for growing this week" will look,
   // regardless of which weekday they open the dashboard.
-  const growingTasks = extractGrowingTaskItems(allTasks);
-  const growingSuggestions = await fetchPendingGrowingSuggestions(supabase);
+  const growingSuggestions = await fetchWeeklyGrowingSuggestions(supabase);
   const recentGrowing = await fetchRecentGrowingKnowledge(supabase);
 
   // For preview, keep weather simple and avoid external API calls.
@@ -154,7 +151,6 @@ export async function GET(request: Request) {
     },
     renewals: renewalItems,
     growing: {
-      tasks: growingTasks,
       suggestions: growingSuggestions,
       recentKnowledge: recentGrowing.knowledge,
       recentWindows: recentGrowing.windows,

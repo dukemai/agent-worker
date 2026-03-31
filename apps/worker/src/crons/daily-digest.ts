@@ -4,9 +4,9 @@ import {
   extractGrowingTaskItems,
   extractPromotionItems,
   extractRenewalItems,
-  fetchPendingGrowingSuggestions,
-  fetchPendingTasksForBucket,
   fetchRecentGrowingKnowledge,
+  fetchWeeklyGrowingSuggestions,
+  fetchPendingTasksForBucket,
   generateBriefingNarrative,
 } from "@agent/shared";
 import { getStockholmWeather } from "../lib/weather";
@@ -30,11 +30,9 @@ export async function runDailyDigest(env: Env): Promise<void> {
   const promotionItems = extractPromotionItems(allTasks);
   const renewalItems = extractRenewalItems(allTasks);
 
-  const dayOfWeek = new Date().getUTCDay();
-  const includeGrowing = dayOfWeek === 1 || dayOfWeek === 5;
+  const includeGrowing = true; // Always include as requested
 
-  const growingTasks = includeGrowing ? extractGrowingTaskItems(allTasks) : [];
-  const growingSuggestions = includeGrowing ? await fetchPendingGrowingSuggestions(supabase) : [];
+  const growingSuggestions = includeGrowing ? await fetchWeeklyGrowingSuggestions(supabase) : [];
   const recentGrowing = includeGrowing ? await fetchRecentGrowingKnowledge(supabase) : { knowledge: [], windows: [] };
 
   // Generate today's learning lessons first so digest can include them.

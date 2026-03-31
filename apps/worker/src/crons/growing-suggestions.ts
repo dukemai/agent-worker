@@ -1,13 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
-
-type GrowingProfile = {
-  id: string;
-  city: string;
-  country_code: string;
-  space_type: string;
-  experience_level: string;
-  interests: string[];
-};
+import { ensureGrowingProfile, GrowingProfile } from "@agent/shared";
 
 type GrowingWindow = {
   id: string;
@@ -49,35 +41,7 @@ export async function runGrowingSuggestions(env: Env): Promise<void> {
   const weekStartDate = getWeekStartDate();
   const currentMonth = new Date().getUTCMonth() + 1;
 
-  const { data: profileRows, error: profileError } = await supabase
-    .from("growing_profiles")
-    .select("id, city, country_code, space_type, experience_level, interests")
-    .order("created_at", { ascending: false })
-    .limit(1);
-
-  if (profileError) {
-    throw new Error(`Failed to load growing profile: ${profileError.message}`);
-  }
-
-  let profile = (profileRows?.[0] as GrowingProfile | undefined) ?? null;
-  if (!profile) {
-    const { data: createdProfile, error: createProfileError } = await supabase
-      .from("growing_profiles")
-      .insert({
-        city: "Stockholm",
-        country_code: "SE",
-        space_type: "balcony",
-        experience_level: "beginner",
-        interests: ["herb", "tomato", "berry"],
-      })
-      .select("id, city, country_code, space_type, experience_level, interests")
-      .single();
-
-    if (createProfileError || !createdProfile) {
-      throw new Error(`Failed to create growing profile: ${createProfileError?.message}`);
-    }
-    profile = createdProfile as GrowingProfile;
-  }
+  const profile = await ensureGrowingProfile(supabase);
 
   const { error: deleteError } = await supabase
     .from("growing_suggestions_log")
@@ -89,52 +53,56 @@ export async function runGrowingSuggestions(env: Env): Promise<void> {
     throw new Error(`Failed to clear pending suggestions: ${deleteError.message}`);
   }
 
-  // Collect existing window_ids for this week to avoid unique constraint violations
-  // if some suggestions were already converted or dismissed (and thus not deleted above).
-  const { data: existingRows, error: existingError } = await supabase
-    .from("growing_suggestions_log")
-    .select("window_id")
-    .eq("week_start_date", weekStartDate);
+  // Collect existing window_ids that should be restricted:
+  // 1. Any window_id already suggested for this week
+  // 2. Any window_id connected to an existing task (pending or done)
+  const [logRes, taskRes] = await Promise.all([
+    supabase
+      .from("growing_suggestions_log")
+      .select("window_id")
+      .eq("week_start_date", weekStartDate),
+    supabase
+      .from("tasks")
+      .select("window_id")
+      .is("window_id", "not.null")
+  ]);
 
-  if (existingError) {
-    throw new Error(`Failed to load existing suggestions: ${existingError.message}`);
-  }
+  const restrictedWindowIds = new Set<string>();
+  
+  (logRes.data ?? []).forEach(row => {
+    if (row.window_id) restrictedWindowIds.add(row.window_id);
+  });
 
-  const existingWindowIds = new Set(
-    (existingRows ?? [])
-      .map((row) => (row as { window_id: string }).window_id)
-      .filter(Boolean)
-  );
+  (taskRes.data ?? []).forEach(row => {
+    if (row.window_id) restrictedWindowIds.add(row.window_id);
+  });
 
   const { data: windowsRows, error: windowsError } = await supabase
     .from("growing_windows")
-    .select("id, item_name, suggestion_kind, suggested_bucket, priority, start_month, end_month, stockholm_note, tags");
+    .select("id, item_name, suggestion_kind, suggested_bucket, priority, start_month, end_month, stockholm_note, tags")
+    .eq("verified", true);
 
   if (windowsError) {
-    throw new Error(`Failed to load growing windows: ${windowsError.message}`);
+    console.error("Error fetching growing windows:", windowsError);
+    return;
   }
 
-  const windows = ((windowsRows ?? []) as GrowingWindow[]).filter((window) =>
-    isMonthInRange(currentMonth, window.start_month, window.end_month) && !existingWindowIds.has(window.id)
+  // Filter windows by current month and EXCLUDE those that were already converted or suggested
+  const windows = ((windowsRows ?? []) as GrowingWindow[]).filter(
+    (window) =>
+      isMonthInRange(currentMonth, window.start_month, window.end_month) &&
+      !restrictedWindowIds.has(window.id)
   );
 
   const interests = profile.interests ?? [];
-  const actions = windows
-    .filter((window) => window.suggestion_kind === "action")
-    .sort((a, b) => {
-      const scoreDiff = scoreWindow(b, interests) - scoreWindow(a, interests);
-      if (scoreDiff !== 0) return scoreDiff;
-      return a.item_name.localeCompare(b.item_name);
-    })
-    .slice(0, 5);
-  const inspirations = windows
-    .filter((window) => window.suggestion_kind === "inspiration")
-    .sort((a, b) => {
-      const scoreDiff = scoreWindow(b, interests) - scoreWindow(a, interests);
-      if (scoreDiff !== 0) return scoreDiff;
-      return a.item_name.localeCompare(b.item_name);
-    })
-    .slice(0, 2);
+  const sortedWindows = windows.sort((a, b) => {
+    const scoreDiff = scoreWindow(b, interests) - scoreWindow(a, interests);
+    if (scoreDiff !== 0) return scoreDiff;
+    return a.item_name.localeCompare(b.item_name);
+  });
+
+  const actions = sortedWindows.filter(w => w.suggestion_kind === "action").slice(0, 10);
+  const inspirations = sortedWindows.filter(w => w.suggestion_kind === "inspiration").slice(0, 10);
   const selected = [...actions, ...inspirations];
 
   if (selected.length === 0) {

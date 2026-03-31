@@ -1,14 +1,6 @@
 import { NextResponse } from "next/server";
 import { errorResponse, getAuthedSupabase } from "@/lib/api";
-
-type GrowingProfile = {
-  id: string;
-  city: string;
-  country_code: string;
-  space_type: string;
-  experience_level: string;
-  interests: string[];
-};
+import { fetchGrowingProfile, GrowingProfile } from "@agent/shared";
 
 type GrowingWindow = {
   id: string;
@@ -31,6 +23,7 @@ type GrowingSuggestion = {
   status: "pending" | "dismissed" | "converted" | "done";
   week_start_date: string;
   converted_task_id: string | null;
+  window_id: string;
 };
 
 function getWeekStartDate(now = new Date()): string {
@@ -64,24 +57,15 @@ export async function GET() {
   const weekStartDate = getWeekStartDate();
   const currentMonth = new Date().getUTCMonth() + 1;
 
-  const { data: profileRows, error: profileError } = await auth.supabase
-    .from("growing_profiles")
-    .select("id, city, country_code, space_type, experience_level, interests")
-    .order("created_at", { ascending: false })
-    .limit(1);
+  const profile = await fetchGrowingProfile(auth.supabase);
 
-  if (profileError) {
-    return errorResponse(profileError.message, 500);
-  }
-
-  const profile = (profileRows?.[0] as GrowingProfile | undefined) ?? null;
   if (!profile) {
     return errorResponse("No growing profile found. Create a profile first.", 404);
   }
 
   const { data: existingRows, error: existingError } = await auth.supabase
     .from("growing_suggestions_log")
-    .select("id, title, details, suggestion_kind, suggested_bucket, status, week_start_date, converted_task_id")
+    .select("id, title, details, suggestion_kind, suggested_bucket, status, week_start_date, converted_task_id, window_id")
     .eq("week_start_date", weekStartDate);
 
   if (existingError) {
@@ -91,6 +75,30 @@ export async function GET() {
   let suggestions = (existingRows ?? []) as GrowingSuggestion[];
 
   if (suggestions.length === 0) {
+    // Get all window_ids that should be restricted:
+    // 1. Any window_id already suggested for this week
+    // 2. Any window_id connected to an existing task (pending or done)
+    const [logRes, taskRes] = await Promise.all([
+      auth.supabase
+        .from("growing_suggestions_log")
+        .select("window_id")
+        .eq("week_start_date", weekStartDate),
+      auth.supabase
+        .from("tasks")
+        .select("window_id")
+        .is("window_id", "not.null")
+    ]);
+
+    const restrictedWindowIds = new Set<string>();
+    
+    (logRes.data ?? []).forEach(row => {
+      if (row.window_id) restrictedWindowIds.add(row.window_id);
+    });
+
+    (taskRes.data ?? []).forEach(row => {
+      if (row.window_id) restrictedWindowIds.add(row.window_id);
+    });
+
     const { data: windowsRows, error: windowsError } = await auth.supabase
       .from("growing_windows")
       .select("id, item_name, suggestion_kind, suggested_bucket, priority, start_month, end_month, stockholm_note, tags")
@@ -101,17 +109,19 @@ export async function GET() {
     }
 
     const windows = ((windowsRows ?? []) as GrowingWindow[]).filter((window) =>
-      isMonthInRange(currentMonth, window.start_month, window.end_month)
+      isMonthInRange(currentMonth, window.start_month, window.end_month) && !restrictedWindowIds.has(window.id)
     );
 
     const interests = profile.interests ?? [];
-    const selected = windows
-      .sort((a, b) => {
-        const scoreDiff = scoreWindow(b, interests) - scoreWindow(a, interests);
-        if (scoreDiff !== 0) return scoreDiff;
-        return a.item_name.localeCompare(b.item_name);
-      })
-      .slice(0, 7);
+    const sortedWindows = windows.sort((a, b) => {
+      const scoreDiff = scoreWindow(b, interests) - scoreWindow(a, interests);
+      if (scoreDiff !== 0) return scoreDiff;
+      return a.item_name.localeCompare(b.item_name);
+    });
+
+    const topActions = sortedWindows.filter(w => w.suggestion_kind === "action").slice(0, 10);
+    const topInspirations = sortedWindows.filter(w => w.suggestion_kind === "inspiration").slice(0, 10);
+    const selected = [...topActions, ...topInspirations];
 
     if (selected.length > 0) {
       const insertPayload = selected.map((window) => ({
@@ -128,7 +138,7 @@ export async function GET() {
       const { data: createdRows, error: createSuggestionsError } = await auth.supabase
         .from("growing_suggestions_log")
         .upsert(insertPayload, { onConflict: "week_start_date,window_id" })
-        .select("id, title, details, suggestion_kind, suggested_bucket, status, week_start_date, converted_task_id");
+        .select("id, title, details, suggestion_kind, suggested_bucket, status, week_start_date, converted_task_id, window_id");
 
       if (createSuggestionsError) {
         return errorResponse(createSuggestionsError.message, 500);

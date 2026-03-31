@@ -108,13 +108,21 @@ export function GrowingWeeklyTab() {
                   <h3 className="font-medium">{item.title}</h3>
                   <p className="mb-3 mt-1 text-sm text-muted-foreground">{item.details}</p>
                   {item.converted_task_id ? (
-                    <p className="mb-3 text-xs text-muted-foreground">Linked task: {item.converted_task_id}</p>
-                  ) : null}
-                  <div className="flex flex-wrap gap-1">
-                    <Button size="sm" variant="outline" className="min-h-11" asChild>
-                      <Link href="/">Open Tasks</Link>
-                    </Button>
-                  </div>
+                    <>
+                      <p className="mb-3 text-xs text-muted-foreground">Linked task: {item.converted_task_id}</p>
+                      <div className="flex flex-wrap gap-1">
+                        <Button size="sm" variant="outline" className="min-h-11" asChild>
+                          <Link href="/">Open Tasks</Link>
+                        </Button>
+                      </div>
+                    </>
+                  ) : (
+                    <div className="flex flex-wrap gap-1">
+                      <Button size="sm" variant="outline" className="min-h-11" asChild>
+                        <Link href="/">Open Tasks</Link>
+                      </Button>
+                    </div>
+                  )}
                 </article>
               ))
             )}

@@ -38,6 +38,8 @@ export interface GrowingTaskDigestItem {
 export interface GrowingSuggestionDigestItem {
   title: string;
   details: string;
+  status?: string;
+  suggestion_kind?: "action" | "inspiration";
 }
 
 export interface RecentGrowingKnowledgeItem {

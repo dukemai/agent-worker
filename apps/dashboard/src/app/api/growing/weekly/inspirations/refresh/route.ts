@@ -1,14 +1,6 @@
 import { NextResponse } from "next/server";
 import { errorResponse, getAuthedSupabase } from "@/lib/api";
-
-type GrowingProfile = {
-  id: string;
-  city: string;
-  country_code: string;
-  space_type: string;
-  experience_level: string;
-  interests: string[];
-};
+import { fetchGrowingProfile, GrowingProfile } from "@agent/shared";
 
 type GrowingWindow = {
   id: string;
@@ -53,17 +45,8 @@ export async function POST() {
   const weekStartDate = getWeekStartDate();
   const currentMonth = new Date().getUTCMonth() + 1;
 
-  const { data: profileRows, error: profileError } = await auth.supabase
-    .from("growing_profiles")
-    .select("id, city, country_code, space_type, experience_level, interests")
-    .order("created_at", { ascending: false })
-    .limit(1);
+  const profile = await fetchGrowingProfile(auth.supabase);
 
-  if (profileError) {
-    return errorResponse(profileError.message, 500);
-  }
-
-  const profile = (profileRows?.[0] as GrowingProfile | undefined) ?? null;
   if (!profile) {
     return errorResponse("No growing profile found. Create a profile first.", 404);
   }
@@ -80,22 +63,27 @@ export async function POST() {
     return errorResponse(deleteError.message, 500);
   }
 
-  // Collect existing window_ids for this week so we don't violate the unique
-  // constraint on (week_start_date, window_id) when inserting new inspirations.
-  const { data: existingRows, error: existingError } = await auth.supabase
-    .from("growing_suggestions_log")
-    .select("window_id")
-    .eq("week_start_date", weekStartDate);
+  // Collect existing window_ids for this week or any already connected to a task
+  const [logRes, taskRes] = await Promise.all([
+    auth.supabase
+      .from("growing_suggestions_log")
+      .select("window_id")
+      .eq("week_start_date", weekStartDate),
+    auth.supabase
+      .from("tasks")
+      .select("window_id")
+      .is("window_id", "not.null")
+  ]);
 
-  if (existingError) {
-    return errorResponse(existingError.message, 500);
-  }
+  const restrictedWindowIds = new Set<string>();
+  
+  (logRes.data ?? []).forEach(row => {
+    if (row.window_id) restrictedWindowIds.add(row.window_id);
+  });
 
-  const existingWindowIds = new Set(
-    (existingRows ?? [])
-      .map((row) => (row as { window_id: string | null }).window_id)
-      .filter((id): id is string => typeof id === "string" && id.length > 0)
-  );
+  (taskRes.data ?? []).forEach(row => {
+    if (row.window_id) restrictedWindowIds.add(row.window_id);
+  });
 
   const { data: windowsRows, error: windowsError } = await auth.supabase
     .from("growing_windows")
@@ -109,7 +97,7 @@ export async function POST() {
   }
   const windows = ((windowsRows ?? []) as GrowingWindow[]).filter(
     (window) =>
-      isMonthInRange(currentMonth, window.start_month, window.end_month) && !existingWindowIds.has(window.id)
+      isMonthInRange(currentMonth, window.start_month, window.end_month) && !restrictedWindowIds.has(window.id)
   );
 
   if (windows.length === 0) {
@@ -123,7 +111,7 @@ export async function POST() {
       if (scoreDiff !== 0) return scoreDiff;
       return a.item_name.localeCompare(b.item_name);
     })
-    .slice(0, 6);
+    .slice(0, 10);
 
   if (selected.length === 0) {
     return NextResponse.json({ success: true, created: 0 });

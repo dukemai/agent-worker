@@ -16,6 +16,7 @@ import React, { Fragment } from "react";
 import type {
   DigestLessonItem,
   GrowingSuggestionDigestItem,
+  GrowingTaskDigestItem,
   PromotionDigestItem,
   RecentGrowingKnowledgeItem,
   RecentGrowingWindowItem,
@@ -53,7 +54,7 @@ function TaskList({ tasks }: { tasks: Task[] }) {
     <>
       {tasks.map((task, index) => (
         <Fragment key={task.id}>
-          {index > 0 && <Hr className="border-gray-100 my-[12px]" />}
+          {index > 0 && <Hr className="border-gray-900/5 my-[12px]" />}
           <Section>
             <Row>
               <Column
@@ -167,48 +168,106 @@ export function DailyDigestEmail(props: Props) {
               </Heading>
               
               <Section className="mb-[32px]">
-                 <Heading className="m-0 text-[12px] font-bold text-gray-400 uppercase tracking-widest mb-[16px] border-b border-solid border-gray-100 pb-[8px]">
+                 <Heading className="m-0 text-[14px] font-bold text-indigo-600 uppercase tracking-wider mb-[12px]">
                    📅 High Priority
                  </Heading>
-                 <TaskList tasks={todayTasks} />
+                 <Section className="bg-indigo-50/30 rounded-xl p-[20px] border border-solid border-indigo-100/50">
+                   <TaskList tasks={todayTasks} />
+                 </Section>
               </Section>
 
               {thisWeekTasks.length > 0 && (
                 <Section className="mb-[32px]">
-                   <Heading className="m-0 text-[12px] font-bold text-gray-400 uppercase tracking-widest mb-[16px] border-b border-solid border-gray-100 pb-[8px]">
+                   <Heading className="m-0 text-[14px] font-bold text-blue-600 uppercase tracking-wider mb-[12px]">
                      📆 Upcoming this Week
                    </Heading>
-                   <TaskList tasks={thisWeekTasks} />
+                   <Section className="bg-blue-50/30 rounded-xl p-[20px] border border-solid border-blue-100/50">
+                     <TaskList tasks={thisWeekTasks} />
+                   </Section>
                 </Section>
               )}
             </Section>
 
-            {/* Growing inspirations */}
+            {/* Growing Suggestions/Inspirations */}
             {growingSuggestions.length > 0 && (
               <Section className="mb-[48px]">
                 <Heading className="m-0 text-[22px] font-bold text-gray-950 mb-[16px]">
-                  Growing Inspirations
+                  Growing Insights
                 </Heading>
-                <Section className="bg-emerald-50/50 rounded-xl p-[20px] border border-solid border-emerald-100">
-                  {growingSuggestions.map((item, index) => (
-                    <Fragment key={item.title}>
-                      {index > 0 && <Hr className="border-emerald-100/50 my-[16px]" />}
-                      <Row>
-                        <Column width="32" valign="top" className="pr-[12px]">
-                          <Text className="m-0 text-emerald-600 font-bold text-[16px]">🌿</Text>
-                        </Column>
-                        <Column>
-                          <Text className="m-0 font-semibold text-[16px] text-gray-900">
-                            {item.title}
-                          </Text>
-                          <Text className="m-0 mt-[4px] text-[14px] text-gray-600 leading-[22px]">
-                            {item.details}
-                          </Text>
-                        </Column>
-                      </Row>
-                    </Fragment>
-                  ))}
-                </Section>
+                
+                {/* Actions First */}
+                {growingSuggestions.filter(s => s.suggestion_kind !== 'inspiration').length > 0 && (
+                  <Section className="mb-[24px]">
+                    <Heading className="m-0 text-[14px] font-bold text-indigo-600 uppercase tracking-wider mb-[12px]">
+                      Recommended Actions
+                    </Heading>
+                    <Section className="bg-emerald-50/30 rounded-xl p-[20px] border border-solid border-emerald-100/50">
+                      {growingSuggestions
+                        .filter(s => s.suggestion_kind !== 'inspiration')
+                        .map((item, index, arr) => (
+                        <Fragment key={item.title}>
+                          {index > 0 && <Hr className="border-emerald-100/30 my-[16px]" />}
+                          <Row>
+                            <Column width="32" valign="top" className="pr-[12px]">
+                              <Section className="w-[24px] h-[24px] rounded-full bg-emerald-100 flex items-center justify-center">
+                                <Text className="m-0 text-emerald-700 font-bold text-[12px]">✓</Text>
+                              </Section>
+                            </Column>
+                            <Column>
+                              <Text className="m-0 font-semibold text-[15px] text-gray-900">
+                                {item.title}
+                                {item.status === 'converted' && (
+                                  <span className="ml-[8px] text-[10px] bg-emerald-100 text-emerald-700 px-[6px] py-[2px] rounded uppercase font-bold tracking-tighter">
+                                    Converted
+                                  </span>
+                                )}
+                              </Text>
+                              <Text className="m-0 mt-[4px] text-[14px] text-gray-600 leading-[22px]">
+                                {item.details}
+                              </Text>
+                            </Column>
+                          </Row>
+                        </Fragment>
+                      ))}
+                    </Section>
+                  </Section>
+                )}
+
+                {/* Inspirations Second */}
+                {growingSuggestions.filter(s => s.suggestion_kind === 'inspiration').length > 0 && (
+                  <Section>
+                    <Heading className="m-0 text-[14px] font-bold text-amber-600 uppercase tracking-wider mb-[12px]">
+                      Weekly Inspirations
+                    </Heading>
+                    <Section className="bg-amber-50/30 rounded-xl p-[20px] border border-solid border-amber-100/50">
+                      {growingSuggestions
+                        .filter(s => s.suggestion_kind === 'inspiration')
+                        .map((item, index, arr) => (
+                        <Fragment key={item.title}>
+                          {index > 0 && <Hr className="border-amber-100/30 my-[16px]" />}
+                          <Row>
+                            <Column width="32" valign="top" className="pr-[12px]">
+                              <Text className="m-0 text-amber-600 font-bold text-[16px]">💡</Text>
+                            </Column>
+                            <Column>
+                              <Text className="m-0 font-semibold text-[15px] text-gray-900">
+                                {item.title}
+                                {item.status === 'converted' && (
+                                  <span className="ml-[8px] text-[10px] bg-amber-100 text-amber-700 px-[6px] py-[2px] rounded uppercase font-bold tracking-tighter">
+                                    Converted
+                                  </span>
+                                )}
+                              </Text>
+                              <Text className="m-0 mt-[4px] text-[14px] text-gray-600 leading-[22px]">
+                                {item.details}
+                              </Text>
+                            </Column>
+                          </Row>
+                        </Fragment>
+                      ))}
+                    </Section>
+                  </Section>
+                )}
               </Section>
             )}
 

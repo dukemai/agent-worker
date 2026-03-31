@@ -1,143 +1,150 @@
 # Database Architecture
 
-This document describes the Supabase/PostgreSQL data model for Dad-Ops and how core domains connect.
+This document describes the Supabase/PostgreSQL data model for Dad-Ops, focusing on how core domains like Tasks, Learning, and Growing are structured and interconnected.
 
-## Overview
-
-- **Database**: PostgreSQL (Supabase)
-- **Access model**: App/API access via Supabase client, with Row Level Security enabled
-- **Primary domains**:
-  - Tasks and buckets
-  - Learning
-  - Family context
-  - Growing (profiles, sources, windows, knowledge, suggestions)
-
-## Domain Model
-
-### 1) Tasks and Buckets
-
-- `tasks`
-  - Core task entity (`title`, `due_date`, `status`, `source`, `metadata`)
-  - Supports both normal tasks and typed records via `metadata` (for example renewals, promotions, growing conversions)
-- Bucket membership tables:
-  - `today_tasks`
-  - `this_week_tasks`
-  - `later_tasks`
-  - Each uses `task_id` as PK + FK to `tasks(id)` with `ON DELETE CASCADE`
-
-Design note: bucket tables intentionally separate membership from task payload, so moving across buckets is lightweight.
-
-### 2) Learning
-
-- `learning_profile`
-  - Curriculum settings per topic/category
-  - `profile_type` constrained to `topic | category`
-- `learning_log`
-  - Lesson entries and feedback
-  - FK `profile_id -> learning_profile(id)` with `ON DELETE CASCADE`
-
-### 3) Family Context
-
-- `family_context`
-  - Key-value preferences (shopping list, seasonal interests, etc.)
-  - `key` is unique
-
-### 4) Growing
-
-- `growing_profiles`
-  - User gardening profile (city, country, space type, experience, interests)
-- `growing_sources`
-  - Input sources for extraction (YouTube/blog)
-  - Includes status pipeline (`queued | processing | done | failed`) and content fields:
-    - `transcript`
-    - `description`
-    - `source_type` (youtube/blog)
-    - `source_language`
-- `growing_windows`
-  - Seasonal actionable windows (month ranges, priority, bucket suggestion)
-  - Can reference source via `source_id`
-  - Includes user verification flag `verified`
-- `growing_knowledge`
-  - Extracted knowledge nuggets from sources
-  - FK `source_id -> growing_sources(id)` with `ON DELETE CASCADE`
-  - Includes `category`, `tags`, `season_relevance`, `location_note`, `language`
-- `growing_suggestions_log`
-  - Weekly suggestion lifecycle with status:
-    - `pending | dismissed | converted | done`
-  - Links:
-    - `profile_id -> growing_profiles(id)` (`ON DELETE SET NULL`)
-    - `window_id -> growing_windows(id)` (`ON DELETE SET NULL`)
-    - `converted_task_id -> tasks(id)` (`ON DELETE SET NULL`)
-  - Unique index on `(week_start_date, window_id)`
-
-## Relationship Diagram
+## Entity Relationship Diagram
 
 ```mermaid
-flowchart LR
-  tasks[(tasks)]
-  today[(today_tasks)]
-  week[(this_week_tasks)]
-  later[(later_tasks)]
-  lp[(learning_profile)]
-  ll[(learning_log)]
-  gp[(growing_profiles)]
-  gs[(growing_sources)]
-  gw[(growing_windows)]
-  gk[(growing_knowledge)]
-  gsl[(growing_suggestions_log)]
-
-  tasks --> today
-  tasks --> week
-  tasks --> later
-
-  lp --> ll
-
-  gs --> gk
-  gs --> gw
-
-  gp --> gsl
-  gw --> gsl
-  tasks --> gsl
+erDiagram
+    tasks ||--o| today_tasks : "is in"
+    tasks ||--o| this_week_tasks : "is in"
+    tasks ||--o| later_tasks : "is in"
+    
+    growing_profiles ||--o{ growing_suggestions_log : "receives"
+    growing_windows ||--o{ growing_suggestions_log : "is suggested via"
+    growing_windows ||--o{ tasks : "is directly linked to"
+    tasks ||--o| growing_suggestions_log : "resolves"
+    
+    growing_sources ||--o{ growing_knowledge : "provides"
+    growing_sources ||--o{ growing_windows : "defines"
+    
+    learning_profile ||--o{ learning_log : "tracks"
 ```
 
-## Constraints and Integrity
+---
 
-- Extensive `CHECK` constraints enforce enums/ranges, including:
-  - buckets (`today`, `this_week`, `later`)
-  - growing suggestion kinds/statuses
-  - months (`1..12`)
-  - growing space/experience levels
-- FK usage:
-  - `ON DELETE CASCADE` where child data is meaningless without parent (`learning_log`, bucket rows, growing knowledge)
-  - `ON DELETE SET NULL` where historical record should remain (`growing_suggestions_log` links)
+## Core Tables
 
-## Indexing Strategy (Current)
+### 1. Tasks & Buckets
+The task system separates core data from view-specific membership.
 
-- `growing_suggestions_log(week_start_date, window_id)` unique index
-- `growing_sources(status, created_at)`
-- `growing_knowledge(category, created_at DESC)`
-- `growing_knowledge(source_id)`
-- `growing_windows(source_id)`
+| Table | Purpose | Key Relationships |
+|-------|---------|-------------------|
+| `tasks` | Central repository for all task data (title, body, due date, metadata). | Parental to all bucket tables. Linked to `growing_windows.id`. |
+| `today_tasks` | Specific list for tasks to be done today. | `task_id` -> `tasks.id` |
+| `this_week_tasks` | Specific list for tasks planned for this week. | `task_id` -> `tasks.id` |
+| `later_tasks` | Specific list for tasks deferred for later. | `task_id` -> `tasks.id` |
 
-## Security Model
+### 2. Growing (Garden Tracker)
+The gardening domain manages seasonal windows, extraction from sources, and personalized suggestions.
 
-- RLS is enabled on all primary application tables.
-- Current policies are broad `authenticated` full-access policies per table.
-- Authentication boundary is enforced in API handlers via `getAuthedSupabase()`.
+| Table | Purpose | Key Relationships |
+|-------|---------|-------------------|
+| `growing_profiles` | User preferences (city, interests, space type). | - |
+| `growing_sources` | Scraped content from YouTube or Blogs. | - |
+| `growing_windows` | Seasonal catalog (e.g., "Start tomatoes" Feb-Apr). | `source_id` -> `growing_sources.id`. Referenced by `tasks.window_id`. |
+| `growing_knowledge` | Extracted atomic tips and reference material. | `source_id` -> `growing_sources.id` |
+| `growing_suggestions_log` | Weekly instances of windows suggested to the user. | `profile_id`, `window_id`, `converted_task_id` |
 
-Operational note: this is suitable for single-user/internal operation; multi-tenant hardening would require user/tenant ownership columns and restrictive policy predicates.
+### 3. Learning
+A curriculum-based system for daily micro-learning.
 
-## Migration Evolution (Highlights)
+| Table | Purpose | Key Relationships |
+|-------|---------|-------------------|
+| `learning_profile` | Defines topics and current learning progress. | - |
+| `learning_log` | History of daily lessons and user feedback. | `profile_id` -> `learning_profile.id` |
 
-- `001` base tasks + learning schema
-- `002` family context table
-- `003` RLS enablement and policies
-- `004` learning profile type support
-- `005` growing profile/windows/suggestions base + seed data
-- `006` growing sources + knowledge + growing/source indexes
-- `007` source transcript support
-- `008` source description support
-- `009` knowledge location metadata
-- `010` multilingual fields (`source_language`, `language`)
-- `010` windows verification flag
-- `011` source type classification
+---
+
+## Key Connections & Data Flow
+
+### The "Growing" Lifecycle
+1. **Sources → Windows/Knowledge**: The extraction worker processes `growing_sources` and populates `growing_windows` (seasonal actions) and `growing_knowledge` (general tips).
+2. **Profile + Windows → Suggestions**: A weekly cruncher matches user `interests` in `growing_profiles` against `growing_windows` to create records in `growing_suggestions_log`.
+3. **Suggestions → Tasks**: When a user clicks "Add to Planner", a new entry in `tasks` is created. `growing_suggestions_log.converted_task_id` is updated, and `tasks.window_id` is populated directly.
+
+### Task Conversion & Metadata
+Tasks generated from other domains (like Renewals or Growing) store their origin in both direct columns and the `metadata` JSONB column:
+- `item_type`: "growing", "renewal", "promotion"
+- `window_id` (UUID): Direct reference to `growing_windows.id` (for growing tasks).
+- `suggestion_id`: The specific log entry from the weekly run.
+
+---
+
+## Constraints & Security
+- **RLS (Row Level Security)**: Enabled on all tables. Currently defaults to `authenticated` full access for the single-user model.
+- **Cascading Deletes**: `ON DELETE CASCADE` is used for bucket memberships and extracted knowledge. `ON DELETE SET NULL` is used for suggestions and task-window links to preserve history.
+
+---
+
+## Detailed Schema Reference
+
+### 1. Tasks Domain
+
+#### `tasks`
+Core task entity. Stores the unified payload for all task types.
+- `id` (UUID, PK): Unique identifier.
+- `created_at` (TIMESTAMPTZ): When the task was created.
+- `title` (TEXT): The task headline.
+- `original_body` (TEXT): The full description or extracted email body.
+- `due_date` (TIMESTAMPTZ): Optional deadline.
+- `status` (TEXT): Task state (`pending`, `done`).
+- `window_id` (UUID, FK): Direct link to `growing_windows(id)`.
+- `metadata` (JSONB): Specialized data (e.g., `item_type`, `suggestion_id`).
+- `source` (TEXT): Origin of the task (default: `email`).
+
+#### `today_tasks`, `this_week_tasks`, `later_tasks`
+Membership tables for task buckets.
+- `task_id` (UUID, PK, FK): Reference to `tasks(id)`. Uses `ON DELETE CASCADE`.
+
+### 2. Growing Domain
+
+#### `growing_profiles`
+User gardening preferences and environment.
+- `city` / `country_code`: Location for weather/growing season matching.
+- `space_type`: `balcony`, `indoor`, `yard`, `mixed`.
+- `experience_level`: `beginner`, `intermediate`, `advanced`.
+- `interests`: Array of strings (e.g., `['tomato', 'herbs']`) used for suggestion scoring.
+
+#### `growing_windows`
+The static catalog of seasonal gardening opportunities.
+- `item_key` (TEXT, Unique): Stable identifier for the window.
+- `suggestion_kind`: `action` (must do) vs `inspiration` (nice to do).
+- `start_month` / `end_month` (INT): The peak window for this activity (1-12).
+- `priority` (INT): Default score for sorting.
+- `verified` (BOOLEAN): Whether the window data has been human-reviewed.
+
+#### `growing_suggestions_log`
+The join table representing a specific window suggested to a specific profile for a specific week.
+- `id` (UUID, PK): Unique identifier.
+- `profile_id` (UUID, FK): Link to `growing_profiles(id)`.
+- `window_id` (UUID, FK): Link to `growing_windows(id)`.
+- `week_start_date` (DATE): Monday of the suggestion week.
+- `status`: `pending`, `dismissed`, `converted`, `done`.
+- `converted_task_id` (UUID, FK): Links to the resulting task if "Add to Planner" was clicked.
+- `title` (TEXT): Copied from window for historical record.
+- `details` (TEXT): Copied from window for historical record.
+- `suggestion_kind`: `action` vs `inspiration`.
+- `suggested_bucket`: `today`, `this_week`, `later`.
+
+#### `growing_sources` & `growing_knowledge`
+Data from the ingestion pipeline (YouTube/Blogs).
+- `growing_sources`: Tracks URLs, processing `status` (`queued`, `processing`, `done`), and full `transcript`.
+- `growing_knowledge`: Individual tips extracted from sources. Includes `category` and `verified` status.
+
+### 3. Learning Domain
+
+#### `learning_profile`
+- `topic`: The subject being learned.
+- `curriculum_outline` (JSONB): The AI-generated path for this topic.
+
+#### `learning_log`
+- `content` (TEXT): The generated lesson text.
+- `feedback` (TEXT): User rating/comments on the lesson quality.
+
+### 4. Utilities
+
+#### `family_context`
+A simple key-value store for cross-cutting user preferences.
+- `key` (TEXT, Unique): e.g., `shopping_list`, `seasonal_interests`.
+- `value` (TEXT): The value associated with the key.

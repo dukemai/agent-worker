@@ -15,3 +15,12 @@ export interface GrowingSourceRow {
   transcript: string | null;
   source_language: string | null;
 }
+
+export interface GrowingProfile {
+  id: string;
+  city: string;
+  country_code: string;
+  space_type: string;
+  experience_level: string;
+  interests: string[];
+}
