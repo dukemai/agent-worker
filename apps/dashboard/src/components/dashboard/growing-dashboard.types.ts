@@ -1,4 +1,5 @@
 import type {
+  GrowingActionKnowledgeLink,
   GrowingKnowledge,
   GrowingKnowledgeCategory,
   GrowingProfile,
@@ -7,10 +8,11 @@ import type {
 } from "@/types/database";
 
 export type WeeklyGrowingResponse = {
+  week_number: number;
   week_start_date: string;
   profile: GrowingProfile;
   actions: GrowingSuggestion[];
-  inspirations: GrowingSuggestion[];
+  supporting_knowledge: GrowingActionKnowledgeLink[];
 };
 
 export type GrowingKnowledgeSource = {

@@ -1,6 +1,6 @@
 /**
  * ISO date string (YYYY-MM-DD) for Monday of the given week (UTC).
- * Used for growing_suggestions_log week_start_date and other week-based logic.
+ * Used for week-based logic and display labels.
  */
 export function getWeekStartDate(now = new Date()): string {
   const date = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
@@ -8,6 +8,17 @@ export function getWeekStartDate(now = new Date()): string {
   const diff = day === 0 ? -6 : 1 - day;
   date.setUTCDate(date.getUTCDate() + diff);
   return date.toISOString().slice(0, 10);
+}
+
+/**
+ * ISO week number (1-53) in UTC.
+ */
+export function getISOWeekNumber(now = new Date()): number {
+  const date = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+  const day = date.getUTCDay() || 7;
+  date.setUTCDate(date.getUTCDate() + 4 - day);
+  const yearStart = new Date(Date.UTC(date.getUTCFullYear(), 0, 1));
+  return Math.ceil((((date.getTime() - yearStart.getTime()) / 86400000) + 1) / 7);
 }
 
 /**

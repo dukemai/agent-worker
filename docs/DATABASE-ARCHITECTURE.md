@@ -119,7 +119,7 @@ The join table representing a specific window suggested to a specific profile fo
 - `id` (UUID, PK): Unique identifier.
 - `profile_id` (UUID, FK): Link to `growing_profiles(id)`.
 - `window_id` (UUID, FK): Link to `growing_windows(id)`.
-- `week_start_date` (DATE): Monday of the suggestion week.
+- `week_number` (INT): ISO week number associated with this suggestion row.
 - `status`: `pending`, `dismissed`, `converted`, `done`.
 - `converted_task_id` (UUID, FK): Links to the resulting task if "Add to Planner" was clicked.
 - `title` (TEXT): Copied from window for historical record.

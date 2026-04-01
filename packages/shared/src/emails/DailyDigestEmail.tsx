@@ -62,11 +62,9 @@ function TaskList({ tasks }: { tasks: Task[] }) {
                 className="pr-[12px]"
                 valign="top"
               >
-                <Section className="w-[28px] h-[28px] rounded-full bg-indigo-50 border border-solid border-indigo-100 flex items-center justify-center">
-                  <Text className="m-0 text-indigo-600 font-bold text-[13px] text-center w-full leading-[28px]">
-                    {index + 1}
-                  </Text>
-                </Section>
+                <Text className="m-0 w-[28px] h-[28px] rounded-full bg-indigo-50 border border-solid border-indigo-100 text-indigo-600 font-bold text-[13px] text-center leading-[28px]">
+                  {index + 1}
+                </Text>
               </Column>
               <Column>
                 <Text className="m-0 font-semibold text-[16px] text-gray-900">
@@ -111,6 +109,29 @@ export function DailyDigestEmail(props: Props) {
 
   const hasNewKnowledge =
     recentGrowingKnowledge.length > 0 || recentGrowingWindows.length > 0;
+  const TASK_COUNT_HIGHLIGHT_REGEX =
+    /(\d+\s+uppgift(?:er)?\s+för idag|\d+\s+uppgift(?:er)?\s+senare den här veckan)/g;
+  const growingTasks = [...todayTasks, ...thisWeekTasks, ...laterTasks].filter(
+    (task) => task.metadata?.item_type === "growing"
+  );
+  const growingTaskKeywords = Array.from(
+    new Set(
+      growingTasks
+        .flatMap((task) => `${task.title} ${task.original_body ?? ""}`.toLowerCase().split(/[^a-z0-9]+/g))
+        .map((token) => token.trim())
+        .filter((token) => token.length >= 3)
+    )
+  );
+  const relatedKnowledgeForGrowingTasks = recentGrowingKnowledge
+    .map((item) => {
+      const haystack = `${item.title} ${item.content} ${item.category}`.toLowerCase();
+      const overlap = growingTaskKeywords.filter((kw) => haystack.includes(kw)).length;
+      return { item, overlap };
+    })
+    .filter((row) => row.overlap > 0)
+    .sort((a, b) => b.overlap - a.overlap)
+    .slice(0, 4)
+    .map((row) => row.item);
 
   return (
     <Html>
@@ -153,11 +174,43 @@ export function DailyDigestEmail(props: Props) {
                 Today&apos;s Briefing
               </Heading>
               <Section className="bg-gray-50 rounded-xl p-[24px] border border-solid border-gray-100">
-                {narrative.split("\n\n").map((p, idx, arr) => (
-                  <Text key={idx} className={`m-0 text-[16px] text-gray-700 leading-[26px] ${idx === arr.length - 1 ? "" : "mb-[16px]"}`}>
-                    {p}
-                  </Text>
-                ))}
+                {narrative.split("\n\n").map((p, idx, arr) => {
+                  const countdownMatch = p.match(/^Det är (\d+)\s+(dag|dagar)\s+kvar till\s+(.+)\.$/);
+                  if (countdownMatch) {
+                    const [, days, unit, holidayName] = countdownMatch;
+                    return (
+                      <Text
+                        key={idx}
+                        className={`m-0 text-[16px] text-gray-700 leading-[26px] ${idx === arr.length - 1 ? "" : "mb-[16px]"}`}
+                      >
+                        Det är{" "}
+                        <span className="text-red-700 font-bold">
+                          {days} {unit}
+                        </span>{" "}
+                        kvar till{" "}
+                        <span className="text-red-700 font-bold">{holidayName}</span>.
+                      </Text>
+                    );
+                  }
+
+                  const parts = p.split(TASK_COUNT_HIGHLIGHT_REGEX);
+                  return (
+                    <Text key={idx} className={`m-0 text-[16px] text-gray-700 leading-[26px] ${idx === arr.length - 1 ? "" : "mb-[16px]"}`}>
+                      {parts.map((part, partIdx) => {
+                        const shouldHighlight = TASK_COUNT_HIGHLIGHT_REGEX.test(part);
+                        TASK_COUNT_HIGHLIGHT_REGEX.lastIndex = 0;
+                        if (shouldHighlight) {
+                          return (
+                            <span key={`${idx}-${partIdx}`} className="font-bold text-gray-900">
+                              {part}
+                            </span>
+                          );
+                        }
+                        return <span key={`${idx}-${partIdx}`}>{part}</span>;
+                      })}
+                    </Text>
+                  );
+                })}
               </Section>
             </Section>
 
@@ -203,30 +256,21 @@ export function DailyDigestEmail(props: Props) {
                     </Heading>
                     <Section className="bg-emerald-50/30 rounded-xl p-[20px] border border-solid border-emerald-100/50">
                       {growingSuggestions
-                        .filter(s => s.suggestion_kind !== 'inspiration')
+                        .filter(s => s.suggestion_kind !== 'inspiration' && s.status === 'pending')
                         .map((item, index, arr) => (
                         <Fragment key={item.title}>
                           {index > 0 && <Hr className="border-emerald-100/30 my-[16px]" />}
-                          <Row>
-                            <Column width="32" valign="top" className="pr-[12px]">
-                              <Section className="w-[24px] h-[24px] rounded-full bg-emerald-100 flex items-center justify-center">
-                                <Text className="m-0 text-emerald-700 font-bold text-[12px]">✓</Text>
-                              </Section>
-                            </Column>
-                            <Column>
-                              <Text className="m-0 font-semibold text-[15px] text-gray-900">
-                                {item.title}
-                                {item.status === 'converted' && (
-                                  <span className="ml-[8px] text-[10px] bg-emerald-100 text-emerald-700 px-[6px] py-[2px] rounded uppercase font-bold tracking-tighter">
-                                    Converted
-                                  </span>
-                                )}
-                              </Text>
-                              <Text className="m-0 mt-[4px] text-[14px] text-gray-600 leading-[22px]">
-                                {item.details}
-                              </Text>
-                            </Column>
-                          </Row>
+                          <Text className="m-0 font-semibold text-[15px] text-gray-900">
+                            {item.title}
+                            {item.status === 'converted' && (
+                              <span className="ml-[8px] text-[10px] bg-emerald-100 text-emerald-700 px-[6px] py-[2px] rounded uppercase font-bold tracking-tighter">
+                                Converted
+                              </span>
+                            )}
+                          </Text>
+                          <Text className="m-0 mt-[4px] text-[14px] text-gray-600 leading-[22px]">
+                            {item.details}
+                          </Text>
                         </Fragment>
                       ))}
                     </Section>
@@ -241,7 +285,7 @@ export function DailyDigestEmail(props: Props) {
                     </Heading>
                     <Section className="bg-amber-50/30 rounded-xl p-[20px] border border-solid border-amber-100/50">
                       {growingSuggestions
-                        .filter(s => s.suggestion_kind === 'inspiration')
+                        .filter(s => s.suggestion_kind === 'inspiration' && s.status === 'pending')
                         .map((item, index, arr) => (
                         <Fragment key={item.title}>
                           {index > 0 && <Hr className="border-amber-100/30 my-[16px]" />}
@@ -268,59 +312,32 @@ export function DailyDigestEmail(props: Props) {
                     </Section>
                   </Section>
                 )}
-              </Section>
-            )}
 
-            {/* New Growing Knowledge */}
-            {hasNewKnowledge && (
-              <Section className="mb-[48px]">
-                <Heading className="m-0 text-[22px] font-bold text-gray-950 mb-[24px]">
-                  Garden Intelligence
-                </Heading>
-
-                {recentGrowingWindows.length > 0 && (
-                  <Section className="mb-[24px]">
-                    <Heading className="m-0 text-[14px] font-bold text-indigo-600 uppercase tracking-wider mb-[16px]">
-                      Actionable Tips
+                {/* Related Knowledge */}
+                {relatedKnowledgeForGrowingTasks.length > 0 && (
+                  <Section className="mt-[24px]">
+                    <Heading className="m-0 text-[14px] font-bold text-teal-600 uppercase tracking-wider mb-[12px]">
+                      Related Knowledge
                     </Heading>
-                    {recentGrowingWindows.map((item, idx, arr) => (
-                      <Section key={item.title} className={`${idx === arr.length - 1 ? "" : "mb-[16px]"}`}>
-                        <Text className="m-0 font-semibold text-[15px] text-gray-900 border-l-[3px] border-solid border-indigo-200 pl-[12px]">
-                          {item.title}
-                          {item.sourceUrl && (
-                             <a href={item.sourceUrl} className="ml-[8px] text-[12px] text-indigo-500 font-medium underline">
-                               Watch source
-                             </a>
-                          )}
-                        </Text>
-                        <Text className="m-0 mt-[6px] text-[14px] text-gray-600 leading-[22px] pl-[15px]">
-                          {item.note}
-                        </Text>
-                      </Section>
-                    ))}
-                  </Section>
-                )}
-
-                {recentGrowingKnowledge.length > 0 && (
-                  <Section className="mt-[32px]">
-                    <Heading className="m-0 text-[14px] font-bold text-gray-400 uppercase tracking-wider mb-[16px]">
-                      Reference Updates
-                    </Heading>
-                    {recentGrowingKnowledge.map((item, idx, arr) => (
-                      <Section key={item.title} className={`${idx === arr.length - 1 ? "" : "mb-[16px]"}`}>
-                         <Text className="m-0 font-semibold text-[15px] text-gray-900">
-                           {item.title} <span className="text-gray-400 font-normal text-[13px] ml-[4px]">#{item.category}</span>
-                         </Text>
-                         <Text className="m-0 mt-[4px] text-[14px] text-gray-600 leading-[22px]">
-                           {item.content.length > 200 ? `${item.content.slice(0, 200)}...` : item.content}
-                           {item.sourceUrl && (
-                             <a href={item.sourceUrl} className="ml-[6px] text-indigo-500 underline">
-                               Read more
-                             </a>
-                           )}
-                         </Text>
-                      </Section>
-                    ))}
+                    <Section className="bg-teal-50/30 rounded-xl p-[20px] border border-solid border-teal-100/50">
+                      {relatedKnowledgeForGrowingTasks.map((item, index) => (
+                        <Fragment key={`${item.title}-${index}`}>
+                          {index > 0 && <Hr className="border-teal-100/40 my-[14px]" />}
+                          <Text className="m-0 font-semibold text-[15px] text-gray-900">
+                            {item.title}
+                            <span className="text-teal-700 font-normal text-[12px] ml-[6px]">#{item.category}</span>
+                          </Text>
+                          <Text className="m-0 mt-[4px] text-[14px] text-gray-600 leading-[22px]">
+                            {item.content.length > 160 ? `${item.content.slice(0, 160)}...` : item.content}
+                            {item.sourceUrl && (
+                              <a href={item.sourceUrl} className="ml-[6px] text-teal-600 underline">
+                                Read source
+                              </a>
+                            )}
+                          </Text>
+                        </Fragment>
+                      ))}
+                    </Section>
                   </Section>
                 )}
               </Section>

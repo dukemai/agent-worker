@@ -24,3 +24,41 @@ export interface GrowingProfile {
   experience_level: string;
   interests: string[];
 }
+
+export interface GrowingWindow {
+  id: string;
+  item_name: string;
+  suggestion_kind: "action" | "inspiration";
+  suggested_bucket: "today" | "this_week" | "later";
+  priority: number;
+  start_month: number;
+  end_month: number;
+  stockholm_note: string;
+  tags: string[];
+}
+
+export interface GrowingSuggestion {
+  id: string;
+  title: string;
+  details: string;
+  suggestion_kind: "action" | "inspiration";
+  suggested_bucket: "today" | "this_week" | "later";
+  status: "pending" | "dismissed" | "converted" | "done";
+  week_number: number;
+  converted_task_id: string | null;
+  window_id: string;
+}
+
+export interface GrowingSupportingKnowledge {
+  id: string;
+  title: string;
+  content: string;
+  category: string;
+  tags: string[];
+}
+
+export interface GrowingActionKnowledgeLink {
+  action_id: string;
+  window_id: string;
+  knowledge: GrowingSupportingKnowledge[];
+}

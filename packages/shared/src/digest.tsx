@@ -11,7 +11,7 @@ import type {
   Task,
 } from "./types";
 import { DAILY_BRIEFING } from "./prompts";
-import { getWeekStartDate, resolveRelatedSourceUrl } from "./utils";
+import { getISOWeekNumber, resolveRelatedSourceUrl } from "./utils";
 import { DailyDigestEmail } from "./emails/DailyDigestEmail";
 
 /**
@@ -78,19 +78,19 @@ export function extractGrowingTaskItems(tasks: Task[]): GrowingTaskDigestItem[] 
 /**
  * Loads growing suggestions for the current week from growing_suggestions_log.
  * Always includes all "inspirations" for the week, plus up to 3 pending "actions".
- * Uses the Monday of the current week (UTC) as week_start_date.
+ * Uses the current ISO week number against week_number.
  */
 export async function fetchWeeklyGrowingSuggestions(
   supabase: SupabaseClient
 ): Promise<GrowingSuggestionDigestItem[]> {
-  const weekStart = getWeekStartDate();
+  const weekNumber = getISOWeekNumber();
 
   // Fetch all inspirations for the week (to ensure they are "always included")
   // and pending actions.
   const { data, error } = await supabase
     .from("growing_suggestions_log")
     .select("title, details, suggestion_kind, status")
-    .eq("week_start_date", weekStart)
+    .eq("week_number", weekNumber)
     .or("suggestion_kind.eq.inspiration,status.eq.pending")
     .order("suggestion_kind", { ascending: false }) // inspirations first
     .order("created_at", { ascending: true });
@@ -134,7 +134,7 @@ export async function fetchRecentGrowingKnowledge(
       .limit(4),
   ]);
 
-  const knowledge =
+  let knowledge =
     knowledgeResult.error || !knowledgeResult.data
       ? []
       : knowledgeResult.data.map((row) => ({
@@ -143,6 +143,25 @@ export async function fetchRecentGrowingKnowledge(
           category: row.category,
           sourceUrl: resolveRelatedSourceUrl(row.source),
         }));
+
+  // Fallback: if nothing was added in the last 24h, still show latest verified knowledge.
+  if (knowledge.length === 0) {
+    const { data: fallbackKnowledge, error: fallbackError } = await supabase
+      .from("growing_knowledge")
+      .select("title, content, category, source:growing_sources(url)")
+      .eq("verified", true)
+      .order("created_at", { ascending: false })
+      .limit(6);
+
+    if (!fallbackError && fallbackKnowledge) {
+      knowledge = fallbackKnowledge.map((row) => ({
+        title: row.title,
+        content: row.content,
+        category: row.category,
+        sourceUrl: resolveRelatedSourceUrl(row.source),
+      }));
+    }
+  }
 
   const windows =
     windowsResult.error || !windowsResult.data
@@ -172,22 +191,23 @@ export function formatTaskList(tasks: Task[]): string {
 
 /**
  * List of upcoming major Swedish public holidays for countdown.
+ * TODO: Replace this hardcoded list with a reliable Swedish holiday data source (API or maintained calendar file).
  */
 const SWEDISH_HOLIDAYS = [
-  { name: "Långfredagen", date: "2026-04-03" },
-  { name: "Påskdagen", date: "2026-04-05" },
-  { name: "Annandag påsk", date: "2026-04-06" },
-  { name: "Valborg", date: "2026-04-30" },
-  { name: "Första maj", date: "2026-05-01" },
-  { name: "Kristi himmelsfärds dag", date: "2026-05-14" },
-  { name: "Sveriges nationaldag", date: "2026-06-06" },
-  { name: "Midsommarafton", date: "2026-06-19" },
-  { name: "Allhelgonadagen", date: "2026-10-31" },
-  { name: "Julafton", date: "2026-12-24" },
-  { name: "Juldagen", date: "2026-12-25" },
-  { name: "Annandag jul", date: "2026-12-26" },
-  { name: "Nyårsafton", date: "2026-12-31" },
-  { name: "Nyårsdagen", date: "2027-01-01" },
+  { name: "Långfredagen", date: "2026-04-03", is_red_day: true },
+  { name: "Påskdagen", date: "2026-04-05", is_red_day: true },
+  { name: "Annandag påsk", date: "2026-04-06", is_red_day: true },
+  { name: "Valborg", date: "2026-04-30", is_red_day: false },
+  { name: "Första maj", date: "2026-05-01", is_red_day: true },
+  { name: "Kristi himmelsfärds dag", date: "2026-05-14", is_red_day: true },
+  { name: "Sveriges nationaldag", date: "2026-06-06", is_red_day: true },
+  { name: "Midsommarafton", date: "2026-06-19", is_red_day: false },
+  { name: "Allhelgonadagen", date: "2026-10-31", is_red_day: true },
+  { name: "Julafton", date: "2026-12-24", is_red_day: false },
+  { name: "Juldagen", date: "2026-12-25", is_red_day: true },
+  { name: "Annandag jul", date: "2026-12-26", is_red_day: true },
+  { name: "Nyårsafton", date: "2026-12-31", is_red_day: false },
+  { name: "Nyårsdagen", date: "2027-01-01", is_red_day: true },
 ];
 
 function getNextHoliday() {
@@ -195,7 +215,7 @@ function getNextHoliday() {
   for (const h of SWEDISH_HOLIDAYS) {
     const holidayDate = new Date(h.date);
     if (holidayDate >= now) {
-      return { name: h.name, date: holidayDate };
+      return { ...h, date: holidayDate };
     }
   }
   return null;

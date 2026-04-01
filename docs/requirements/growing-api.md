@@ -25,10 +25,11 @@ This document defines the current dashboard API contract for Growing features un
 - Auto-seeds weekly suggestions from `growing_windows` when no pending suggestions exist.
 
 Response:
+- `week_number: number` (ISO week number, UTC)
 - `week_start_date: string` (YYYY-MM-DD, Monday/UTC)
 - `profile: GrowingProfile`
 - `actions: GrowingSuggestion[]`
-- `inspirations: GrowingSuggestion[]`
+- `supporting_knowledge: Array<{ action_id, window_id, knowledge: Array<{ id, title, content, category, tags }> }>`
 
 ## Profile
 

@@ -1,7 +1,6 @@
-import { createClient, type SupabaseClient } from "@supabase/supabase-js";
+import { createClient } from "@supabase/supabase-js";
 import {
   buildEmailHtml,
-  extractGrowingTaskItems,
   extractPromotionItems,
   extractRenewalItems,
   fetchRecentGrowingKnowledge,
@@ -11,7 +10,7 @@ import {
 } from "@agent/shared";
 import { getStockholmWeather } from "../lib/weather";
 import { sendEmail } from "../lib/resend";
-import { runLearningLoop, type GeneratedLesson } from "./learning-loop";
+import { type GeneratedLesson } from "./learning-loop";
 
 export async function runDailyDigest(env: Env): Promise<void> {
   if (!env.RESEND_API_KEY || !env.DIGEST_RECIPIENT_EMAIL) {

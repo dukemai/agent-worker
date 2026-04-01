@@ -78,9 +78,23 @@ export interface GrowingSuggestion {
   suggestion_kind: GrowingSuggestionKind;
   suggested_bucket: Bucket;
   status: GrowingSuggestionStatus;
-  week_start_date: string;
+  week_number: number;
   converted_task_id: string | null;
   window_id: string;
+}
+
+export interface GrowingSupportingKnowledge {
+  id: string;
+  title: string;
+  content: string;
+  category: string;
+  tags: string[];
+}
+
+export interface GrowingActionKnowledgeLink {
+  action_id: string;
+  window_id: string;
+  knowledge: GrowingSupportingKnowledge[];
 }
 
 export interface GrowingSource {
