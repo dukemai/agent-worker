@@ -1,5 +1,5 @@
 import type {
-  GrowingActionKnowledgeLink,
+  GrowingWindowKnowledgeLink,
   GrowingKnowledge,
   GrowingKnowledgeCategory,
   GrowingProfile,
@@ -12,7 +12,7 @@ export type WeeklyGrowingResponse = {
   week_start_date: string;
   profile: GrowingProfile;
   actions: GrowingSuggestion[];
-  supporting_knowledge: GrowingActionKnowledgeLink[];
+  supporting_knowledge: GrowingWindowKnowledgeLink[];
 };
 
 export type GrowingKnowledgeSource = {

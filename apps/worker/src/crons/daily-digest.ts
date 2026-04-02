@@ -1,13 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
-import {
-  buildEmailHtml,
-  extractPromotionItems,
-  extractRenewalItems,
-  fetchRecentGrowingKnowledge,
-  fetchWeeklyGrowingSuggestions,
-  fetchPendingTasksForBucket,
-  generateBriefingNarrative,
-} from "@agent/shared";
+import { buildDigestEmailHtml, loadDigestEmailContent } from "@agent/shared";
 import { getStockholmWeather } from "../lib/weather";
 import { sendEmail } from "../lib/resend";
 import { type GeneratedLesson } from "./learning-loop";
@@ -19,25 +11,9 @@ export async function runDailyDigest(env: Env): Promise<void> {
 
   const supabase = createClient(env.SUPABASE_URL, env.SUPABASE_SERVICE_KEY);
 
-  // Fetch tasks from all buckets in parallel
-  const [todayTasks, thisWeekTasks, laterTasks] = await Promise.all([
-    fetchPendingTasksForBucket(supabase, "today_tasks"),
-    fetchPendingTasksForBucket(supabase, "this_week_tasks"),
-    fetchPendingTasksForBucket(supabase, "later_tasks"),
-  ]);
-  const allTasks = [...todayTasks, ...thisWeekTasks, ...laterTasks];
-  const promotionItems = extractPromotionItems(allTasks);
-  const renewalItems = extractRenewalItems(allTasks);
-
-  const includeGrowing = true; // Always include as requested
-
-  const growingSuggestions = includeGrowing ? await fetchWeeklyGrowingSuggestions(supabase) : [];
-  const recentGrowing = includeGrowing ? await fetchRecentGrowingKnowledge(supabase) : { knowledge: [], windows: [] };
-
   // Generate today's learning lessons first so digest can include them.
   const lessons: GeneratedLesson[] = [];
 
-  // Fetch weather (non-fatal if it fails)
   let weatherSummary = "Weather unavailable";
   let rainForecast = false;
   if (env.OPENWEATHER_API_KEY) {
@@ -50,43 +26,20 @@ export async function runDailyDigest(env: Env): Promise<void> {
     }
   }
 
-  // Generate narrative with Gemini (non-fatal if it fails)
-  let narrative = "Have a great day! Check your tasks below.";
-  if (env.GEMINI_API_KEY) {
-    try {
-      narrative = await generateBriefingNarrative(
-        env.GEMINI_API_KEY,
-        weatherSummary,
-        todayTasks,
-        thisWeekTasks,
-        laterTasks,
-        rainForecast
-      );
-    } catch (err) {
-      console.warn("Gemini briefing failed, using fallback:", err);
-    }
-  }
+  const content = await loadDigestEmailContent(supabase, {
+    ensureWeeklySuggestionsWhenEmpty: true,
+    weatherSummary,
+    rainForecast,
+    lessons,
+  });
 
   const dashboardUrl = "https://your-dashboard.vercel.app";
 
-  const html = await buildEmailHtml(
-    weatherSummary,
-    rainForecast,
-    todayTasks,
-    thisWeekTasks,
-    laterTasks,
-    lessons,
-    promotionItems,
-    renewalItems,
-    growingSuggestions,
-    recentGrowing.knowledge,
-    recentGrowing.windows,
-    narrative,
-    dashboardUrl
-  );
+  const html = await buildDigestEmailHtml(content, dashboardUrl);
 
-  const totalTasks = todayTasks.length + thisWeekTasks.length + laterTasks.length;
-  const subject = `Dad-Ops: ${todayTasks.length} today · ${totalTasks} total — ${new Date().toLocaleDateString("sv-SE")}`;
+  const totalTasks =
+    content.todayTasks.length + content.thisWeekTasks.length + content.laterTasks.length;
+  const subject = `Dad-Ops: ${content.todayTasks.length} today · ${totalTasks} total — ${new Date().toLocaleDateString("sv-SE")}`;
 
   await sendEmail(env.RESEND_API_KEY, {
     from: "Dad-Ops Agent <digest@wkalender.app>",
@@ -95,5 +48,7 @@ export async function runDailyDigest(env: Env): Promise<void> {
     html,
   });
 
-  console.log(`Daily digest sent to ${env.DIGEST_RECIPIENT_EMAIL} (today: ${todayTasks.length}, week: ${thisWeekTasks.length}, later: ${laterTasks.length})`);
+  console.log(
+    `Daily digest sent to ${env.DIGEST_RECIPIENT_EMAIL} (today: ${content.todayTasks.length}, week: ${content.thisWeekTasks.length}, later: ${content.laterTasks.length})`
+  );
 }

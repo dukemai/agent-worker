@@ -72,7 +72,7 @@ export function GrowingWeeklyTab() {
   if (!data) {
     return <p className="text-sm text-muted-foreground">No weekly growing suggestions available.</p>;
   }
-  const supportingByActionId = new Map(data.supporting_knowledge.map((item) => [item.action_id, item.knowledge]));
+  const supportingByWindowId = new Map(data.supporting_knowledge.map((item) => [item.window_id, item.knowledge]));
 
   return (
     <section className="space-y-3">
@@ -98,13 +98,13 @@ export function GrowingWeeklyTab() {
                     )}
                   </div>
                   <p className="mb-4 mt-2 text-sm text-gray-600 leading-relaxed">{item.details}</p>
-                  {supportingByActionId.get(item.id)?.length ? (
+                  {item.window_id && supportingByWindowId.get(item.window_id)?.length ? (
                     <div className="mb-4 rounded-lg border border-emerald-100 bg-emerald-50/30 p-3">
                       <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-emerald-700">
                         Related knowledge
                       </p>
                       <div className="space-y-2">
-                        {supportingByActionId.get(item.id)!.map((k) => (
+                        {supportingByWindowId.get(item.window_id!)!.map((k) => (
                           <div key={`${item.id}-${k.id}`}>
                             <p className="text-sm font-medium text-gray-800">{k.title}</p>
                             <p className="text-xs text-gray-600 line-clamp-2">{k.content}</p>
@@ -158,7 +158,7 @@ export function GrowingWeeklyTab() {
               <p className="text-sm text-muted-foreground italic">No supporting knowledge found for current actions.</p>
             ) : (
               data.actions.map((action) => {
-                const related = supportingByActionId.get(action.id) ?? [];
+                const related = action.window_id ? supportingByWindowId.get(action.window_id) ?? [] : [];
                 if (related.length === 0) return null;
                 return (
                   <article

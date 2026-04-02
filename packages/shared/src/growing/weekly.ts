@@ -1,10 +1,10 @@
 import { SupabaseClient } from "@supabase/supabase-js";
 import {
-  GrowingActionKnowledgeLink,
   GrowingProfile,
   GrowingSuggestion,
   GrowingSupportingKnowledge,
   GrowingWindow,
+  GrowingWindowKnowledgeLink,
 } from "../types/growing";
 import { getISOWeekNumber } from "../utils";
 
@@ -154,23 +154,44 @@ function tokenize(text: string): string[] {
     .filter((s) => s.length >= 3);
 }
 
+/** Unique window ids in first-seen order (e.g. follow weekly action order). */
+export function uniqueOrderedWindowIds(items: { window_id?: string | null }[]): string[] {
+  const seen = new Set<string>();
+  const out: string[] = [];
+  for (const item of items) {
+    const id = item.window_id;
+    if (typeof id === "string" && id.length > 0 && !seen.has(id)) {
+      seen.add(id);
+      out.push(id);
+    }
+  }
+  return out;
+}
+
+export function orderGrowingWindowsByIds(orderedIds: string[], windows: GrowingWindow[]): GrowingWindow[] {
+  const byId = new Map(windows.map((w) => [w.id, w]));
+  return orderedIds.map((id) => byId.get(id)).filter((w): w is GrowingWindow => w != null);
+}
+
+export async function fetchGrowingWindowsByIds(supabase: SupabaseClient, ids: string[]): Promise<GrowingWindow[]> {
+  if (ids.length === 0) return [];
+  const { data, error } = await supabase.from("growing_windows").select("*").in("id", ids);
+  if (error) {
+    throw new Error(`Failed to fetch growing windows: ${error.message}`);
+  }
+  return (data ?? []) as GrowingWindow[];
+}
+
+/**
+ * Scores verified knowledge rows against each catalog window (tags, title tokens, profile interests).
+ */
 export async function generateWeeklySupportingKnowledge(
   supabase: SupabaseClient,
-  actions: GrowingSuggestion[],
+  windows: GrowingWindow[],
   profile: GrowingProfile,
-  limitPerAction = 3
-): Promise<GrowingActionKnowledgeLink[]> {
-  const actionWindowIds = actions.map((a) => a.window_id).filter(Boolean);
-  if (actionWindowIds.length === 0) return [] as GrowingActionKnowledgeLink[];
-
-  const { data: actionWindows, error: actionWindowsError } = await supabase
-    .from("growing_windows")
-    .select("id, item_name, tags")
-    .in("id", actionWindowIds);
-
-  if (actionWindowsError) {
-    throw new Error(`Failed to fetch action windows for supporting knowledge: ${actionWindowsError.message}`);
-  }
+  limitPerWindow = 3
+): Promise<GrowingWindowKnowledgeLink[]> {
+  if (windows.length === 0) return [];
 
   const { data: knowledgeRows, error: knowledgeError } = await supabase
     .from("growing_knowledge")
@@ -183,14 +204,6 @@ export async function generateWeeklySupportingKnowledge(
     throw new Error(`Failed to fetch supporting knowledge: ${knowledgeError.message}`);
   }
 
-  const windowsById = new Map<string, { item_name: string; tags: string[] }>();
-  for (const row of actionWindows ?? []) {
-    windowsById.set(row.id, {
-      item_name: String(row.item_name ?? ""),
-      tags: Array.isArray(row.tags) ? (row.tags as string[]) : [],
-    });
-  }
-
   const normalizeKnowledge = (row: any): GrowingSupportingKnowledge => ({
     id: row.id,
     title: row.title,
@@ -199,24 +212,18 @@ export async function generateWeeklySupportingKnowledge(
     tags: Array.isArray(row.tags) ? (row.tags as string[]) : [],
   });
 
-  const results: GrowingActionKnowledgeLink[] = [];
-  for (const action of actions) {
-    const actionWindow = windowsById.get(action.window_id);
-    if (!actionWindow) {
-      results.push({ action_id: action.id, window_id: action.window_id, knowledge: [] });
-      continue;
-    }
-
+  const results: GrowingWindowKnowledgeLink[] = [];
+  for (const window of windows) {
     const keywordSet = new Set<string>();
-    for (const tag of actionWindow.tags) keywordSet.add(tag.toLowerCase().trim());
-    for (const token of tokenize(actionWindow.item_name)) keywordSet.add(token);
+    for (const tag of window.tags ?? []) keywordSet.add(tag.toLowerCase().trim());
+    for (const token of tokenize(window.item_name)) keywordSet.add(token);
     for (const interest of profile.interests ?? []) {
       const normalized = interest.toLowerCase().trim();
       if (normalized) keywordSet.add(normalized);
     }
     const keywords = Array.from(keywordSet).filter(Boolean);
     if (keywords.length === 0) {
-      results.push({ action_id: action.id, window_id: action.window_id, knowledge: [] });
+      results.push({ window_id: window.id, knowledge: [] });
       continue;
     }
 
@@ -234,8 +241,8 @@ export async function generateWeeklySupportingKnowledge(
       .filter((item) => item.score > 0)
       .sort((a, b) => b.score - a.score);
 
-    const top = scored.slice(0, limitPerAction).map((item) => normalizeKnowledge(item.row));
-    results.push({ action_id: action.id, window_id: action.window_id, knowledge: top });
+    const top = scored.slice(0, limitPerWindow).map((item) => normalizeKnowledge(item.row));
+    results.push({ window_id: window.id, knowledge: top });
   }
 
   return results;

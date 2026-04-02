@@ -91,8 +91,7 @@ export interface GrowingSupportingKnowledge {
   tags: string[];
 }
 
-export interface GrowingActionKnowledgeLink {
-  action_id: string;
+export interface GrowingWindowKnowledgeLink {
   window_id: string;
   knowledge: GrowingSupportingKnowledge[];
 }

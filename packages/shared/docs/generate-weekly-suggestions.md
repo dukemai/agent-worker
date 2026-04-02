@@ -53,8 +53,8 @@ After weekly actions are selected, supporting knowledge is fetched separately:
 3. Build a keyword set from action tags, tokenized action names, and profile interests.
 4. Load recent verified `growing_knowledge` rows.
 5. Score knowledge rows by overlap with action keywords (tags and text).
-6. Return top matches grouped per action as `supporting_knowledge` in the weekly API response:
-   - each group contains `action_id`, `window_id`, and `knowledge[]`.
+6. Return top matches grouped per catalog window as `supporting_knowledge` in the weekly API response:
+   - each group contains `window_id` and `knowledge[]` (from `generateWeeklySupportingKnowledge` over `growing_windows` rows).
 
 ## Persistence Shape
 

@@ -19,7 +19,7 @@ export async function fetchPendingTasksForBucket(
 
   const { data: tasks, error: tasksError } = await supabase
     .from("tasks")
-    .select("id, title, original_body, due_date, status, source, metadata")
+    .select("id, title, original_body, due_date, status, source, metadata, window_id")
     .in("id", taskIds)
     .eq("status", "pending")
     .order("due_date", { ascending: true, nullsFirst: false });

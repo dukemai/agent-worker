@@ -10,6 +10,8 @@ export interface Task {
   status: string;
   source: string;
   metadata: Record<string, unknown> | null;
+  /** Set for growing-season tasks linked to `growing_windows`. */
+  window_id: string | null;
 }
 
 export interface BucketRow {
@@ -36,10 +38,14 @@ export interface GrowingTaskDigestItem {
 }
 
 export interface GrowingSuggestionDigestItem {
+  id?: string;
+  window_id?: string;
   title: string;
   details: string;
   status?: string;
   suggestion_kind?: "action" | "inspiration";
+  suggested_bucket?: "today" | "this_week" | "later";
+  week_number?: number;
 }
 
 export interface RecentGrowingKnowledgeItem {

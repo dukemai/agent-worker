@@ -1,12 +1,15 @@
 import { NextResponse } from "next/server";
 import { errorResponse, getAuthedSupabase } from "@/lib/api";
-import { 
-  fetchGrowingProfile, 
+import {
+  fetchGrowingProfile,
+  fetchGrowingWindowsByIds,
   generateWeeklySupportingKnowledge,
-  generateWeeklySuggestions, 
+  generateWeeklySuggestions,
   getISOWeekNumber,
   getWeekStartDate,
-  GrowingSuggestion
+  orderGrowingWindowsByIds,
+  uniqueOrderedWindowIds,
+  type GrowingSuggestion,
 } from "@agent/shared";
 
 export async function GET() {
@@ -45,7 +48,10 @@ export async function GET() {
     const sortedSuggestions = [...suggestions].sort((a, b) => a.title.localeCompare(b.title));
 
     const actions = sortedSuggestions.filter((item) => item.suggestion_kind === "action");
-    const supportingKnowledge = await generateWeeklySupportingKnowledge(auth.supabase, actions, profile);
+    const windowIds = uniqueOrderedWindowIds(actions);
+    const windows = await fetchGrowingWindowsByIds(auth.supabase, windowIds);
+    const orderedWindows = orderGrowingWindowsByIds(windowIds, windows);
+    const supportingKnowledge = await generateWeeklySupportingKnowledge(auth.supabase, orderedWindows, profile);
 
     return NextResponse.json({
       week_number: currentWeekNumber,

@@ -57,8 +57,8 @@ export interface GrowingSupportingKnowledge {
   tags: string[];
 }
 
-export interface GrowingActionKnowledgeLink {
-  action_id: string;
+/** Knowledge matches scored against a catalog window (one row per window). */
+export interface GrowingWindowKnowledgeLink {
   window_id: string;
   knowledge: GrowingSupportingKnowledge[];
 }

@@ -56,32 +56,19 @@ function TaskList({ tasks }: { tasks: Task[] }) {
         <Fragment key={task.id}>
           {index > 0 && <Hr className="border-gray-900/5 my-[12px]" />}
           <Section>
-            <Row>
-              <Column
-                width="32"
-                className="pr-[12px]"
-                valign="top"
-              >
-                <Text className="m-0 w-[28px] h-[28px] rounded-full bg-indigo-50 border border-solid border-indigo-100 text-indigo-600 font-bold text-[13px] text-center leading-[28px]">
-                  {index + 1}
-                </Text>
-              </Column>
-              <Column>
-                <Text className="m-0 font-semibold text-[16px] text-gray-900">
-                  {task.title}
-                </Text>
-                {task.due_date && (
-                   <Text className="m-0 text-[12px] text-gray-400 uppercase tracking-wider font-medium mt-[2px]">
-                     Due: {new Date(task.due_date).toLocaleDateString("sv-SE")}
-                   </Text>
-                )}
-                {task.original_body && (
-                  <Text className="m-0 mt-[6px] text-[14px] text-gray-500 leading-[20px]">
-                    {task.original_body}
-                  </Text>
-                )}
-              </Column>
-            </Row>
+            <Text className="m-0 font-semibold text-[16px] text-gray-900">
+              {task.title}
+            </Text>
+            {task.due_date && (
+              <Text className="m-0 text-[12px] text-gray-400 uppercase tracking-wider font-medium mt-[2px]">
+                Due: {new Date(task.due_date).toLocaleDateString("sv-SE")}
+              </Text>
+            )}
+            {task.original_body && (
+              <Text className="m-0 mt-[6px] text-[14px] text-gray-500 leading-[20px]">
+                {task.original_body}
+              </Text>
+            )}
           </Section>
         </Fragment>
       ))}
@@ -111,27 +98,8 @@ export function DailyDigestEmail(props: Props) {
     recentGrowingKnowledge.length > 0 || recentGrowingWindows.length > 0;
   const TASK_COUNT_HIGHLIGHT_REGEX =
     /(\d+\s+uppgift(?:er)?\s+för idag|\d+\s+uppgift(?:er)?\s+senare den här veckan)/g;
-  const growingTasks = [...todayTasks, ...thisWeekTasks, ...laterTasks].filter(
-    (task) => task.metadata?.item_type === "growing"
-  );
-  const growingTaskKeywords = Array.from(
-    new Set(
-      growingTasks
-        .flatMap((task) => `${task.title} ${task.original_body ?? ""}`.toLowerCase().split(/[^a-z0-9]+/g))
-        .map((token) => token.trim())
-        .filter((token) => token.length >= 3)
-    )
-  );
-  const relatedKnowledgeForGrowingTasks = recentGrowingKnowledge
-    .map((item) => {
-      const haystack = `${item.title} ${item.content} ${item.category}`.toLowerCase();
-      const overlap = growingTaskKeywords.filter((kw) => haystack.includes(kw)).length;
-      return { item, overlap };
-    })
-    .filter((row) => row.overlap > 0)
-    .sort((a, b) => b.overlap - a.overlap)
-    .slice(0, 4)
-    .map((row) => row.item);
+  /** Knowledge is pre-scoped (derived from unfinished growing tasks linked via `window_id`). */
+  const relatedKnowledgeForGrowingTasks = recentGrowingKnowledge.slice(0, 4);
 
   return (
     <Html>
@@ -241,9 +209,8 @@ export function DailyDigestEmail(props: Props) {
               )}
             </Section>
 
-            {/* Growing Suggestions/Inspirations */}
-            {growingSuggestions.length > 0 && (
-              <Section className="mb-[48px]">
+            {/* Growing Insights */}
+            <Section className="mb-[48px]">
                 <Heading className="m-0 text-[22px] font-bold text-gray-950 mb-[16px]">
                   Growing Insights
                 </Heading>
@@ -274,6 +241,13 @@ export function DailyDigestEmail(props: Props) {
                         </Fragment>
                       ))}
                     </Section>
+                  </Section>
+                )}
+                {growingSuggestions.filter(s => s.suggestion_kind !== 'inspiration').length === 0 && (
+                  <Section className="mb-[24px] bg-emerald-50/20 rounded-xl p-[16px] border border-solid border-emerald-100/50">
+                    <Text className="m-0 text-[14px] text-gray-500 italic">
+                      No recommended growing actions for this week yet.
+                    </Text>
                   </Section>
                 )}
 
@@ -340,8 +314,14 @@ export function DailyDigestEmail(props: Props) {
                     </Section>
                   </Section>
                 )}
+                {relatedKnowledgeForGrowingTasks.length === 0 && (
+                  <Section className="mt-[24px] bg-teal-50/20 rounded-xl p-[16px] border border-solid border-teal-100/50">
+                    <Text className="m-0 text-[14px] text-gray-500 italic">
+                      No related growing knowledge matched your current growing tasks.
+                    </Text>
+                  </Section>
+                )}
               </Section>
-            )}
 
             {/* Upcoming Renewals */}
             {renewalItems.length > 0 && (

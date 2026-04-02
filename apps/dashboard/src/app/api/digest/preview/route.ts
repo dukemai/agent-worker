@@ -1,23 +1,12 @@
 import { NextResponse } from "next/server";
-import {
-  buildEmailHtml,
-  extractGrowingTaskItems,
-  extractPromotionItems,
-  extractRenewalItems,
-  fetchRecentGrowingKnowledge,
-  fetchWeeklyGrowingSuggestions,
-  fetchPendingTasksForBucket,
-  generateBriefingNarrative,
-} from "@agent/shared";
+import { buildDigestEmailHtml, loadDigestEmailContent } from "@agent/shared";
 import type {
   DigestLessonItem,
   GrowingSuggestionDigestItem,
-  GrowingTaskDigestItem,
   PromotionDigestItem,
   RecentGrowingKnowledgeItem,
   RecentGrowingWindowItem,
   RenewalDigestItem,
-  Task as DigestTask,
 } from "@agent/shared";
 import { getAuthedSupabase } from "@/lib/api";
 import type { Bucket } from "@/types/database";
@@ -71,43 +60,26 @@ export async function GET(request: Request) {
   const supabase = auth.supabase;
   const previewDate = getPreviewDate();
 
-  // Fetch tasks from all buckets in parallel using shared helper.
-  const [todayTasks, thisWeekTasks, laterTasks] = await Promise.all([
-    fetchPendingTasksForBucket(supabase, "today_tasks"),
-    fetchPendingTasksForBucket(supabase, "this_week_tasks"),
-    fetchPendingTasksForBucket(supabase, "later_tasks"),
-  ]);
-
-  const allTasks: DigestTask[] = [...todayTasks, ...thisWeekTasks, ...laterTasks];
-  const promotionItems = extractPromotionItems(allTasks);
-  const renewalItems = extractRenewalItems(allTasks);
-
-  // how "Growing this week" and "Inspirations for growing this week" will look,
-  // regardless of which weekday they open the dashboard.
-  const growingSuggestions = await fetchWeeklyGrowingSuggestions(supabase);
-  const recentGrowing = await fetchRecentGrowingKnowledge(supabase);
-
-  // For preview, keep weather simple and avoid external API calls.
+  // Same digest payload as the worker cron (no weekly suggestion generation; no side effects).
   const weatherSummary = "Väderförhandsvisning: se faktiska detaljer i den skickade digesten.";
   const rainForecast = false;
 
-  // Generate narrative using shared template-based implementation (no AI).
-  let narrative =
-    "Förhandsvisning av dagens briefing. Vädret och uppgifterna nedan speglar hur e-postdigesten kommer se ut.";
-  try {
-    narrative = await generateBriefingNarrative(
-      "",
-      weatherSummary,
-      todayTasks,
-      thisWeekTasks,
-      laterTasks,
-      rainForecast
-    );
-  } catch (err) {
-    console.warn("Digest preview: narrative generation failed, using fallback:", err);
-  }
+  const content = await loadDigestEmailContent(supabase, {
+    ensureWeeklySuggestionsWhenEmpty: false,
+    weatherSummary,
+    rainForecast,
+    lessons: [],
+  });
 
-  const mapTasks = (tasks: DigestTask[], bucket: Bucket): DigestTaskPreviewItem[] =>
+  const url = new URL(request.url);
+  const dashboardUrl = process.env.NEXT_PUBLIC_DASHBOARD_URL ?? url.origin;
+
+  const html = await buildDigestEmailHtml(content, dashboardUrl);
+
+  const mapTasks = (
+    tasks: typeof content.todayTasks,
+    bucket: Bucket
+  ): DigestTaskPreviewItem[] =>
     tasks.map((task) => ({
       id: task.id,
       title: task.title,
@@ -116,50 +88,29 @@ export async function GET(request: Request) {
       bucket,
     }));
 
-  const url = new URL(request.url);
-  const dashboardUrl = process.env.NEXT_PUBLIC_DASHBOARD_URL ?? url.origin;
-
-  const html = await buildEmailHtml(
-    weatherSummary,
-    rainForecast,
-    todayTasks,
-    thisWeekTasks,
-    laterTasks,
-    [], // lessons omitted in preview
-    promotionItems,
-    renewalItems,
-    growingSuggestions,
-    recentGrowing.knowledge,
-    recentGrowing.windows,
-    narrative,
-    dashboardUrl
-  );
-
   const response: DigestPreviewResponse = {
     date: previewDate,
     generated_at: new Date().toISOString(),
     weather: {
-      summary: weatherSummary,
-      rainForecast,
+      summary: content.weatherSummary,
+      rainForecast: content.rainForecast,
     },
-    narrative,
+    narrative: content.narrative,
     html,
     tasks: {
-      today: mapTasks(todayTasks, "today"),
-      this_week: mapTasks(thisWeekTasks, "this_week"),
-      later: mapTasks(laterTasks, "later"),
+      today: mapTasks(content.todayTasks, "today"),
+      this_week: mapTasks(content.thisWeekTasks, "this_week"),
+      later: mapTasks(content.laterTasks, "later"),
     },
-    renewals: renewalItems,
+    renewals: content.renewalItems,
     growing: {
-      suggestions: growingSuggestions,
-      recentKnowledge: recentGrowing.knowledge,
-      recentWindows: recentGrowing.windows,
+      suggestions: content.growingSuggestions,
+      recentKnowledge: content.recentGrowingKnowledge,
+      recentWindows: content.recentGrowingWindows,
     },
-    // For preview, omit learning generation to avoid side effects; can be filled in later.
-    learning: [],
-    promotions: promotionItems,
+    learning: content.lessons,
+    promotions: content.promotionItems,
   };
 
   return NextResponse.json(response);
 }
-

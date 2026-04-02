@@ -29,7 +29,7 @@ Response:
 - `week_start_date: string` (YYYY-MM-DD, Monday/UTC)
 - `profile: GrowingProfile`
 - `actions: GrowingSuggestion[]`
-- `supporting_knowledge: Array<{ action_id, window_id, knowledge: Array<{ id, title, content, category, tags }> }>`
+- `supporting_knowledge: Array<{ window_id, knowledge: Array<{ id, title, content, category, tags }> }>`
 
 ## Profile
 

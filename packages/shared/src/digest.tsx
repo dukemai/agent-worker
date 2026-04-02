@@ -10,7 +10,17 @@ import type {
   RecentGrowingWindowItem,
   Task,
 } from "./types";
+import type { GrowingWindowKnowledgeLink } from "./types/growing";
 import { DAILY_BRIEFING } from "./prompts";
+import { fetchPendingTasksForBucket } from "./fetch-pending-tasks";
+import { ensureGrowingProfile } from "./growing/growing-profile";
+import {
+  fetchGrowingWindowsByIds,
+  generateWeeklySuggestions,
+  generateWeeklySupportingKnowledge,
+  orderGrowingWindowsByIds,
+  uniqueOrderedWindowIds,
+} from "./growing/weekly";
 import { getISOWeekNumber, resolveRelatedSourceUrl } from "./utils";
 import { DailyDigestEmail } from "./emails/DailyDigestEmail";
 
@@ -85,25 +95,48 @@ export async function fetchWeeklyGrowingSuggestions(
 ): Promise<GrowingSuggestionDigestItem[]> {
   const weekNumber = getISOWeekNumber();
 
-  // Fetch all inspirations for the week (to ensure they are "always included")
-  // and pending actions.
   const { data, error } = await supabase
     .from("growing_suggestions_log")
-    .select("title, details, suggestion_kind, status")
+    .select("id, window_id, title, details, suggestion_kind, status, suggested_bucket, week_number")
     .eq("week_number", weekNumber)
-    .or("suggestion_kind.eq.inspiration,status.eq.pending")
-    .order("suggestion_kind", { ascending: false }) // inspirations first
     .order("created_at", { ascending: true });
 
   if (error) return [];
 
-  // Map to the digest item shape, including status for inspirations
   return ((data ?? []) as any[]).map((row) => ({
+    id: row.id,
+    window_id: row.window_id,
     title: row.title,
     details: row.details,
     status: row.status,
     suggestion_kind: row.suggestion_kind,
+    suggested_bucket: row.suggested_bucket,
+    week_number: row.week_number,
   }));
+}
+
+/**
+ * Flattens per-window supporting knowledge into a deduped list for the digest email payload.
+ */
+export function flattenSupportingKnowledgeForDigest(
+  links: GrowingWindowKnowledgeLink[]
+): RecentGrowingKnowledgeItem[] {
+  const seen = new Set<string>();
+  const out: RecentGrowingKnowledgeItem[] = [];
+  for (const link of links) {
+    for (const k of link.knowledge) {
+      if (!seen.has(k.id)) {
+        seen.add(k.id);
+        out.push({
+          title: k.title,
+          content: k.content,
+          category: k.category,
+          sourceUrl: null,
+        });
+      }
+    }
+  }
+  return out;
 }
 
 /**
@@ -349,6 +382,164 @@ export async function buildEmailHtml(
       narrative={narrative}
       dashboardUrl={dashboardUrl}
     />
+  );
+}
+
+/**
+ * Options for {@link loadDigestEmailContent}. Weather is supplied by the caller (real API in worker, placeholders in preview).
+ */
+export type LoadDigestEmailContentOptions = {
+  /**
+   * When true and the weekly log is empty for the current week, generate and persist suggestions.
+   * Use true for the production daily digest; false for dashboard preview so opening preview does not mutate the log.
+   */
+  ensureWeeklySuggestionsWhenEmpty?: boolean;
+  weatherSummary: string;
+  rainForecast: boolean;
+  lessons?: DigestLessonItem[];
+  /**
+   * If set, used as the briefing narrative instead of the template from {@link generateBriefingNarrative}.
+   */
+  narrativeOverride?: string;
+};
+
+/**
+ * Full payload for the daily digest email (tasks, growing sections, narrative). Built by {@link loadDigestEmailContent}.
+ */
+export type DigestEmailContent = {
+  weatherSummary: string;
+  rainForecast: boolean;
+  todayTasks: Task[];
+  thisWeekTasks: Task[];
+  laterTasks: Task[];
+  lessons: DigestLessonItem[];
+  promotionItems: PromotionDigestItem[];
+  renewalItems: RenewalDigestItem[];
+  growingSuggestions: GrowingSuggestionDigestItem[];
+  recentGrowingKnowledge: RecentGrowingKnowledgeItem[];
+  recentGrowingWindows: RecentGrowingWindowItem[];
+  narrative: string;
+};
+
+/**
+ * Loads everything needed for the daily digest HTML: bucket tasks, promotions/renewals, weekly growing suggestions,
+ * supporting knowledge for unfinished growing tasks with `window_id`, and the briefing narrative.
+ * Shared by the worker cron and the dashboard digest preview so they stay in sync.
+ */
+export async function loadDigestEmailContent(
+  supabase: SupabaseClient,
+  options: LoadDigestEmailContentOptions
+): Promise<DigestEmailContent> {
+  const lessons = options.lessons ?? [];
+
+  const [todayTasks, thisWeekTasks, laterTasks] = await Promise.all([
+    fetchPendingTasksForBucket(supabase, "today_tasks"),
+    fetchPendingTasksForBucket(supabase, "this_week_tasks"),
+    fetchPendingTasksForBucket(supabase, "later_tasks"),
+  ]);
+  const allTasks = [...todayTasks, ...thisWeekTasks, ...laterTasks];
+  const promotionItems = extractPromotionItems(allTasks);
+  const renewalItems = extractRenewalItems(allTasks);
+
+  let growingSuggestions: GrowingSuggestionDigestItem[] = await fetchWeeklyGrowingSuggestions(supabase);
+  if (growingSuggestions.length === 0 && options.ensureWeeklySuggestionsWhenEmpty) {
+    try {
+      const profile = await ensureGrowingProfile(supabase);
+      const generated = await generateWeeklySuggestions(supabase, profile);
+      growingSuggestions = generated.map((s) => ({
+        id: s.id,
+        window_id: s.window_id,
+        title: s.title,
+        details: s.details,
+        status: s.status,
+        suggestion_kind: s.suggestion_kind,
+        suggested_bucket: s.suggested_bucket,
+        week_number: s.week_number,
+      }));
+    } catch (err) {
+      console.warn("Growing suggestions generation during digest failed, continuing:", err);
+    }
+  }
+
+  // "Related Knowledge" in the email: derived from unfinished growing tasks linked to `growing_windows` via `window_id`.
+  let relatedGrowingKnowledge: RecentGrowingKnowledgeItem[] = [];
+  try {
+    const undoneGrowingTasks = allTasks.filter(
+      (t) =>
+        t.status !== "done" &&
+        t.metadata?.item_type === "growing" &&
+        t.window_id
+    );
+    const windowIds = uniqueOrderedWindowIds(undoneGrowingTasks);
+    if (windowIds.length > 0) {
+      const profile = await ensureGrowingProfile(supabase);
+      const windows = await fetchGrowingWindowsByIds(supabase, windowIds);
+      const orderedWindows = orderGrowingWindowsByIds(windowIds, windows);
+      const links = await generateWeeklySupportingKnowledge(supabase, orderedWindows, profile);
+      relatedGrowingKnowledge = flattenSupportingKnowledgeForDigest(links);
+    }
+  } catch (err) {
+    console.warn("Supporting knowledge for digest failed, continuing:", err);
+  }
+
+  const recentGrowingWindows: RecentGrowingWindowItem[] = [];
+
+  let narrative: string;
+  if (options.narrativeOverride !== undefined) {
+    narrative = options.narrativeOverride;
+  } else {
+    try {
+      narrative = await generateBriefingNarrative(
+        "",
+        options.weatherSummary,
+        todayTasks,
+        thisWeekTasks,
+        laterTasks,
+        options.rainForecast
+      );
+    } catch (err) {
+      console.warn("Briefing narrative generation failed, using fallback:", err);
+      narrative = "Have a great day! Check your tasks below.";
+    }
+  }
+
+  return {
+    weatherSummary: options.weatherSummary,
+    rainForecast: options.rainForecast,
+    todayTasks,
+    thisWeekTasks,
+    laterTasks,
+    lessons,
+    promotionItems,
+    renewalItems,
+    growingSuggestions,
+    recentGrowingKnowledge: relatedGrowingKnowledge,
+    recentGrowingWindows,
+    narrative,
+  };
+}
+
+/**
+ * Renders the digest email HTML from {@link DigestEmailContent} (same inputs as {@link buildEmailHtml}).
+ */
+export async function buildDigestEmailHtml(
+  content: DigestEmailContent,
+  dashboardUrl: string
+): Promise<string> {
+  return buildEmailHtml(
+    content.weatherSummary,
+    content.rainForecast,
+    content.todayTasks,
+    content.thisWeekTasks,
+    content.laterTasks,
+    content.lessons,
+    content.promotionItems,
+    content.renewalItems,
+    content.growingSuggestions,
+    content.recentGrowingKnowledge,
+    content.recentGrowingWindows,
+    content.narrative,
+    dashboardUrl
   );
 }
 
