@@ -15,8 +15,10 @@ export function TasksDashboard() {
           <TabsTrigger value="renewals">Renewals</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="tasks" className="space-y-6">
-          <AddTaskCard />
+        <TabsContent value="tasks" className="space-y-4">
+          <div className="flex justify-end">
+            <AddTaskCard />
+          </div>
           <TasksBoard />
         </TabsContent>
 

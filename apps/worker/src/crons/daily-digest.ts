@@ -33,7 +33,7 @@ export async function runDailyDigest(env: Env): Promise<void> {
     lessons,
   });
 
-  const dashboardUrl = "https://your-dashboard.vercel.app";
+  const dashboardUrl = "https://agent-workder-dashboard.vercel.app";
 
   const html = await buildDigestEmailHtml(content, dashboardUrl);
 

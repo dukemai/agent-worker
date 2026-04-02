@@ -33,7 +33,11 @@ export function TasksBoard() {
     this_week: thisWeekQuery.data ?? EMPTY_TASKS.this_week,
     later: laterQuery.data ?? EMPTY_TASKS.later,
   };
-  const loading = todayQuery.isLoading || thisWeekQuery.isLoading || laterQuery.isLoading;
+  const loadingByBucket: Record<Bucket, boolean> = {
+    today: todayQuery.isLoading,
+    this_week: thisWeekQuery.isLoading,
+    later: laterQuery.isLoading,
+  };
   const queryError = getTasksQueryError(
     todayQuery.error,
     thisWeekQuery.error,
@@ -124,7 +128,6 @@ export function TasksBoard() {
   return (
     <>
       {displayError ? <p className="text-sm text-red-600">{displayError}</p> : null}
-      {loading ? <p>Loading tasks...</p> : null}
 
       <section className="md:hidden">
         <Tabs value={activeBucket} onValueChange={(value) => setActiveBucket(value as Bucket)}>
@@ -140,6 +143,7 @@ export function TasksBoard() {
               <BucketCard
                 bucket={bucket}
                 tasks={tasks}
+                loading={loadingByBucket[bucket]}
                 onMove={onMove}
                 onMarkDone={onMarkDone}
                 onDelete={onDelete}
@@ -155,6 +159,7 @@ export function TasksBoard() {
             key={bucket}
             bucket={bucket}
             tasks={tasks}
+            loading={loadingByBucket[bucket]}
             onMove={onMove}
             onMarkDone={onMarkDone}
             onDelete={onDelete}

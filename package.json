@@ -2,6 +2,7 @@
   "name": "cloudflare-email-worker",
   "version": "1.0.0",
   "private": true,
+  "packageManager": "pnpm@10.30.3",
   "workspaces": [
     ".",
     "apps/*",
@@ -13,12 +14,16 @@
     "types": "wrangler types",
     "test:fixture": "./scripts/test-fixture.sh",
     "dashboard:dev": "pnpm --filter dashboard dev",
+    "dashboard:build": "pnpm --filter dashboard build",
     "dev:all": "pnpm turbo run dev --parallel",
     "build:all": "pnpm turbo run build",
     "lint:all": "pnpm turbo run lint --parallel"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20241127.0",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "next": "16.1.6",
     "turbo": "^2.8.11",
     "typescript": "^5.5.0",
     "wrangler": "^3.91.0"

@@ -8,14 +8,6 @@ import {
 } from "../types/growing";
 import { getISOWeekNumber } from "../utils";
 
-export function getWeekStartDate(now = new Date()): string {
-  const date = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
-  const day = date.getUTCDay();
-  const diff = day === 0 ? -6 : 1 - day;
-  date.setUTCDate(date.getUTCDate() + diff);
-  return date.toISOString().slice(0, 10);
-}
-
 export function isMonthInRange(month: number, startMonth: number, endMonth: number): boolean {
   if (startMonth <= endMonth) {
     return month >= startMonth && month <= endMonth;

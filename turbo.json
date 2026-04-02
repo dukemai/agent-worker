@@ -8,6 +8,10 @@
       "dependsOn": ["^build"],
       "outputs": [".next/**", "dist/**"]
     },
+    "dashboard:build": {
+      "dependsOn": ["^dashboard:build"],
+      "outputs": [".next/**", "dist/**", "apps/dasboard/.next/**"]
+    },
     "lint": {
       "cache": true
     },

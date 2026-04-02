@@ -2,16 +2,32 @@
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { FormEvent, useState } from "react";
+import { PlusIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import type { Bucket } from "@/types/database";
+import { cn } from "@/lib/utils";
 import { readApiError } from "./api";
 import type { CreateTaskPayload } from "./types";
 import { BUCKETS, BUCKET_LABELS } from "./types";
 
+const selectClassName = cn(
+  "border-input bg-background dark:bg-input/30 flex h-9 w-full rounded-md border px-3 py-2 text-sm shadow-xs outline-none",
+  "focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]"
+);
+
 export function AddTaskCard() {
   const queryClient = useQueryClient();
+  const [open, setOpen] = useState(false);
   const [newTitle, setNewTitle] = useState("");
   const [newDueDate, setNewDueDate] = useState("");
   const [newBucket, setNewBucket] = useState<Bucket>("later");
@@ -37,6 +53,13 @@ export function AddTaskCard() {
     },
   });
 
+  function resetForm() {
+    setNewTitle("");
+    setNewDueDate("");
+    setNewBucket("later");
+    setError(null);
+  }
+
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError(null);
@@ -46,46 +69,89 @@ export function AddTaskCard() {
         due_date: newDueDate ? new Date(newDueDate).toISOString() : null,
         bucket: newBucket,
       });
-      setNewTitle("");
-      setNewDueDate("");
-      setNewBucket("later");
+      resetForm();
+      setOpen(false);
     } catch {
       return;
     }
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Add Task</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <form className="grid gap-3 md:grid-cols-4" onSubmit={handleSubmit}>
-          <Input
-            className="md:col-span-2"
-            placeholder="Task title"
-            value={newTitle}
-            onChange={(event) => setNewTitle(event.target.value)}
-            required
-          />
-          <Input type="date" value={newDueDate} onChange={(event) => setNewDueDate(event.target.value)} />
-          <select
-            className="rounded-md border px-3 py-2 text-sm"
-            value={newBucket}
-            onChange={(event) => setNewBucket(event.target.value as Bucket)}
-          >
-            {BUCKETS.map((bucket) => (
-              <option key={bucket} value={bucket}>
-                {BUCKET_LABELS[bucket]}
-              </option>
-            ))}
-          </select>
-          <Button className="min-h-11 md:col-start-4" type="submit">
-            Add Task
-          </Button>
+    <Dialog
+      open={open}
+      onOpenChange={(next) => {
+        setOpen(next);
+        if (!next) {
+          setError(null);
+        }
+      }}
+    >
+      <DialogTrigger asChild>
+        <Button type="button" className="gap-2">
+          <PlusIcon className="size-4" aria-hidden />
+          Add task
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="sm:max-w-md" showCloseButton>
+        <DialogHeader>
+          <DialogTitle>Add task</DialogTitle>
+          <DialogDescription>
+            Create a task and choose which list it belongs in.
+          </DialogDescription>
+        </DialogHeader>
+        <form id="add-task-form" className="grid gap-4" onSubmit={handleSubmit}>
+          <div className="grid gap-2">
+            <label htmlFor="task-title" className="text-sm font-medium">
+              Title
+            </label>
+            <Input
+              id="task-title"
+              placeholder="What needs to be done?"
+              value={newTitle}
+              onChange={(event) => setNewTitle(event.target.value)}
+              required
+              autoFocus
+            />
+          </div>
+          <div className="grid gap-2">
+            <label htmlFor="task-due" className="text-sm font-medium">
+              Due date <span className="text-muted-foreground font-normal">(optional)</span>
+            </label>
+            <Input
+              id="task-due"
+              type="date"
+              value={newDueDate}
+              onChange={(event) => setNewDueDate(event.target.value)}
+            />
+          </div>
+          <div className="grid gap-2">
+            <label htmlFor="task-bucket" className="text-sm font-medium">
+              List
+            </label>
+            <select
+              id="task-bucket"
+              className={selectClassName}
+              value={newBucket}
+              onChange={(event) => setNewBucket(event.target.value as Bucket)}
+            >
+              {BUCKETS.map((bucket) => (
+                <option key={bucket} value={bucket}>
+                  {BUCKET_LABELS[bucket]}
+                </option>
+              ))}
+            </select>
+          </div>
+          {error ? <p className="text-sm text-red-600">{error}</p> : null}
         </form>
-        {error ? <p className="mt-3 text-sm text-red-600">{error}</p> : null}
-      </CardContent>
-    </Card>
+        <DialogFooter>
+          <Button type="button" variant="outline" onClick={() => setOpen(false)}>
+            Cancel
+          </Button>
+          <Button type="submit" form="add-task-form" disabled={createTaskMutation.isPending}>
+            {createTaskMutation.isPending ? "Adding…" : "Add task"}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }
