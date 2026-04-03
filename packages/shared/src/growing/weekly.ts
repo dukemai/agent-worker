@@ -46,7 +46,27 @@ export async function generateWeeklySuggestions(
   const currentWeekNumber = getISOWeekNumber();
   const currentMonth = getMonthFromISOWeek(currentWeekNumber);
 
-  // 1) Clean up existing rows for current week
+  // 1) Read existing rows for this week so we can preserve certain statuses (e.g. dismissed)
+  const { data: existingRows, error: existingError } = await supabase
+    .from("growing_suggestions_log")
+    .select("window_id, status, converted_task_id")
+    .eq("week_number", currentWeekNumber);
+
+  if (existingError) {
+    throw new Error(`Failed to read existing weekly suggestions: ${existingError.message}`);
+  }
+
+  const dismissedByWindowId = new Map<string, { status: GrowingSuggestion["status"]; converted_task_id: string | null }>();
+  (existingRows ?? []).forEach((row: any) => {
+    if (typeof row.window_id === "string" && row.window_id.length > 0 && row.status === "dismissed") {
+      dismissedByWindowId.set(row.window_id, {
+        status: "dismissed",
+        converted_task_id: (row.converted_task_id as string | null) ?? null,
+      });
+    }
+  });
+
+  // 2) Clean up existing rows for current week so we can rebuild deterministically.
   const { error: cleanupError } = await supabase
     .from("growing_suggestions_log")
     .delete()
@@ -72,25 +92,25 @@ export async function generateWeeklySuggestions(
     isMonthInRange(currentMonth, window.start_month, window.end_month)
   );
 
-  // 3) Restrict windows that already became tasks
+  // 3) Load all tasks linked to growing windows so we can mark suggestions as already \"in plan\".
   const { data: taskWindows, error: taskError } = await supabase
     .from("tasks")
-    .select("window_id")
+    .select("id, window_id")
     .not("window_id", "is", null);
 
   if (taskError) {
-    throw new Error(`Failed to fetch restricted task windows: ${taskError.message}`);
+    throw new Error(`Failed to fetch task windows: ${taskError.message}`);
   }
 
-  const restrictedWindowIds = new Set<string>();
-  (taskWindows ?? []).forEach((row) => {
-    if (row.window_id) restrictedWindowIds.add(row.window_id);
+  const windowToTaskId = new Map<string, string>();
+  (taskWindows ?? []).forEach((row: { id?: string; window_id?: string | null }) => {
+    if (row.window_id && typeof row.id === "string" && !windowToTaskId.has(row.window_id)) {
+      windowToTaskId.set(row.window_id, row.id);
+    }
   });
 
-  const availableWindows = seasonalWindows.filter((window) => !restrictedWindowIds.has(window.id));
-
-  // 4) Score and sort
-  const sortedWindows = availableWindows.sort((a, b) => {
+  // 4) Score and sort seasonal windows (including ones that already have tasks).
+  const sortedWindows = seasonalWindows.sort((a, b) => {
     const scoreDiff = scoreWindow(b, profile.interests) - scoreWindow(a, profile.interests);
     if (scoreDiff !== 0) return scoreDiff;
     return a.item_name.localeCompare(b.item_name);
@@ -101,16 +121,35 @@ export async function generateWeeklySuggestions(
   const toInsert = [...topActions];
   // 6) Upsert for this week using composite key (week_number, window_id)
   if (toInsert.length > 0) {
-    const payload = toInsert.map((window) => ({
-      profile_id: profile.id,
-      window_id: window.id,
-      title: window.item_name,
-      details: window.stockholm_note,
-      suggestion_kind: window.suggestion_kind,
-      suggested_bucket: window.suggested_bucket,
-      week_number: currentWeekNumber,
-      status: "pending",
-    }));
+    const payload = toInsert.map((window) => {
+      const dismissed = dismissedByWindowId.get(window.id);
+      let status: GrowingSuggestion["status"];
+      let converted_task_id: string | null = null;
+
+      if (dismissed) {
+        // If user explicitly dismissed this window for the week, keep it dismissed even if a task exists.
+        status = "dismissed";
+        converted_task_id = dismissed.converted_task_id ?? null;
+      } else if (windowToTaskId.has(window.id)) {
+        status = "converted";
+        converted_task_id = windowToTaskId.get(window.id) ?? null;
+      } else {
+        status = "pending";
+        converted_task_id = null;
+      }
+
+      return {
+        profile_id: profile.id,
+        window_id: window.id,
+        title: window.item_name,
+        details: window.stockholm_note,
+        suggestion_kind: window.suggestion_kind,
+        suggested_bucket: window.suggested_bucket,
+        week_number: currentWeekNumber,
+        status,
+        converted_task_id,
+      };
+    });
 
     const { error: upsertError } = await supabase
       .from("growing_suggestions_log")

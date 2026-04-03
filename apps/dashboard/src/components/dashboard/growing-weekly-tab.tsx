@@ -8,6 +8,7 @@ import type { Bucket } from "@/types/database";
 import {
   convertGrowingSuggestion,
   fetchWeeklyGrowing,
+  refreshWeeklyInspirations,
   updateSuggestionStatus,
 } from "@/lib/growing-api";
 
@@ -37,7 +38,14 @@ export function GrowingWeeklyTab() {
     },
   });
 
-  const isBusy = convertMutation.isPending || statusMutation.isPending;
+  const regenerateMutation = useMutation({
+    mutationFn: refreshWeeklyInspirations,
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["growing", "weekly"] });
+    },
+  });
+
+  const isBusy = convertMutation.isPending || statusMutation.isPending || regenerateMutation.isPending;
 
   async function onAddToBucket(suggestionId: string, bucket: Bucket) {
     try {
@@ -73,10 +81,23 @@ export function GrowingWeeklyTab() {
     return <p className="text-sm text-muted-foreground">No weekly growing suggestions available.</p>;
   }
   const supportingByWindowId = new Map(data.supporting_knowledge.map((item) => [item.window_id, item.knowledge]));
+  const activeActions = data.actions.filter((item) => item.status !== "dismissed");
 
   return (
     <section className="space-y-3">
-      {error ? <p className="text-sm text-red-600">{error}</p> : null}
+      <div className="flex items-center justify-between gap-2">
+        {error ? <p className="text-sm text-red-600">{error}</p> : <span />}
+        <Button
+          type="button"
+          size="xs"
+          variant="ghost"
+          className="text-xs text-muted-foreground hover:text-foreground px-2 h-7"
+          onClick={() => regenerateMutation.mutate()}
+          disabled={isBusy}
+        >
+          {regenerateMutation.isPending ? "Regenerating…" : "Regenerate"}
+        </Button>
+      </div>
       <div className="grid gap-4 md:grid-cols-2">
         <Card className="bg-emerald-50/20 border-emerald-100/50">
           <CardHeader>
@@ -84,10 +105,10 @@ export function GrowingWeeklyTab() {
             <p className="text-sm text-emerald-600 font-medium">Recommended Actions</p>
           </CardHeader>
           <CardContent className="space-y-4">
-            {data.actions.length === 0 ? (
+            {activeActions.length === 0 ? (
               <p className="text-sm text-muted-foreground italic">No seasonal actions logged for this week.</p>
             ) : (
-              data.actions.map((item) => (
+              activeActions.map((item) => (
                 <article key={item.id} className="rounded-xl border border-emerald-100/50 bg-white p-4 shadow-sm transition-all hover:shadow-md">
                   <div className="flex items-start justify-between gap-2">
                     <h3 className="font-semibold text-gray-900">{item.title}</h3>

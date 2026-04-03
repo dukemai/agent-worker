@@ -53,6 +53,12 @@ Year: 2026
   - `docs/requirements/growing.md` reflects actions + supporting knowledge model,
   - `packages/shared/docs/generate-weekly-suggestions.md` includes supporting-knowledge flow details.
 
+- Polished dashboard tasks UX:
+  - Switched \"Add Task\" inline card to a Radix dialog modal trigger to free vertical space for the task columns.
+  - Moved loading state and item counts into each `BucketCard` header so every column shows its own \"Loading tasks…\" and `(n)` count.
+  - Flattened bucket columns (removed borders/shadows) while keeping individual tasks as cards.
+  - Redesigned `TaskCard` to use background and typography for status (pending vs done) and compact icon-sized controls for complete, open, and delete.
+
 ## Decisions
 
 - Use single ISO `week_number` as the primary weekly key for growing suggestions.

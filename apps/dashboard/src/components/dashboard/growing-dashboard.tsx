@@ -10,7 +10,9 @@ import { GrowingWindowsTab } from "./growing-windows-tab";
 export function GrowingDashboard() {
   return (
     <main className="mx-auto w-full max-w-7xl space-y-6 px-4 py-6">
-      <GrowingContextCard />
+      <div className="flex justify-end">
+        <GrowingContextCard />
+      </div>
 
       <Tabs defaultValue="weekly" className="space-y-4">
         <TabsList className="w-full justify-start overflow-x-auto">
