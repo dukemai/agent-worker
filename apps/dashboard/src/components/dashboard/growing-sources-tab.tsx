@@ -151,6 +151,10 @@ export function GrowingSourcesTab() {
     saveTranscriptMutation.isPending && saveTranscriptMutation.variables
       ? saveTranscriptMutation.variables.sourceId
       : undefined;
+  const deletingId =
+    deleteSourceMutation.isPending && deleteSourceMutation.variables
+      ? deleteSourceMutation.variables
+      : undefined;
 
   async function onSubmitSource(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -312,24 +316,46 @@ export function GrowingSourcesTab() {
 
               return (
                 <article key={source.id} className="rounded-md border bg-card/60 p-3">
-                  <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
-                    <div className="space-y-1">
-                      <h3 className="font-medium">{source.title ?? "Pending title"}</h3>
+                  <div className="mb-2 flex flex-wrap items-start justify-between gap-2">
+                    <div className="min-w-0 flex-1 space-y-1">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <h3 className="font-medium">{source.title ?? "Pending title"}</h3>
+                        <Badge variant="outline" className="text-[10px] uppercase tracking-wide shrink-0">
+                          {sourceTypeLabel}
+                        </Badge>
+                        <Badge
+                          variant="outline"
+                          className={cn(
+                            "text-[10px] uppercase tracking-wide border px-2 py-0.5 shrink-0",
+                            SOURCE_STATUS_CLASS[source.status]
+                          )}
+                        >
+                          {source.status}
+                        </Badge>
+                      </div>
                       <p className="text-xs text-muted-foreground">{secondaryLine}</p>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <Badge variant="outline" className="text-[10px] uppercase tracking-wide">
-                        {sourceTypeLabel}
-                      </Badge>
-                      <Badge
+                    <div className="flex flex-wrap items-center gap-2 shrink-0">
+                      {(source.status === "done" || source.status === "failed") ? (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => cleanAndReextractMutation.mutate(source.id)}
+                          disabled={cleanAndReextractPendingId === source.id || !hasTranscript || isSourceBusy}
+                          title="Delete extracted knowledge and re-run extraction"
+                        >
+                          {cleanAndReextractPendingId === source.id ? "Cleaning & extracting…" : "Clean & re-extract"}
+                        </Button>
+                      ) : null}
+                      <Button
+                        size="sm"
                         variant="outline"
-                        className={cn(
-                          "text-[10px] uppercase tracking-wide border px-2 py-0.5",
-                          SOURCE_STATUS_CLASS[source.status]
-                        )}
+                        className="text-destructive hover:bg-destructive/10"
+                        onClick={() => deleteSourceMutation.mutate(source.id)}
+                        disabled={isSourceBusy || deletingId === source.id}
                       >
-                        {source.status}
-                      </Badge>
+                        {deletingId === source.id ? "Deleting…" : "Delete"}
+                      </Button>
                     </div>
                   </div>
                   <p className="mb-3 break-all text-xs text-muted-foreground">{source.url}</p>
@@ -415,25 +441,6 @@ export function GrowingSourcesTab() {
                         {processSourcePendingId === source.id ? "Extracting..." : "Extract now"}
                       </Button>
                     ) : null}
-                    {(source.status === "done" || source.status === "failed") ? (
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => cleanAndReextractMutation.mutate(source.id)}
-                        disabled={cleanAndReextractPendingId === source.id || !hasTranscript}
-                        title="Delete extracted knowledge and re-run extraction"
-                      >
-                        {cleanAndReextractPendingId === source.id ? "Cleaning & extracting…" : "Clean & re-extract"}
-                      </Button>
-                    ) : null}
-                    <Button
-                      size="sm"
-                      variant="destructive"
-                      onClick={() => deleteSourceMutation.mutate(source.id)}
-                      disabled={isSourceBusy}
-                    >
-                      Delete
-                    </Button>
                   </div>
                   {source.error_message ? (
                     <p className="mt-2 text-xs text-red-600">Error: {source.error_message}</p>

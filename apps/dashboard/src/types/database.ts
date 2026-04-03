@@ -18,6 +18,8 @@ export type GrowingKnowledgeCategory =
 export interface Task {
   id: string;
   created_at: string;
+  /** Refreshed on every update; may be absent before migration `016_tasks_updated_at`. */
+  updated_at?: string;
   title: string;
   original_body: string | null;
   due_date: string | null;
