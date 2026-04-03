@@ -5,6 +5,7 @@ import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
   deleteGrowingWindow,
@@ -14,6 +15,7 @@ import {
   updateGrowingWindowVerified,
 } from "@/lib/growing-api";
 import { extractYouTubeVideoId } from "@/lib/youtube";
+import { cn } from "@/lib/utils";
 
 const MONTH_NAMES = ["", "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 const MONTH_OPTIONS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] as const;
@@ -25,9 +27,44 @@ function formatMonthRange(start: number, end: number): string {
   return `${MONTH_NAMES[start] ?? start}–${MONTH_NAMES[end] ?? end}`;
 }
 
+type SeasonPhase = "early" | "peak" | "late" | "off";
+
+function getSeasonPhase(start: number, end: number): SeasonPhase {
+  // Compute midpoint of the range, handling wrap-around (e.g. Nov–Feb).
+  let s = start;
+  let e = end;
+  if (s < 1 || s > 12 || e < 1 || e > 12) return "off";
+  if (e < s) {
+    e += 12;
+  }
+  const mid = ((s + e) / 2) % 12 || 12;
+  if (mid <= 3) return "early"; // Jan–Mar
+  if (mid <= 7) return "peak"; // Apr–Jul
+  if (mid <= 10) return "late"; // Aug–Oct
+  return "off"; // Nov–Dec
+}
+
+function getSeasonPhaseClass(phase: SeasonPhase): string {
+  switch (phase) {
+    case "early":
+      return "border-blue-200 bg-blue-50 text-blue-800";
+    case "peak":
+      return "border-emerald-200 bg-emerald-50 text-emerald-800";
+    case "late":
+      return "border-amber-200 bg-amber-50 text-amber-800";
+    case "off":
+    default:
+      return "border-muted bg-muted/40 text-muted-foreground";
+  }
+}
+
+const VERIFIED_BADGE_CLASS = "border-emerald-200 bg-emerald-50 text-emerald-800";
+const UNVERIFIED_BADGE_CLASS = "border-amber-200 bg-amber-50 text-amber-800";
+
 export function GrowingWindowsTab() {
   const queryClient = useQueryClient();
   const [verification, setVerification] = useState<WindowVerificationFilter>("all");
+  const [monthFilter, setMonthFilter] = useState<number | "all">("all");
   const windowsQuery = useQuery({
     queryKey: ["growing", "windows", verification],
     queryFn: () =>
@@ -100,6 +137,18 @@ export function GrowingWindowsTab() {
 
   const total = windows.length;
   const verifiedCount = windows.filter((w) => w.verified).length;
+  const visibleWindows = windows.filter((w) => {
+    if (monthFilter === "all") return true;
+    const m = monthFilter;
+    const start = w.start_month;
+    const end = w.end_month;
+    if (start < 1 || start > 12 || end < 1 || end > 12) return false;
+    if (start <= end) {
+      return m >= start && m <= end;
+    }
+    // Wrap-around range like Nov–Feb.
+    return m >= start || m <= end;
+  });
 
   function startEditMonths(window: GrowingWindowItem) {
     setEditingMonthsId(window.id);
@@ -132,16 +181,18 @@ export function GrowingWindowsTab() {
     <div className="space-y-4">
       <Card>
         <CardHeader>
-          <CardTitle>Actionable Windows</CardTitle>
+          <CardTitle>
+            Actionable Windows
+            {!isLoading && total > 0 ? (
+              <span className="ml-1.5 text-sm font-normal text-muted-foreground tabular-nums">
+                ({verifiedCount}/{total} verified)
+              </span>
+            ) : null}
+          </CardTitle>
           <p className="text-sm text-muted-foreground">
             Seasonal tips extracted from your sources (YouTube or blogs). Mark as verified when you&apos;ve confirmed
             they work for your location.
           </p>
-          {!isLoading && total > 0 ? (
-            <p className="text-sm font-medium">
-              {total} total · {verifiedCount} verified
-            </p>
-          ) : null}
           <div className="mt-2 flex flex-wrap gap-2">
             <Select value={verification} onValueChange={(value) => setVerification(value as WindowVerificationFilter)}>
               <SelectTrigger className="w-[200px]">
@@ -151,6 +202,24 @@ export function GrowingWindowsTab() {
                 <SelectItem value="all">All windows</SelectItem>
                 <SelectItem value="verified">Verified only</SelectItem>
                 <SelectItem value="unverified">Unverified only</SelectItem>
+              </SelectContent>
+            </Select>
+            <Select
+              value={monthFilter === "all" ? "all" : String(monthFilter)}
+              onValueChange={(value) =>
+                setMonthFilter(value === "all" ? "all" : Number(value) as number)
+              }
+            >
+              <SelectTrigger className="w-[220px]">
+                <SelectValue placeholder="Filter by month window" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All months</SelectItem>
+                {MONTH_OPTIONS.map((m) => (
+                  <SelectItem key={m} value={String(m)}>
+                    {MONTH_NAMES[m]}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
@@ -163,8 +232,12 @@ export function GrowingWindowsTab() {
             <p className="text-sm text-muted-foreground">
               No actionable windows yet. Extract knowledge from a source first.
             </p>
+          ) : visibleWindows.length === 0 ? (
+            <p className="text-sm text-muted-foreground italic">
+              No windows match your filter. Try a different search or clear it.
+            </p>
           ) : (
-            windows.map((window) => {
+            visibleWindows.map((window) => {
               const isBlog = window.source?.source_type === "blog";
               const isYouTube = window.source?.url ? extractYouTubeVideoId(window.source.url) !== null : false;
               let sourceLabel: string | null = null;
@@ -187,17 +260,30 @@ export function GrowingWindowsTab() {
               }
 
               return (
-                <article key={window.id} className="rounded-md border p-3">
+                <article key={window.id} className="rounded-md border bg-card/60 p-3">
                   <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
                     <div className="flex flex-wrap items-center gap-2">
                       <h3 className="font-medium">{window.item_name}</h3>
                       <Badge variant="outline">{window.action_type ?? window.suggestion_kind}</Badge>
                       <Badge variant="secondary">{window.suggested_bucket}</Badge>
-                      {window.verified ? (
-                        <Badge variant="default">Verified</Badge>
-                      ) : (
-                        <Badge variant="outline">Unverified</Badge>
-                      )}
+                      <Badge
+                        variant="outline"
+                        className={cn(
+                          "text-[11px] tabular-nums border px-2 py-0.5",
+                          getSeasonPhaseClass(getSeasonPhase(window.start_month, window.end_month))
+                        )}
+                      >
+                        {formatMonthRange(window.start_month, window.end_month)}
+                      </Badge>
+                      <Badge
+                        variant="outline"
+                        className={cn(
+                          "text-[11px] uppercase tracking-wide border px-2 py-0.5",
+                          window.verified ? VERIFIED_BADGE_CLASS : UNVERIFIED_BADGE_CLASS
+                        )}
+                      >
+                        {window.verified ? "Verified" : "Unverified"}
+                      </Badge>
                     </div>
                     <div className="flex flex-wrap gap-2">
                       <Button
@@ -222,7 +308,11 @@ export function GrowingWindowsTab() {
                   <p className="mb-2 text-sm text-muted-foreground">{window.stockholm_note}</p>
                   <div className="mb-2 flex flex-wrap gap-1">
                     {window.tags.map((tag) => (
-                      <Badge key={`${window.id}-${tag}`} variant="secondary">
+                      <Badge
+                        key={`${window.id}-${tag}`}
+                        variant="outline"
+                        className="border-amber-200 bg-amber-50 text-amber-800"
+                      >
                         {tag}
                       </Badge>
                     ))}

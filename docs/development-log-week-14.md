@@ -59,6 +59,13 @@ Year: 2026
   - Flattened bucket columns (removed borders/shadows) while keeping individual tasks as cards.
   - Redesigned `TaskCard` to use background and typography for status (pending vs done) and compact icon-sized controls for complete, open, and delete.
 
+- Improved growing weekly planning & UI:
+  - Updated `generateWeeklySuggestions` to derive initial `status` from the real tasks table: any window that already has a task now comes back as `status: "converted"` with `converted_task_id` set, so the dashboard can show it as \"Planned\".
+  - Preserved per-window dismissed status across regenerations by reading existing `growing_suggestions_log` rows for the current week and keeping `status: \"dismissed\"` when rebuilding suggestions.
+  - Filtered dismissed actions out of the \"Recommended Actions\" bucket in `GrowingWeeklyTab` while still keeping them in the raw response (so UI only highlights active recommendations).
+  - Turned the growing context editor into a modal with a compact trigger and a one-line profile summary, aligning growing UI with the updated task design system.
+  - Added a compact \"Regenerate\" control on the weekly growing tab that calls `/api/growing/weekly/inspirations/refresh` and refreshes weekly suggestions without dominating the layout.
+
 ## Decisions
 
 - Use single ISO `week_number` as the primary weekly key for growing suggestions.

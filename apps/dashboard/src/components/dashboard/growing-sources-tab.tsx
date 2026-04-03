@@ -5,6 +5,7 @@ import { useState, type FormEvent } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import {
@@ -17,14 +18,18 @@ import {
   deleteGrowingSource,
   updateSourceTranscript,
 } from "@/lib/growing-api";
+import { cn } from "@/lib/utils";
 import { extractYouTubeVideoId } from "@/lib/youtube";
 
-const SOURCE_STATUS_VARIANT = {
-  queued: "secondary",
-  processing: "secondary",
-  done: "default",
-  failed: "destructive",
-} as const;
+const SOURCE_STATUS_CLASS: Record<
+  "queued" | "processing" | "done" | "failed",
+  string
+> = {
+  queued: "border-amber-200 bg-amber-50 text-amber-800",
+  processing: "border-amber-200 bg-amber-50 text-amber-800",
+  done: "border-emerald-200 bg-emerald-50 text-emerald-800",
+  failed: "border-red-200 bg-red-50 text-red-800",
+};
 
 const PREVIEW_CHARS = 200;
 const DESCRIPTION_PREVIEW_CHARS = 150;
@@ -38,6 +43,7 @@ export function GrowingSourcesTab() {
   const [fullTranscriptCache, setFullTranscriptCache] = useState<Record<string, string>>({});
   const [loadingFullId, setLoadingFullId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [addOpen, setAddOpen] = useState(false);
 
   const sourcesQuery = useQuery({
     queryKey: ["growing", "sources"],
@@ -156,6 +162,7 @@ export function GrowingSourcesTab() {
         url: nextUrl,
         transcript: youtubeTranscript.trim() || null,
       });
+      setAddOpen(false);
     } catch {
       return;
     }
@@ -186,63 +193,90 @@ export function GrowingSourcesTab() {
 
   return (
     <div className="space-y-4">
-      <Card>
-        <CardHeader>
-          <CardTitle>Get transcript or article content</CardTitle>
-          <p className="text-sm text-muted-foreground">
-            Paste a transcript or article content below for each source. To get a transcript from a YouTube video, use
-            an external tool such as{" "}
-            <a
-              href="https://notegpt.io/"
-              target="_blank"
-              rel="noreferrer"
-              className="font-medium text-primary underline"
-            >
-              NoteGPT
-            </a>{" "}
-            (YouTube Transcript Generator). For blog posts, you can use{" "}
-            <a
-              href="https://give-me-markdown.com/"
-              target="_blank"
-              rel="noreferrer"
-              className="font-medium text-primary underline"
-            >
-              give-me-markdown.com
-            </a>{" "}
-            to convert a page into Markdown, then paste the result here.
-          </p>
-        </CardHeader>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Add Source (YouTube or blog)</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <form className="flex flex-col gap-3" onSubmit={onSubmitSource}>
-            <Input
-              type="url"
-              value={youtubeUrl}
-              onChange={(e) => setYoutubeUrl(e.target.value)}
-              placeholder="https://www.youtube.com/watch?v=... or https://example.com/article"
-            />
-            <Textarea
-              value={youtubeTranscript}
-              onChange={(e) => setYoutubeTranscript(e.target.value)}
-              placeholder="Optional: paste transcript or article content when adding (or add it below after saving)"
-              rows={4}
-              className="resize-y"
-            />
-            <Button type="submit" disabled={isSourceBusy || youtubeUrl.trim().length === 0}>
-              Add Source
+      <div className="flex justify-end">
+        <Dialog
+          open={addOpen}
+          onOpenChange={(next) => {
+            setAddOpen(next);
+            if (!next) {
+              setError(null);
+            }
+          }}
+        >
+          <DialogTrigger asChild>
+            <Button type="button" size="sm" variant="outline">
+              Add source
             </Button>
-          </form>
-        </CardContent>
-      </Card>
+          </DialogTrigger>
+          <DialogContent className="max-w-lg" showCloseButton>
+            <DialogHeader>
+              <DialogTitle>Add Source (YouTube or blog)</DialogTitle>
+              <p className="text-sm text-muted-foreground">
+                Paste a transcript or article content for each source. To get a transcript from a YouTube video, use an
+                external tool such as{" "}
+                <a
+                  href="https://notegpt.io/"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="font-medium text-primary underline"
+                >
+                  NoteGPT
+                </a>{" "}
+                (YouTube Transcript Generator). For blog posts, you can use{" "}
+                <a
+                  href="https://give-me-markdown.com/"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="font-medium text-primary underline"
+                >
+                  give-me-markdown.com
+                </a>{" "}
+                to convert a page into Markdown, then paste the result here.
+              </p>
+            </DialogHeader>
+            <form id="add-source-form" className="flex flex-col gap-3" onSubmit={onSubmitSource}>
+              <Input
+                type="url"
+                value={youtubeUrl}
+                onChange={(e) => setYoutubeUrl(e.target.value)}
+                placeholder="https://www.youtube.com/watch?v=... or https://example.com/article"
+                required
+                autoFocus
+              />
+              <Textarea
+                value={youtubeTranscript}
+                onChange={(e) => setYoutubeTranscript(e.target.value)}
+                placeholder="Optional: paste transcript or article content when adding (or add it below after saving)"
+                rows={4}
+                className="resize-y"
+              />
+            </form>
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={() => setAddOpen(false)}>
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                form="add-source-form"
+                disabled={isSourceBusy || youtubeUrl.trim().length === 0}
+              >
+                {addSourceMutation.isPending ? "Adding…" : "Add source"}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>Saved Sources</CardTitle>
+          <CardTitle>
+            Saved Sources
+            {sources.length > 0 ? (
+              <span className="ml-1.5 text-sm font-normal text-muted-foreground tabular-nums">
+                ({sources.length})
+              </span>
+            ) : null}
+          </CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
           {error ? <p className="text-sm text-red-600">{error}</p> : null}
@@ -277,7 +311,7 @@ export function GrowingSourcesTab() {
               }
 
               return (
-                <article key={source.id} className="rounded-md border p-3">
+                <article key={source.id} className="rounded-md border bg-card/60 p-3">
                   <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
                     <div className="space-y-1">
                       <h3 className="font-medium">{source.title ?? "Pending title"}</h3>
@@ -287,7 +321,15 @@ export function GrowingSourcesTab() {
                       <Badge variant="outline" className="text-[10px] uppercase tracking-wide">
                         {sourceTypeLabel}
                       </Badge>
-                      <Badge variant={SOURCE_STATUS_VARIANT[source.status]}>{source.status}</Badge>
+                      <Badge
+                        variant="outline"
+                        className={cn(
+                          "text-[10px] uppercase tracking-wide border px-2 py-0.5",
+                          SOURCE_STATUS_CLASS[source.status]
+                        )}
+                      >
+                        {source.status}
+                      </Badge>
                     </div>
                   </div>
                   <p className="mb-3 break-all text-xs text-muted-foreground">{source.url}</p>
@@ -386,7 +428,7 @@ export function GrowingSourcesTab() {
                     ) : null}
                     <Button
                       size="sm"
-                      variant="outline"
+                      variant="destructive"
                       onClick={() => deleteSourceMutation.mutate(source.id)}
                       disabled={isSourceBusy}
                     >
