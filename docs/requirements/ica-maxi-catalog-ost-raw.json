@@ -1,0 +1,58 @@
+[
+  {
+    "id": "4c714e80-d752-4620-9e95-9b600b6b627d",
+    "name": "Påläggsost",
+    "productCount": 164,
+    "fullURLPath": "Mejeri-Ost/Ost/Påläggsost",
+    "retailerCategoryId": "268",
+    "children": []
+  },
+  {
+    "id": "b2822b7d-ace5-4d6a-b2ca-3d0ef0e509ae",
+    "name": "Mjukost",
+    "productCount": 33,
+    "fullURLPath": "Mejeri-Ost/Ost/Mjukost",
+    "retailerCategoryId": "269",
+    "children": []
+  },
+  {
+    "id": "09a8815f-bc53-4f56-b4d3-7ea35cf53955",
+    "name": "Dessertost",
+    "productCount": 140,
+    "fullURLPath": "Mejeri-Ost/Ost/Dessertost",
+    "retailerCategoryId": "270",
+    "children": []
+  },
+  {
+    "id": "8051983e-d1e8-4756-8ecd-a4ca9374bfc5",
+    "name": "Färskost & cream cheese",
+    "productCount": 47,
+    "fullURLPath": "Mejeri-Ost/Ost/Färskost-cream-cheese",
+    "retailerCategoryId": "273",
+    "children": []
+  },
+  {
+    "id": "51d9cb25-c568-434b-a515-984d0c9181ae",
+    "name": "Matlagningsost",
+    "productCount": 165,
+    "fullURLPath": "Mejeri-Ost/Ost/Matlagningsost",
+    "retailerCategoryId": "272",
+    "children": []
+  },
+  {
+    "id": "d5f20721-13dd-41a2-92fd-7c0c9a42f150",
+    "name": "Mesost & messmör",
+    "productCount": 9,
+    "fullURLPath": "Mejeri-Ost/Ost/Mesost-messmör",
+    "retailerCategoryId": "274",
+    "children": []
+  },
+  {
+    "id": "4f24b8aa-8b10-4186-82f6-1080b7eed4aa",
+    "name": "Vegansk Ost",
+    "productCount": 15,
+    "fullURLPath": "Mejeri-Ost/Ost/Vegansk-Ost",
+    "retailerCategoryId": "2324",
+    "children": []
+  }
+]

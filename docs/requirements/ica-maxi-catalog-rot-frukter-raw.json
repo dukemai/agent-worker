@@ -1,0 +1,74 @@
+[
+  {
+    "id": "c69802f5-c51c-4c07-a2b7-02b9f52d7e2d",
+    "name": "Betor",
+    "productCount": 6,
+    "fullURLPath": "Frukt-Grönt/Rotfrukter/Betor",
+    "retailerCategoryId": "4547",
+    "children": []
+  },
+  {
+    "id": "ef503f56-bc49-4150-a659-833e7fafd351",
+    "name": "Rotselleri",
+    "productCount": 1,
+    "fullURLPath": "Frukt-Grönt/Rotfrukter/Rotselleri",
+    "retailerCategoryId": "4545",
+    "children": []
+  },
+  {
+    "id": "2072b799-566c-4ba5-a72c-451ca86eec7d",
+    "name": "Kålrot",
+    "productCount": 1,
+    "fullURLPath": "Frukt-Grönt/Rotfrukter/Kålrot",
+    "retailerCategoryId": "4538",
+    "children": []
+  },
+  {
+    "id": "438d4eb1-9d08-4baa-b5f7-5df5045325c0",
+    "name": "Morötter",
+    "productCount": 8,
+    "fullURLPath": "Frukt-Grönt/Rotfrukter/Morötter",
+    "retailerCategoryId": "4548",
+    "children": []
+  },
+  {
+    "id": "cfba5d0d-3481-489c-9b74-d660204924d2",
+    "name": "Palsternacka",
+    "productCount": 2,
+    "fullURLPath": "Frukt-Grönt/Rotfrukter/Palsternacka",
+    "retailerCategoryId": "4546",
+    "children": []
+  },
+  {
+    "id": "249e6219-0faa-4cb1-ad51-8d937ade999d",
+    "name": "Pepparrot",
+    "productCount": 1,
+    "fullURLPath": "Frukt-Grönt/Rotfrukter/Pepparrot",
+    "retailerCategoryId": "4549",
+    "children": []
+  },
+  {
+    "id": "03982a20-9f2c-4fa8-9996-e8c467d8cd3e",
+    "name": "Jordärtskocka",
+    "productCount": 1,
+    "fullURLPath": "Frukt-Grönt/Rotfrukter/Jordärtskocka",
+    "retailerCategoryId": "4550",
+    "children": []
+  },
+  {
+    "id": "f1346b41-d843-4d2f-98ba-84f113361e3c",
+    "name": "Rättika",
+    "productCount": 1,
+    "fullURLPath": "Frukt-Grönt/Rotfrukter/Rättika",
+    "retailerCategoryId": "4568",
+    "children": []
+  },
+  {
+    "id": "54ea6b0a-beae-4a06-89d9-8401f5bce2ca",
+    "name": "Övriga rotfrukter",
+    "productCount": 2,
+    "fullURLPath": "Frukt-Grönt/Rotfrukter/Övriga-rotfrukter",
+    "retailerCategoryId": "4551",
+    "children": []
+  }
+]

@@ -44,12 +44,26 @@
 - [ ] Reuse as much email template rendering logic as possible
 - [ ] Show when the preview was generated and for which date
 
-### Phase 7: State Tracker App — planned
-- [ ] Separate mobile app for recording and resuming work/learning states
-- [ ] Optimized for fragmented mobile access while looking after kids
+### Phase 7: Stability & Polish — done
+- [x] Growing weekly: `week_number` model, migrations, API, digest, types
+- [x] Weekly generation: rebuild, dedupe, dismissed + converted handling, supporting knowledge linkage
+- [x] Dashboard/tasks/growing UX polish (dialogs, filters, sorts, layout)
+- [x] Docs and contracts aligned (`growing-api`, weekly generation notes)
 
-### Phase 8: Learning Agent Specialization — deferred
-- [ ] Economy learning agent
-- [ ] Deep AI learning agent
-- [ ] Growing-things learning agent
-- [ ] Agent-specific cadence and progression memory
+### Phase 8: Meal & Shopping Plan from Promotions — planned
+- [ ] Structured extraction from promotion emails / deal metadata toward meal + shopping outputs
+- [ ] Family-context-aware suggestions with traceability to source promotions
+- [ ] Dashboard and/or digest surface for the plan (scope TBD in `docs/phases/08-meal-shopping-from-promotions/SCOPE.md`)
+
+### Phase 9: YouTube Knowledge Extraction — planned
+- [ ] Reliable transcript/caption pipeline into `growing_knowledge`
+- [ ] Enrichment (tags, titles) and Sources tab status/re-extract UX
+- [ ] Guardrails for failures, length, and dedupe
+
+### Phase 10: Learning Agent Specialization — planned
+- [ ] Dedicated agents per topic (economy, deep AI, growing) with independent cadence
+- [ ] Agent-specific progression memory and feedback / difficulty loops
+- [ ] Prompt tuning and eval fixtures per agent as needed (see `docs/phases/10-learning-agents/SCOPE.md`)
+
+### Deferred (not scheduled as numbered phases)
+- **State tracker mobile app** (was `08-state-tracker`): resumable work/learning states—parked until reprioritized

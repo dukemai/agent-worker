@@ -1,5 +1,19 @@
 # Dad-Ops Agent — Decision Log
 
+## 2026-04-03: [Roadmap] Phase 10 — learning agent specialization after Phase 9
+
+**Context**: After re-scoping phases 8–9, learning agent specialization no longer had a numbered phase.
+**Decision**: Schedule **Phase 10: Learning Agent Specialization** (per-topic agents, cadence, progression) **after Phase 9** (YouTube knowledge extraction). Documented in `docs/phases/10-learning-agents/SCOPE.md` and `docs/ROADMAP.md`.
+**Alternatives considered**: Keep learning agents only in a vague “deferred” bucket (rejected: you still want it on the roadmap); merge agents into Phase 9 (rejected: different scope—ingestion vs agent behavior).
+**Status**: accepted
+
+## 2026-04-03: [Roadmap] Phases 8–9 — meal/shopping from promotions, YouTube knowledge extraction
+
+**Context**: Phase 7 (stability & polish) is complete. Former planned work included a state-tracker mobile app (`08-state-tracker`) and learning-agent specialization (`09-learning-agents`).
+**Decision**: Numbered phases **8** and **9** are now **meal & shopping plan from promotion letters** and **YouTube → growing knowledge extraction**, respectively. State-tracker remains **deferred** (listed in `docs/ROADMAP.md`). Learning agents are **Phase 10** (see decision above).
+**Alternatives considered**: Keep old phase folders and insert new phases as 10/11 (rejected: would desync mental model and ROADMAP numbering); merge both new ideas into one phase (rejected: different domains and delivery paths).
+**Status**: accepted
+
 ## 2026-02-25: [Phase 5] Growing suggestions: generate Sun/Wed, show in digest Mon/Fri
 
 **Context**: Growing suggestions were generated on-demand when the weekly API was first called. With frequent knowledge updates, we needed a predictable schedule and fresh generation.

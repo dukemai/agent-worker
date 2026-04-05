@@ -1,0 +1,66 @@
+[
+    {
+      "id": "2c0eb3ea-f2e9-4b8d-8721-746089d258b3",
+      "name": "Gul lök",
+      "productCount": 3,
+      "fullURLPath": "Frukt-Grönt/Lök/Gul-lök",
+      "retailerCategoryId": "1262",
+      "children": []
+    },
+    {
+      "id": "d8c8986d-2a56-4347-9490-aafe1a2a6f60",
+      "name": "Rödlök",
+      "productCount": 4,
+      "fullURLPath": "Frukt-Grönt/Lök/Rödlök",
+      "retailerCategoryId": "1263",
+      "children": []
+    },
+    {
+      "id": "fe0ff50e-9ece-4d53-96f1-30fc5b191ea4",
+      "name": "Vitlök",
+      "productCount": 6,
+      "fullURLPath": "Frukt-Grönt/Lök/Vitlök",
+      "retailerCategoryId": "1264",
+      "children": []
+    },
+    {
+      "id": "0bb55fbd-01db-46ea-9457-10e47886b385",
+      "name": "Schalottenlök",
+      "productCount": 3,
+      "fullURLPath": "Frukt-Grönt/Lök/Schalottenlök",
+      "retailerCategoryId": "4571",
+      "children": []
+    },
+    {
+      "id": "c9f26260-cb0f-4ff9-88a7-a755b307472c",
+      "name": "Salladslök",
+      "productCount": 1,
+      "fullURLPath": "Frukt-Grönt/Lök/Salladslök",
+      "retailerCategoryId": "4569",
+      "children": []
+    },
+    {
+      "id": "fceb7a20-be6d-4ddd-9745-c5563b897da0",
+      "name": "Purjolök",
+      "productCount": 2,
+      "fullURLPath": "Frukt-Grönt/Lök/Purjolök",
+      "retailerCategoryId": "4570",
+      "children": []
+    },
+    {
+      "id": "df2b1174-169d-4b7e-8da8-80d84007bd68",
+      "name": "Ramslök",
+      "productCount": 1,
+      "fullURLPath": "Frukt-Grönt/Lök/Ramslök",
+      "retailerCategoryId": "4562",
+      "children": []
+    },
+    {
+      "id": "bae75f15-8a1e-4cee-8e2c-0ef94f5cf9a3",
+      "name": "Övrig lök",
+      "productCount": 1,
+      "fullURLPath": "Frukt-Grönt/Lök/Övrig-lök",
+      "retailerCategoryId": "4572",
+      "children": []
+    }
+  ]

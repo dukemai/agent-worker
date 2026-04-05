@@ -66,6 +66,22 @@ Year: 2026
   - Turned the growing context editor into a modal with a compact trigger and a one-line profile summary, aligning growing UI with the updated task design system.
   - Added a compact \"Regenerate\" control on the weekly growing tab that calls `/api/growing/weekly/inspirations/refresh` and refreshes weekly suggestions without dominating the layout.
 
+- Tasks board filtering and sorting (per column):
+  - Each `BucketCard` now has its own status filter (all / undone / done) and sort (last updated newest or oldest; status with undone or done first).
+  - Default sort is **undone first**, with newest activity as the tie-breaker within the same status.
+  - Header counts show `(visible/total)` when a filter other than \"all\" is active.
+  - Added migration `016_tasks_updated_at.sql`: `tasks.updated_at` column, backfill from `created_at`, and a `BEFORE UPDATE` trigger so \"last updated\" reflects real edits; `Task` in dashboard types includes optional `updated_at` until all DBs are migrated.
+
+- Global dialog scrolling:
+  - `DialogContent` now caps height (`max-h` using viewport) with `overflow-y-auto` and `min-w-0` so tall content (e.g. Add Source with long transcript) stays scrollable and the footer actions remain reachable.
+
+- Growing Knowledge tab layout:
+  - \"Mark verified\" / \"Mark unverified\" and \"Delete\" moved to the right side of each knowledge row (aligned with Growing Windows cards).
+  - Filter controls moved into the **Knowledge Library** card header (same pattern as the Windows tab), instead of a separate Filters card.
+
+- Growing Sources tab layout:
+  - **Delete** and **Clean & re-extract** sit in the top row on the right; **Video/Blog** and **status** badges sit inline next to the title, with subtitle (channel / hostname) on the next line.
+
 ## Decisions
 
 - Use single ISO `week_number` as the primary weekly key for growing suggestions.
@@ -78,10 +94,11 @@ Year: 2026
 - **Year collision risk**: week number alone can collide across years (e.g., week 14 in different years). A `week_year` field may be needed for strict uniqueness over time.
 - Some non-core docs/contracts may still reference legacy `week_start_date` and should be aligned in a follow-up sweep.
 - Until all environments apply migration `015`, some DBs may still hit ON CONFLICT constraint gaps (fallback path currently mitigates this).
+- Until migration `016_tasks_updated_at` is applied, task \"last updated\" sorts fall back to `created_at` only.
 
 ## Next Steps
 
 - Decide whether to add `week_year` (recommended) and update unique key/index accordingly.
-- Run migration in target environment and verify existing data backfill.
+- Run pending DB migrations in target environments (including `016_tasks_updated_at` for task `updated_at`) and verify backfill and dashboard sort behavior.
 - Remove deprecated inspirations refresh endpoint/client helper if no longer needed.
 - Smoke-test end-to-end flows: weekly generation, convert-to-task, action-linked supporting knowledge relevance, and digest rendering.

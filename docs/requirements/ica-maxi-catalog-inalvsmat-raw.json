@@ -1,0 +1,18 @@
+[
+  {
+    "id": "53c377bf-1f76-4ea3-9cfe-8abeb1f7e99a",
+    "name": "Lever",
+    "productCount": 2,
+    "fullURLPath": "Kött-Chark-Fågel/Inälvsmat/Lever",
+    "retailerCategoryId": "4761",
+    "children": []
+  },
+  {
+    "id": "5b725488-8840-4ea9-b1d5-aa6cc783f121",
+    "name": "Övrig inälvsmat",
+    "productCount": 1,
+    "fullURLPath": "Kött-Chark-Fågel/Inälvsmat/Övrig-inälvsmat",
+    "retailerCategoryId": "4763",
+    "children": []
+  }
+]

@@ -1,0 +1,58 @@
+[
+  {
+    "id": "86358231-d741-4482-938f-440b74ec2c27",
+    "name": "Fast potatis",
+    "productCount": 5,
+    "fullURLPath": "Frukt-Grönt/Potatis/Fast-potatis",
+    "retailerCategoryId": "4725",
+    "children": []
+  },
+  {
+    "id": "f205e9b6-920f-4b41-8b86-8b0212c6c206",
+    "name": "Mjölig potatis",
+    "productCount": 6,
+    "fullURLPath": "Frukt-Grönt/Potatis/Mjölig-potatis",
+    "retailerCategoryId": "4726",
+    "children": []
+  },
+  {
+    "id": "87426923-c15a-48c7-8427-4194f102aa73",
+    "name": "Färskpotatis",
+    "productCount": 1,
+    "fullURLPath": "Frukt-Grönt/Potatis/Färskpotatis",
+    "retailerCategoryId": "4730",
+    "children": []
+  },
+  {
+    "id": "04ec4754-e6ef-4941-b18a-c481eb43b9df",
+    "name": "Delikatesspotatis",
+    "productCount": 10,
+    "fullURLPath": "Frukt-Grönt/Potatis/Delikatesspotatis",
+    "retailerCategoryId": "4727",
+    "children": []
+  },
+  {
+    "id": "790d1646-9854-4fce-810b-ef521855056f",
+    "name": "Mandelpotatis",
+    "productCount": 2,
+    "fullURLPath": "Frukt-Grönt/Potatis/Mandelpotatis",
+    "retailerCategoryId": "4731",
+    "children": []
+  },
+  {
+    "id": "aa746c6e-6c53-4045-869c-b82e365fd6cd",
+    "name": "Bakpotatis",
+    "productCount": 2,
+    "fullURLPath": "Frukt-Grönt/Potatis/Bakpotatis",
+    "retailerCategoryId": "4728",
+    "children": []
+  },
+  {
+    "id": "0a6a9bdd-f4ef-4f1e-b382-0562e204e43c",
+    "name": "Sötpotatis",
+    "productCount": 2,
+    "fullURLPath": "Frukt-Grönt/Potatis/Sötpotatis",
+    "retailerCategoryId": "4729",
+    "children": []
+  }
+]

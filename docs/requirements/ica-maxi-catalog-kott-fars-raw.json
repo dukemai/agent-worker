@@ -1,0 +1,58 @@
+[
+  {
+    "id": "a3dfd0bd-7d83-4d31-b820-4ed952bffba7",
+    "name": "Nötfärs",
+    "productCount": 12,
+    "fullURLPath": "Kött-Chark-Fågel/Köttfärs/Nötfärs",
+    "retailerCategoryId": "1384",
+    "children": []
+  },
+  {
+    "id": "f755f624-efda-4a4c-8d10-05c7db515fdd",
+    "name": "Fläskfärs",
+    "productCount": 7,
+    "fullURLPath": "Kött-Chark-Fågel/Köttfärs/Fläskfärs",
+    "retailerCategoryId": "1385",
+    "children": []
+  },
+  {
+    "id": "2eff4fd7-49bf-4803-b1ae-504e9bc5b4ad",
+    "name": "Blandfärs",
+    "productCount": 8,
+    "fullURLPath": "Kött-Chark-Fågel/Köttfärs/Blandfärs",
+    "retailerCategoryId": "1386",
+    "children": []
+  },
+  {
+    "id": "5cd193ec-5e70-4e96-99af-36ea112695ec",
+    "name": "Lammfärs",
+    "productCount": 2,
+    "fullURLPath": "Kött-Chark-Fågel/Köttfärs/Lammfärs",
+    "retailerCategoryId": "4928",
+    "children": []
+  },
+  {
+    "id": "f160a06a-676c-4ac0-abac-d8b7c92233aa",
+    "name": "Kycklingfärs",
+    "productCount": 3,
+    "fullURLPath": "Kött-Chark-Fågel/Köttfärs/Kycklingfärs",
+    "retailerCategoryId": "33",
+    "children": []
+  },
+  {
+    "id": "f1c63f30-af8b-4075-885e-4613a73cd042",
+    "name": "Kalkonfärs",
+    "productCount": 2,
+    "fullURLPath": "Kött-Chark-Fågel/Köttfärs/Kalkonfärs",
+    "retailerCategoryId": "4889",
+    "children": []
+  },
+  {
+    "id": "2d3b941a-588f-4f77-b10b-cadb9debd1c4",
+    "name": "Viltfärs",
+    "productCount": 3,
+    "fullURLPath": "Kött-Chark-Fågel/Köttfärs/Viltfärs",
+    "retailerCategoryId": "4935",
+    "children": []
+  }
+]

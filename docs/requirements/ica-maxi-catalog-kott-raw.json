@@ -1,0 +1,276 @@
+[
+  {
+    "id": "db4dd486-6cf9-496b-b7e2-f9b0f95aba2a",
+    "name": "Nötkött",
+    "productCount": 69,
+    "fullURLPath": "Kött-Chark-Fågel/Kött/Nötkött",
+    "retailerCategoryId": "2",
+    "children": [
+      {
+        "id": "e4a73ce4-fa49-47a0-b22c-1570f3da88ed",
+        "name": "Entrecôte",
+        "productCount": 8,
+        "fullURLPath": "Kött-Chark-Fågel/Kött/Nötkött/Entrecôte",
+        "retailerCategoryId": "4745",
+        "children": []
+      },
+      {
+        "id": "bb37b6e6-8b46-4b6b-bcb2-a4a009e255d3",
+        "name": "Oxfilé",
+        "productCount": 9,
+        "fullURLPath": "Kött-Chark-Fågel/Kött/Nötkött/Oxfilé",
+        "retailerCategoryId": "4754",
+        "children": []
+      },
+      {
+        "id": "10273e34-15c3-4cf0-bc22-02e91310a265",
+        "name": "Rostbiff",
+        "productCount": 3,
+        "fullURLPath": "Kött-Chark-Fågel/Kött/Nötkött/Rostbiff",
+        "retailerCategoryId": "4756",
+        "children": []
+      },
+      {
+        "id": "152951ca-8209-4511-88ba-2c52fda98f3c",
+        "name": "Rostas",
+        "productCount": 4,
+        "fullURLPath": "Kött-Chark-Fågel/Kött/Nötkött/Rostas",
+        "retailerCategoryId": "4755",
+        "children": []
+      },
+      {
+        "id": "b2da019c-bb92-4ce9-9013-53174e9594d3",
+        "name": "Flankstek",
+        "productCount": 4,
+        "fullURLPath": "Kött-Chark-Fågel/Kött/Nötkött/Flankstek",
+        "retailerCategoryId": "4746",
+        "children": []
+      },
+      {
+        "id": "e6036a2a-c9ac-4300-8d25-a52f060300ee",
+        "name": "Fransyska",
+        "productCount": 2,
+        "fullURLPath": "Kött-Chark-Fågel/Kött/Nötkött/Fransyska",
+        "retailerCategoryId": "4747",
+        "children": []
+      },
+      {
+        "id": "c3b06355-2461-4a76-8fb3-1c1ce9d1cc8f",
+        "name": "Ryggbiff",
+        "productCount": 10,
+        "fullURLPath": "Kött-Chark-Fågel/Kött/Nötkött/Ryggbiff",
+        "retailerCategoryId": "4757",
+        "children": []
+      },
+      {
+        "id": "d9d3dd9c-b331-4310-94b8-8a65d55683a4",
+        "name": "Högrev",
+        "productCount": 4,
+        "fullURLPath": "Kött-Chark-Fågel/Kött/Nötkött/Högrev",
+        "retailerCategoryId": "4750",
+        "children": []
+      },
+      {
+        "id": "fdf6a923-2098-4ff4-b8f7-f8ffd5e17e05",
+        "name": "Lövbiff",
+        "productCount": 7,
+        "fullURLPath": "Kött-Chark-Fågel/Kött/Nötkött/Lövbiff",
+        "retailerCategoryId": "4753",
+        "children": []
+      },
+      {
+        "id": "d47fea14-3311-4156-934b-dcedd707613f",
+        "name": "Kalvkött",
+        "productCount": 6,
+        "fullURLPath": "Kött-Chark-Fågel/Kött/Nötkött/Kalvkött",
+        "retailerCategoryId": "4752",
+        "children": []
+      },
+      {
+        "id": "913fa108-2f76-4926-8664-872d2f5a37c0",
+        "name": "Grytbitar & Strimlat nötkött",
+        "productCount": 1,
+        "fullURLPath": "Kött-Chark-Fågel/Kött/Nötkött/Grytbitar-Strimlat-nötkött",
+        "retailerCategoryId": "4749",
+        "children": []
+      },
+      {
+        "id": "f331eb80-2241-4a39-b439-d9cd7ccd9382",
+        "name": "Pepparbiff & Färdigkryddat nötkött",
+        "productCount": 8,
+        "fullURLPath": "Kött-Chark-Fågel/Kött/Nötkött/Pepparbiff-Färdigkryddat-nötkött",
+        "retailerCategoryId": "4748",
+        "children": []
+      },
+      {
+        "id": "4a0bc0b8-3610-4b41-be46-65a26348778a",
+        "name": "Övrigt nötkött",
+        "productCount": 6,
+        "fullURLPath": "Kött-Chark-Fågel/Kött/Nötkött/Övrigt-nötkött",
+        "retailerCategoryId": "4758",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "74dfbe91-d9b0-49d6-acc4-ebcb9614f73a",
+    "name": "Fläsk",
+    "productCount": 82,
+    "fullURLPath": "Kött-Chark-Fågel/Kött/Fläsk",
+    "retailerCategoryId": "13",
+    "children": [
+      {
+        "id": "d449840e-8fdb-498b-b14e-db8a47b551ca",
+        "name": "Fläskfilé",
+        "productCount": 4,
+        "fullURLPath": "Kött-Chark-Fågel/Kött/Fläsk/Fläskfilé",
+        "retailerCategoryId": "4953",
+        "children": []
+      },
+      {
+        "id": "4be58255-3f07-41a0-8fa4-1299a007cc72",
+        "name": "Fläskytterfilé",
+        "productCount": 6,
+        "fullURLPath": "Kött-Chark-Fågel/Kött/Fläsk/Fläskytterfilé",
+        "retailerCategoryId": "4958",
+        "children": []
+      },
+      {
+        "id": "c7f6f0b3-b566-4627-a88f-3b00572d46be",
+        "name": "Fläskkarré",
+        "productCount": 13,
+        "fullURLPath": "Kött-Chark-Fågel/Kött/Fläsk/Fläskkarré",
+        "retailerCategoryId": "4954",
+        "children": []
+      },
+      {
+        "id": "5c3a20b3-d854-4df9-a7ca-fcc89bfd5ac7",
+        "name": "Fläskkotlett",
+        "productCount": 10,
+        "fullURLPath": "Kött-Chark-Fågel/Kött/Fläsk/Fläskkotlett",
+        "retailerCategoryId": "4955",
+        "children": []
+      },
+      {
+        "id": "f755f624-efda-4a4c-8d10-05c7db515fdd",
+        "name": "Fläskfärs",
+        "productCount": 7,
+        "fullURLPath": "Kött-Chark-Fågel/Kött/Fläsk/Fläskfärs",
+        "retailerCategoryId": "1385",
+        "children": []
+      },
+      {
+        "id": "b1c41734-3295-443e-9f13-d6c04ceed998",
+        "name": "Fläsklägg",
+        "productCount": 2,
+        "fullURLPath": "Kött-Chark-Fågel/Kött/Fläsk/Fläsklägg",
+        "retailerCategoryId": "4956",
+        "children": []
+      },
+      {
+        "id": "20449f02-5cff-45a6-876c-298703234ce7",
+        "name": "Fläskschnitzel",
+        "productCount": 2,
+        "fullURLPath": "Kött-Chark-Fågel/Kött/Fläsk/Fläskschnitzel",
+        "retailerCategoryId": "4957",
+        "children": []
+      },
+      {
+        "id": "4c8f1d41-2033-426c-81b6-a5dddd58b8e6",
+        "name": "Färdigkryddat fläskkött",
+        "productCount": 12,
+        "fullURLPath": "Kött-Chark-Fågel/Kött/Fläsk/Färdigkryddat-fläskkött",
+        "retailerCategoryId": "2120",
+        "children": []
+      },
+      {
+        "id": "bee7de0a-be1a-4b39-9535-894f9972f6f6",
+        "name": "Strimlat fläskkött",
+        "productCount": 4,
+        "fullURLPath": "Kött-Chark-Fågel/Kött/Fläsk/Strimlat-fläskkött",
+        "retailerCategoryId": "4964",
+        "children": []
+      },
+      {
+        "id": "13d2a2f7-a1ed-4bc5-96a2-dddcdd6cd6e1",
+        "name": "Grytbitar fläsk",
+        "productCount": 1,
+        "fullURLPath": "Kött-Chark-Fågel/Kött/Fläsk/Grytbitar-fläsk",
+        "retailerCategoryId": "4959",
+        "children": []
+      },
+      {
+        "id": "6171e4b3-625c-4813-887c-f2c5e77d3853",
+        "name": "Kassler",
+        "productCount": 5,
+        "fullURLPath": "Kött-Chark-Fågel/Kött/Fläsk/Kassler",
+        "retailerCategoryId": "4960",
+        "children": []
+      },
+      {
+        "id": "e1a06bfe-6be1-4b05-ae27-8f6b93311849",
+        "name": "Picknickbog",
+        "productCount": 2,
+        "fullURLPath": "Kött-Chark-Fågel/Kött/Fläsk/Picknickbog",
+        "retailerCategoryId": "4961",
+        "children": []
+      },
+      {
+        "id": "7d4bc393-7d52-44f2-aea6-46fd003c5bfc",
+        "name": "Revbensspjäll",
+        "productCount": 8,
+        "fullURLPath": "Kött-Chark-Fågel/Kött/Fläsk/Revbensspjäll",
+        "retailerCategoryId": "785",
+        "children": []
+      },
+      {
+        "id": "f2140a6d-194a-46eb-ac85-34a92f1cf2b5",
+        "name": "Sidfläsk",
+        "productCount": 2,
+        "fullURLPath": "Kött-Chark-Fågel/Kött/Fläsk/Sidfläsk",
+        "retailerCategoryId": "4962",
+        "children": []
+      },
+      {
+        "id": "1866a668-3f81-4ad7-a755-b85e844d39b5",
+        "name": "Skinkstek",
+        "productCount": 1,
+        "fullURLPath": "Kött-Chark-Fågel/Kött/Fläsk/Skinkstek",
+        "retailerCategoryId": "4963",
+        "children": []
+      },
+      {
+        "id": "fd5f0df5-1f3a-41c3-a444-b328394183b2",
+        "name": "Julskinka",
+        "productCount": 4,
+        "fullURLPath": "Kött-Chark-Fågel/Kött/Fläsk/Julskinka",
+        "retailerCategoryId": "1168",
+        "children": []
+      },
+      {
+        "id": "64e44810-2b76-4c57-adae-070a311be68c",
+        "name": "Övrigt fläskkött",
+        "productCount": 2,
+        "fullURLPath": "Kött-Chark-Fågel/Kött/Fläsk/Övrigt-fläskkött",
+        "retailerCategoryId": "4965",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "65d862a4-f71d-437c-a480-1347be521958",
+    "name": "Lamm",
+    "productCount": 14,
+    "fullURLPath": "Kött-Chark-Fågel/Kött/Lamm",
+    "retailerCategoryId": "4924",
+    "children": []
+  },
+  {
+    "id": "55f2bab3-8593-47cb-a059-b44acb7721fd",
+    "name": "Vilt",
+    "productCount": 11,
+    "fullURLPath": "Kött-Chark-Fågel/Kött/Vilt",
+    "retailerCategoryId": "4934",
+    "children": []
+  }
+]

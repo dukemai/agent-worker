@@ -1,0 +1,90 @@
+[
+  {
+    "id": "75a67bc0-3d07-44b8-b832-913dae584eaa",
+    "name": "Falukorv",
+    "productCount": 17,
+    "fullURLPath": "Kött-Chark-Fågel/Korv/Falukorv",
+    "retailerCategoryId": "51",
+    "children": []
+  },
+  {
+    "id": "f8cbdec5-f0c2-41e7-b73a-2dfc4d0815cb",
+    "name": "Grillkorv",
+    "productCount": 30,
+    "fullURLPath": "Kött-Chark-Fågel/Korv/Grillkorv",
+    "retailerCategoryId": "52",
+    "children": []
+  },
+  {
+    "id": "c7e1b13c-4d60-4f7c-9d50-af380a4c1100",
+    "name": "Frukostkorv",
+    "productCount": 2,
+    "fullURLPath": "Kött-Chark-Fågel/Korv/Frukostkorv",
+    "retailerCategoryId": "53",
+    "children": []
+  },
+  {
+    "id": "4b2e20ef-71bc-4dea-9129-bfa0b8909698",
+    "name": "Varmkorv",
+    "productCount": 18,
+    "fullURLPath": "Kött-Chark-Fågel/Korv/Varmkorv",
+    "retailerCategoryId": "54",
+    "children": []
+  },
+  {
+    "id": "1a48d8d3-4aea-404d-b147-27ace7dba3db",
+    "name": "Kryddkorv",
+    "productCount": 61,
+    "fullURLPath": "Kött-Chark-Fågel/Korv/Kryddkorv",
+    "retailerCategoryId": "55",
+    "children": []
+  },
+  {
+    "id": "20a61acd-acd6-4bf6-b15f-fe7d7cc3e6da",
+    "name": "Isterband",
+    "productCount": 4,
+    "fullURLPath": "Kött-Chark-Fågel/Korv/Isterband",
+    "retailerCategoryId": "57",
+    "children": []
+  },
+  {
+    "id": "a53e7ec0-074b-4059-ae1e-0ff486c87e31",
+    "name": "Prinskorv",
+    "productCount": 5,
+    "fullURLPath": "Kött-Chark-Fågel/Korv/Prinskorv",
+    "retailerCategoryId": "58",
+    "children": []
+  },
+  {
+    "id": "3eecc1af-85f5-4827-b72c-c88aba7ecab8",
+    "name": "Fläskkorv",
+    "productCount": 1,
+    "fullURLPath": "Kött-Chark-Fågel/Korv/Fläskkorv",
+    "retailerCategoryId": "59",
+    "children": []
+  },
+  {
+    "id": "7cf3caca-1679-4f6f-acf7-f1c01743d9b1",
+    "name": "Kycklingkorv",
+    "productCount": 13,
+    "fullURLPath": "Kött-Chark-Fågel/Korv/Kycklingkorv",
+    "retailerCategoryId": "61",
+    "children": []
+  },
+  {
+    "id": "d9919617-88ba-4b64-bf35-19c50a4e0702",
+    "name": "Färsk korv",
+    "productCount": 11,
+    "fullURLPath": "Kött-Chark-Fågel/Korv/Färsk-korv",
+    "retailerCategoryId": "1558",
+    "children": []
+  },
+  {
+    "id": "aeb2a596-972b-4728-952e-ad94b44edd02",
+    "name": "Glutenfri korv",
+    "productCount": 23,
+    "fullURLPath": "Kött-Chark-Fågel/Korv/Glutenfri-korv",
+    "retailerCategoryId": "2841",
+    "children": []
+  }
+]

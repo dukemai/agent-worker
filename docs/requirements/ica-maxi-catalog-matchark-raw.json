@@ -1,0 +1,42 @@
+[
+  {
+    "id": "92f7b193-614b-4197-a8d2-dda13c0bdc2a",
+    "name": "Köttbullar & färsprodukter",
+    "productCount": 25,
+    "fullURLPath": "Kött-Chark-Fågel/Matchark/Köttbullar-färsprodukter",
+    "retailerCategoryId": "1381",
+    "children": []
+  },
+  {
+    "id": "b8fbe466-4b2c-4f12-885f-bdac9bc9123a",
+    "name": "Hamburgare",
+    "productCount": 19,
+    "fullURLPath": "Kött-Chark-Fågel/Matchark/Hamburgare",
+    "retailerCategoryId": "2210",
+    "children": []
+  },
+  {
+    "id": "e69d38a9-b082-424e-93bb-a972009a32c1",
+    "name": "Bacon & stekfläsk",
+    "productCount": 36,
+    "fullURLPath": "Kött-Chark-Fågel/Matchark/Bacon-stekfläsk",
+    "retailerCategoryId": "1548",
+    "children": []
+  },
+  {
+    "id": "4ac4aa19-ab90-430c-8b60-4cd5cf692a54",
+    "name": "Blodpudding",
+    "productCount": 4,
+    "fullURLPath": "Kött-Chark-Fågel/Matchark/Blodpudding",
+    "retailerCategoryId": "1472",
+    "children": []
+  },
+  {
+    "id": "55be5423-b532-4420-b0a2-7dd7bfe55ead",
+    "name": "Sylta",
+    "productCount": 3,
+    "fullURLPath": "Kött-Chark-Fågel/Matchark/Sylta",
+    "retailerCategoryId": "4966",
+    "children": []
+  }
+]

@@ -17,7 +17,13 @@
     "dashboard:build": "pnpm --filter dashboard build",
     "dev:all": "pnpm turbo run dev --parallel",
     "build:all": "pnpm turbo run build",
-    "lint:all": "pnpm turbo run lint --parallel"
+    "lint:all": "pnpm turbo run lint --parallel",
+    "playwright:test": "pnpm --filter @agent/playwright-tools test",
+    "playwright:match-rules": "pnpm --filter @agent/playwright-tools test:match-rules",
+    "playwright:ui": "pnpm --filter @agent/playwright-tools test:ui",
+    "playwright:install": "pnpm --filter @agent/playwright-tools exec playwright install chromium",
+    "promo:download-watchlist": "pnpm --filter @agent/playwright-tools download-watchlist",
+    "promo:picker-catalog": "node scripts/build-ica-maxi-promo-picker-catalog.mjs"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20241127.0",

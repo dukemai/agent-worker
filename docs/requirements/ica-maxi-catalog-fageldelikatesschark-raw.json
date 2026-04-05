@@ -1,0 +1,50 @@
+[
+  {
+    "id": "cdc719c5-b8d5-4f82-b995-a6677c3ebea9",
+    "name": "Lufttorkad skinka",
+    "productCount": 31,
+    "fullURLPath": "Kött-Chark-Fågel/Delikatesschark/Lufttorkad-skinka",
+    "retailerCategoryId": "2624",
+    "children": []
+  },
+  {
+    "id": "7196cfb1-44d5-40d0-b9f2-726eb287b412",
+    "name": "Lufttorkad nöt",
+    "productCount": 2,
+    "fullURLPath": "Kött-Chark-Fågel/Delikatesschark/Lufttorkad-nöt",
+    "retailerCategoryId": "2625",
+    "children": []
+  },
+  {
+    "id": "52aa9e9f-9ee9-4eb7-b8f2-a8dc6d34c3fd",
+    "name": "Salami delikatess",
+    "productCount": 44,
+    "fullURLPath": "Kött-Chark-Fågel/Delikatesschark/Salami-delikatess",
+    "retailerCategoryId": "2626",
+    "children": []
+  },
+  {
+    "id": "a90c3c76-666c-4a57-94db-fbd2efc7915d",
+    "name": "Tapas & Antipasti",
+    "productCount": 34,
+    "fullURLPath": "Kött-Chark-Fågel/Delikatesschark/Tapas-Antipasti",
+    "retailerCategoryId": "2627",
+    "children": []
+  },
+  {
+    "id": "2744c53e-5c88-4490-b4f3-eafbf7343adf",
+    "name": "Medvurst & Mortadella",
+    "productCount": 2,
+    "fullURLPath": "Kött-Chark-Fågel/Delikatesschark/Medvurst-Mortadella",
+    "retailerCategoryId": "2628",
+    "children": []
+  },
+  {
+    "id": "e70642a6-9ff4-429f-b28b-dc74d71eb022",
+    "name": "Ölkorv",
+    "productCount": 36,
+    "fullURLPath": "Kött-Chark-Fågel/Delikatesschark/Ölkorv",
+    "retailerCategoryId": "2629",
+    "children": []
+  }
+]

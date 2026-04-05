@@ -1,0 +1,3789 @@
+{
+  "schemaVersion": 1,
+  "retailer": "ica-maxi",
+  "meta": {
+    "generatedAt": "2026-04-05T19:24:35.730Z",
+    "description": "ICA Maxi Handla category tree + merged leaf snapshots for promo watchlist picker suggestions.",
+    "sources": [
+      "docs/requirements/ica-maxi-initial-state-raw.json",
+      "docs/requirements/ica-maxi-catalog-frukt-raw.json",
+      "docs/requirements/ica-maxi-catalog-farska-bar-raw.json",
+      "docs/requirements/ica-maxi-catalog-farska-kryddor-raw.json",
+      "docs/requirements/ica-maxi-catalog-vegetables-raw.json",
+      "docs/requirements/ica-maxi-catalog-kal-raw.json",
+      "docs/requirements/ica-maxi-catalog-lok-raw.json",
+      "docs/requirements/ica-maxi-catalog-potatis-raw.json",
+      "docs/requirements/ica-maxi-catalog-rot-frukter-raw.json",
+      "docs/requirements/ica-maxi-catalog-juice-fruktdryck-raw.json",
+      "docs/requirements/ica-maxi-catalog-agg-jast-raw.json",
+      "docs/requirements/ica-maxi-catalog-mjolk-raw.json",
+      "docs/requirements/ica-maxi-catalog-ost-raw.json",
+      "docs/requirements/ica-maxi-catalog-smor-magarin-raw.json",
+      "docs/requirements/ica-maxi-catalog-yoghurt-raw.json",
+      "docs/requirements/ica-maxi-catalog-fageldelikatesschark-raw.json",
+      "docs/requirements/ica-maxi-catalog-inalvsmat-raw.json",
+      "docs/requirements/ica-maxi-catalog-korv-raw.json",
+      "docs/requirements/ica-maxi-catalog-kott-raw.json",
+      "docs/requirements/ica-maxi-catalog-kott-fars-raw.json",
+      "docs/requirements/ica-maxi-catalog-kyckling-fagel-raw.json",
+      "docs/requirements/ica-maxi-catalog-matchark-raw.json",
+      "docs/requirements/ica-maxi-catalog-palagg-raw.json"
+    ]
+  },
+  "categories": [
+    {
+      "id": "70e47511-1892-45c5-8b0a-c5340ef8e518",
+      "name": "Apotek, Hälsa & Skönhet",
+      "fullURLPath": "Apotek-Hälsa-Skönhet",
+      "parentId": null,
+      "departmentId": "70e47511-1892-45c5-8b0a-c5340ef8e518"
+    },
+    {
+      "id": "ac8a89ea-5c01-476f-bbb8-3c05526780d7",
+      "name": "Barn",
+      "fullURLPath": "Barn",
+      "parentId": null,
+      "departmentId": "ac8a89ea-5c01-476f-bbb8-3c05526780d7"
+    },
+    {
+      "id": "71542409-5f2e-4ae3-9ad7-6751e10afb38",
+      "name": "Blommor & Trädgård",
+      "fullURLPath": "Blommor-Trädgård",
+      "parentId": null,
+      "departmentId": "71542409-5f2e-4ae3-9ad7-6751e10afb38"
+    },
+    {
+      "id": "a34eb6f1-7ef8-4bcb-b166-4373726c158f",
+      "name": "Bröd & Kakor",
+      "fullURLPath": "Bröd-Kakor",
+      "parentId": null,
+      "departmentId": "a34eb6f1-7ef8-4bcb-b166-4373726c158f"
+    },
+    {
+      "id": "555f311d-70ca-4bd8-bd50-921545531f89",
+      "name": "Djur",
+      "fullURLPath": "Djur",
+      "parentId": null,
+      "departmentId": "555f311d-70ca-4bd8-bd50-921545531f89"
+    },
+    {
+      "id": "34948432-df3c-4468-991b-f0db32126003",
+      "name": "Dryck",
+      "fullURLPath": "Dryck",
+      "parentId": null,
+      "departmentId": "34948432-df3c-4468-991b-f0db32126003"
+    },
+    {
+      "id": "c4e30eb9-a7e6-4a1b-9f99-9f60edc4cadd",
+      "name": "Juice & Fruktdryck",
+      "fullURLPath": "Dryck/Juice-Fruktdryck",
+      "parentId": "7aac2fb3-4bf5-4763-9610-fd2ad3ef930a",
+      "departmentId": "7aac2fb3-4bf5-4763-9610-fd2ad3ef930a"
+    },
+    {
+      "id": "c4e30eb9-a7e6-4a1b-9f99-9f60edc4cadd",
+      "name": "Juice & Fruktdryck",
+      "fullURLPath": "Dryck/Juice-Fruktdryck",
+      "parentId": "34948432-df3c-4468-991b-f0db32126003",
+      "departmentId": "34948432-df3c-4468-991b-f0db32126003"
+    },
+    {
+      "id": "fc0292c5-c74d-4229-9577-ec302310430f",
+      "name": "Fisk & Skaldjur",
+      "fullURLPath": "Fisk-Skaldjur",
+      "parentId": null,
+      "departmentId": "fc0292c5-c74d-4229-9577-ec302310430f"
+    },
+    {
+      "id": "a45a055c-66e1-4edc-a02a-2098bb2e9e46",
+      "name": "Fritid",
+      "fullURLPath": "Fritid",
+      "parentId": null,
+      "departmentId": "a45a055c-66e1-4edc-a02a-2098bb2e9e46"
+    },
+    {
+      "id": "f82845b1-7be6-4e08-8b5d-7f2c0f0a7d38",
+      "name": "Frukt & Grönt",
+      "fullURLPath": "Frukt-Grönt",
+      "parentId": null,
+      "departmentId": "f82845b1-7be6-4e08-8b5d-7f2c0f0a7d38"
+    },
+    {
+      "id": "18d60b20-1c1a-4023-92f4-6c18facf3915",
+      "name": "Frukt",
+      "fullURLPath": "Frukt-Grönt/Frukt",
+      "parentId": "f82845b1-7be6-4e08-8b5d-7f2c0f0a7d38",
+      "departmentId": "f82845b1-7be6-4e08-8b5d-7f2c0f0a7d38"
+    },
+    {
+      "id": "83676072-0bbe-4b65-92ed-d09c14c452b9",
+      "name": "Exotisk frukt",
+      "fullURLPath": "Frukt-Grönt/Frukt/Exotisk-frukt",
+      "parentId": "18d60b20-1c1a-4023-92f4-6c18facf3915",
+      "departmentId": "f82845b1-7be6-4e08-8b5d-7f2c0f0a7d38"
+    },
+    {
+      "id": "67601f4b-c7e4-42ae-af1a-204ec5f57530",
+      "name": "Färska bär",
+      "fullURLPath": "Frukt-Grönt/Färska-bär",
+      "parentId": "f82845b1-7be6-4e08-8b5d-7f2c0f0a7d38",
+      "departmentId": "f82845b1-7be6-4e08-8b5d-7f2c0f0a7d38"
+    },
+    {
+      "id": "34ac4412-f004-47ef-ae7c-047841f42c24",
+      "name": "Färska kryddor",
+      "fullURLPath": "Frukt-Grönt/Färska-kryddor",
+      "parentId": "f82845b1-7be6-4e08-8b5d-7f2c0f0a7d38",
+      "departmentId": "f82845b1-7be6-4e08-8b5d-7f2c0f0a7d38"
+    },
+    {
+      "id": "6395d7ab-beee-4895-b733-cbfe2b63c069",
+      "name": "Grönsaker",
+      "fullURLPath": "Frukt-Grönt/Grönsaker",
+      "parentId": "f82845b1-7be6-4e08-8b5d-7f2c0f0a7d38",
+      "departmentId": "f82845b1-7be6-4e08-8b5d-7f2c0f0a7d38"
+    },
+    {
+      "id": "da43879d-6b3c-4835-922e-098e8fde7833",
+      "name": "Sallad",
+      "fullURLPath": "Frukt-Grönt/Grönsaker/Sallad",
+      "parentId": "6395d7ab-beee-4895-b733-cbfe2b63c069",
+      "departmentId": "f82845b1-7be6-4e08-8b5d-7f2c0f0a7d38"
+    },
+    {
+      "id": "1db9c37c-87ea-4d92-84d4-5670eaaeb018",
+      "name": "Kål",
+      "fullURLPath": "Frukt-Grönt/Kål",
+      "parentId": "f82845b1-7be6-4e08-8b5d-7f2c0f0a7d38",
+      "departmentId": "f82845b1-7be6-4e08-8b5d-7f2c0f0a7d38"
+    },
+    {
+      "id": "9a66038b-f95a-45b6-9a50-76a43c494031",
+      "name": "Lök",
+      "fullURLPath": "Frukt-Grönt/Lök",
+      "parentId": "f82845b1-7be6-4e08-8b5d-7f2c0f0a7d38",
+      "departmentId": "f82845b1-7be6-4e08-8b5d-7f2c0f0a7d38"
+    },
+    {
+      "id": "c5b9394b-20ac-4f52-93b9-f7dd1fd09e00",
+      "name": "Potatis",
+      "fullURLPath": "Frukt-Grönt/Potatis",
+      "parentId": "f82845b1-7be6-4e08-8b5d-7f2c0f0a7d38",
+      "departmentId": "f82845b1-7be6-4e08-8b5d-7f2c0f0a7d38"
+    },
+    {
+      "id": "c03f7cb4-d742-46c2-8872-a79345413ce7",
+      "name": "Rotfrukter",
+      "fullURLPath": "Frukt-Grönt/Rotfrukter",
+      "parentId": "f82845b1-7be6-4e08-8b5d-7f2c0f0a7d38",
+      "departmentId": "f82845b1-7be6-4e08-8b5d-7f2c0f0a7d38"
+    },
+    {
+      "id": "360db808-e41c-463d-8cb1-ec80eb426b37",
+      "name": "Fryst",
+      "fullURLPath": "Fryst",
+      "parentId": null,
+      "departmentId": "360db808-e41c-463d-8cb1-ec80eb426b37"
+    },
+    {
+      "id": "5d7bd782-7db9-4fef-ab86-3b7c5e797ccb",
+      "name": "Färdigmat",
+      "fullURLPath": "Färdigmat",
+      "parentId": null,
+      "departmentId": "5d7bd782-7db9-4fef-ab86-3b7c5e797ccb"
+    },
+    {
+      "id": "bb534c25-3729-48bc-b9cc-c4516145879c",
+      "name": "Glass, Godis & Snacks",
+      "fullURLPath": "Glass-Godis-Snacks",
+      "parentId": null,
+      "departmentId": "bb534c25-3729-48bc-b9cc-c4516145879c"
+    },
+    {
+      "id": "2461df2c-19e0-4435-84ef-210111f66562",
+      "name": "Grill",
+      "fullURLPath": "Grill",
+      "parentId": null,
+      "departmentId": "2461df2c-19e0-4435-84ef-210111f66562"
+    },
+    {
+      "id": "898d465a-1c6b-487a-9be1-31fac1cc4014",
+      "name": "Hem & Inredning",
+      "fullURLPath": "Hem-Inredning",
+      "parentId": null,
+      "departmentId": "898d465a-1c6b-487a-9be1-31fac1cc4014"
+    },
+    {
+      "id": "a6c5191e-77ac-4dae-a6e8-da5b0aba93e0",
+      "name": "Kläder & Accessoarer",
+      "fullURLPath": "Kläder-Accessoarer",
+      "parentId": null,
+      "departmentId": "a6c5191e-77ac-4dae-a6e8-da5b0aba93e0"
+    },
+    {
+      "id": "a0bceaa9-e61a-470f-9566-d46aae9b5b74",
+      "name": "Kök",
+      "fullURLPath": "Kök",
+      "parentId": null,
+      "departmentId": "a0bceaa9-e61a-470f-9566-d46aae9b5b74"
+    },
+    {
+      "id": "c0a4a3ed-f97c-4b2f-81ca-dcc9a7e044f7",
+      "name": "Kött, Chark & Fågel",
+      "fullURLPath": "Kött-Chark-Fågel",
+      "parentId": null,
+      "departmentId": "c0a4a3ed-f97c-4b2f-81ca-dcc9a7e044f7"
+    },
+    {
+      "id": "33926eaa-54a2-447b-a831-c269c8b0f73d",
+      "name": "Delikatesschark",
+      "fullURLPath": "Kött-Chark-Fågel/Delikatesschark",
+      "parentId": "c0a4a3ed-f97c-4b2f-81ca-dcc9a7e044f7",
+      "departmentId": "c0a4a3ed-f97c-4b2f-81ca-dcc9a7e044f7"
+    },
+    {
+      "id": "4f2418e6-c1bc-4161-9a77-892689973e49",
+      "name": "Inälvsmat",
+      "fullURLPath": "Kött-Chark-Fågel/Inälvsmat",
+      "parentId": "c0a4a3ed-f97c-4b2f-81ca-dcc9a7e044f7",
+      "departmentId": "c0a4a3ed-f97c-4b2f-81ca-dcc9a7e044f7"
+    },
+    {
+      "id": "68ed3c20-58e3-44d6-a95b-24ece4612260",
+      "name": "Korv",
+      "fullURLPath": "Kött-Chark-Fågel/Korv",
+      "parentId": "c0a4a3ed-f97c-4b2f-81ca-dcc9a7e044f7",
+      "departmentId": "c0a4a3ed-f97c-4b2f-81ca-dcc9a7e044f7"
+    },
+    {
+      "id": "3be2f7c8-cdd9-42ac-9405-60d42b4df012",
+      "name": "Kyckling & Fågel",
+      "fullURLPath": "Kött-Chark-Fågel/Kyckling-Fågel",
+      "parentId": "c0a4a3ed-f97c-4b2f-81ca-dcc9a7e044f7",
+      "departmentId": "c0a4a3ed-f97c-4b2f-81ca-dcc9a7e044f7"
+    },
+    {
+      "id": "b4b30a51-2c01-45c4-b449-33bf5481d6c1",
+      "name": "Kött",
+      "fullURLPath": "Kött-Chark-Fågel/Kött",
+      "parentId": "c0a4a3ed-f97c-4b2f-81ca-dcc9a7e044f7",
+      "departmentId": "c0a4a3ed-f97c-4b2f-81ca-dcc9a7e044f7"
+    },
+    {
+      "id": "74dfbe91-d9b0-49d6-acc4-ebcb9614f73a",
+      "name": "Fläsk",
+      "fullURLPath": "Kött-Chark-Fågel/Kött/Fläsk",
+      "parentId": "b4b30a51-2c01-45c4-b449-33bf5481d6c1",
+      "departmentId": "c0a4a3ed-f97c-4b2f-81ca-dcc9a7e044f7"
+    },
+    {
+      "id": "db4dd486-6cf9-496b-b7e2-f9b0f95aba2a",
+      "name": "Nötkött",
+      "fullURLPath": "Kött-Chark-Fågel/Kött/Nötkött",
+      "parentId": "b4b30a51-2c01-45c4-b449-33bf5481d6c1",
+      "departmentId": "c0a4a3ed-f97c-4b2f-81ca-dcc9a7e044f7"
+    },
+    {
+      "id": "68c65d92-4160-4761-a547-6e5fcec34466",
+      "name": "Köttfärs",
+      "fullURLPath": "Kött-Chark-Fågel/Köttfärs",
+      "parentId": "c0a4a3ed-f97c-4b2f-81ca-dcc9a7e044f7",
+      "departmentId": "c0a4a3ed-f97c-4b2f-81ca-dcc9a7e044f7"
+    },
+    {
+      "id": "dd850748-c56e-4aa3-bd97-81281fea9bae",
+      "name": "Matchark",
+      "fullURLPath": "Kött-Chark-Fågel/Matchark",
+      "parentId": "c0a4a3ed-f97c-4b2f-81ca-dcc9a7e044f7",
+      "departmentId": "c0a4a3ed-f97c-4b2f-81ca-dcc9a7e044f7"
+    },
+    {
+      "id": "6a7fd157-5a0f-44e0-aff8-318de3bb8a96",
+      "name": "Pålägg",
+      "fullURLPath": "Kött-Chark-Fågel/Pålägg",
+      "parentId": "c0a4a3ed-f97c-4b2f-81ca-dcc9a7e044f7",
+      "departmentId": "c0a4a3ed-f97c-4b2f-81ca-dcc9a7e044f7"
+    },
+    {
+      "id": "7aac2fb3-4bf5-4763-9610-fd2ad3ef930a",
+      "name": "Mejeri & Ost",
+      "fullURLPath": "Mejeri-Ost",
+      "parentId": null,
+      "departmentId": "7aac2fb3-4bf5-4763-9610-fd2ad3ef930a"
+    },
+    {
+      "id": "77a83ff9-a0cf-4aa0-907f-c0d47e0ec53c",
+      "name": "Mjölk",
+      "fullURLPath": "Mejeri-Ost/Mjölk",
+      "parentId": "7aac2fb3-4bf5-4763-9610-fd2ad3ef930a",
+      "departmentId": "7aac2fb3-4bf5-4763-9610-fd2ad3ef930a"
+    },
+    {
+      "id": "342706ff-6dd8-4e9d-9ab3-8ff5aac99dd1",
+      "name": "Ost",
+      "fullURLPath": "Mejeri-Ost/Ost",
+      "parentId": "7aac2fb3-4bf5-4763-9610-fd2ad3ef930a",
+      "departmentId": "7aac2fb3-4bf5-4763-9610-fd2ad3ef930a"
+    },
+    {
+      "id": "876bd9ea-151c-492a-999d-1249cdd4a617",
+      "name": "Smör & Margarin",
+      "fullURLPath": "Mejeri-Ost/Smör-Margarin",
+      "parentId": "7aac2fb3-4bf5-4763-9610-fd2ad3ef930a",
+      "departmentId": "7aac2fb3-4bf5-4763-9610-fd2ad3ef930a"
+    },
+    {
+      "id": "f6a0d5e7-b4c8-435b-9eb4-14cbafd8409b",
+      "name": "Yoghurt",
+      "fullURLPath": "Mejeri-Ost/Yoghurt",
+      "parentId": "7aac2fb3-4bf5-4763-9610-fd2ad3ef930a",
+      "departmentId": "7aac2fb3-4bf5-4763-9610-fd2ad3ef930a"
+    },
+    {
+      "id": "2d99b8cd-01f7-4ba9-8a19-1e059a158f7a",
+      "name": "Ägg & Jäst",
+      "fullURLPath": "Mejeri-Ost/Ägg-Jäst",
+      "parentId": "7aac2fb3-4bf5-4763-9610-fd2ad3ef930a",
+      "departmentId": "7aac2fb3-4bf5-4763-9610-fd2ad3ef930a"
+    },
+    {
+      "id": "f4882652-d405-4cd1-876c-247667adc392",
+      "name": "Skafferi",
+      "fullURLPath": "Skafferi",
+      "parentId": null,
+      "departmentId": "f4882652-d405-4cd1-876c-247667adc392"
+    },
+    {
+      "id": "563524de-aa3c-49b6-a9d0-27924320f035",
+      "name": "Städ, Tvätt & Papper",
+      "fullURLPath": "Städ-Tvätt-Papper",
+      "parentId": null,
+      "departmentId": "563524de-aa3c-49b6-a9d0-27924320f035"
+    },
+    {
+      "id": "4d09b54a-c6f7-4898-8aac-b089712f7e76",
+      "name": "Tobak",
+      "fullURLPath": "Tobak",
+      "parentId": null,
+      "departmentId": "4d09b54a-c6f7-4898-8aac-b089712f7e76"
+    },
+    {
+      "id": "e128adca-fd5e-4b7e-a34e-a0badfe367ac",
+      "name": "Träning & Återhämtning",
+      "fullURLPath": "Träning-Återhämtning",
+      "parentId": null,
+      "departmentId": "e128adca-fd5e-4b7e-a34e-a0badfe367ac"
+    },
+    {
+      "id": "442f3f18-3b3a-484a-ae0d-700be34148ed",
+      "name": "Vegetariskt",
+      "fullURLPath": "Vegetariskt",
+      "parentId": null,
+      "departmentId": "442f3f18-3b3a-484a-ae0d-700be34148ed"
+    }
+  ],
+  "items": [
+    {
+      "id": "171ad091-7747-448c-beef-5fc5c7a9988a",
+      "name": "Ananas",
+      "watchlistText": "Ananas",
+      "fullURLPath": "Frukt-Grönt/Frukt/Exotisk-frukt/Ananas",
+      "parentCategoryId": "83676072-0bbe-4b65-92ed-d09c14c452b9",
+      "departmentId": "f82845b1-7be6-4e08-8b5d-7f2c0f0a7d38",
+      "retailerCategoryId": "4878",
+      "productCount": 1
+    },
+    {
+      "id": "dffd1c20-4bb5-4121-a57f-bba5f316ab3d",
+      "name": "Anka & övrig fågel",
+      "watchlistText": "Anka & övrig fågel",
+      "fullURLPath": "Kött-Chark-Fågel/Kyckling-Fågel/Anka-övrig-fågel",
+      "parentCategoryId": "3be2f7c8-cdd9-42ac-9405-60d42b4df012",
+      "departmentId": "c0a4a3ed-f97c-4b2f-81ca-dcc9a7e044f7",
+      "retailerCategoryId": "34",
+      "productCount": 12
+    },
+    {
+      "id": "76e0023e-2f9d-4d66-857c-48abfa598274",
+      "name": "Ansiktsvård",
+      "watchlistText": "Ansiktsvård",
+      "fullURLPath": "Apotek-Hälsa-Skönhet/Ansiktsvård",
+      "parentCategoryId": "70e47511-1892-45c5-8b0a-c5340ef8e518",
+      "departmentId": "70e47511-1892-45c5-8b0a-c5340ef8e518"
+    },
+    {
+      "id": "c42c9de6-52b7-4363-98f0-f63ce9f53af2",
+      "name": "Apelsinjuice",
+      "watchlistText": "Apelsinjuice",
+      "fullURLPath": "Mejeri-Ost/Juice-Fruktdryck/Apelsinjuice",
+      "parentCategoryId": "c4e30eb9-a7e6-4a1b-9f99-9f60edc4cadd",
+      "departmentId": "7aac2fb3-4bf5-4763-9610-fd2ad3ef930a",
+      "retailerCategoryId": "2587",
+      "productCount": 29
+    },
+    {
+      "id": "9d32a56a-aad2-4c69-a8db-640657dc43b1",
+      "name": "Aubergine",
+      "watchlistText": "Aubergine",
+      "fullURLPath": "Frukt-Grönt/Grönsaker/Aubergine",
+      "parentCategoryId": "6395d7ab-beee-4895-b733-cbfe2b63c069",
+      "departmentId": "f82845b1-7be6-4e08-8b5d-7f2c0f0a7d38",
+      "retailerCategoryId": "4530",
+      "productCount": 2
+    },
+    {
+      "id": "3a1d2f8e-0c4d-4f3d-ad25-0719d64707ce",
+      "name": "Avokado",
+      "watchlistText": "Avokado",
+      "fullURLPath": "Frukt-Grönt/Frukt/Avokado",
+      "parentCategoryId": "18d60b20-1c1a-4023-92f4-6c18facf3915",
+      "departmentId": "f82845b1-7be6-4e08-8b5d-7f2c0f0a7d38",
+      "retailerCategoryId": "3415",
+      "productCount": 5
+    },
+    {
+      "id": "5453158f-fde8-4ee8-ac69-481dee8b48ed",
+      "name": "Babykläder",
+      "watchlistText": "Babykläder",
+      "fullURLPath": "Kläder-Accessoarer/Babykläder",
+      "parentCategoryId": "ac8a89ea-5c01-476f-bbb8-3c05526780d7",
+      "departmentId": "ac8a89ea-5c01-476f-bbb8-3c05526780d7"
+    },
+    {
+      "id": "e69d38a9-b082-424e-93bb-a972009a32c1",
+      "name": "Bacon & stekfläsk",
+      "watchlistText": "Bacon & stekfläsk",
+      "fullURLPath": "Kött-Chark-Fågel/Matchark/Bacon-stekfläsk",
+      "parentCategoryId": "dd850748-c56e-4aa3-bd97-81281fea9bae",
+      "departmentId": "c0a4a3ed-f97c-4b2f-81ca-dcc9a7e044f7",
+      "retailerCategoryId": "1548",
+      "productCount": 36
+    },
+    {
+      "id": "7589e52e-ec8f-43f5-bc41-5d87781e57e7",
+      "name": "Badrum",
+      "watchlistText": "Badrum",
+      "fullURLPath": "Hem-Inredning/Badrum",
+      "parentCategoryId": "898d465a-1c6b-487a-9be1-31fac1cc4014",
+      "departmentId": "898d465a-1c6b-487a-9be1-31fac1cc4014"
+    },
+    {
+      "id": "aa746c6e-6c53-4045-869c-b82e365fd6cd",
+      "name": "Bakpotatis",
+      "watchlistText": "Bakpotatis",
+      "fullURLPath": "Frukt-Grönt/Potatis/Bakpotatis",
+      "parentCategoryId": "c5b9394b-20ac-4f52-93b9-f7dd1fd09e00",
+      "departmentId": "f82845b1-7be6-4e08-8b5d-7f2c0f0a7d38",
+      "retailerCategoryId": "4728",
+      "productCount": 2
+    },
+    {
+      "id": "f9c0d07e-86e2-4daa-bff8-0a5a9ee97c6d",
+      "name": "Banan",
+      "watchlistText": "Banan",
+      "fullURLPath": "Frukt-Grönt/Frukt/Banan",
+      "parentCategoryId": "18d60b20-1c1a-4023-92f4-6c18facf3915",
+      "departmentId": "f82845b1-7be6-4e08-8b5d-7f2c0f0a7d38",
+      "retailerCategoryId": "675",
+      "productCount": 4
+    },
+    {
+      "id": "f455948e-9183-430b-aa77-50e279220909",
+      "name": "Barn & Ungdomsböcker",
+      "watchlistText": "Barn & Ungdomsböcker",
+      "fullURLPath": "Barn/Barn-Ungdomsböcker",
+      "parentCategoryId": "ac8a89ea-5c01-476f-bbb8-3c05526780d7",
+      "departmentId": "ac8a89ea-5c01-476f-bbb8-3c05526780d7"
+    },
+    {
+      "id": "8504d61f-c9e8-4fc4-81a6-6bc3819fbc78",
+      "name": "Barn- & Babyvård",
+      "watchlistText": "Barn- & Babyvård",
+      "fullURLPath": "Barn/Barn-Babyvård",
+      "parentCategoryId": "ac8a89ea-5c01-476f-bbb8-3c05526780d7",
+      "departmentId": "ac8a89ea-5c01-476f-bbb8-3c05526780d7"
+    },
+    {
+      "id": "ea0d4d28-c362-4d08-9bd9-15292aa4f342",
+      "name": "Barngröt & Välling",
+      "watchlistText": "Barngröt & Välling",
+      "fullURLPath": "Barn/Barngröt-Välling",
+      "parentCategoryId": "ac8a89ea-5c01-476f-bbb8-3c05526780d7",
+      "departmentId": "ac8a89ea-5c01-476f-bbb8-3c05526780d7"
+    },
+    {
+      "id": "62b74f20-4ac5-4f6f-9914-c2e55778499d",
+      "name": "Barnkalas",
+      "watchlistText": "Barnkalas",
+      "fullURLPath": "Barn/Barnkalas",
+      "parentCategoryId": "ac8a89ea-5c01-476f-bbb8-3c05526780d7",
+      "departmentId": "ac8a89ea-5c01-476f-bbb8-3c05526780d7"
+    },
+    {
+      "id": "a9807c3f-5215-4e31-9af5-1da9b9214c46",
+      "name": "Barnkläder",
+      "watchlistText": "Barnkläder",
+      "fullURLPath": "Kläder-Accessoarer/Barnkläder",
+      "parentCategoryId": "ac8a89ea-5c01-476f-bbb8-3c05526780d7",
+      "departmentId": "ac8a89ea-5c01-476f-bbb8-3c05526780d7"
+    },
+    {
+      "id": "d1201a6f-6f03-4c7f-9cd3-b3ddaa0f6bea",
+      "name": "Barnmat",
+      "watchlistText": "Barnmat",
+      "fullURLPath": "Barn/Barnmat",
+      "parentCategoryId": "ac8a89ea-5c01-476f-bbb8-3c05526780d7",
+      "departmentId": "ac8a89ea-5c01-476f-bbb8-3c05526780d7"
+    },
+    {
+      "id": "1a91939a-030e-49b5-b22f-ef0864ec7691",
+      "name": "Barnyoghurt",
+      "watchlistText": "Barnyoghurt",
+      "fullURLPath": "Mejeri-Ost/Yoghurt/Barnyoghurt",
+      "parentCategoryId": "f6a0d5e7-b4c8-435b-9eb4-14cbafd8409b",
+      "departmentId": "7aac2fb3-4bf5-4763-9610-fd2ad3ef930a",
+      "retailerCategoryId": "1236",
+      "productCount": 10
+    },
+    {
+      "id": "6a8362a7-859c-47f7-9737-800f8d81113a",
+      "name": "Basilika",
+      "watchlistText": "Basilika",
+      "fullURLPath": "Frukt-Grönt/Färska-kryddor/Basilika",
+      "parentCategoryId": "34ac4412-f004-47ef-ae7c-047841f42c24",
+      "departmentId": "f82845b1-7be6-4e08-8b5d-7f2c0f0a7d38",
+      "retailerCategoryId": "1074",
+      "productCount": 4
+    },
+    {
+      "id": "d0ef8e84-b384-42e6-a07c-79cdded71081",
+      "name": "Belysning",
+      "watchlistText": "Belysning",
+      "fullURLPath": "Hem-Inredning/Belysning",
+      "parentCategoryId": "898d465a-1c6b-487a-9be1-31fac1cc4014",
+      "departmentId": "898d465a-1c6b-487a-9be1-31fac1cc4014"
+    },
+    {
+      "id": "c69802f5-c51c-4c07-a2b7-02b9f52d7e2d",
+      "name": "Betor",
+      "watchlistText": "Betor",
+      "fullURLPath": "Frukt-Grönt/Rotfrukter/Betor",
+      "parentCategoryId": "c03f7cb4-d742-46c2-8872-a79345413ce7",
+      "departmentId": "f82845b1-7be6-4e08-8b5d-7f2c0f0a7d38",
+      "retailerCategoryId": "4547",
+      "productCount": 6
+    },
+    {
+      "id": "c3fcc576-a726-440d-9e44-75f8e3683432",
+      "name": "Biltillbehör",
+      "watchlistText": "Biltillbehör",
+      "fullURLPath": "Fritid/Biltillbehör",
+      "parentCategoryId": "a45a055c-66e1-4edc-a02a-2098bb2e9e46",
+      "departmentId": "a45a055c-66e1-4edc-a02a-2098bb2e9e46"
+    },
+    {
+      "id": "2eff4fd7-49bf-4803-b1ae-504e9bc5b4ad",
+      "name": "Blandfärs",
+      "watchlistText": "Blandfärs",
+      "fullURLPath": "Kött-Chark-Fågel/Köttfärs/Blandfärs",
+      "parentCategoryId": "68c65d92-4160-4761-a547-6e5fcec34466",
+      "departmentId": "c0a4a3ed-f97c-4b2f-81ca-dcc9a7e044f7",
+      "retailerCategoryId": "1386",
+      "productCount": 8
+    },
+    {
+      "id": "4ac4aa19-ab90-430c-8b60-4cd5cf692a54",
+      "name": "Blodpudding",
+      "watchlistText": "Blodpudding",
+      "fullURLPath": "Kött-Chark-Fågel/Matchark/Blodpudding",
+      "parentCategoryId": "dd850748-c56e-4aa3-bd97-81281fea9bae",
+      "departmentId": "c0a4a3ed-f97c-4b2f-81ca-dcc9a7e044f7",
+      "retailerCategoryId": "1472",
+      "productCount": 4
+    },
+    {
+      "id": "04c39a8e-b793-4d76-b1e6-53b2018cfcaf",
+      "name": "Blomkål",
+      "watchlistText": "Blomkål",
+      "fullURLPath": "Frukt-Grönt/Kål/Blomkål",
+      "parentCategoryId": "1db9c37c-87ea-4d92-84d4-5670eaaeb018",
+      "departmentId": "f82845b1-7be6-4e08-8b5d-7f2c0f0a7d38",
+      "retailerCategoryId": "4528",
+      "productCount": 1
+    },
+    {
+      "id": "ce84adfb-d9bc-460b-b71d-1808d4ee1566",
+      "name": "Blomtillbehör",
+      "watchlistText": "Blomtillbehör",
+      "fullURLPath": "Blommor-Trädgård/Blomtillbehör",
+      "parentCategoryId": "71542409-5f2e-4ae3-9ad7-6751e10afb38",
+      "departmentId": "71542409-5f2e-4ae3-9ad7-6751e10afb38"
+    },
+    {
+      "id": "911f287b-a861-465e-8ed6-ed324be687aa",
+      "name": "Blåbär",
+      "watchlistText": "Blåbär",
+      "fullURLPath": "Frukt-Grönt/Färska-bär/Blåbär",
+      "parentCategoryId": "67601f4b-c7e4-42ae-af1a-204ec5f57530",
+      "departmentId": "f82845b1-7be6-4e08-8b5d-7f2c0f0a7d38",
+      "retailerCategoryId": "1377",
+      "productCount": 4
+    },
+    {
+      "id": "9dacd6ae-f4a6-4873-a697-c9d30a746534",
+      "name": "Blöjor & Tvättservetter",
+      "watchlistText": "Blöjor & Tvättservetter",
+      "fullURLPath": "Barn/Blöjor-Tvättservetter",
+      "parentCategoryId": "ac8a89ea-5c01-476f-bbb8-3c05526780d7",
+      "departmentId": "ac8a89ea-5c01-476f-bbb8-3c05526780d7"
+    },
+    {
+      "id": "f77fbf7e-03d5-4201-8166-568ab367a643",
+      "name": "Bordsask margarin",
+      "watchlistText": "Bordsask margarin",
+      "fullURLPath": "Mejeri-Ost/Smör-Margarin/Bordsask-margarin",
+      "parentCategoryId": "876bd9ea-151c-492a-999d-1249cdd4a617",
+      "departmentId": "7aac2fb3-4bf5-4763-9610-fd2ad3ef930a",
+      "retailerCategoryId": "4665",
+      "productCount": 23
+    },
+    {
+      "id": "9a77ca64-c798-4c76-9e1f-3aa0567c6194",
+      "name": "Bordsask smör",
+      "watchlistText": "Bordsask smör",
+      "fullURLPath": "Mejeri-Ost/Smör-Margarin/Bordsask-smör",
+      "parentCategoryId": "876bd9ea-151c-492a-999d-1249cdd4a617",
+      "departmentId": "7aac2fb3-4bf5-4763-9610-fd2ad3ef930a",
+      "retailerCategoryId": "277",
+      "productCount": 20
+    },
+    {
+      "id": "dc8e18f0-acd3-469f-8ea8-9f7f15886db9",
+      "name": "Brandsäkerhet",
+      "watchlistText": "Brandsäkerhet",
+      "fullURLPath": "Hem-Inredning/Brandsäkerhet",
+      "parentCategoryId": "898d465a-1c6b-487a-9be1-31fac1cc4014",
+      "departmentId": "898d465a-1c6b-487a-9be1-31fac1cc4014"
+    },
+    {
+      "id": "a59d40b5-08f2-4fd4-859c-d85eb44e09d8",
+      "name": "Broccoli",
+      "watchlistText": "Broccoli",
+      "fullURLPath": "Frukt-Grönt/Kål/Broccoli",
+      "parentCategoryId": "1db9c37c-87ea-4d92-84d4-5670eaaeb018",
+      "departmentId": "f82845b1-7be6-4e08-8b5d-7f2c0f0a7d38",
+      "retailerCategoryId": "4529",
+      "productCount": 3
+    },
+    {
+      "id": "76939032-aec5-47e3-a2a6-77826d46b774",
+      "name": "Böcker & Tidningar",
+      "watchlistText": "Böcker & Tidningar",
+      "fullURLPath": "Fritid/Böcker-Tidningar",
+      "parentCategoryId": "a45a055c-66e1-4edc-a02a-2098bb2e9e46",
+      "departmentId": "a45a055c-66e1-4edc-a02a-2098bb2e9e46"
+    },
+    {
+      "id": "f092d4cd-ef86-49fa-b5a5-200ba09fca76",
+      "name": "Bönor, linser & fröer",
+      "watchlistText": "Bönor, linser & fröer",
+      "fullURLPath": "Skafferi/Bönor-linser-fröer",
+      "parentCategoryId": "f4882652-d405-4cd1-876c-247667adc392",
+      "departmentId": "f4882652-d405-4cd1-876c-247667adc392"
+    },
+    {
+      "id": "6ab34ce3-167f-42f4-9e88-efa76970d09b",
+      "name": "Chips & snacks",
+      "watchlistText": "Chips & snacks",
+      "fullURLPath": "Glass-Godis-Snacks/Chips-snacks",
+      "parentCategoryId": "bb534c25-3729-48bc-b9cc-c4516145879c",
+      "departmentId": "bb534c25-3729-48bc-b9cc-c4516145879c"
+    },
+    {
+      "id": "1fa477c3-52d0-4203-a6a7-89f3b35d37fc",
+      "name": "Choklad",
+      "watchlistText": "Choklad",
+      "fullURLPath": "Glass-Godis-Snacks/Choklad",
+      "parentCategoryId": "bb534c25-3729-48bc-b9cc-c4516145879c",
+      "departmentId": "bb534c25-3729-48bc-b9cc-c4516145879c"
+    },
+    {
+      "id": "47e62fe8-5f76-40ae-a65b-539954101540",
+      "name": "Cigaretter",
+      "watchlistText": "Cigaretter",
+      "fullURLPath": "Tobak/Cigaretter",
+      "parentCategoryId": "4d09b54a-c6f7-4898-8aac-b089712f7e76",
+      "departmentId": "4d09b54a-c6f7-4898-8aac-b089712f7e76"
+    },
+    {
+      "id": "44f4c403-70ca-415a-97df-9cd8ad863dd0",
+      "name": "Citronmeliss",
+      "watchlistText": "Citronmeliss",
+      "fullURLPath": "Frukt-Grönt/Färska-kryddor/Citronmeliss",
+      "parentCategoryId": "34ac4412-f004-47ef-ae7c-047841f42c24",
+      "departmentId": "f82845b1-7be6-4e08-8b5d-7f2c0f0a7d38",
+      "retailerCategoryId": "4560",
+      "productCount": 2
+    },
+    {
+      "id": "a452d7a6-f1cc-4f9e-affa-49d6106a4c42",
+      "name": "Citrusfrukt",
+      "watchlistText": "Citrusfrukt",
+      "fullURLPath": "Frukt-Grönt/Frukt/Citrusfrukt",
+      "parentCategoryId": "18d60b20-1c1a-4023-92f4-6c18facf3915",
+      "departmentId": "f82845b1-7be6-4e08-8b5d-7f2c0f0a7d38",
+      "retailerCategoryId": "4917",
+      "productCount": 14
+    },
+    {
+      "id": "365feebb-1164-493b-8a20-47e203187e6d",
+      "name": "Citrusjuice & Lemonad",
+      "watchlistText": "Citrusjuice & Lemonad",
+      "fullURLPath": "Mejeri-Ost/Juice-Fruktdryck/Citrusjuice-Lemonad",
+      "parentCategoryId": "c4e30eb9-a7e6-4a1b-9f99-9f60edc4cadd",
+      "departmentId": "7aac2fb3-4bf5-4763-9610-fd2ad3ef930a",
+      "retailerCategoryId": "2588",
+      "productCount": 12
+    },
+    {
+      "id": "eadb0914-c274-4d75-854d-8432a50ceeff",
+      "name": "Cosmopolitan",
+      "watchlistText": "Cosmopolitan",
+      "fullURLPath": "Frukt-Grönt/Grönsaker/Sallad/Cosmopolitan",
+      "parentCategoryId": "da43879d-6b3c-4835-922e-098e8fde7833",
+      "departmentId": "f82845b1-7be6-4e08-8b5d-7f2c0f0a7d38",
+      "retailerCategoryId": "4588",
+      "productCount": 1
+    },
+    {
+      "id": "02f8b6c4-2d82-40ba-9110-1c6bfd651e4a",
+      "name": "Cottage cheese",
+      "watchlistText": "Cottage cheese",
+      "fullURLPath": "Mejeri-Ost/Cottage-cheese",
+      "parentCategoryId": "7aac2fb3-4bf5-4763-9610-fd2ad3ef930a",
+      "departmentId": "7aac2fb3-4bf5-4763-9610-fd2ad3ef930a"
+    },
+    {
+      "id": "107df3c2-03fe-4c83-b721-2867539fa99e",
+      "name": "Crème fraiche",
+      "watchlistText": "Crème fraiche",
+      "fullURLPath": "Mejeri-Ost/Crème-fraiche",
+      "parentCategoryId": "7aac2fb3-4bf5-4763-9610-fd2ad3ef930a",
+      "departmentId": "7aac2fb3-4bf5-4763-9610-fd2ad3ef930a"
+    },
+    {
+      "id": "2d27612b-5109-4eef-b5bb-fcbbb4cbbc88",
+      "name": "Crunchita",
+      "watchlistText": "Crunchita",
+      "fullURLPath": "Frukt-Grönt/Grönsaker/Sallad/Crunchita",
+      "parentCategoryId": "da43879d-6b3c-4835-922e-098e8fde7833",
+      "departmentId": "f82845b1-7be6-4e08-8b5d-7f2c0f0a7d38",
+      "retailerCategoryId": "4589",
+      "productCount": 1
+    },
+    {
+      "id": "0ea7ce1d-98db-499d-9eda-d2aa6bbc169b",
+      "name": "Cykeltillbehör & Hjälmar",
+      "watchlistText": "Cykeltillbehör & Hjälmar",
+      "fullURLPath": "Fritid/Cykeltillbehör-Hjälmar",
+      "parentCategoryId": "a45a055c-66e1-4edc-a02a-2098bb2e9e46",
+      "departmentId": "a45a055c-66e1-4edc-a02a-2098bb2e9e46"
+    },
+    {
+      "id": "4bbc68fa-9d11-4780-bf86-0d4b7d1bdf77",
+      "name": "Dadlar",
+      "watchlistText": "Dadlar",
+      "fullURLPath": "Frukt-Grönt/Frukt/Exotisk-frukt/Dadlar",
+      "parentCategoryId": "83676072-0bbe-4b65-92ed-d09c14c452b9",
+      "departmentId": "f82845b1-7be6-4e08-8b5d-7f2c0f0a7d38",
+      "retailerCategoryId": "4879",
+      "productCount": 19
+    },
+    {
+      "id": "89e02379-1a68-462e-aeab-b706c6c78329",
+      "name": "Damkläder",
+      "watchlistText": "Damkläder",
+      "fullURLPath": "Kläder-Accessoarer/Damkläder",
+      "parentCategoryId": "a6c5191e-77ac-4dae-a6e8-da5b0aba93e0",
+      "departmentId": "a6c5191e-77ac-4dae-a6e8-da5b0aba93e0"
+    },
+    {
+      "id": "04ec4754-e6ef-4941-b18a-c481eb43b9df",
+      "name": "Delikatesspotatis",
+      "watchlistText": "Delikatesspotatis",
+      "fullURLPath": "Frukt-Grönt/Potatis/Delikatesspotatis",
+      "parentCategoryId": "c5b9394b-20ac-4f52-93b9-f7dd1fd09e00",
+      "departmentId": "f82845b1-7be6-4e08-8b5d-7f2c0f0a7d38",
+      "retailerCategoryId": "4727",
+      "productCount": 10
+    },
+    {
+      "id": "79682d3f-bcd6-47b2-b01c-36c4cd8f0248",
+      "name": "Desserter",
+      "watchlistText": "Desserter",
+      "fullURLPath": "Skafferi/Desserter",
+      "parentCategoryId": "f4882652-d405-4cd1-876c-247667adc392",
+      "departmentId": "f4882652-d405-4cd1-876c-247667adc392"
+    },
+    {
+      "id": "09a8815f-bc53-4f56-b4d3-7ea35cf53955",
+      "name": "Dessertost",
+      "watchlistText": "Dessertost",
+      "fullURLPath": "Mejeri-Ost/Ost/Dessertost",
+      "parentCategoryId": "342706ff-6dd8-4e9d-9ab3-8ff5aac99dd1",
+      "departmentId": "7aac2fb3-4bf5-4763-9610-fd2ad3ef930a",
+      "retailerCategoryId": "270",
+      "productCount": 140
+    },
+    {
+      "id": "18732480-dc49-48e3-824e-a65de9f2174b",
+      "name": "Dill",
+      "watchlistText": "Dill",
+      "fullURLPath": "Frukt-Grönt/Färska-kryddor/Dill",
+      "parentCategoryId": "34ac4412-f004-47ef-ae7c-047841f42c24",
+      "departmentId": "f82845b1-7be6-4e08-8b5d-7f2c0f0a7d38",
+      "retailerCategoryId": "1072",
+      "productCount": 2
+    },
+    {
+      "id": "72a1fa3c-e975-4160-89d5-d0b160d4af93",
+      "name": "Disk",
+      "watchlistText": "Disk",
+      "fullURLPath": "Städ-Tvätt-Papper/Disk",
+      "parentCategoryId": "563524de-aa3c-49b6-a9d0-27924320f035",
+      "departmentId": "563524de-aa3c-49b6-a9d0-27924320f035"
+    },
+    {
+      "id": "064ccc7e-5f1a-4c7f-9517-cffb2771e28c",
+      "name": "Djurvård",
+      "watchlistText": "Djurvård",
+      "fullURLPath": "Djur/Djurvård",
+      "parentCategoryId": "555f311d-70ca-4bd8-bd50-921545531f89",
+      "departmentId": "555f311d-70ca-4bd8-bd50-921545531f89"
+    },
+    {
+      "id": "f15158b2-6d01-4b54-9fe2-0500c0b7cfa2",
+      "name": "Dragon",
+      "watchlistText": "Dragon",
+      "fullURLPath": "Frukt-Grönt/Färska-kryddor/Dragon",
+      "parentCategoryId": "34ac4412-f004-47ef-ae7c-047841f42c24",
+      "departmentId": "f82845b1-7be6-4e08-8b5d-7f2c0f0a7d38",
+      "retailerCategoryId": "4557",
+      "productCount": 1
+    },
+    {
+      "id": "98b2145a-ca3d-47f6-8b87-ec9345e9ad93",
+      "name": "Drickyoghurt",
+      "watchlistText": "Drickyoghurt",
+      "fullURLPath": "Mejeri-Ost/Yoghurt/Drickyoghurt",
+      "parentCategoryId": "f6a0d5e7-b4c8-435b-9eb4-14cbafd8409b",
+      "departmentId": "7aac2fb3-4bf5-4763-9610-fd2ad3ef930a",
+      "retailerCategoryId": "1728",
+      "productCount": 24
+    },
+    {
+      "id": "10d7c0ee-e1e8-418b-89e8-cd45c160630b",
+      "name": "Drinkmix & koncentrat",
+      "watchlistText": "Drinkmix & koncentrat",
+      "fullURLPath": "Dryck/Drinkmix-koncentrat",
+      "parentCategoryId": "34948432-df3c-4468-991b-f0db32126003",
+      "departmentId": "34948432-df3c-4468-991b-f0db32126003"
+    },
+    {
+      "id": "e47d117a-8382-4cc4-8154-48ab2602806f",
+      "name": "Druvor",
+      "watchlistText": "Druvor",
+      "fullURLPath": "Frukt-Grönt/Frukt/Druvor",
+      "parentCategoryId": "18d60b20-1c1a-4023-92f4-6c18facf3915",
+      "departmentId": "f82845b1-7be6-4e08-8b5d-7f2c0f0a7d38",
+      "retailerCategoryId": "682",
+      "productCount": 5
+    },
+    {
+      "id": "c55fe742-3250-45ec-a6e4-4873c2d945dd",
+      "name": "Duka & Servera",
+      "watchlistText": "Duka & Servera",
+      "fullURLPath": "Kök/Duka-Servera",
+      "parentCategoryId": "a0bceaa9-e61a-470f-9566-d46aae9b5b74",
+      "departmentId": "a0bceaa9-e61a-470f-9566-d46aae9b5b74"
+    },
+    {
+      "id": "0ea62c6a-a35b-47df-a8e1-ae150c76db37",
+      "name": "Energi",
+      "watchlistText": "Energi",
+      "fullURLPath": "Träning-Återhämtning/Energi",
+      "parentCategoryId": "e128adca-fd5e-4b7e-a34e-a0badfe367ac",
+      "departmentId": "e128adca-fd5e-4b7e-a34e-a0badfe367ac"
+    },
+    {
+      "id": "b2a28421-4651-4bc5-90f5-0b35ba48661d",
+      "name": "Energidryck & Sportdryck",
+      "watchlistText": "Energidryck & Sportdryck",
+      "fullURLPath": "Träning-Återhämtning/Energidryck-Sportdryck",
+      "parentCategoryId": "34948432-df3c-4468-991b-f0db32126003",
+      "departmentId": "34948432-df3c-4468-991b-f0db32126003"
+    },
+    {
+      "id": "3f1b513a-fc4e-4ea0-a4e9-e21c646b659b",
+      "name": "Engångsartiklar",
+      "watchlistText": "Engångsartiklar",
+      "fullURLPath": "Kök/Engångsartiklar",
+      "parentCategoryId": "a0bceaa9-e61a-470f-9566-d46aae9b5b74",
+      "departmentId": "a0bceaa9-e61a-470f-9566-d46aae9b5b74"
+    },
+    {
+      "id": "e4a73ce4-fa49-47a0-b22c-1570f3da88ed",
+      "name": "Entrecôte",
+      "watchlistText": "Entrecôte",
+      "fullURLPath": "Kött-Chark-Fågel/Kött/Nötkött/Entrecôte",
+      "parentCategoryId": "db4dd486-6cf9-496b-b7e2-f9b0f95aba2a",
+      "departmentId": "c0a4a3ed-f97c-4b2f-81ca-dcc9a7e044f7",
+      "retailerCategoryId": "4745",
+      "productCount": 8
+    },
+    {
+      "id": "75a67bc0-3d07-44b8-b832-913dae584eaa",
+      "name": "Falukorv",
+      "watchlistText": "Falukorv",
+      "fullURLPath": "Kött-Chark-Fågel/Korv/Falukorv",
+      "parentCategoryId": "68ed3c20-58e3-44d6-a95b-24ece4612260",
+      "departmentId": "c0a4a3ed-f97c-4b2f-81ca-dcc9a7e044f7",
+      "retailerCategoryId": "51",
+      "productCount": 17
+    },
+    {
+      "id": "86358231-d741-4482-938f-440b74ec2c27",
+      "name": "Fast potatis",
+      "watchlistText": "Fast potatis",
+      "fullURLPath": "Frukt-Grönt/Potatis/Fast-potatis",
+      "parentCategoryId": "c5b9394b-20ac-4f52-93b9-f7dd1fd09e00",
+      "departmentId": "f82845b1-7be6-4e08-8b5d-7f2c0f0a7d38",
+      "retailerCategoryId": "4725",
+      "productCount": 5
+    },
+    {
+      "id": "a1a2559b-a2b5-41e3-a5f4-f31a1f120766",
+      "name": "Fikon",
+      "watchlistText": "Fikon",
+      "fullURLPath": "Frukt-Grönt/Frukt/Exotisk-frukt/Fikon",
+      "parentCategoryId": "83676072-0bbe-4b65-92ed-d09c14c452b9",
+      "departmentId": "f82845b1-7be6-4e08-8b5d-7f2c0f0a7d38",
+      "retailerCategoryId": "4883",
+      "productCount": 1
+    },
+    {
+      "id": "d312e68f-2cda-44d4-b2f6-a414855ae6e8",
+      "name": "Filmjölk",
+      "watchlistText": "Filmjölk",
+      "fullURLPath": "Mejeri-Ost/Filmjölk",
+      "parentCategoryId": "7aac2fb3-4bf5-4763-9610-fd2ad3ef930a",
+      "departmentId": "7aac2fb3-4bf5-4763-9610-fd2ad3ef930a"
+    },
+    {
+      "id": "0cae5f1b-e8c8-4a27-b8c4-7fb95069e1da",
+      "name": "Fisk",
+      "watchlistText": "Fisk",
+      "fullURLPath": "Fisk-Skaldjur/Fisk",
+      "parentCategoryId": "fc0292c5-c74d-4229-9577-ec302310430f",
+      "departmentId": "fc0292c5-c74d-4229-9577-ec302310430f"
+    },
+    {
+      "id": "f9aaf11f-e7f0-4f0b-a597-7a66339ebde9",
+      "name": "Fisk & köttkonserver",
+      "watchlistText": "Fisk & köttkonserver",
+      "fullURLPath": "Skafferi/Fisk-köttkonserver",
+      "parentCategoryId": "f4882652-d405-4cd1-876c-247667adc392",
+      "departmentId": "f4882652-d405-4cd1-876c-247667adc392"
+    },
+    {
+      "id": "b00bf1f1-b1b9-412f-a503-706da36859e2",
+      "name": "Fixa",
+      "watchlistText": "Fixa",
+      "fullURLPath": "Fritid/Fixa",
+      "parentCategoryId": "a45a055c-66e1-4edc-a02a-2098bb2e9e46",
+      "departmentId": "a45a055c-66e1-4edc-a02a-2098bb2e9e46"
+    },
+    {
+      "id": "b2da019c-bb92-4ce9-9013-53174e9594d3",
+      "name": "Flankstek",
+      "watchlistText": "Flankstek",
+      "fullURLPath": "Kött-Chark-Fågel/Kött/Nötkött/Flankstek",
+      "parentCategoryId": "db4dd486-6cf9-496b-b7e2-f9b0f95aba2a",
+      "departmentId": "c0a4a3ed-f97c-4b2f-81ca-dcc9a7e044f7",
+      "retailerCategoryId": "4746",
+      "productCount": 4
+    },
+    {
+      "id": "5b2224ba-f8a8-4501-9ee8-e54b6972d729",
+      "name": "Flingor, müsli & gryner",
+      "watchlistText": "Flingor, müsli & gryner",
+      "fullURLPath": "Skafferi/Flingor-müsli-gryner",
+      "parentCategoryId": "f4882652-d405-4cd1-876c-247667adc392",
+      "departmentId": "f4882652-d405-4cd1-876c-247667adc392"
+    },
+    {
+      "id": "2ba08f2b-8fd9-42e8-b600-a89c4ba41e6c",
+      "name": "Flytande smör & margarin",
+      "watchlistText": "Flytande smör & margarin",
+      "fullURLPath": "Mejeri-Ost/Smör-Margarin/Flytande-smör-margarin",
+      "parentCategoryId": "876bd9ea-151c-492a-999d-1249cdd4a617",
+      "departmentId": "7aac2fb3-4bf5-4763-9610-fd2ad3ef930a",
+      "retailerCategoryId": "278",
+      "productCount": 9
+    },
+    {
+      "id": "d449840e-8fdb-498b-b14e-db8a47b551ca",
+      "name": "Fläskfilé",
+      "watchlistText": "Fläskfilé",
+      "fullURLPath": "Kött-Chark-Fågel/Kött/Fläsk/Fläskfilé",
+      "parentCategoryId": "74dfbe91-d9b0-49d6-acc4-ebcb9614f73a",
+      "departmentId": "c0a4a3ed-f97c-4b2f-81ca-dcc9a7e044f7",
+      "retailerCategoryId": "4953",
+      "productCount": 4
+    },
+    {
+      "id": "f755f624-efda-4a4c-8d10-05c7db515fdd",
+      "name": "Fläskfärs",
+      "watchlistText": "Fläskfärs",
+      "fullURLPath": "Kött-Chark-Fågel/Kött/Fläsk/Fläskfärs",
+      "parentCategoryId": "74dfbe91-d9b0-49d6-acc4-ebcb9614f73a",
+      "departmentId": "c0a4a3ed-f97c-4b2f-81ca-dcc9a7e044f7",
+      "retailerCategoryId": "1385",
+      "productCount": 7
+    },
+    {
+      "id": "c7f6f0b3-b566-4627-a88f-3b00572d46be",
+      "name": "Fläskkarré",
+      "watchlistText": "Fläskkarré",
+      "fullURLPath": "Kött-Chark-Fågel/Kött/Fläsk/Fläskkarré",
+      "parentCategoryId": "74dfbe91-d9b0-49d6-acc4-ebcb9614f73a",
+      "departmentId": "c0a4a3ed-f97c-4b2f-81ca-dcc9a7e044f7",
+      "retailerCategoryId": "4954",
+      "productCount": 13
+    },
+    {
+      "id": "3eecc1af-85f5-4827-b72c-c88aba7ecab8",
+      "name": "Fläskkorv",
+      "watchlistText": "Fläskkorv",
+      "fullURLPath": "Kött-Chark-Fågel/Korv/Fläskkorv",
+      "parentCategoryId": "68ed3c20-58e3-44d6-a95b-24ece4612260",
+      "departmentId": "c0a4a3ed-f97c-4b2f-81ca-dcc9a7e044f7",
+      "retailerCategoryId": "59",
+      "productCount": 1
+    },
+    {
+      "id": "5c3a20b3-d854-4df9-a7ca-fcc89bfd5ac7",
+      "name": "Fläskkotlett",
+      "watchlistText": "Fläskkotlett",
+      "fullURLPath": "Kött-Chark-Fågel/Kött/Fläsk/Fläskkotlett",
+      "parentCategoryId": "74dfbe91-d9b0-49d6-acc4-ebcb9614f73a",
+      "departmentId": "c0a4a3ed-f97c-4b2f-81ca-dcc9a7e044f7",
+      "retailerCategoryId": "4955",
+      "productCount": 10
+    },
+    {
+      "id": "b1c41734-3295-443e-9f13-d6c04ceed998",
+      "name": "Fläsklägg",
+      "watchlistText": "Fläsklägg",
+      "fullURLPath": "Kött-Chark-Fågel/Kött/Fläsk/Fläsklägg",
+      "parentCategoryId": "74dfbe91-d9b0-49d6-acc4-ebcb9614f73a",
+      "departmentId": "c0a4a3ed-f97c-4b2f-81ca-dcc9a7e044f7",
+      "retailerCategoryId": "4956",
+      "productCount": 2
+    },
+    {
+      "id": "20449f02-5cff-45a6-876c-298703234ce7",
+      "name": "Fläskschnitzel",
+      "watchlistText": "Fläskschnitzel",
+      "fullURLPath": "Kött-Chark-Fågel/Kött/Fläsk/Fläskschnitzel",
+      "parentCategoryId": "74dfbe91-d9b0-49d6-acc4-ebcb9614f73a",
+      "departmentId": "c0a4a3ed-f97c-4b2f-81ca-dcc9a7e044f7",
+      "retailerCategoryId": "4957",
+      "productCount": 2
+    },
+    {
+      "id": "4be58255-3f07-41a0-8fa4-1299a007cc72",
+      "name": "Fläskytterfilé",
+      "watchlistText": "Fläskytterfilé",
+      "fullURLPath": "Kött-Chark-Fågel/Kött/Fläsk/Fläskytterfilé",
+      "parentCategoryId": "74dfbe91-d9b0-49d6-acc4-ebcb9614f73a",
+      "departmentId": "c0a4a3ed-f97c-4b2f-81ca-dcc9a7e044f7",
+      "retailerCategoryId": "4958",
+      "productCount": 6
+    },
+    {
+      "id": "e6036a2a-c9ac-4300-8d25-a52f060300ee",
+      "name": "Fransyska",
+      "watchlistText": "Fransyska",
+      "fullURLPath": "Kött-Chark-Fågel/Kött/Nötkött/Fransyska",
+      "parentCategoryId": "db4dd486-6cf9-496b-b7e2-f9b0f95aba2a",
+      "departmentId": "c0a4a3ed-f97c-4b2f-81ca-dcc9a7e044f7",
+      "retailerCategoryId": "4747",
+      "productCount": 2
+    },
+    {
+      "id": "c7e1b13c-4d60-4f7c-9d50-af380a4c1100",
+      "name": "Frukostkorv",
+      "watchlistText": "Frukostkorv",
+      "fullURLPath": "Kött-Chark-Fågel/Korv/Frukostkorv",
+      "parentCategoryId": "68ed3c20-58e3-44d6-a95b-24ece4612260",
+      "departmentId": "c0a4a3ed-f97c-4b2f-81ca-dcc9a7e044f7",
+      "retailerCategoryId": "53",
+      "productCount": 2
+    },
+    {
+      "id": "aac2b911-7a14-4881-9e71-01f473fb6dd0",
+      "name": "Fruktdryck",
+      "watchlistText": "Fruktdryck",
+      "fullURLPath": "Mejeri-Ost/Juice-Fruktdryck/Fruktdryck",
+      "parentCategoryId": "c4e30eb9-a7e6-4a1b-9f99-9f60edc4cadd",
+      "departmentId": "7aac2fb3-4bf5-4763-9610-fd2ad3ef930a",
+      "retailerCategoryId": "2590",
+      "productCount": 67
+    },
+    {
+      "id": "1fa527d7-4927-4c3e-8893-798929a6e967",
+      "name": "Fruktpåsar",
+      "watchlistText": "Fruktpåsar",
+      "fullURLPath": "Frukt-Grönt/Frukt/Fruktpåsar",
+      "parentCategoryId": "18d60b20-1c1a-4023-92f4-6c18facf3915",
+      "departmentId": "f82845b1-7be6-4e08-8b5d-7f2c0f0a7d38",
+      "retailerCategoryId": "2723",
+      "productCount": 10
+    },
+    {
+      "id": "8c016ec5-420a-4e4d-87c7-25949c90d939",
+      "name": "Fryst bröd & dessert",
+      "watchlistText": "Fryst bröd & dessert",
+      "fullURLPath": "Fryst/Fryst-bröd-dessert",
+      "parentCategoryId": "360db808-e41c-463d-8cb1-ec80eb426b37",
+      "departmentId": "360db808-e41c-463d-8cb1-ec80eb426b37"
+    },
+    {
+      "id": "bc4b7fea-8873-4a06-a684-4828fc1c5194",
+      "name": "Fryst fisk & Skaldjur",
+      "watchlistText": "Fryst fisk & Skaldjur",
+      "fullURLPath": "Fryst/Fryst-fisk-Skaldjur",
+      "parentCategoryId": "360db808-e41c-463d-8cb1-ec80eb426b37",
+      "departmentId": "360db808-e41c-463d-8cb1-ec80eb426b37"
+    },
+    {
+      "id": "5edb3eb9-65a2-4136-be59-1b1c3d71e476",
+      "name": "Fryst frukt & bär",
+      "watchlistText": "Fryst frukt & bär",
+      "fullURLPath": "Fryst/Fryst-frukt-bär",
+      "parentCategoryId": "360db808-e41c-463d-8cb1-ec80eb426b37",
+      "departmentId": "360db808-e41c-463d-8cb1-ec80eb426b37"
+    },
+    {
+      "id": "c1223071-8a2e-4dc9-a5a5-6288b18ea95f",
+      "name": "Fryst fågel",
+      "watchlistText": "Fryst fågel",
+      "fullURLPath": "Fryst/Fryst-fågel",
+      "parentCategoryId": "360db808-e41c-463d-8cb1-ec80eb426b37",
+      "departmentId": "360db808-e41c-463d-8cb1-ec80eb426b37"
+    },
+    {
+      "id": "d59fe447-36e6-49be-a5a4-c2946f447ed2",
+      "name": "Fryst färdigmat",
+      "watchlistText": "Fryst färdigmat",
+      "fullURLPath": "Fryst/Fryst-färdigmat",
+      "parentCategoryId": "360db808-e41c-463d-8cb1-ec80eb426b37",
+      "departmentId": "360db808-e41c-463d-8cb1-ec80eb426b37"
+    },
+    {
+      "id": "1070cc2c-7727-4d4f-8f65-58da3b126b12",
+      "name": "Fryst kött & burgare",
+      "watchlistText": "Fryst kött & burgare",
+      "fullURLPath": "Fryst/Fryst-kött-burgare",
+      "parentCategoryId": "360db808-e41c-463d-8cb1-ec80eb426b37",
+      "departmentId": "360db808-e41c-463d-8cb1-ec80eb426b37"
+    },
+    {
+      "id": "19f48756-6028-4361-9473-366e53bd8df7",
+      "name": "Fryst potatis",
+      "watchlistText": "Fryst potatis",
+      "fullURLPath": "Fryst/Fryst-potatis",
+      "parentCategoryId": "360db808-e41c-463d-8cb1-ec80eb426b37",
+      "departmentId": "360db808-e41c-463d-8cb1-ec80eb426b37"
+    },
+    {
+      "id": "8069b325-ba1b-4d63-93e6-19aacfca9723",
+      "name": "Fryst vegetarisk färdigmat",
+      "watchlistText": "Fryst vegetarisk färdigmat",
+      "fullURLPath": "Fryst/Fryst-vegetarisk-färdigmat",
+      "parentCategoryId": "442f3f18-3b3a-484a-ae0d-700be34148ed",
+      "departmentId": "442f3f18-3b3a-484a-ae0d-700be34148ed"
+    },
+    {
+      "id": "947311e0-0931-4699-835b-7fd694e17221",
+      "name": "Frysta grönsaker",
+      "watchlistText": "Frysta grönsaker",
+      "fullURLPath": "Fryst/Frysta-grönsaker",
+      "parentCategoryId": "360db808-e41c-463d-8cb1-ec80eb426b37",
+      "departmentId": "360db808-e41c-463d-8cb1-ec80eb426b37"
+    },
+    {
+      "id": "c2122836-66fb-4f52-b9fd-a272c525a5f0",
+      "name": "Fågel",
+      "watchlistText": "Fågel",
+      "fullURLPath": "Kött-Chark-Fågel/Pålägg/Fågel",
+      "parentCategoryId": "6a7fd157-5a0f-44e0-aff8-318de3bb8a96",
+      "departmentId": "c0a4a3ed-f97c-4b2f-81ca-dcc9a7e044f7",
+      "retailerCategoryId": "45",
+      "productCount": 34
+    },
+    {
+      "id": "d29bb325-8723-48a1-9041-a4b8fbb5636b",
+      "name": "Fågelmat & Tillbehör",
+      "watchlistText": "Fågelmat & Tillbehör",
+      "fullURLPath": "Djur/Fågelmat-Tillbehör",
+      "parentCategoryId": "555f311d-70ca-4bd8-bd50-921545531f89",
+      "departmentId": "555f311d-70ca-4bd8-bd50-921545531f89"
+    },
+    {
+      "id": "623575d3-4d06-463d-b5b2-d04035e58565",
+      "name": "Fänkål",
+      "watchlistText": "Fänkål",
+      "fullURLPath": "Frukt-Grönt/Kål/Fänkål",
+      "parentCategoryId": "1db9c37c-87ea-4d92-84d4-5670eaaeb018",
+      "departmentId": "f82845b1-7be6-4e08-8b5d-7f2c0f0a7d38",
+      "retailerCategoryId": "4537",
+      "productCount": 1
+    },
+    {
+      "id": "af256e1f-043d-4fbf-89f4-015038f15051",
+      "name": "Färdig is",
+      "watchlistText": "Färdig is",
+      "fullURLPath": "Fryst/Färdig-is",
+      "parentCategoryId": "360db808-e41c-463d-8cb1-ec80eb426b37",
+      "departmentId": "360db808-e41c-463d-8cb1-ec80eb426b37"
+    },
+    {
+      "id": "f530dd3e-cded-47a3-b16a-d5e007bd21d7",
+      "name": "Färdig proteindryck",
+      "watchlistText": "Färdig proteindryck",
+      "fullURLPath": "Träning-Återhämtning/Färdig-proteindryck",
+      "parentCategoryId": "e128adca-fd5e-4b7e-a34e-a0badfe367ac",
+      "departmentId": "e128adca-fd5e-4b7e-a34e-a0badfe367ac"
+    },
+    {
+      "id": "d48e1452-10cc-4b2d-af58-d60b7422a452",
+      "name": "Färdiga fiskrätter",
+      "watchlistText": "Färdiga fiskrätter",
+      "fullURLPath": "Fisk-Skaldjur/Färdiga-fiskrätter",
+      "parentCategoryId": "fc0292c5-c74d-4229-9577-ec302310430f",
+      "departmentId": "fc0292c5-c74d-4229-9577-ec302310430f"
+    },
+    {
+      "id": "4c8f1d41-2033-426c-81b6-a5dddd58b8e6",
+      "name": "Färdigkryddat fläskkött",
+      "watchlistText": "Färdigkryddat fläskkött",
+      "fullURLPath": "Kött-Chark-Fågel/Kött/Fläsk/Färdigkryddat-fläskkött",
+      "parentCategoryId": "74dfbe91-d9b0-49d6-acc4-ebcb9614f73a",
+      "departmentId": "c0a4a3ed-f97c-4b2f-81ca-dcc9a7e044f7",
+      "retailerCategoryId": "2120",
+      "productCount": 12
+    },
+    {
+      "id": "6ba2dde1-c8a5-4e3c-bfbb-d54feb33525b",
+      "name": "Färsk chilipeppar",
+      "watchlistText": "Färsk chilipeppar",
+      "fullURLPath": "Frukt-Grönt/Färska-kryddor/Färsk-chilipeppar",
+      "parentCategoryId": "34ac4412-f004-47ef-ae7c-047841f42c24",
+      "departmentId": "f82845b1-7be6-4e08-8b5d-7f2c0f0a7d38",
+      "retailerCategoryId": "1651",
+      "productCount": 6
+    },
+    {
+      "id": "d9919617-88ba-4b64-bf35-19c50a4e0702",
+      "name": "Färsk korv",
+      "watchlistText": "Färsk korv",
+      "fullURLPath": "Kött-Chark-Fågel/Korv/Färsk-korv",
+      "parentCategoryId": "68ed3c20-58e3-44d6-a95b-24ece4612260",
+      "departmentId": "c0a4a3ed-f97c-4b2f-81ca-dcc9a7e044f7",
+      "retailerCategoryId": "1558",
+      "productCount": 11
+    },
+    {
+      "id": "ad0023fa-1688-4b61-ad4c-8163c6909a12",
+      "name": "Färsk pasta",
+      "watchlistText": "Färsk pasta",
+      "fullURLPath": "Färdigmat/Färsk-pasta",
+      "parentCategoryId": "5d7bd782-7db9-4fef-ab86-3b7c5e797ccb",
+      "departmentId": "5d7bd782-7db9-4fef-ab86-3b7c5e797ccb"
+    },
+    {
+      "id": "771a189b-0e78-4a19-bfed-d3eb6154895b",
+      "name": "Färsk vegetarisk färdigmat",
+      "watchlistText": "Färsk vegetarisk färdigmat",
+      "fullURLPath": "Vegetariskt/Färsk-vegetarisk-färdigmat",
+      "parentCategoryId": "442f3f18-3b3a-484a-ae0d-700be34148ed",
+      "departmentId": "442f3f18-3b3a-484a-ae0d-700be34148ed"
+    },
+    {
+      "id": "8051983e-d1e8-4756-8ecd-a4ca9374bfc5",
+      "name": "Färskost & cream cheese",
+      "watchlistText": "Färskost & cream cheese",
+      "fullURLPath": "Mejeri-Ost/Ost/Färskost-cream-cheese",
+      "parentCategoryId": "342706ff-6dd8-4e9d-9ab3-8ff5aac99dd1",
+      "departmentId": "7aac2fb3-4bf5-4763-9610-fd2ad3ef930a",
+      "retailerCategoryId": "273",
+      "productCount": 47
+    },
+    {
+      "id": "87426923-c15a-48c7-8427-4194f102aa73",
+      "name": "Färskpotatis",
+      "watchlistText": "Färskpotatis",
+      "fullURLPath": "Frukt-Grönt/Potatis/Färskpotatis",
+      "parentCategoryId": "c5b9394b-20ac-4f52-93b9-f7dd1fd09e00",
+      "departmentId": "f82845b1-7be6-4e08-8b5d-7f2c0f0a7d38",
+      "retailerCategoryId": "4730",
+      "productCount": 1
+    },
+    {
+      "id": "ad152300-323c-4b1d-aeeb-f143626b3590",
+      "name": "Förberedd fågel",
+      "watchlistText": "Förberedd fågel",
+      "fullURLPath": "Kött-Chark-Fågel/Kyckling-Fågel/Förberedd-fågel",
+      "parentCategoryId": "3be2f7c8-cdd9-42ac-9405-60d42b4df012",
+      "departmentId": "c0a4a3ed-f97c-4b2f-81ca-dcc9a7e044f7",
+      "retailerCategoryId": "1546",
+      "productCount": 29
+    },
+    {
+      "id": "584b5dcc-f489-4d3b-bcaa-2189802fdb29",
+      "name": "Förvaring",
+      "watchlistText": "Förvaring",
+      "fullURLPath": "Hem-Inredning/Förvaring",
+      "parentCategoryId": "898d465a-1c6b-487a-9be1-31fac1cc4014",
+      "departmentId": "898d465a-1c6b-487a-9be1-31fac1cc4014"
+    },
+    {
+      "id": "2147a428-d74c-4b44-ac4a-f72702d55f7a",
+      "name": "Glass",
+      "watchlistText": "Glass",
+      "fullURLPath": "Fryst/Glass",
+      "parentCategoryId": "bb534c25-3729-48bc-b9cc-c4516145879c",
+      "departmentId": "bb534c25-3729-48bc-b9cc-c4516145879c"
+    },
+    {
+      "id": "f6095e8e-8f8c-4c82-9163-f88d928f3d67",
+      "name": "Glutenfri Färdigmat",
+      "watchlistText": "Glutenfri Färdigmat",
+      "fullURLPath": "Färdigmat/Glutenfri-Färdigmat",
+      "parentCategoryId": "5d7bd782-7db9-4fef-ab86-3b7c5e797ccb",
+      "departmentId": "5d7bd782-7db9-4fef-ab86-3b7c5e797ccb"
+    },
+    {
+      "id": "aeb2a596-972b-4728-952e-ad94b44edd02",
+      "name": "Glutenfri korv",
+      "watchlistText": "Glutenfri korv",
+      "fullURLPath": "Kött-Chark-Fågel/Korv/Glutenfri-korv",
+      "parentCategoryId": "68ed3c20-58e3-44d6-a95b-24ece4612260",
+      "departmentId": "c0a4a3ed-f97c-4b2f-81ca-dcc9a7e044f7",
+      "retailerCategoryId": "2841",
+      "productCount": 23
+    },
+    {
+      "id": "3fc5f139-f90b-4a35-ab1a-4f429d009bb7",
+      "name": "Glutenfritt bröd & Kakor",
+      "watchlistText": "Glutenfritt bröd & Kakor",
+      "fullURLPath": "Bröd-Kakor/Glutenfritt-bröd-Kakor",
+      "parentCategoryId": "a34eb6f1-7ef8-4bcb-b166-4373726c158f",
+      "departmentId": "a34eb6f1-7ef8-4bcb-b166-4373726c158f"
+    },
+    {
+      "id": "985e6074-329f-4b29-9c6f-451a838c2cf3",
+      "name": "Godis",
+      "watchlistText": "Godis",
+      "fullURLPath": "Glass-Godis-Snacks/Godis",
+      "parentCategoryId": "bb534c25-3729-48bc-b9cc-c4516145879c",
+      "departmentId": "bb534c25-3729-48bc-b9cc-c4516145879c"
+    },
+    {
+      "id": "44328115-7b23-45be-9511-7ac03bdec35b",
+      "name": "Gott till grillat",
+      "watchlistText": "Gott till grillat",
+      "fullURLPath": "Grill/Gott-till-grillat",
+      "parentCategoryId": "2461df2c-19e0-4435-84ef-210111f66562",
+      "departmentId": "2461df2c-19e0-4435-84ef-210111f66562"
+    },
+    {
+      "id": "d3fde179-1d92-4cd7-aaa9-3f6d3d6629dd",
+      "name": "Gratäng & röror",
+      "watchlistText": "Gratäng & röror",
+      "fullURLPath": "Färdigmat/Gratäng-röror",
+      "parentCategoryId": "5d7bd782-7db9-4fef-ab86-3b7c5e797ccb",
+      "departmentId": "5d7bd782-7db9-4fef-ab86-3b7c5e797ccb"
+    },
+    {
+      "id": "4b5ab0b2-c583-4a46-92a7-a8b1ccf75adf",
+      "name": "Grill",
+      "watchlistText": "Grill",
+      "fullURLPath": "Fritid/Grill",
+      "parentCategoryId": "a45a055c-66e1-4edc-a02a-2098bb2e9e46",
+      "departmentId": "a45a055c-66e1-4edc-a02a-2098bb2e9e46"
+    },
+    {
+      "id": "f9374999-f2ae-441d-8cd2-d00bc5f738f0",
+      "name": "Grilla Fisk, Skaldjur & Ost",
+      "watchlistText": "Grilla Fisk, Skaldjur & Ost",
+      "fullURLPath": "Grill/Grilla-Fisk-Skaldjur-Ost",
+      "parentCategoryId": "2461df2c-19e0-4435-84ef-210111f66562",
+      "departmentId": "2461df2c-19e0-4435-84ef-210111f66562"
+    },
+    {
+      "id": "d8b7d22c-32e8-4c82-a276-eacf7ca31c22",
+      "name": "Grilla Grönsaker & Vego",
+      "watchlistText": "Grilla Grönsaker & Vego",
+      "fullURLPath": "Grill/Grilla-Grönsaker-Vego",
+      "parentCategoryId": "2461df2c-19e0-4435-84ef-210111f66562",
+      "departmentId": "2461df2c-19e0-4435-84ef-210111f66562"
+    },
+    {
+      "id": "833a0222-35f5-4de0-b804-d77afae9c0b4",
+      "name": "Grilla Korv & Hamburgare",
+      "watchlistText": "Grilla Korv & Hamburgare",
+      "fullURLPath": "Grill/Grilla-Korv-Hamburgare",
+      "parentCategoryId": "2461df2c-19e0-4435-84ef-210111f66562",
+      "departmentId": "2461df2c-19e0-4435-84ef-210111f66562"
+    },
+    {
+      "id": "69a28288-a253-4371-b3f0-21d85cc381de",
+      "name": "Grilla Kyckling",
+      "watchlistText": "Grilla Kyckling",
+      "fullURLPath": "Grill/Grilla-Kyckling",
+      "parentCategoryId": "2461df2c-19e0-4435-84ef-210111f66562",
+      "departmentId": "2461df2c-19e0-4435-84ef-210111f66562"
+    },
+    {
+      "id": "0cf84345-17d9-4986-998a-fcab3ad4f74b",
+      "name": "Grilla Kött",
+      "watchlistText": "Grilla Kött",
+      "fullURLPath": "Grill/Grilla-Kött",
+      "parentCategoryId": "2461df2c-19e0-4435-84ef-210111f66562",
+      "departmentId": "2461df2c-19e0-4435-84ef-210111f66562"
+    },
+    {
+      "id": "1f3b1f24-4eaf-46aa-99f1-faaa99611eca",
+      "name": "Grillar & Grillredskap",
+      "watchlistText": "Grillar & Grillredskap",
+      "fullURLPath": "Grill/Grillar-Grillredskap",
+      "parentCategoryId": "2461df2c-19e0-4435-84ef-210111f66562",
+      "departmentId": "2461df2c-19e0-4435-84ef-210111f66562"
+    },
+    {
+      "id": "f8cbdec5-f0c2-41e7-b73a-2dfc4d0815cb",
+      "name": "Grillkorv",
+      "watchlistText": "Grillkorv",
+      "fullURLPath": "Kött-Chark-Fågel/Korv/Grillkorv",
+      "parentCategoryId": "68ed3c20-58e3-44d6-a95b-24ece4612260",
+      "departmentId": "c0a4a3ed-f97c-4b2f-81ca-dcc9a7e044f7",
+      "retailerCategoryId": "52",
+      "productCount": 30
+    },
+    {
+      "id": "12b5281e-3d95-4d23-9393-1c8d0a81247f",
+      "name": "Grillnyheter",
+      "watchlistText": "Grillnyheter",
+      "fullURLPath": "Grill/Grillnyheter",
+      "parentCategoryId": "2461df2c-19e0-4435-84ef-210111f66562",
+      "departmentId": "2461df2c-19e0-4435-84ef-210111f66562"
+    },
+    {
+      "id": "8f88db23-7610-4f2e-b13d-207446efac3f",
+      "name": "Groddar",
+      "watchlistText": "Groddar",
+      "fullURLPath": "Frukt-Grönt/Grönsaker/Groddar",
+      "parentCategoryId": "6395d7ab-beee-4895-b733-cbfe2b63c069",
+      "departmentId": "f82845b1-7be6-4e08-8b5d-7f2c0f0a7d38",
+      "retailerCategoryId": "4581",
+      "productCount": 4
+    },
+    {
+      "id": "913fa108-2f76-4926-8664-872d2f5a37c0",
+      "name": "Grytbitar & Strimlat nötkött",
+      "watchlistText": "Grytbitar & Strimlat nötkött",
+      "fullURLPath": "Kött-Chark-Fågel/Kött/Nötkött/Grytbitar-Strimlat-nötkött",
+      "parentCategoryId": "db4dd486-6cf9-496b-b7e2-f9b0f95aba2a",
+      "departmentId": "c0a4a3ed-f97c-4b2f-81ca-dcc9a7e044f7",
+      "retailerCategoryId": "4749",
+      "productCount": 1
+    },
+    {
+      "id": "13d2a2f7-a1ed-4bc5-96a2-dddcdd6cd6e1",
+      "name": "Grytbitar fläsk",
+      "watchlistText": "Grytbitar fläsk",
+      "fullURLPath": "Kött-Chark-Fågel/Kött/Fläsk/Grytbitar-fläsk",
+      "parentCategoryId": "74dfbe91-d9b0-49d6-acc4-ebcb9614f73a",
+      "departmentId": "c0a4a3ed-f97c-4b2f-81ca-dcc9a7e044f7",
+      "retailerCategoryId": "4959",
+      "productCount": 1
+    },
+    {
+      "id": "26a16380-e8a8-49ae-9cb3-db908dde8ff2",
+      "name": "Grädde",
+      "watchlistText": "Grädde",
+      "fullURLPath": "Mejeri-Ost/Grädde",
+      "parentCategoryId": "7aac2fb3-4bf5-4763-9610-fd2ad3ef930a",
+      "departmentId": "7aac2fb3-4bf5-4763-9610-fd2ad3ef930a"
+    },
+    {
+      "id": "e532fb01-d8cd-4936-b80c-6b1af259a242",
+      "name": "Gräddfil",
+      "watchlistText": "Gräddfil",
+      "fullURLPath": "Mejeri-Ost/Gräddfil",
+      "parentCategoryId": "7aac2fb3-4bf5-4763-9610-fd2ad3ef930a",
+      "departmentId": "7aac2fb3-4bf5-4763-9610-fd2ad3ef930a"
+    },
+    {
+      "id": "a4bda5a2-68ab-41db-9008-1fd05c4e388a",
+      "name": "Gräslök",
+      "watchlistText": "Gräslök",
+      "fullURLPath": "Frukt-Grönt/Färska-kryddor/Gräslök",
+      "parentCategoryId": "34ac4412-f004-47ef-ae7c-047841f42c24",
+      "departmentId": "f82845b1-7be6-4e08-8b5d-7f2c0f0a7d38",
+      "retailerCategoryId": "1071",
+      "productCount": 2
+    },
+    {
+      "id": "adb7da02-abb2-41fc-93d8-cc1d85035c51",
+      "name": "Grönkål",
+      "watchlistText": "Grönkål",
+      "fullURLPath": "Frukt-Grönt/Kål/Grönkål",
+      "parentCategoryId": "1db9c37c-87ea-4d92-84d4-5670eaaeb018",
+      "departmentId": "f82845b1-7be6-4e08-8b5d-7f2c0f0a7d38",
+      "retailerCategoryId": "4535",
+      "productCount": 2
+    },
+    {
+      "id": "2df07ec5-9db5-43e0-bf35-52cda27692bb",
+      "name": "Grönsaksjuice",
+      "watchlistText": "Grönsaksjuice",
+      "fullURLPath": "Mejeri-Ost/Juice-Fruktdryck/Grönsaksjuice",
+      "parentCategoryId": "c4e30eb9-a7e6-4a1b-9f99-9f60edc4cadd",
+      "departmentId": "7aac2fb3-4bf5-4763-9610-fd2ad3ef930a",
+      "retailerCategoryId": "2592",
+      "productCount": 8
+    },
+    {
+      "id": "eabaae0d-558c-4e1b-abaa-3886d8119c83",
+      "name": "Grönsakskonserver",
+      "watchlistText": "Grönsakskonserver",
+      "fullURLPath": "Skafferi/Grönsakskonserver",
+      "parentCategoryId": "f4882652-d405-4cd1-876c-247667adc392",
+      "departmentId": "f4882652-d405-4cd1-876c-247667adc392"
+    },
+    {
+      "id": "7ba05983-0023-46ee-8451-c06ffcae3a30",
+      "name": "Gröt & rullpack",
+      "watchlistText": "Gröt & rullpack",
+      "fullURLPath": "Färdigmat/Gröt-rullpack",
+      "parentCategoryId": "5d7bd782-7db9-4fef-ab86-3b7c5e797ccb",
+      "departmentId": "5d7bd782-7db9-4fef-ab86-3b7c5e797ccb"
+    },
+    {
+      "id": "2c0eb3ea-f2e9-4b8d-8721-746089d258b3",
+      "name": "Gul lök",
+      "watchlistText": "Gul lök",
+      "fullURLPath": "Frukt-Grönt/Lök/Gul-lök",
+      "parentCategoryId": "9a66038b-f95a-45b6-9a50-76a43c494031",
+      "departmentId": "f82845b1-7be6-4e08-8b5d-7f2c0f0a7d38",
+      "retailerCategoryId": "1262",
+      "productCount": 3
+    },
+    {
+      "id": "b84aa1c3-cb92-4f6b-8acc-bef946a04605",
+      "name": "Gurka",
+      "watchlistText": "Gurka",
+      "fullURLPath": "Frukt-Grönt/Grönsaker/Gurka",
+      "parentCategoryId": "6395d7ab-beee-4895-b733-cbfe2b63c069",
+      "departmentId": "f82845b1-7be6-4e08-8b5d-7f2c0f0a7d38",
+      "retailerCategoryId": "689",
+      "productCount": 3
+    },
+    {
+      "id": "a74f6d3b-3f1e-4ab2-9c24-5c740b0541b0",
+      "name": "Hallon",
+      "watchlistText": "Hallon",
+      "fullURLPath": "Frukt-Grönt/Färska-bär/Hallon",
+      "parentCategoryId": "67601f4b-c7e4-42ae-af1a-204ec5f57530",
+      "departmentId": "f82845b1-7be6-4e08-8b5d-7f2c0f0a7d38",
+      "retailerCategoryId": "1376",
+      "productCount": 1
+    },
+    {
+      "id": "80289b93-ae7b-47d4-bbde-c8381ef52808",
+      "name": "Halstabletter",
+      "watchlistText": "Halstabletter",
+      "fullURLPath": "Glass-Godis-Snacks/Halstabletter",
+      "parentCategoryId": "bb534c25-3729-48bc-b9cc-c4516145879c",
+      "departmentId": "bb534c25-3729-48bc-b9cc-c4516145879c"
+    },
+    {
+      "id": "b8fbe466-4b2c-4f12-885f-bdac9bc9123a",
+      "name": "Hamburgare",
+      "watchlistText": "Hamburgare",
+      "fullURLPath": "Kött-Chark-Fågel/Matchark/Hamburgare",
+      "parentCategoryId": "dd850748-c56e-4aa3-bd97-81281fea9bae",
+      "departmentId": "c0a4a3ed-f97c-4b2f-81ca-dcc9a7e044f7",
+      "retailerCategoryId": "2210",
+      "productCount": 19
+    },
+    {
+      "id": "7c0f88c1-7ca3-4306-b0e1-a4d72639024b",
+      "name": "Hamburgerkött & vilt",
+      "watchlistText": "Hamburgerkött & vilt",
+      "fullURLPath": "Kött-Chark-Fågel/Pålägg/Hamburgerkött-vilt",
+      "parentCategoryId": "6a7fd157-5a0f-44e0-aff8-318de3bb8a96",
+      "departmentId": "c0a4a3ed-f97c-4b2f-81ca-dcc9a7e044f7",
+      "retailerCategoryId": "48",
+      "productCount": 2
+    },
+    {
+      "id": "c26df667-d884-4daf-94ae-45d0d58532f5",
+      "name": "Hel kyckling",
+      "watchlistText": "Hel kyckling",
+      "fullURLPath": "Kött-Chark-Fågel/Kyckling-Fågel/Hel-kyckling",
+      "parentCategoryId": "3be2f7c8-cdd9-42ac-9405-60d42b4df012",
+      "departmentId": "c0a4a3ed-f97c-4b2f-81ca-dcc9a7e044f7",
+      "retailerCategoryId": "30",
+      "productCount": 7
+    },
+    {
+      "id": "c16b9d44-abd0-484a-aaab-dc7fc3de4e43",
+      "name": "Hemelektronik & Batterier",
+      "watchlistText": "Hemelektronik & Batterier",
+      "fullURLPath": "Fritid/Hemelektronik-Batterier",
+      "parentCategoryId": "a45a055c-66e1-4edc-a02a-2098bb2e9e46",
+      "departmentId": "a45a055c-66e1-4edc-a02a-2098bb2e9e46"
+    },
+    {
+      "id": "d7221e7e-4b1f-4def-bb70-3eecf8db4831",
+      "name": "Hemtextil",
+      "watchlistText": "Hemtextil",
+      "fullURLPath": "Hem-Inredning/Hemtextil",
+      "parentCategoryId": "898d465a-1c6b-487a-9be1-31fac1cc4014",
+      "departmentId": "898d465a-1c6b-487a-9be1-31fac1cc4014"
+    },
+    {
+      "id": "d94112dc-4a38-4a7c-9009-43dbcfd0800d",
+      "name": "Herrkläder",
+      "watchlistText": "Herrkläder",
+      "fullURLPath": "Kläder-Accessoarer/Herrkläder",
+      "parentCategoryId": "a6c5191e-77ac-4dae-a6e8-da5b0aba93e0",
+      "departmentId": "a6c5191e-77ac-4dae-a6e8-da5b0aba93e0"
+    },
+    {
+      "id": "2d4add7f-caae-451b-b85f-e0bc71ef6561",
+      "name": "Hjärtsallad",
+      "watchlistText": "Hjärtsallad",
+      "fullURLPath": "Frukt-Grönt/Grönsaker/Sallad/Hjärtsallad",
+      "parentCategoryId": "da43879d-6b3c-4835-922e-098e8fde7833",
+      "departmentId": "f82845b1-7be6-4e08-8b5d-7f2c0f0a7d38",
+      "retailerCategoryId": "4592",
+      "productCount": 1
+    },
+    {
+      "id": "cb27f1c5-0069-4940-ba64-77dbc7d1e4f4",
+      "name": "Hudvård",
+      "watchlistText": "Hudvård",
+      "fullURLPath": "Apotek-Hälsa-Skönhet/Hudvård",
+      "parentCategoryId": "70e47511-1892-45c5-8b0a-c5340ef8e518",
+      "departmentId": "70e47511-1892-45c5-8b0a-c5340ef8e518"
+    },
+    {
+      "id": "4491cd95-241d-4037-8686-7aafb4f2f95e",
+      "name": "Hund",
+      "watchlistText": "Hund",
+      "fullURLPath": "Djur/Hund",
+      "parentCategoryId": "555f311d-70ca-4bd8-bd50-921545531f89",
+      "departmentId": "555f311d-70ca-4bd8-bd50-921545531f89"
+    },
+    {
+      "id": "b09915fe-1af6-4e7f-86ba-0abb019f2a5c",
+      "name": "Husgeråd & Köksredskap",
+      "watchlistText": "Husgeråd & Köksredskap",
+      "fullURLPath": "Kök/Husgeråd-Köksredskap",
+      "parentCategoryId": "a0bceaa9-e61a-470f-9566-d46aae9b5b74",
+      "departmentId": "a0bceaa9-e61a-470f-9566-d46aae9b5b74"
+    },
+    {
+      "id": "b202ef46-1f87-460d-b4ab-ad3bc9985723",
+      "name": "Hårvård & Styling",
+      "watchlistText": "Hårvård & Styling",
+      "fullURLPath": "Apotek-Hälsa-Skönhet/Hårvård-Styling",
+      "parentCategoryId": "70e47511-1892-45c5-8b0a-c5340ef8e518",
+      "departmentId": "70e47511-1892-45c5-8b0a-c5340ef8e518"
+    },
+    {
+      "id": "d9d3dd9c-b331-4310-94b8-8a65d55683a4",
+      "name": "Högrev",
+      "watchlistText": "Högrev",
+      "fullURLPath": "Kött-Chark-Fågel/Kött/Nötkött/Högrev",
+      "parentCategoryId": "db4dd486-6cf9-496b-b7e2-f9b0f95aba2a",
+      "departmentId": "c0a4a3ed-f97c-4b2f-81ca-dcc9a7e044f7",
+      "retailerCategoryId": "4750",
+      "productCount": 4
+    },
+    {
+      "id": "3fee4ee6-7bc8-4599-aa04-2e266ab69bfa",
+      "name": "Ingefära",
+      "watchlistText": "Ingefära",
+      "fullURLPath": "Frukt-Grönt/Färska-kryddor/Ingefära",
+      "parentCategoryId": "34ac4412-f004-47ef-ae7c-047841f42c24",
+      "departmentId": "f82845b1-7be6-4e08-8b5d-7f2c0f0a7d38",
+      "retailerCategoryId": "4552",
+      "productCount": 2
+    },
+    {
+      "id": "64fbc96f-a17e-4e9f-b608-e80cf4051ca9",
+      "name": "Inredningsdetaljer",
+      "watchlistText": "Inredningsdetaljer",
+      "fullURLPath": "Hem-Inredning/Inredningsdetaljer",
+      "parentCategoryId": "898d465a-1c6b-487a-9be1-31fac1cc4014",
+      "departmentId": "898d465a-1c6b-487a-9be1-31fac1cc4014"
+    },
+    {
+      "id": "3ec4fec7-59bd-4724-a9d6-ad33b4bc3049",
+      "name": "Intimprodukter",
+      "watchlistText": "Intimprodukter",
+      "fullURLPath": "Apotek-Hälsa-Skönhet/Intimprodukter",
+      "parentCategoryId": "70e47511-1892-45c5-8b0a-c5340ef8e518",
+      "departmentId": "70e47511-1892-45c5-8b0a-c5340ef8e518"
+    },
+    {
+      "id": "927d9590-557b-42ba-ba52-595f6c7cd6c1",
+      "name": "Isbergssallad",
+      "watchlistText": "Isbergssallad",
+      "fullURLPath": "Frukt-Grönt/Grönsaker/Sallad/Isbergssallad",
+      "parentCategoryId": "da43879d-6b3c-4835-922e-098e8fde7833",
+      "departmentId": "f82845b1-7be6-4e08-8b5d-7f2c0f0a7d38",
+      "retailerCategoryId": "4593",
+      "productCount": 1
+    },
+    {
+      "id": "20a61acd-acd6-4bf6-b15f-fe7d7cc3e6da",
+      "name": "Isterband",
+      "watchlistText": "Isterband",
+      "fullURLPath": "Kött-Chark-Fågel/Korv/Isterband",
+      "parentCategoryId": "68ed3c20-58e3-44d6-a95b-24ece4612260",
+      "departmentId": "c0a4a3ed-f97c-4b2f-81ca-dcc9a7e044f7",
+      "retailerCategoryId": "57",
+      "productCount": 4
+    },
+    {
+      "id": "4ce51888-a1fa-46f5-86b1-4ddbd54d8cff",
+      "name": "Jordgubbar",
+      "watchlistText": "Jordgubbar",
+      "fullURLPath": "Frukt-Grönt/Färska-bär/Jordgubbar",
+      "parentCategoryId": "67601f4b-c7e4-42ae-af1a-204ec5f57530",
+      "departmentId": "f82845b1-7be6-4e08-8b5d-7f2c0f0a7d38",
+      "retailerCategoryId": "1375",
+      "productCount": 4
+    },
+    {
+      "id": "03982a20-9f2c-4fa8-9996-e8c467d8cd3e",
+      "name": "Jordärtskocka",
+      "watchlistText": "Jordärtskocka",
+      "fullURLPath": "Frukt-Grönt/Rotfrukter/Jordärtskocka",
+      "parentCategoryId": "c03f7cb4-d742-46c2-8872-a79345413ce7",
+      "departmentId": "f82845b1-7be6-4e08-8b5d-7f2c0f0a7d38",
+      "retailerCategoryId": "4550",
+      "productCount": 1
+    },
+    {
+      "id": "4fa7bce2-6b53-43a8-af66-c405c3114e01",
+      "name": "Juice övriga smaker",
+      "watchlistText": "Juice övriga smaker",
+      "fullURLPath": "Mejeri-Ost/Juice-Fruktdryck/Juice-övriga-smaker",
+      "parentCategoryId": "c4e30eb9-a7e6-4a1b-9f99-9f60edc4cadd",
+      "departmentId": "7aac2fb3-4bf5-4763-9610-fd2ad3ef930a",
+      "retailerCategoryId": "2593",
+      "productCount": 36
+    },
+    {
+      "id": "fd5f0df5-1f3a-41c3-a444-b328394183b2",
+      "name": "Julskinka",
+      "watchlistText": "Julskinka",
+      "fullURLPath": "Kött-Chark-Fågel/Kött/Fläsk/Julskinka",
+      "parentCategoryId": "74dfbe91-d9b0-49d6-acc4-ebcb9614f73a",
+      "departmentId": "c0a4a3ed-f97c-4b2f-81ca-dcc9a7e044f7",
+      "retailerCategoryId": "1168",
+      "productCount": 4
+    },
+    {
+      "id": "d39dcef6-fc0d-46be-b2be-865da03c2789",
+      "name": "Jäst",
+      "watchlistText": "Jäst",
+      "fullURLPath": "Mejeri-Ost/Ägg-Jäst/Jäst",
+      "parentCategoryId": "2d99b8cd-01f7-4ba9-8a19-1e059a158f7a",
+      "departmentId": "7aac2fb3-4bf5-4763-9610-fd2ad3ef930a",
+      "retailerCategoryId": "4515",
+      "productCount": 7
+    },
+    {
+      "id": "60df6ebc-1558-4f58-8296-89159ca04a15",
+      "name": "Kaffe, te & choklad",
+      "watchlistText": "Kaffe, te & choklad",
+      "fullURLPath": "Skafferi/Kaffe-te-choklad",
+      "parentCategoryId": "34948432-df3c-4468-991b-f0db32126003",
+      "departmentId": "34948432-df3c-4468-991b-f0db32126003"
+    },
+    {
+      "id": "9b395301-be7b-4c89-8a53-99ed5164dd7d",
+      "name": "Kaffebröd",
+      "watchlistText": "Kaffebröd",
+      "fullURLPath": "Bröd-Kakor/Kaffebröd",
+      "parentCategoryId": "a34eb6f1-7ef8-4bcb-b166-4373726c158f",
+      "departmentId": "a34eb6f1-7ef8-4bcb-b166-4373726c158f"
+    },
+    {
+      "id": "898d5458-9dd4-45d1-a196-084a8d81c71b",
+      "name": "Kalkon",
+      "watchlistText": "Kalkon",
+      "fullURLPath": "Kött-Chark-Fågel/Kyckling-Fågel/Kalkon",
+      "parentCategoryId": "3be2f7c8-cdd9-42ac-9405-60d42b4df012",
+      "departmentId": "c0a4a3ed-f97c-4b2f-81ca-dcc9a7e044f7",
+      "retailerCategoryId": "4886",
+      "productCount": 15
+    },
+    {
+      "id": "f1c63f30-af8b-4075-885e-4613a73cd042",
+      "name": "Kalkonfärs",
+      "watchlistText": "Kalkonfärs",
+      "fullURLPath": "Kött-Chark-Fågel/Köttfärs/Kalkonfärs",
+      "parentCategoryId": "68c65d92-4160-4761-a547-6e5fcec34466",
+      "departmentId": "c0a4a3ed-f97c-4b2f-81ca-dcc9a7e044f7",
+      "retailerCategoryId": "4889",
+      "productCount": 2
+    },
+    {
+      "id": "d47fea14-3311-4156-934b-dcedd707613f",
+      "name": "Kalvkött",
+      "watchlistText": "Kalvkött",
+      "fullURLPath": "Kött-Chark-Fågel/Kött/Nötkött/Kalvkött",
+      "parentCategoryId": "db4dd486-6cf9-496b-b7e2-f9b0f95aba2a",
+      "departmentId": "c0a4a3ed-f97c-4b2f-81ca-dcc9a7e044f7",
+      "retailerCategoryId": "4752",
+      "productCount": 6
+    },
+    {
+      "id": "6171e4b3-625c-4813-887c-f2c5e77d3853",
+      "name": "Kassler",
+      "watchlistText": "Kassler",
+      "fullURLPath": "Kött-Chark-Fågel/Kött/Fläsk/Kassler",
+      "parentCategoryId": "74dfbe91-d9b0-49d6-acc4-ebcb9614f73a",
+      "departmentId": "c0a4a3ed-f97c-4b2f-81ca-dcc9a7e044f7",
+      "retailerCategoryId": "4960",
+      "productCount": 5
+    },
+    {
+      "id": "8a098cc2-88e4-4448-8358-fa6e7b25922b",
+      "name": "Kastruller & Stekpannor",
+      "watchlistText": "Kastruller & Stekpannor",
+      "fullURLPath": "Kök/Kastruller-Stekpannor",
+      "parentCategoryId": "a0bceaa9-e61a-470f-9566-d46aae9b5b74",
+      "departmentId": "a0bceaa9-e61a-470f-9566-d46aae9b5b74"
+    },
+    {
+      "id": "f5ee349a-4331-43c7-af82-11126dc3bc0b",
+      "name": "Katt",
+      "watchlistText": "Katt",
+      "fullURLPath": "Djur/Katt",
+      "parentCategoryId": "555f311d-70ca-4bd8-bd50-921545531f89",
+      "departmentId": "555f311d-70ca-4bd8-bd50-921545531f89"
+    },
+    {
+      "id": "2759ecac-58f9-4c16-a1fa-d14f53cdf731",
+      "name": "Kaviar & Rom",
+      "watchlistText": "Kaviar & Rom",
+      "fullURLPath": "Fisk-Skaldjur/Kaviar-Rom",
+      "parentCategoryId": "fc0292c5-c74d-4229-9577-ec302310430f",
+      "departmentId": "fc0292c5-c74d-4229-9577-ec302310430f"
+    },
+    {
+      "id": "90ac3f24-3a01-4e4a-b0a6-add1717b5e2a",
+      "name": "Kex & kakor",
+      "watchlistText": "Kex & kakor",
+      "fullURLPath": "Bröd-Kakor/Kex-kakor",
+      "parentCategoryId": "a34eb6f1-7ef8-4bcb-b166-4373726c158f",
+      "departmentId": "a34eb6f1-7ef8-4bcb-b166-4373726c158f"
+    },
+    {
+      "id": "2f5e5ac9-76bd-489f-a654-dc8b3c057116",
+      "name": "Kiwi",
+      "watchlistText": "Kiwi",
+      "fullURLPath": "Frukt-Grönt/Frukt/Exotisk-frukt/Kiwi",
+      "parentCategoryId": "83676072-0bbe-4b65-92ed-d09c14c452b9",
+      "departmentId": "f82845b1-7be6-4e08-8b5d-7f2c0f0a7d38",
+      "retailerCategoryId": "4880",
+      "productCount": 5
+    },
+    {
+      "id": "855958e8-7bcc-45c3-a476-4be0392b7779",
+      "name": "Knäckebröd & Skorpor",
+      "watchlistText": "Knäckebröd & Skorpor",
+      "fullURLPath": "Bröd-Kakor/Knäckebröd-Skorpor",
+      "parentCategoryId": "a34eb6f1-7ef8-4bcb-b166-4373726c158f",
+      "departmentId": "a34eb6f1-7ef8-4bcb-b166-4373726c158f"
+    },
+    {
+      "id": "014fb976-769c-4ea0-8ec5-f7178aef5091",
+      "name": "Konstgjorda Blommor & Växter",
+      "watchlistText": "Konstgjorda Blommor & Växter",
+      "fullURLPath": "Blommor-Trädgård/Konstgjorda-Blommor-Växter",
+      "parentCategoryId": "71542409-5f2e-4ae3-9ad7-6751e10afb38",
+      "departmentId": "71542409-5f2e-4ae3-9ad7-6751e10afb38"
+    },
+    {
+      "id": "29f5b577-0be8-4be5-8b6b-55d0fc1fc44b",
+      "name": "Kontor, Hobby & Pyssel",
+      "watchlistText": "Kontor, Hobby & Pyssel",
+      "fullURLPath": "Hem-Inredning/Kontor-Hobby-Pyssel",
+      "parentCategoryId": "898d465a-1c6b-487a-9be1-31fac1cc4014",
+      "departmentId": "898d465a-1c6b-487a-9be1-31fac1cc4014"
+    },
+    {
+      "id": "49bcfaec-6c0e-48d5-8007-1fc659010521",
+      "name": "Koriander",
+      "watchlistText": "Koriander",
+      "fullURLPath": "Frukt-Grönt/Färska-kryddor/Koriander",
+      "parentCategoryId": "34ac4412-f004-47ef-ae7c-047841f42c24",
+      "departmentId": "f82845b1-7be6-4e08-8b5d-7f2c0f0a7d38",
+      "retailerCategoryId": "4555",
+      "productCount": 2
+    },
+    {
+      "id": "1db4d6d4-baa0-4499-a168-0ff9649c5316",
+      "name": "Korvbröd, Hamburgerbröd & Maträttsbröd",
+      "watchlistText": "Korvbröd, Hamburgerbröd & Maträttsbröd",
+      "fullURLPath": "Bröd-Kakor/Korvbröd-Hamburgerbröd-Maträttsbröd",
+      "parentCategoryId": "a34eb6f1-7ef8-4bcb-b166-4373726c158f",
+      "departmentId": "a34eb6f1-7ef8-4bcb-b166-4373726c158f"
+    },
+    {
+      "id": "5bd19e61-4ff1-4ef3-a884-8024ddcd7805",
+      "name": "Krispsallad",
+      "watchlistText": "Krispsallad",
+      "fullURLPath": "Frukt-Grönt/Grönsaker/Sallad/Krispsallad",
+      "parentCategoryId": "da43879d-6b3c-4835-922e-098e8fde7833",
+      "departmentId": "f82845b1-7be6-4e08-8b5d-7f2c0f0a7d38",
+      "retailerCategoryId": "4594",
+      "productCount": 1
+    },
+    {
+      "id": "17ae6e45-b9a7-4578-b13c-aa19dd4422df",
+      "name": "Krukor & Vaser",
+      "watchlistText": "Krukor & Vaser",
+      "fullURLPath": "Blommor-Trädgård/Krukor-Vaser",
+      "parentCategoryId": "71542409-5f2e-4ae3-9ad7-6751e10afb38",
+      "departmentId": "71542409-5f2e-4ae3-9ad7-6751e10afb38"
+    },
+    {
+      "id": "d804772e-3209-4ed0-83ab-b9a9ed8589cd",
+      "name": "Krukväxter & Blomsterarrangemang",
+      "watchlistText": "Krukväxter & Blomsterarrangemang",
+      "fullURLPath": "Blommor-Trädgård/Krukväxter-Blomsterarrangemang",
+      "parentCategoryId": "71542409-5f2e-4ae3-9ad7-6751e10afb38",
+      "departmentId": "71542409-5f2e-4ae3-9ad7-6751e10afb38"
+    },
+    {
+      "id": "1a48d8d3-4aea-404d-b147-27ace7dba3db",
+      "name": "Kryddkorv",
+      "watchlistText": "Kryddkorv",
+      "fullURLPath": "Kött-Chark-Fågel/Korv/Kryddkorv",
+      "parentCategoryId": "68ed3c20-58e3-44d6-a95b-24ece4612260",
+      "departmentId": "c0a4a3ed-f97c-4b2f-81ca-dcc9a7e044f7",
+      "retailerCategoryId": "55",
+      "productCount": 61
+    },
+    {
+      "id": "53c05e35-a19c-497d-9a1d-2624d482be97",
+      "name": "Kryddor & smaksättare",
+      "watchlistText": "Kryddor & smaksättare",
+      "fullURLPath": "Skafferi/Kryddor-smaksättare",
+      "parentCategoryId": "f4882652-d405-4cd1-876c-247667adc392",
+      "departmentId": "f4882652-d405-4cd1-876c-247667adc392"
+    },
+    {
+      "id": "63210a68-b487-4ffd-bff9-0d39206d9427",
+      "name": "Kryddsmör",
+      "watchlistText": "Kryddsmör",
+      "fullURLPath": "Mejeri-Ost/Smör-Margarin/Kryddsmör",
+      "parentCategoryId": "876bd9ea-151c-492a-999d-1249cdd4a617",
+      "departmentId": "7aac2fb3-4bf5-4763-9610-fd2ad3ef930a",
+      "retailerCategoryId": "1984",
+      "productCount": 8
+    },
+    {
+      "id": "4ccb3617-bef5-422e-a0b6-bb4b6e827a7c",
+      "name": "Kvarg",
+      "watchlistText": "Kvarg",
+      "fullURLPath": "Mejeri-Ost/Kvarg",
+      "parentCategoryId": "7aac2fb3-4bf5-4763-9610-fd2ad3ef930a",
+      "departmentId": "7aac2fb3-4bf5-4763-9610-fd2ad3ef930a"
+    },
+    {
+      "id": "11bc4dab-eda7-4ab5-aba5-f475de7ed402",
+      "name": "Kycklingdelar",
+      "watchlistText": "Kycklingdelar",
+      "fullURLPath": "Kött-Chark-Fågel/Kyckling-Fågel/Kycklingdelar",
+      "parentCategoryId": "3be2f7c8-cdd9-42ac-9405-60d42b4df012",
+      "departmentId": "c0a4a3ed-f97c-4b2f-81ca-dcc9a7e044f7",
+      "retailerCategoryId": "31",
+      "productCount": 29
+    },
+    {
+      "id": "6840862f-f574-47b1-bbf4-1ddd08c74af3",
+      "name": "Kycklingfilé",
+      "watchlistText": "Kycklingfilé",
+      "fullURLPath": "Kött-Chark-Fågel/Kyckling-Fågel/Kycklingfilé",
+      "parentCategoryId": "3be2f7c8-cdd9-42ac-9405-60d42b4df012",
+      "departmentId": "c0a4a3ed-f97c-4b2f-81ca-dcc9a7e044f7",
+      "retailerCategoryId": "32",
+      "productCount": 44
+    },
+    {
+      "id": "f160a06a-676c-4ac0-abac-d8b7c92233aa",
+      "name": "Kycklingfärs",
+      "watchlistText": "Kycklingfärs",
+      "fullURLPath": "Kött-Chark-Fågel/Köttfärs/Kycklingfärs",
+      "parentCategoryId": "68c65d92-4160-4761-a547-6e5fcec34466",
+      "departmentId": "c0a4a3ed-f97c-4b2f-81ca-dcc9a7e044f7",
+      "retailerCategoryId": "33",
+      "productCount": 3
+    },
+    {
+      "id": "7cf3caca-1679-4f6f-acf7-f1c01743d9b1",
+      "name": "Kycklingkorv",
+      "watchlistText": "Kycklingkorv",
+      "fullURLPath": "Kött-Chark-Fågel/Korv/Kycklingkorv",
+      "parentCategoryId": "68ed3c20-58e3-44d6-a95b-24ece4612260",
+      "departmentId": "c0a4a3ed-f97c-4b2f-81ca-dcc9a7e044f7",
+      "retailerCategoryId": "61",
+      "productCount": 13
+    },
+    {
+      "id": "4d8e47c8-3759-4490-ad44-25d72f6e6e6e",
+      "name": "Kylda mellanmål & desserter",
+      "watchlistText": "Kylda mellanmål & desserter",
+      "fullURLPath": "Mejeri-Ost/Kylda-mellanmål-desserter",
+      "parentCategoryId": "7aac2fb3-4bf5-4763-9610-fd2ad3ef930a",
+      "departmentId": "7aac2fb3-4bf5-4763-9610-fd2ad3ef930a"
+    },
+    {
+      "id": "08d27ef1-eac5-4dbb-88d5-1be4f0882268",
+      "name": "Kylda såser",
+      "watchlistText": "Kylda såser",
+      "fullURLPath": "Färdigmat/Kylda-såser",
+      "parentCategoryId": "5d7bd782-7db9-4fef-ab86-3b7c5e797ccb",
+      "departmentId": "5d7bd782-7db9-4fef-ab86-3b7c5e797ccb"
+    },
+    {
+      "id": "2072b799-566c-4ba5-a72c-451ca86eec7d",
+      "name": "Kålrot",
+      "watchlistText": "Kålrot",
+      "fullURLPath": "Frukt-Grönt/Kål/Kålrot",
+      "parentCategoryId": "1db9c37c-87ea-4d92-84d4-5670eaaeb018",
+      "departmentId": "f82845b1-7be6-4e08-8b5d-7f2c0f0a7d38",
+      "retailerCategoryId": "4538",
+      "productCount": 1
+    },
+    {
+      "id": "cea5896c-e877-430a-bff5-e6ddd1635526",
+      "name": "Köksmaskiner",
+      "watchlistText": "Köksmaskiner",
+      "fullURLPath": "Kök/Köksmaskiner",
+      "parentCategoryId": "a0bceaa9-e61a-470f-9566-d46aae9b5b74",
+      "departmentId": "a0bceaa9-e61a-470f-9566-d46aae9b5b74"
+    },
+    {
+      "id": "431853ed-da0b-4e18-9d68-27b001ad32b5",
+      "name": "Kökstextil",
+      "watchlistText": "Kökstextil",
+      "fullURLPath": "Kök/Kökstextil",
+      "parentCategoryId": "a0bceaa9-e61a-470f-9566-d46aae9b5b74",
+      "departmentId": "a0bceaa9-e61a-470f-9566-d46aae9b5b74"
+    },
+    {
+      "id": "92f7b193-614b-4197-a8d2-dda13c0bdc2a",
+      "name": "Köttbullar & färsprodukter",
+      "watchlistText": "Köttbullar & färsprodukter",
+      "fullURLPath": "Kött-Chark-Fågel/Matchark/Köttbullar-färsprodukter",
+      "parentCategoryId": "dd850748-c56e-4aa3-bd97-81281fea9bae",
+      "departmentId": "c0a4a3ed-f97c-4b2f-81ca-dcc9a7e044f7",
+      "retailerCategoryId": "1381",
+      "productCount": 25
+    },
+    {
+      "id": "175c5b23-6659-4ee3-98fc-841215352537",
+      "name": "Laktosfri mjölk",
+      "watchlistText": "Laktosfri mjölk",
+      "fullURLPath": "Mejeri-Ost/Mjölk/Laktosfri-mjölk",
+      "parentCategoryId": "77a83ff9-a0cf-4aa0-907f-c0d47e0ec53c",
+      "departmentId": "7aac2fb3-4bf5-4763-9610-fd2ad3ef930a",
+      "retailerCategoryId": "2840",
+      "productCount": 22
+    },
+    {
+      "id": "f3394082-466c-4a3c-9049-11a7d05e8ccb",
+      "name": "Laktosfri yoghurt",
+      "watchlistText": "Laktosfri yoghurt",
+      "fullURLPath": "Mejeri-Ost/Yoghurt/Laktosfri-yoghurt",
+      "parentCategoryId": "f6a0d5e7-b4c8-435b-9eb4-14cbafd8409b",
+      "departmentId": "7aac2fb3-4bf5-4763-9610-fd2ad3ef930a",
+      "retailerCategoryId": "4513",
+      "productCount": 50
+    },
+    {
+      "id": "f733b5c2-19ec-480f-864f-e6daa5df1b35",
+      "name": "Laktosfritt smör & margarin",
+      "watchlistText": "Laktosfritt smör & margarin",
+      "fullURLPath": "Mejeri-Ost/Smör-Margarin/Laktosfritt-smör-margarin",
+      "parentCategoryId": "876bd9ea-151c-492a-999d-1249cdd4a617",
+      "departmentId": "7aac2fb3-4bf5-4763-9610-fd2ad3ef930a",
+      "retailerCategoryId": "2906",
+      "productCount": 11
+    },
+    {
+      "id": "65d862a4-f71d-437c-a480-1347be521958",
+      "name": "Lamm",
+      "watchlistText": "Lamm",
+      "fullURLPath": "Kött-Chark-Fågel/Kött/Lamm",
+      "parentCategoryId": "b4b30a51-2c01-45c4-b449-33bf5481d6c1",
+      "departmentId": "c0a4a3ed-f97c-4b2f-81ca-dcc9a7e044f7",
+      "retailerCategoryId": "4924",
+      "productCount": 14
+    },
+    {
+      "id": "5cd193ec-5e70-4e96-99af-36ea112695ec",
+      "name": "Lammfärs",
+      "watchlistText": "Lammfärs",
+      "fullURLPath": "Kött-Chark-Fågel/Köttfärs/Lammfärs",
+      "parentCategoryId": "68c65d92-4160-4761-a547-6e5fcec34466",
+      "departmentId": "c0a4a3ed-f97c-4b2f-81ca-dcc9a7e044f7",
+      "retailerCategoryId": "4928",
+      "productCount": 2
+    },
+    {
+      "id": "94828ec1-5a2c-4208-b7cc-760e2cd4f755",
+      "name": "Leksaker",
+      "watchlistText": "Leksaker",
+      "fullURLPath": "Fritid/Leksaker",
+      "parentCategoryId": "ac8a89ea-5c01-476f-bbb8-3c05526780d7",
+      "departmentId": "ac8a89ea-5c01-476f-bbb8-3c05526780d7"
+    },
+    {
+      "id": "53c377bf-1f76-4ea3-9cfe-8abeb1f7e99a",
+      "name": "Lever",
+      "watchlistText": "Lever",
+      "fullURLPath": "Kött-Chark-Fågel/Inälvsmat/Lever",
+      "parentCategoryId": "4f2418e6-c1bc-4161-9a77-892689973e49",
+      "departmentId": "c0a4a3ed-f97c-4b2f-81ca-dcc9a7e044f7",
+      "retailerCategoryId": "4761",
+      "productCount": 2
+    },
+    {
+      "id": "7196cfb1-44d5-40d0-b9f2-726eb287b412",
+      "name": "Lufttorkad nöt",
+      "watchlistText": "Lufttorkad nöt",
+      "fullURLPath": "Kött-Chark-Fågel/Delikatesschark/Lufttorkad-nöt",
+      "parentCategoryId": "33926eaa-54a2-447b-a831-c269c8b0f73d",
+      "departmentId": "c0a4a3ed-f97c-4b2f-81ca-dcc9a7e044f7",
+      "retailerCategoryId": "2625",
+      "productCount": 2
+    },
+    {
+      "id": "cdc719c5-b8d5-4f82-b995-a6677c3ebea9",
+      "name": "Lufttorkad skinka",
+      "watchlistText": "Lufttorkad skinka",
+      "fullURLPath": "Kött-Chark-Fågel/Delikatesschark/Lufttorkad-skinka",
+      "parentCategoryId": "33926eaa-54a2-447b-a831-c269c8b0f73d",
+      "departmentId": "c0a4a3ed-f97c-4b2f-81ca-dcc9a7e044f7",
+      "retailerCategoryId": "2624",
+      "productCount": 31
+    },
+    {
+      "id": "9f48d43d-b48d-4796-80e7-d4e93fc4de9d",
+      "name": "Läsk",
+      "watchlistText": "Läsk",
+      "fullURLPath": "Dryck/Läsk",
+      "parentCategoryId": "34948432-df3c-4468-991b-f0db32126003",
+      "departmentId": "34948432-df3c-4468-991b-f0db32126003"
+    },
+    {
+      "id": "aee8a924-a3d1-4395-88a1-a91adb897e60",
+      "name": "Lättmjölk",
+      "watchlistText": "Lättmjölk",
+      "fullURLPath": "Mejeri-Ost/Mjölk/Lättmjölk",
+      "parentCategoryId": "77a83ff9-a0cf-4aa0-907f-c0d47e0ec53c",
+      "departmentId": "7aac2fb3-4bf5-4763-9610-fd2ad3ef930a",
+      "retailerCategoryId": "1313",
+      "productCount": 13
+    },
+    {
+      "id": "fdf6a923-2098-4ff4-b8f7-f8ffd5e17e05",
+      "name": "Lövbiff",
+      "watchlistText": "Lövbiff",
+      "fullURLPath": "Kött-Chark-Fågel/Kött/Nötkött/Lövbiff",
+      "parentCategoryId": "db4dd486-6cf9-496b-b7e2-f9b0f95aba2a",
+      "departmentId": "c0a4a3ed-f97c-4b2f-81ca-dcc9a7e044f7",
+      "retailerCategoryId": "4753",
+      "productCount": 7
+    },
+    {
+      "id": "5d9e36b6-c4ed-49c6-a279-b933fa92b3d8",
+      "name": "Mache",
+      "watchlistText": "Mache",
+      "fullURLPath": "Frukt-Grönt/Grönsaker/Sallad/Mache",
+      "parentCategoryId": "da43879d-6b3c-4835-922e-098e8fde7833",
+      "departmentId": "f82845b1-7be6-4e08-8b5d-7f2c0f0a7d38",
+      "retailerCategoryId": "4595",
+      "productCount": 1
+    },
+    {
+      "id": "f83cb438-7298-4b9c-ac82-f72114a1ff55",
+      "name": "Majs",
+      "watchlistText": "Majs",
+      "fullURLPath": "Frukt-Grönt/Grönsaker/Majs",
+      "parentCategoryId": "6395d7ab-beee-4895-b733-cbfe2b63c069",
+      "departmentId": "f82845b1-7be6-4e08-8b5d-7f2c0f0a7d38",
+      "retailerCategoryId": "4583",
+      "productCount": 2
+    },
+    {
+      "id": "790d1646-9854-4fce-810b-ef521855056f",
+      "name": "Mandelpotatis",
+      "watchlistText": "Mandelpotatis",
+      "fullURLPath": "Frukt-Grönt/Potatis/Mandelpotatis",
+      "parentCategoryId": "c5b9394b-20ac-4f52-93b9-f7dd1fd09e00",
+      "departmentId": "f82845b1-7be6-4e08-8b5d-7f2c0f0a7d38",
+      "retailerCategoryId": "4731",
+      "productCount": 2
+    },
+    {
+      "id": "5b4d2271-0048-4448-819d-ae30c0226d52",
+      "name": "Mango",
+      "watchlistText": "Mango",
+      "fullURLPath": "Frukt-Grönt/Frukt/Exotisk-frukt/Mango",
+      "parentCategoryId": "83676072-0bbe-4b65-92ed-d09c14c452b9",
+      "departmentId": "f82845b1-7be6-4e08-8b5d-7f2c0f0a7d38",
+      "retailerCategoryId": "4877",
+      "productCount": 1
+    },
+    {
+      "id": "c26bff7e-481b-4d04-a3cf-fcadbe6116e7",
+      "name": "Matbröd",
+      "watchlistText": "Matbröd",
+      "fullURLPath": "Bröd-Kakor/Matbröd",
+      "parentCategoryId": "a34eb6f1-7ef8-4bcb-b166-4373726c158f",
+      "departmentId": "a34eb6f1-7ef8-4bcb-b166-4373726c158f"
+    },
+    {
+      "id": "96714c60-da25-417b-bbbb-8e76b1a37078",
+      "name": "Matfett margarin",
+      "watchlistText": "Matfett margarin",
+      "fullURLPath": "Mejeri-Ost/Smör-Margarin/Matfett-margarin",
+      "parentCategoryId": "876bd9ea-151c-492a-999d-1249cdd4a617",
+      "departmentId": "7aac2fb3-4bf5-4763-9610-fd2ad3ef930a",
+      "retailerCategoryId": "1601",
+      "productCount": 7
+    },
+    {
+      "id": "3efc5634-8188-4ddc-abf1-8fe9a1e1fef8",
+      "name": "Matfett smör",
+      "watchlistText": "Matfett smör",
+      "fullURLPath": "Mejeri-Ost/Smör-Margarin/Matfett-smör",
+      "parentCategoryId": "876bd9ea-151c-492a-999d-1249cdd4a617",
+      "departmentId": "7aac2fb3-4bf5-4763-9610-fd2ad3ef930a",
+      "retailerCategoryId": "1218",
+      "productCount": 14
+    },
+    {
+      "id": "dda0825a-4b79-417f-9a89-7b3dbd07fc3d",
+      "name": "Matfett övrigt",
+      "watchlistText": "Matfett övrigt",
+      "fullURLPath": "Mejeri-Ost/Smör-Margarin/Matfett-övrigt",
+      "parentCategoryId": "876bd9ea-151c-492a-999d-1249cdd4a617",
+      "departmentId": "7aac2fb3-4bf5-4763-9610-fd2ad3ef930a",
+      "retailerCategoryId": "4664",
+      "productCount": 2
+    },
+    {
+      "id": "666f737f-d908-4fd9-aea3-5c4c12d514ff",
+      "name": "Matförvaring",
+      "watchlistText": "Matförvaring",
+      "fullURLPath": "Kök/Matförvaring",
+      "parentCategoryId": "a0bceaa9-e61a-470f-9566-d46aae9b5b74",
+      "departmentId": "a0bceaa9-e61a-470f-9566-d46aae9b5b74"
+    },
+    {
+      "id": "51d9cb25-c568-434b-a515-984d0c9181ae",
+      "name": "Matlagningsost",
+      "watchlistText": "Matlagningsost",
+      "fullURLPath": "Mejeri-Ost/Ost/Matlagningsost",
+      "parentCategoryId": "342706ff-6dd8-4e9d-9ab3-8ff5aac99dd1",
+      "departmentId": "7aac2fb3-4bf5-4763-9610-fd2ad3ef930a",
+      "retailerCategoryId": "272",
+      "productCount": 165
+    },
+    {
+      "id": "4e775a1f-9b9a-4ede-8f70-c3dc3bb70208",
+      "name": "Matlagningsyoghurt",
+      "watchlistText": "Matlagningsyoghurt",
+      "fullURLPath": "Mejeri-Ost/Yoghurt/Matlagningsyoghurt",
+      "parentCategoryId": "f6a0d5e7-b4c8-435b-9eb4-14cbafd8409b",
+      "departmentId": "7aac2fb3-4bf5-4763-9610-fd2ad3ef930a",
+      "retailerCategoryId": "4504",
+      "productCount": 20
+    },
+    {
+      "id": "40233562-19f6-4316-8668-0ab49b592d65",
+      "name": "Matning & Babytillbehör",
+      "watchlistText": "Matning & Babytillbehör",
+      "fullURLPath": "Barn/Matning-Babytillbehör",
+      "parentCategoryId": "ac8a89ea-5c01-476f-bbb8-3c05526780d7",
+      "departmentId": "ac8a89ea-5c01-476f-bbb8-3c05526780d7"
+    },
+    {
+      "id": "2744c53e-5c88-4490-b4f3-eafbf7343adf",
+      "name": "Medvurst & Mortadella",
+      "watchlistText": "Medvurst & Mortadella",
+      "fullURLPath": "Kött-Chark-Fågel/Delikatesschark/Medvurst-Mortadella",
+      "parentCategoryId": "33926eaa-54a2-447b-a831-c269c8b0f73d",
+      "departmentId": "c0a4a3ed-f97c-4b2f-81ca-dcc9a7e044f7",
+      "retailerCategoryId": "2628",
+      "productCount": 2
+    },
+    {
+      "id": "b7d2e654-3124-4cd3-a6a7-583cb567bddd",
+      "name": "Mellanmjölk",
+      "watchlistText": "Mellanmjölk",
+      "fullURLPath": "Mejeri-Ost/Mjölk/Mellanmjölk",
+      "parentCategoryId": "77a83ff9-a0cf-4aa0-907f-c0d47e0ec53c",
+      "departmentId": "7aac2fb3-4bf5-4763-9610-fd2ad3ef930a",
+      "retailerCategoryId": "1312",
+      "productCount": 25
+    },
+    {
+      "id": "bf5d5106-070e-4102-996c-f167d80f2844",
+      "name": "Mellanmål & Barndryck",
+      "watchlistText": "Mellanmål & Barndryck",
+      "fullURLPath": "Barn/Mellanmål-Barndryck",
+      "parentCategoryId": "ac8a89ea-5c01-476f-bbb8-3c05526780d7",
+      "departmentId": "ac8a89ea-5c01-476f-bbb8-3c05526780d7"
+    },
+    {
+      "id": "1afa0d24-5d93-4116-9ad7-0313fcc8ae9c",
+      "name": "Melon",
+      "watchlistText": "Melon",
+      "fullURLPath": "Frukt-Grönt/Frukt/Melon",
+      "parentCategoryId": "18d60b20-1c1a-4023-92f4-6c18facf3915",
+      "departmentId": "f82845b1-7be6-4e08-8b5d-7f2c0f0a7d38",
+      "retailerCategoryId": "4914",
+      "productCount": 5
+    },
+    {
+      "id": "d5f20721-13dd-41a2-92fd-7c0c9a42f150",
+      "name": "Mesost & messmör",
+      "watchlistText": "Mesost & messmör",
+      "fullURLPath": "Mejeri-Ost/Ost/Mesost-messmör",
+      "parentCategoryId": "342706ff-6dd8-4e9d-9ab3-8ff5aac99dd1",
+      "departmentId": "7aac2fb3-4bf5-4763-9610-fd2ad3ef930a",
+      "retailerCategoryId": "274",
+      "productCount": 9
+    },
+    {
+      "id": "7aa34780-2ced-4f61-9956-012385129fe0",
+      "name": "Minimjölk",
+      "watchlistText": "Minimjölk",
+      "fullURLPath": "Mejeri-Ost/Mjölk/Minimjölk",
+      "parentCategoryId": "77a83ff9-a0cf-4aa0-907f-c0d47e0ec53c",
+      "departmentId": "7aac2fb3-4bf5-4763-9610-fd2ad3ef930a",
+      "retailerCategoryId": "1584",
+      "productCount": 1
+    },
+    {
+      "id": "b2822b7d-ace5-4d6a-b2ca-3d0ef0e509ae",
+      "name": "Mjukost",
+      "watchlistText": "Mjukost",
+      "fullURLPath": "Mejeri-Ost/Ost/Mjukost",
+      "parentCategoryId": "342706ff-6dd8-4e9d-9ab3-8ff5aac99dd1",
+      "departmentId": "7aac2fb3-4bf5-4763-9610-fd2ad3ef930a",
+      "retailerCategoryId": "269",
+      "productCount": 33
+    },
+    {
+      "id": "92dc546e-6541-462e-8082-520f78ce30f8",
+      "name": "Mjöl & Bakning",
+      "watchlistText": "Mjöl & Bakning",
+      "fullURLPath": "Skafferi/Mjöl-Bakning",
+      "parentCategoryId": "f4882652-d405-4cd1-876c-247667adc392",
+      "departmentId": "f4882652-d405-4cd1-876c-247667adc392"
+    },
+    {
+      "id": "f205e9b6-920f-4b41-8b86-8b0212c6c206",
+      "name": "Mjölig potatis",
+      "watchlistText": "Mjölig potatis",
+      "fullURLPath": "Frukt-Grönt/Potatis/Mjölig-potatis",
+      "parentCategoryId": "c5b9394b-20ac-4f52-93b9-f7dd1fd09e00",
+      "departmentId": "f82845b1-7be6-4e08-8b5d-7f2c0f0a7d38",
+      "retailerCategoryId": "4726",
+      "productCount": 6
+    },
+    {
+      "id": "f6bd29ba-3910-4322-90f5-f777b2742837",
+      "name": "Mjölkersättning",
+      "watchlistText": "Mjölkersättning",
+      "fullURLPath": "Barn/Mjölkersättning",
+      "parentCategoryId": "ac8a89ea-5c01-476f-bbb8-3c05526780d7",
+      "departmentId": "ac8a89ea-5c01-476f-bbb8-3c05526780d7"
+    },
+    {
+      "id": "6c7290c5-3f85-47f9-b389-acc2b3f1533a",
+      "name": "Mjölkfri dryck",
+      "watchlistText": "Mjölkfri dryck",
+      "fullURLPath": "Mejeri-Ost/Mjölk/Mjölkfri-dryck",
+      "parentCategoryId": "77a83ff9-a0cf-4aa0-907f-c0d47e0ec53c",
+      "departmentId": "7aac2fb3-4bf5-4763-9610-fd2ad3ef930a",
+      "retailerCategoryId": "302",
+      "productCount": 77
+    },
+    {
+      "id": "dbbdbc86-629c-490f-87be-727085463534",
+      "name": "Mjölkfri yoghurt",
+      "watchlistText": "Mjölkfri yoghurt",
+      "fullURLPath": "Mejeri-Ost/Yoghurt/Mjölkfri-yoghurt",
+      "parentCategoryId": "f6a0d5e7-b4c8-435b-9eb4-14cbafd8409b",
+      "departmentId": "7aac2fb3-4bf5-4763-9610-fd2ad3ef930a",
+      "retailerCategoryId": "1893",
+      "productCount": 21
+    },
+    {
+      "id": "b9aaac86-293e-40c2-b892-658d2f53c47c",
+      "name": "Mjölkfritt mejeri",
+      "watchlistText": "Mjölkfritt mejeri",
+      "fullURLPath": "Vegetariskt/Mjölkfritt-mejeri",
+      "parentCategoryId": "442f3f18-3b3a-484a-ae0d-700be34148ed",
+      "departmentId": "442f3f18-3b3a-484a-ae0d-700be34148ed"
+    },
+    {
+      "id": "438d4eb1-9d08-4baa-b5f7-5df5045325c0",
+      "name": "Morötter",
+      "watchlistText": "Morötter",
+      "fullURLPath": "Frukt-Grönt/Rotfrukter/Morötter",
+      "parentCategoryId": "c03f7cb4-d742-46c2-8872-a79345413ce7",
+      "departmentId": "f82845b1-7be6-4e08-8b5d-7f2c0f0a7d38",
+      "retailerCategoryId": "4548",
+      "productCount": 8
+    },
+    {
+      "id": "b6121667-c184-4443-84ee-7fd77e875b1a",
+      "name": "Munvård",
+      "watchlistText": "Munvård",
+      "fullURLPath": "Apotek-Hälsa-Skönhet/Munvård",
+      "parentCategoryId": "70e47511-1892-45c5-8b0a-c5340ef8e518",
+      "departmentId": "70e47511-1892-45c5-8b0a-c5340ef8e518"
+    },
+    {
+      "id": "096a82ae-71c4-498d-9976-b9e836a7ad3c",
+      "name": "Mynta",
+      "watchlistText": "Mynta",
+      "fullURLPath": "Frukt-Grönt/Färska-kryddor/Mynta",
+      "parentCategoryId": "34ac4412-f004-47ef-ae7c-047841f42c24",
+      "departmentId": "f82845b1-7be6-4e08-8b5d-7f2c0f0a7d38",
+      "retailerCategoryId": "4556",
+      "productCount": 1
+    },
+    {
+      "id": "eb556945-b2f7-4f8f-8fa0-727bb08e407a",
+      "name": "Måltidsdryck",
+      "watchlistText": "Måltidsdryck",
+      "fullURLPath": "Mejeri-Ost/Juice-Fruktdryck/Måltidsdryck",
+      "parentCategoryId": "c4e30eb9-a7e6-4a1b-9f99-9f60edc4cadd",
+      "departmentId": "7aac2fb3-4bf5-4763-9610-fd2ad3ef930a",
+      "retailerCategoryId": "2594",
+      "productCount": 64
+    },
+    {
+      "id": "c1db2ab6-f049-44f3-81b7-fecfe2b05bfd",
+      "name": "Naturell yoghurt",
+      "watchlistText": "Naturell yoghurt",
+      "fullURLPath": "Mejeri-Ost/Yoghurt/Naturell-yoghurt",
+      "parentCategoryId": "f6a0d5e7-b4c8-435b-9eb4-14cbafd8409b",
+      "departmentId": "7aac2fb3-4bf5-4763-9610-fd2ad3ef930a",
+      "retailerCategoryId": "1233",
+      "productCount": 21
+    },
+    {
+      "id": "870a49f4-b887-48cf-a07e-9bcab04f1262",
+      "name": "Naturgodis, Nötter & Bars",
+      "watchlistText": "Naturgodis, Nötter & Bars",
+      "fullURLPath": "Glass-Godis-Snacks/Naturgodis-Nötter-Bars",
+      "parentCategoryId": "bb534c25-3729-48bc-b9cc-c4516145879c",
+      "departmentId": "bb534c25-3729-48bc-b9cc-c4516145879c"
+    },
+    {
+      "id": "77ffb421-06f2-48dd-ac8d-8550e7c70232",
+      "name": "Nypressad Juice",
+      "watchlistText": "Nypressad Juice",
+      "fullURLPath": "Mejeri-Ost/Juice-Fruktdryck/Nypressad-Juice",
+      "parentCategoryId": "c4e30eb9-a7e6-4a1b-9f99-9f60edc4cadd",
+      "departmentId": "7aac2fb3-4bf5-4763-9610-fd2ad3ef930a",
+      "retailerCategoryId": "2586",
+      "productCount": 12
+    },
+    {
+      "id": "a3dfd0bd-7d83-4d31-b820-4ed952bffba7",
+      "name": "Nötfärs",
+      "watchlistText": "Nötfärs",
+      "fullURLPath": "Kött-Chark-Fågel/Köttfärs/Nötfärs",
+      "parentCategoryId": "68c65d92-4160-4761-a547-6e5fcec34466",
+      "departmentId": "c0a4a3ed-f97c-4b2f-81ca-dcc9a7e044f7",
+      "retailerCategoryId": "1384",
+      "productCount": 12
+    },
+    {
+      "id": "44f84083-71eb-4867-82b7-40d2cd0b8796",
+      "name": "Odla & Plantera",
+      "watchlistText": "Odla & Plantera",
+      "fullURLPath": "Blommor-Trädgård/Odla-Plantera",
+      "parentCategoryId": "71542409-5f2e-4ae3-9ad7-6751e10afb38",
+      "departmentId": "71542409-5f2e-4ae3-9ad7-6751e10afb38"
+    },
+    {
+      "id": "7c39b8db-bc15-4e82-b53e-571ead857fad",
+      "name": "Oregano",
+      "watchlistText": "Oregano",
+      "fullURLPath": "Frukt-Grönt/Färska-kryddor/Oregano",
+      "parentCategoryId": "34ac4412-f004-47ef-ae7c-047841f42c24",
+      "departmentId": "f82845b1-7be6-4e08-8b5d-7f2c0f0a7d38",
+      "retailerCategoryId": "4561",
+      "productCount": 2
+    },
+    {
+      "id": "bb37b6e6-8b46-4b6b-bcb2-a4a009e255d3",
+      "name": "Oxfilé",
+      "watchlistText": "Oxfilé",
+      "fullURLPath": "Kött-Chark-Fågel/Kött/Nötkött/Oxfilé",
+      "parentCategoryId": "db4dd486-6cf9-496b-b7e2-f9b0f95aba2a",
+      "departmentId": "c0a4a3ed-f97c-4b2f-81ca-dcc9a7e044f7",
+      "retailerCategoryId": "4754",
+      "productCount": 9
+    },
+    {
+      "id": "0e230ce1-0400-4184-8f6e-816792312c3d",
+      "name": "Paketinslagning",
+      "watchlistText": "Paketinslagning",
+      "fullURLPath": "Hem-Inredning/Paketinslagning",
+      "parentCategoryId": "898d465a-1c6b-487a-9be1-31fac1cc4014",
+      "departmentId": "898d465a-1c6b-487a-9be1-31fac1cc4014"
+    },
+    {
+      "id": "cfba5d0d-3481-489c-9b74-d660204924d2",
+      "name": "Palsternacka",
+      "watchlistText": "Palsternacka",
+      "fullURLPath": "Frukt-Grönt/Rotfrukter/Palsternacka",
+      "parentCategoryId": "c03f7cb4-d742-46c2-8872-a79345413ce7",
+      "departmentId": "f82845b1-7be6-4e08-8b5d-7f2c0f0a7d38",
+      "retailerCategoryId": "4546",
+      "productCount": 2
+    },
+    {
+      "id": "9600890f-9bfb-4cd5-96b9-4012ec0c7d6d",
+      "name": "Papaya",
+      "watchlistText": "Papaya",
+      "fullURLPath": "Frukt-Grönt/Frukt/Exotisk-frukt/Papaya",
+      "parentCategoryId": "83676072-0bbe-4b65-92ed-d09c14c452b9",
+      "departmentId": "f82845b1-7be6-4e08-8b5d-7f2c0f0a7d38",
+      "retailerCategoryId": "4884",
+      "productCount": 1
+    },
+    {
+      "id": "c436bce4-1cc3-4b75-8610-9b5e8d6ed914",
+      "name": "Paprika",
+      "watchlistText": "Paprika",
+      "fullURLPath": "Frukt-Grönt/Grönsaker/Paprika",
+      "parentCategoryId": "6395d7ab-beee-4895-b733-cbfe2b63c069",
+      "departmentId": "f82845b1-7be6-4e08-8b5d-7f2c0f0a7d38",
+      "retailerCategoryId": "688",
+      "productCount": 10
+    },
+    {
+      "id": "19dddb0b-d1a0-4fb2-8c97-51dd59df4248",
+      "name": "Passionsfrukt",
+      "watchlistText": "Passionsfrukt",
+      "fullURLPath": "Frukt-Grönt/Frukt/Exotisk-frukt/Passionsfrukt",
+      "parentCategoryId": "83676072-0bbe-4b65-92ed-d09c14c452b9",
+      "departmentId": "f82845b1-7be6-4e08-8b5d-7f2c0f0a7d38",
+      "retailerCategoryId": "4881",
+      "productCount": 1
+    },
+    {
+      "id": "81827787-f0ca-4cfa-b50a-7114bc5fe459",
+      "name": "Pasta, ris & mos",
+      "watchlistText": "Pasta, ris & mos",
+      "fullURLPath": "Skafferi/Pasta-ris-mos",
+      "parentCategoryId": "f4882652-d405-4cd1-876c-247667adc392",
+      "departmentId": "f4882652-d405-4cd1-876c-247667adc392"
+    },
+    {
+      "id": "f54ac1da-b421-4d27-9f90-7c81c4333703",
+      "name": "Pastej & paté",
+      "watchlistText": "Pastej & paté",
+      "fullURLPath": "Kött-Chark-Fågel/Pålägg/Pastej-paté",
+      "parentCategoryId": "6a7fd157-5a0f-44e0-aff8-318de3bb8a96",
+      "departmentId": "c0a4a3ed-f97c-4b2f-81ca-dcc9a7e044f7",
+      "retailerCategoryId": "49",
+      "productCount": 40
+    },
+    {
+      "id": "f331eb80-2241-4a39-b439-d9cd7ccd9382",
+      "name": "Pepparbiff & Färdigkryddat nötkött",
+      "watchlistText": "Pepparbiff & Färdigkryddat nötkött",
+      "fullURLPath": "Kött-Chark-Fågel/Kött/Nötkött/Pepparbiff-Färdigkryddat-nötkött",
+      "parentCategoryId": "db4dd486-6cf9-496b-b7e2-f9b0f95aba2a",
+      "departmentId": "c0a4a3ed-f97c-4b2f-81ca-dcc9a7e044f7",
+      "retailerCategoryId": "4748",
+      "productCount": 8
+    },
+    {
+      "id": "249e6219-0faa-4cb1-ad51-8d937ade999d",
+      "name": "Pepparrot",
+      "watchlistText": "Pepparrot",
+      "fullURLPath": "Frukt-Grönt/Rotfrukter/Pepparrot",
+      "parentCategoryId": "c03f7cb4-d742-46c2-8872-a79345413ce7",
+      "departmentId": "f82845b1-7be6-4e08-8b5d-7f2c0f0a7d38",
+      "retailerCategoryId": "4549",
+      "productCount": 1
+    },
+    {
+      "id": "c1e1259b-3809-4054-ac8b-74398c24b523",
+      "name": "Persilja",
+      "watchlistText": "Persilja",
+      "fullURLPath": "Frukt-Grönt/Färska-kryddor/Persilja",
+      "parentCategoryId": "34ac4412-f004-47ef-ae7c-047841f42c24",
+      "departmentId": "f82845b1-7be6-4e08-8b5d-7f2c0f0a7d38",
+      "retailerCategoryId": "1073",
+      "productCount": 5
+    },
+    {
+      "id": "e1a06bfe-6be1-4b05-ae27-8f6b93311849",
+      "name": "Picknickbog",
+      "watchlistText": "Picknickbog",
+      "fullURLPath": "Kött-Chark-Fågel/Kött/Fläsk/Picknickbog",
+      "parentCategoryId": "74dfbe91-d9b0-49d6-acc4-ebcb9614f73a",
+      "departmentId": "c0a4a3ed-f97c-4b2f-81ca-dcc9a7e044f7",
+      "retailerCategoryId": "4961",
+      "productCount": 2
+    },
+    {
+      "id": "9ddf2a0c-8049-4bd5-8e60-cc0090dd2379",
+      "name": "Pizzakit & kylda degar",
+      "watchlistText": "Pizzakit & kylda degar",
+      "fullURLPath": "Färdigmat/Pizzakit-kylda-degar",
+      "parentCategoryId": "5d7bd782-7db9-4fef-ab86-3b7c5e797ccb",
+      "departmentId": "5d7bd782-7db9-4fef-ab86-3b7c5e797ccb"
+    },
+    {
+      "id": "b3bcfc38-20c4-44b4-8f3e-683f58800ef9",
+      "name": "Plåster & Sårvård",
+      "watchlistText": "Plåster & Sårvård",
+      "fullURLPath": "Apotek-Hälsa-Skönhet/Plåster-Sårvård",
+      "parentCategoryId": "70e47511-1892-45c5-8b0a-c5340ef8e518",
+      "departmentId": "70e47511-1892-45c5-8b0a-c5340ef8e518"
+    },
+    {
+      "id": "7a508dad-53e4-4159-82b6-796937a0017d",
+      "name": "Portionsrätter",
+      "watchlistText": "Portionsrätter",
+      "fullURLPath": "Färdigmat/Portionsrätter",
+      "parentCategoryId": "5d7bd782-7db9-4fef-ab86-3b7c5e797ccb",
+      "departmentId": "5d7bd782-7db9-4fef-ab86-3b7c5e797ccb"
+    },
+    {
+      "id": "a53e7ec0-074b-4059-ae1e-0ff486c87e31",
+      "name": "Prinskorv",
+      "watchlistText": "Prinskorv",
+      "fullURLPath": "Kött-Chark-Fågel/Korv/Prinskorv",
+      "parentCategoryId": "68ed3c20-58e3-44d6-a95b-24ece4612260",
+      "departmentId": "c0a4a3ed-f97c-4b2f-81ca-dcc9a7e044f7",
+      "retailerCategoryId": "58",
+      "productCount": 5
+    },
+    {
+      "id": "4d5caebd-de6c-4dc2-81ce-c28231b88477",
+      "name": "Proteinbars",
+      "watchlistText": "Proteinbars",
+      "fullURLPath": "Träning-Återhämtning/Proteinbars",
+      "parentCategoryId": "e128adca-fd5e-4b7e-a34e-a0badfe367ac",
+      "departmentId": "e128adca-fd5e-4b7e-a34e-a0badfe367ac"
+    },
+    {
+      "id": "0cf1989b-eda1-44dc-94a0-8c113ec8ad18",
+      "name": "Proteinmål",
+      "watchlistText": "Proteinmål",
+      "fullURLPath": "Träning-Återhämtning/Proteinmål",
+      "parentCategoryId": "e128adca-fd5e-4b7e-a34e-a0badfe367ac",
+      "departmentId": "e128adca-fd5e-4b7e-a34e-a0badfe367ac"
+    },
+    {
+      "id": "960baeed-c38a-4c62-836e-c2429075f6b5",
+      "name": "Proteinpulver & Övriga tillskott",
+      "watchlistText": "Proteinpulver & Övriga tillskott",
+      "fullURLPath": "Träning-Återhämtning/Proteinpulver-Övriga-tillskott",
+      "parentCategoryId": "e128adca-fd5e-4b7e-a34e-a0badfe367ac",
+      "departmentId": "e128adca-fd5e-4b7e-a34e-a0badfe367ac"
+    },
+    {
+      "id": "fceb7a20-be6d-4ddd-9745-c5563b897da0",
+      "name": "Purjolök",
+      "watchlistText": "Purjolök",
+      "fullURLPath": "Frukt-Grönt/Lök/Purjolök",
+      "parentCategoryId": "9a66038b-f95a-45b6-9a50-76a43c494031",
+      "departmentId": "f82845b1-7be6-4e08-8b5d-7f2c0f0a7d38",
+      "retailerCategoryId": "4570",
+      "productCount": 2
+    },
+    {
+      "id": "cb0756d2-985b-45de-89af-bd068eb7de5a",
+      "name": "Påläggskorv",
+      "watchlistText": "Påläggskorv",
+      "fullURLPath": "Kött-Chark-Fågel/Pålägg/Påläggskorv",
+      "parentCategoryId": "6a7fd157-5a0f-44e0-aff8-318de3bb8a96",
+      "departmentId": "c0a4a3ed-f97c-4b2f-81ca-dcc9a7e044f7",
+      "retailerCategoryId": "42",
+      "productCount": 26
+    },
+    {
+      "id": "4c714e80-d752-4620-9e95-9b600b6b627d",
+      "name": "Påläggsost",
+      "watchlistText": "Påläggsost",
+      "fullURLPath": "Mejeri-Ost/Ost/Påläggsost",
+      "parentCategoryId": "342706ff-6dd8-4e9d-9ab3-8ff5aac99dd1",
+      "departmentId": "7aac2fb3-4bf5-4763-9610-fd2ad3ef930a",
+      "retailerCategoryId": "268",
+      "productCount": 164
+    },
+    {
+      "id": "7279128f-e13e-47af-b2e2-94567d72768f",
+      "name": "Päron",
+      "watchlistText": "Päron",
+      "fullURLPath": "Frukt-Grönt/Frukt/Päron",
+      "parentCategoryId": "18d60b20-1c1a-4023-92f4-6c18facf3915",
+      "departmentId": "f82845b1-7be6-4e08-8b5d-7f2c0f0a7d38",
+      "retailerCategoryId": "677",
+      "productCount": 6
+    },
+    {
+      "id": "2ca7d26d-dac9-42f0-88d7-b8e1b1f57822",
+      "name": "Rabarber",
+      "watchlistText": "Rabarber",
+      "fullURLPath": "Frukt-Grönt/Frukt/Rabarber",
+      "parentCategoryId": "18d60b20-1c1a-4023-92f4-6c18facf3915",
+      "departmentId": "f82845b1-7be6-4e08-8b5d-7f2c0f0a7d38",
+      "retailerCategoryId": "4606",
+      "productCount": 1
+    },
+    {
+      "id": "b770581b-9179-4387-b130-a34954da4f96",
+      "name": "Rakvård & Hårborttagning",
+      "watchlistText": "Rakvård & Hårborttagning",
+      "fullURLPath": "Apotek-Hälsa-Skönhet/Rakvård-Hårborttagning",
+      "parentCategoryId": "70e47511-1892-45c5-8b0a-c5340ef8e518",
+      "departmentId": "70e47511-1892-45c5-8b0a-c5340ef8e518"
+    },
+    {
+      "id": "df2b1174-169d-4b7e-8da8-80d84007bd68",
+      "name": "Ramslök",
+      "watchlistText": "Ramslök",
+      "fullURLPath": "Frukt-Grönt/Lök/Ramslök",
+      "parentCategoryId": "9a66038b-f95a-45b6-9a50-76a43c494031",
+      "departmentId": "f82845b1-7be6-4e08-8b5d-7f2c0f0a7d38",
+      "retailerCategoryId": "4562",
+      "productCount": 1
+    },
+    {
+      "id": "aa4d04ec-beb8-49ed-bbc8-ff1b6175a6fb",
+      "name": "Receptfria läkemedel",
+      "watchlistText": "Receptfria läkemedel",
+      "fullURLPath": "Apotek-Hälsa-Skönhet/Receptfria-läkemedel",
+      "parentCategoryId": "70e47511-1892-45c5-8b0a-c5340ef8e518",
+      "departmentId": "70e47511-1892-45c5-8b0a-c5340ef8e518"
+    },
+    {
+      "id": "7d4bc393-7d52-44f2-aea6-46fd003c5bfc",
+      "name": "Revbensspjäll",
+      "watchlistText": "Revbensspjäll",
+      "fullURLPath": "Kött-Chark-Fågel/Kött/Fläsk/Revbensspjäll",
+      "parentCategoryId": "74dfbe91-d9b0-49d6-acc4-ebcb9614f73a",
+      "departmentId": "c0a4a3ed-f97c-4b2f-81ca-dcc9a7e044f7",
+      "retailerCategoryId": "785",
+      "productCount": 8
+    },
+    {
+      "id": "cbceb008-06bd-4050-89a4-90c576ba4832",
+      "name": "Romansallad",
+      "watchlistText": "Romansallad",
+      "fullURLPath": "Frukt-Grönt/Grönsaker/Sallad/Romansallad",
+      "parentCategoryId": "da43879d-6b3c-4835-922e-098e8fde7833",
+      "departmentId": "f82845b1-7be6-4e08-8b5d-7f2c0f0a7d38",
+      "retailerCategoryId": "4596",
+      "productCount": 2
+    },
+    {
+      "id": "97645390-1910-4daa-8517-1e9073fdceae",
+      "name": "Rosmarin",
+      "watchlistText": "Rosmarin",
+      "fullURLPath": "Frukt-Grönt/Färska-kryddor/Rosmarin",
+      "parentCategoryId": "34ac4412-f004-47ef-ae7c-047841f42c24",
+      "departmentId": "f82845b1-7be6-4e08-8b5d-7f2c0f0a7d38",
+      "retailerCategoryId": "4554",
+      "productCount": 1
+    },
+    {
+      "id": "152951ca-8209-4511-88ba-2c52fda98f3c",
+      "name": "Rostas",
+      "watchlistText": "Rostas",
+      "fullURLPath": "Kött-Chark-Fågel/Kött/Nötkött/Rostas",
+      "parentCategoryId": "db4dd486-6cf9-496b-b7e2-f9b0f95aba2a",
+      "departmentId": "c0a4a3ed-f97c-4b2f-81ca-dcc9a7e044f7",
+      "retailerCategoryId": "4755",
+      "productCount": 4
+    },
+    {
+      "id": "10273e34-15c3-4cf0-bc22-02e91310a265",
+      "name": "Rostbiff",
+      "watchlistText": "Rostbiff",
+      "fullURLPath": "Kött-Chark-Fågel/Kött/Nötkött/Rostbiff",
+      "parentCategoryId": "db4dd486-6cf9-496b-b7e2-f9b0f95aba2a",
+      "departmentId": "c0a4a3ed-f97c-4b2f-81ca-dcc9a7e044f7",
+      "retailerCategoryId": "4756",
+      "productCount": 3
+    },
+    {
+      "id": "e233c2e5-67b7-4a4b-afd7-fab9c81c902f",
+      "name": "Rostbiff & pastrami",
+      "watchlistText": "Rostbiff & pastrami",
+      "fullURLPath": "Kött-Chark-Fågel/Pålägg/Rostbiff-pastrami",
+      "parentCategoryId": "6a7fd157-5a0f-44e0-aff8-318de3bb8a96",
+      "departmentId": "c0a4a3ed-f97c-4b2f-81ca-dcc9a7e044f7",
+      "retailerCategoryId": "46",
+      "productCount": 4
+    },
+    {
+      "id": "ef503f56-bc49-4150-a659-833e7fafd351",
+      "name": "Rotselleri",
+      "watchlistText": "Rotselleri",
+      "fullURLPath": "Frukt-Grönt/Rotfrukter/Rotselleri",
+      "parentCategoryId": "c03f7cb4-d742-46c2-8872-a79345413ce7",
+      "departmentId": "f82845b1-7be6-4e08-8b5d-7f2c0f0a7d38",
+      "retailerCategoryId": "4545",
+      "productCount": 1
+    },
+    {
+      "id": "e815f30d-9bd7-4bd5-8672-ad12807fb518",
+      "name": "Rucola",
+      "watchlistText": "Rucola",
+      "fullURLPath": "Frukt-Grönt/Grönsaker/Sallad/Rucola",
+      "parentCategoryId": "da43879d-6b3c-4835-922e-098e8fde7833",
+      "departmentId": "f82845b1-7be6-4e08-8b5d-7f2c0f0a7d38",
+      "retailerCategoryId": "4597",
+      "productCount": 3
+    },
+    {
+      "id": "5494e05c-0672-4705-88d5-5a8ea4a288c5",
+      "name": "Rull- & piptobak",
+      "watchlistText": "Rull- & piptobak",
+      "fullURLPath": "Tobak/Rull-piptobak",
+      "parentCategoryId": "4d09b54a-c6f7-4898-8aac-b089712f7e76",
+      "departmentId": "4d09b54a-c6f7-4898-8aac-b089712f7e76"
+    },
+    {
+      "id": "c3b06355-2461-4a76-8fb3-1c1ce9d1cc8f",
+      "name": "Ryggbiff",
+      "watchlistText": "Ryggbiff",
+      "fullURLPath": "Kött-Chark-Fågel/Kött/Nötkött/Ryggbiff",
+      "parentCategoryId": "db4dd486-6cf9-496b-b7e2-f9b0f95aba2a",
+      "departmentId": "c0a4a3ed-f97c-4b2f-81ca-dcc9a7e044f7",
+      "retailerCategoryId": "4757",
+      "productCount": 10
+    },
+    {
+      "id": "1ae52516-747f-4570-ba2b-386cfef57867",
+      "name": "Rädisor",
+      "watchlistText": "Rädisor",
+      "fullURLPath": "Frukt-Grönt/Grönsaker/Rädisor",
+      "parentCategoryId": "6395d7ab-beee-4895-b733-cbfe2b63c069",
+      "departmentId": "f82845b1-7be6-4e08-8b5d-7f2c0f0a7d38",
+      "retailerCategoryId": "4584",
+      "productCount": 3
+    },
+    {
+      "id": "f1346b41-d843-4d2f-98ba-84f113361e3c",
+      "name": "Rättika",
+      "watchlistText": "Rättika",
+      "fullURLPath": "Frukt-Grönt/Rotfrukter/Rättika",
+      "parentCategoryId": "c03f7cb4-d742-46c2-8872-a79345413ce7",
+      "departmentId": "f82845b1-7be6-4e08-8b5d-7f2c0f0a7d38",
+      "retailerCategoryId": "4568",
+      "productCount": 1
+    },
+    {
+      "id": "73bad600-c506-427b-ac3c-84d8f4f5f11a",
+      "name": "Rödkål",
+      "watchlistText": "Rödkål",
+      "fullURLPath": "Frukt-Grönt/Kål/Rödkål",
+      "parentCategoryId": "1db9c37c-87ea-4d92-84d4-5670eaaeb018",
+      "departmentId": "f82845b1-7be6-4e08-8b5d-7f2c0f0a7d38",
+      "retailerCategoryId": "4533",
+      "productCount": 2
+    },
+    {
+      "id": "d8c8986d-2a56-4347-9490-aafe1a2a6f60",
+      "name": "Rödlök",
+      "watchlistText": "Rödlök",
+      "fullURLPath": "Frukt-Grönt/Lök/Rödlök",
+      "parentCategoryId": "9a66038b-f95a-45b6-9a50-76a43c494031",
+      "departmentId": "f82845b1-7be6-4e08-8b5d-7f2c0f0a7d38",
+      "retailerCategoryId": "1263",
+      "productCount": 4
+    },
+    {
+      "id": "071547c8-85dc-4bac-8d3e-4f1f4d02c562",
+      "name": "Saft & Lightdryck",
+      "watchlistText": "Saft & Lightdryck",
+      "fullURLPath": "Dryck/Saft-Lightdryck",
+      "parentCategoryId": "34948432-df3c-4468-991b-f0db32126003",
+      "departmentId": "34948432-df3c-4468-991b-f0db32126003"
+    },
+    {
+      "id": "ecf70a00-ea5f-404b-bf3a-4ef5c68805f5",
+      "name": "Salami",
+      "watchlistText": "Salami",
+      "fullURLPath": "Kött-Chark-Fågel/Pålägg/Salami",
+      "parentCategoryId": "6a7fd157-5a0f-44e0-aff8-318de3bb8a96",
+      "departmentId": "c0a4a3ed-f97c-4b2f-81ca-dcc9a7e044f7",
+      "retailerCategoryId": "43",
+      "productCount": 63
+    },
+    {
+      "id": "52aa9e9f-9ee9-4eb7-b8f2-a8dc6d34c3fd",
+      "name": "Salami delikatess",
+      "watchlistText": "Salami delikatess",
+      "fullURLPath": "Kött-Chark-Fågel/Delikatesschark/Salami-delikatess",
+      "parentCategoryId": "33926eaa-54a2-447b-a831-c269c8b0f73d",
+      "departmentId": "c0a4a3ed-f97c-4b2f-81ca-dcc9a7e044f7",
+      "retailerCategoryId": "2626",
+      "productCount": 44
+    },
+    {
+      "id": "2510b47b-59c2-4ebd-95dc-3ffece8768b9",
+      "name": "Salladskål",
+      "watchlistText": "Salladskål",
+      "fullURLPath": "Frukt-Grönt/Kål/Salladskål",
+      "parentCategoryId": "1db9c37c-87ea-4d92-84d4-5670eaaeb018",
+      "departmentId": "f82845b1-7be6-4e08-8b5d-7f2c0f0a7d38",
+      "retailerCategoryId": "4540",
+      "productCount": 1
+    },
+    {
+      "id": "c9f26260-cb0f-4ff9-88a7-a755b307472c",
+      "name": "Salladslök",
+      "watchlistText": "Salladslök",
+      "fullURLPath": "Frukt-Grönt/Lök/Salladslök",
+      "parentCategoryId": "9a66038b-f95a-45b6-9a50-76a43c494031",
+      "departmentId": "f82845b1-7be6-4e08-8b5d-7f2c0f0a7d38",
+      "retailerCategoryId": "4569",
+      "productCount": 1
+    },
+    {
+      "id": "1e1153f0-7111-49cb-92c5-60d526ba764b",
+      "name": "Salladsmix",
+      "watchlistText": "Salladsmix",
+      "fullURLPath": "Frukt-Grönt/Grönsaker/Sallad/Salladsmix",
+      "parentCategoryId": "da43879d-6b3c-4835-922e-098e8fde7833",
+      "departmentId": "f82845b1-7be6-4e08-8b5d-7f2c0f0a7d38",
+      "retailerCategoryId": "4591",
+      "productCount": 18
+    },
+    {
+      "id": "0bb55fbd-01db-46ea-9457-10e47886b385",
+      "name": "Schalottenlök",
+      "watchlistText": "Schalottenlök",
+      "fullURLPath": "Frukt-Grönt/Lök/Schalottenlök",
+      "parentCategoryId": "9a66038b-f95a-45b6-9a50-76a43c494031",
+      "departmentId": "f82845b1-7be6-4e08-8b5d-7f2c0f0a7d38",
+      "retailerCategoryId": "4571",
+      "productCount": 3
+    },
+    {
+      "id": "f2140a6d-194a-46eb-ac85-34a92f1cf2b5",
+      "name": "Sidfläsk",
+      "watchlistText": "Sidfläsk",
+      "fullURLPath": "Kött-Chark-Fågel/Kött/Fläsk/Sidfläsk",
+      "parentCategoryId": "74dfbe91-d9b0-49d6-acc4-ebcb9614f73a",
+      "departmentId": "c0a4a3ed-f97c-4b2f-81ca-dcc9a7e044f7",
+      "retailerCategoryId": "4962",
+      "productCount": 2
+    },
+    {
+      "id": "1a0893ca-17a8-467b-b4cf-35662dc87340",
+      "name": "Sill & Ansjovis",
+      "watchlistText": "Sill & Ansjovis",
+      "fullURLPath": "Fisk-Skaldjur/Sill-Ansjovis",
+      "parentCategoryId": "fc0292c5-c74d-4229-9577-ec302310430f",
+      "departmentId": "fc0292c5-c74d-4229-9577-ec302310430f"
+    },
+    {
+      "id": "7520810c-c847-4a53-8a06-6f0eefc0ac0d",
+      "name": "Skaldjur",
+      "watchlistText": "Skaldjur",
+      "fullURLPath": "Fisk-Skaldjur/Skaldjur",
+      "parentCategoryId": "fc0292c5-c74d-4229-9577-ec302310430f",
+      "departmentId": "fc0292c5-c74d-4229-9577-ec302310430f"
+    },
+    {
+      "id": "f857880f-3617-4c15-b2c0-453c80c55508",
+      "name": "Skinka",
+      "watchlistText": "Skinka",
+      "fullURLPath": "Kött-Chark-Fågel/Pålägg/Skinka",
+      "parentCategoryId": "6a7fd157-5a0f-44e0-aff8-318de3bb8a96",
+      "departmentId": "c0a4a3ed-f97c-4b2f-81ca-dcc9a7e044f7",
+      "retailerCategoryId": "44",
+      "productCount": 57
+    },
+    {
+      "id": "1866a668-3f81-4ad7-a755-b85e844d39b5",
+      "name": "Skinkstek",
+      "watchlistText": "Skinkstek",
+      "fullURLPath": "Kött-Chark-Fågel/Kött/Fläsk/Skinkstek",
+      "parentCategoryId": "74dfbe91-d9b0-49d6-acc4-ebcb9614f73a",
+      "departmentId": "c0a4a3ed-f97c-4b2f-81ca-dcc9a7e044f7",
+      "retailerCategoryId": "4963",
+      "productCount": 1
+    },
+    {
+      "id": "7913f0dc-f254-45e0-be06-751b45d1da25",
+      "name": "Skor & Skovård",
+      "watchlistText": "Skor & Skovård",
+      "fullURLPath": "Kläder-Accessoarer/Skor-Skovård",
+      "parentCategoryId": "a6c5191e-77ac-4dae-a6e8-da5b0aba93e0",
+      "departmentId": "a6c5191e-77ac-4dae-a6e8-da5b0aba93e0"
+    },
+    {
+      "id": "adff6d6c-1499-41f7-94b1-e950567992fd",
+      "name": "Smaker från världen",
+      "watchlistText": "Smaker från världen",
+      "fullURLPath": "Skafferi/Smaker-från-världen",
+      "parentCategoryId": "f4882652-d405-4cd1-876c-247667adc392",
+      "departmentId": "f4882652-d405-4cd1-876c-247667adc392"
+    },
+    {
+      "id": "91d2ff49-e760-4944-8d92-ef525b783573",
+      "name": "Smaksatt mjölk",
+      "watchlistText": "Smaksatt mjölk",
+      "fullURLPath": "Mejeri-Ost/Mjölk/Smaksatt-mjölk",
+      "parentCategoryId": "77a83ff9-a0cf-4aa0-907f-c0d47e0ec53c",
+      "departmentId": "7aac2fb3-4bf5-4763-9610-fd2ad3ef930a",
+      "retailerCategoryId": "1314",
+      "productCount": 18
+    },
+    {
+      "id": "125cf734-2d9b-4c6b-8aeb-9277cdd6d187",
+      "name": "Smaksatt yoghurt",
+      "watchlistText": "Smaksatt yoghurt",
+      "fullURLPath": "Mejeri-Ost/Yoghurt/Smaksatt-yoghurt",
+      "parentCategoryId": "f6a0d5e7-b4c8-435b-9eb4-14cbafd8409b",
+      "departmentId": "7aac2fb3-4bf5-4763-9610-fd2ad3ef930a",
+      "retailerCategoryId": "1234",
+      "productCount": 75
+    },
+    {
+      "id": "b0f5adf2-b8e4-4093-a3ab-1735abf4866f",
+      "name": "Smink & Nagelvård",
+      "watchlistText": "Smink & Nagelvård",
+      "fullURLPath": "Apotek-Hälsa-Skönhet/Smink-Nagelvård",
+      "parentCategoryId": "70e47511-1892-45c5-8b0a-c5340ef8e518",
+      "departmentId": "70e47511-1892-45c5-8b0a-c5340ef8e518"
+    },
+    {
+      "id": "067c3bea-298f-451a-b012-0c5e0d101b43",
+      "name": "Smoothie & Fruktshots",
+      "watchlistText": "Smoothie & Fruktshots",
+      "fullURLPath": "Mejeri-Ost/Juice-Fruktdryck/Smoothie-Fruktshots",
+      "parentCategoryId": "c4e30eb9-a7e6-4a1b-9f99-9f60edc4cadd",
+      "departmentId": "7aac2fb3-4bf5-4763-9610-fd2ad3ef930a",
+      "retailerCategoryId": "2597",
+      "productCount": 40
+    },
+    {
+      "id": "6e8f1c17-41fc-4e02-981d-5e673b8e4d15",
+      "name": "Smådjur",
+      "watchlistText": "Smådjur",
+      "fullURLPath": "Djur/Smådjur",
+      "parentCategoryId": "555f311d-70ca-4bd8-bd50-921545531f89",
+      "departmentId": "555f311d-70ca-4bd8-bd50-921545531f89"
+    },
+    {
+      "id": "ab4a231c-e1c8-4c5d-8a87-74e2db93e403",
+      "name": "Smörgåsar, Smörgåstårta & Wraps",
+      "watchlistText": "Smörgåsar, Smörgåstårta & Wraps",
+      "fullURLPath": "Färdigmat/Smörgåsar-Smörgåstårta-Wraps",
+      "parentCategoryId": "5d7bd782-7db9-4fef-ab86-3b7c5e797ccb",
+      "departmentId": "5d7bd782-7db9-4fef-ab86-3b7c5e797ccb"
+    },
+    {
+      "id": "7198b260-d6d1-46c8-94e7-9685fbcae0df",
+      "name": "Snittblommor",
+      "watchlistText": "Snittblommor",
+      "fullURLPath": "Blommor-Trädgård/Snittblommor",
+      "parentCategoryId": "71542409-5f2e-4ae3-9ad7-6751e10afb38",
+      "departmentId": "71542409-5f2e-4ae3-9ad7-6751e10afb38"
+    },
+    {
+      "id": "c30a2ec8-575b-4757-a346-7c65b8ed7a06",
+      "name": "Snus",
+      "watchlistText": "Snus",
+      "fullURLPath": "Tobak/Snus",
+      "parentCategoryId": "4d09b54a-c6f7-4898-8aac-b089712f7e76",
+      "departmentId": "4d09b54a-c6f7-4898-8aac-b089712f7e76"
+    },
+    {
+      "id": "fb4a479f-2985-43e8-9bf2-f7e3272c9ff1",
+      "name": "Snus utan nikotin",
+      "watchlistText": "Snus utan nikotin",
+      "fullURLPath": "Tobak/Snus-utan-nikotin",
+      "parentCategoryId": "4d09b54a-c6f7-4898-8aac-b089712f7e76",
+      "departmentId": "4d09b54a-c6f7-4898-8aac-b089712f7e76"
+    },
+    {
+      "id": "bfde8c4a-22d9-4d3a-bf87-285e486073e5",
+      "name": "Snus utan tobak",
+      "watchlistText": "Snus utan tobak",
+      "fullURLPath": "Tobak/Snus-utan-tobak",
+      "parentCategoryId": "4d09b54a-c6f7-4898-8aac-b089712f7e76",
+      "departmentId": "4d09b54a-c6f7-4898-8aac-b089712f7e76"
+    },
+    {
+      "id": "27cab957-fae5-4af3-9c9d-5589a12af077",
+      "name": "Solskydd",
+      "watchlistText": "Solskydd",
+      "fullURLPath": "Apotek-Hälsa-Skönhet/Solskydd",
+      "parentCategoryId": "70e47511-1892-45c5-8b0a-c5340ef8e518",
+      "departmentId": "70e47511-1892-45c5-8b0a-c5340ef8e518"
+    },
+    {
+      "id": "1c6cf97a-125b-4474-b777-d9bfc7f48d8f",
+      "name": "Sovrum",
+      "watchlistText": "Sovrum",
+      "fullURLPath": "Hem-Inredning/Sovrum",
+      "parentCategoryId": "898d465a-1c6b-487a-9be1-31fac1cc4014",
+      "departmentId": "898d465a-1c6b-487a-9be1-31fac1cc4014"
+    },
+    {
+      "id": "fa51da84-b493-4037-b742-307342aca735",
+      "name": "Sparris",
+      "watchlistText": "Sparris",
+      "fullURLPath": "Frukt-Grönt/Grönsaker/Sparris",
+      "parentCategoryId": "6395d7ab-beee-4895-b733-cbfe2b63c069",
+      "departmentId": "f82845b1-7be6-4e08-8b5d-7f2c0f0a7d38",
+      "retailerCategoryId": "4585",
+      "productCount": 4
+    },
+    {
+      "id": "8fb30fc8-0888-4ce1-837e-20e0d3c23b9f",
+      "name": "Spenat",
+      "watchlistText": "Spenat",
+      "fullURLPath": "Frukt-Grönt/Grönsaker/Sallad/Spenat",
+      "parentCategoryId": "da43879d-6b3c-4835-922e-098e8fde7833",
+      "departmentId": "f82845b1-7be6-4e08-8b5d-7f2c0f0a7d38",
+      "retailerCategoryId": "4598",
+      "productCount": 3
+    },
+    {
+      "id": "1d294748-7b93-44c2-83d7-4e6126996b39",
+      "name": "Spetskål",
+      "watchlistText": "Spetskål",
+      "fullURLPath": "Frukt-Grönt/Kål/Spetskål",
+      "parentCategoryId": "1db9c37c-87ea-4d92-84d4-5670eaaeb018",
+      "departmentId": "f82845b1-7be6-4e08-8b5d-7f2c0f0a7d38",
+      "retailerCategoryId": "4534",
+      "productCount": 2
+    },
+    {
+      "id": "7865e5fa-4c87-4eb8-baa0-1291b99b1c03",
+      "name": "Standardmjölk",
+      "watchlistText": "Standardmjölk",
+      "fullURLPath": "Mejeri-Ost/Mjölk/Standardmjölk",
+      "parentCategoryId": "77a83ff9-a0cf-4aa0-907f-c0d47e0ec53c",
+      "departmentId": "7aac2fb3-4bf5-4763-9610-fd2ad3ef930a",
+      "retailerCategoryId": "1248",
+      "productCount": 21
+    },
+    {
+      "id": "2c330185-7ae0-4044-b23c-13ff1f342d16",
+      "name": "Stenfrukt",
+      "watchlistText": "Stenfrukt",
+      "fullURLPath": "Frukt-Grönt/Frukt/Stenfrukt",
+      "parentCategoryId": "18d60b20-1c1a-4023-92f4-6c18facf3915",
+      "departmentId": "f82845b1-7be6-4e08-8b5d-7f2c0f0a7d38",
+      "retailerCategoryId": "4910",
+      "productCount": 1
+    },
+    {
+      "id": "928442f0-3bfd-42b3-9dee-af2e0fcce838",
+      "name": "Stilldrink",
+      "watchlistText": "Stilldrink",
+      "fullURLPath": "Dryck/Stilldrink",
+      "parentCategoryId": "34948432-df3c-4468-991b-f0db32126003",
+      "departmentId": "34948432-df3c-4468-991b-f0db32126003"
+    },
+    {
+      "id": "2851e059-7537-486f-bf75-1d15c417be2a",
+      "name": "Stjälkselleri",
+      "watchlistText": "Stjälkselleri",
+      "fullURLPath": "Frukt-Grönt/Grönsaker/Stjälkselleri",
+      "parentCategoryId": "6395d7ab-beee-4895-b733-cbfe2b63c069",
+      "departmentId": "f82845b1-7be6-4e08-8b5d-7f2c0f0a7d38",
+      "retailerCategoryId": "4586",
+      "productCount": 2
+    },
+    {
+      "id": "bee7de0a-be1a-4b39-9535-894f9972f6f6",
+      "name": "Strimlat fläskkött",
+      "watchlistText": "Strimlat fläskkött",
+      "fullURLPath": "Kött-Chark-Fågel/Kött/Fläsk/Strimlat-fläskkött",
+      "parentCategoryId": "74dfbe91-d9b0-49d6-acc4-ebcb9614f73a",
+      "departmentId": "c0a4a3ed-f97c-4b2f-81ca-dcc9a7e044f7",
+      "retailerCategoryId": "4964",
+      "productCount": 4
+    },
+    {
+      "id": "6a4b2c51-eee3-4291-8e63-66e18bc0b704",
+      "name": "Städ",
+      "watchlistText": "Städ",
+      "fullURLPath": "Städ-Tvätt-Papper/Städ",
+      "parentCategoryId": "563524de-aa3c-49b6-a9d0-27924320f035",
+      "departmentId": "563524de-aa3c-49b6-a9d0-27924320f035"
+    },
+    {
+      "id": "4ec92291-5b9b-4393-a86d-89939050eff5",
+      "name": "Surkål",
+      "watchlistText": "Surkål",
+      "fullURLPath": "Frukt-Grönt/Kål/Surkål",
+      "parentCategoryId": "1db9c37c-87ea-4d92-84d4-5670eaaeb018",
+      "departmentId": "f82845b1-7be6-4e08-8b5d-7f2c0f0a7d38",
+      "retailerCategoryId": "4543",
+      "productCount": 7
+    },
+    {
+      "id": "8349c5e8-d2d0-4bb6-9f15-5b7d9e58e16e",
+      "name": "Svamp",
+      "watchlistText": "Svamp",
+      "fullURLPath": "Frukt-Grönt/Svamp",
+      "parentCategoryId": "f82845b1-7be6-4e08-8b5d-7f2c0f0a7d38",
+      "departmentId": "f82845b1-7be6-4e08-8b5d-7f2c0f0a7d38"
+    },
+    {
+      "id": "1a948a92-f4cf-4088-874c-eb9c909c5290",
+      "name": "Sylt, mos & marmelad",
+      "watchlistText": "Sylt, mos & marmelad",
+      "fullURLPath": "Skafferi/Sylt-mos-marmelad",
+      "parentCategoryId": "f4882652-d405-4cd1-876c-247667adc392",
+      "departmentId": "f4882652-d405-4cd1-876c-247667adc392"
+    },
+    {
+      "id": "55be5423-b532-4420-b0a2-7dd7bfe55ead",
+      "name": "Sylta",
+      "watchlistText": "Sylta",
+      "fullURLPath": "Kött-Chark-Fågel/Matchark/Sylta",
+      "parentCategoryId": "dd850748-c56e-4aa3-bd97-81281fea9bae",
+      "departmentId": "c0a4a3ed-f97c-4b2f-81ca-dcc9a7e044f7",
+      "retailerCategoryId": "4966",
+      "productCount": 3
+    },
+    {
+      "id": "0a6a9bdd-f4ef-4f1e-b382-0562e204e43c",
+      "name": "Sötpotatis",
+      "watchlistText": "Sötpotatis",
+      "fullURLPath": "Frukt-Grönt/Potatis/Sötpotatis",
+      "parentCategoryId": "c5b9394b-20ac-4f52-93b9-f7dd1fd09e00",
+      "departmentId": "f82845b1-7be6-4e08-8b5d-7f2c0f0a7d38",
+      "retailerCategoryId": "4729",
+      "productCount": 2
+    },
+    {
+      "id": "a90c3c76-666c-4a57-94db-fbd2efc7915d",
+      "name": "Tapas & Antipasti",
+      "watchlistText": "Tapas & Antipasti",
+      "fullURLPath": "Kött-Chark-Fågel/Delikatesschark/Tapas-Antipasti",
+      "parentCategoryId": "33926eaa-54a2-447b-a831-c269c8b0f73d",
+      "departmentId": "c0a4a3ed-f97c-4b2f-81ca-dcc9a7e044f7",
+      "retailerCategoryId": "2627",
+      "productCount": 34
+    },
+    {
+      "id": "76e80a41-7b91-4653-b35a-a716ccfad8ff",
+      "name": "Timjan",
+      "watchlistText": "Timjan",
+      "fullURLPath": "Frukt-Grönt/Färska-kryddor/Timjan",
+      "parentCategoryId": "34ac4412-f004-47ef-ae7c-047841f42c24",
+      "departmentId": "f82845b1-7be6-4e08-8b5d-7f2c0f0a7d38",
+      "retailerCategoryId": "4553",
+      "productCount": 2
+    },
+    {
+      "id": "ff402b4f-1898-4ef8-a862-ce3b0471db8f",
+      "name": "Toalett & Hushållspapper",
+      "watchlistText": "Toalett & Hushållspapper",
+      "fullURLPath": "Städ-Tvätt-Papper/Toalett-Hushållspapper",
+      "parentCategoryId": "563524de-aa3c-49b6-a9d0-27924320f035",
+      "departmentId": "563524de-aa3c-49b6-a9d0-27924320f035"
+    },
+    {
+      "id": "1313449e-b92d-4664-b507-aa9738c57516",
+      "name": "Tomat",
+      "watchlistText": "Tomat",
+      "fullURLPath": "Frukt-Grönt/Grönsaker/Tomat",
+      "parentCategoryId": "6395d7ab-beee-4895-b733-cbfe2b63c069",
+      "departmentId": "f82845b1-7be6-4e08-8b5d-7f2c0f0a7d38",
+      "retailerCategoryId": "686",
+      "productCount": 12
+    },
+    {
+      "id": "2a46eb66-e9ce-40b7-9faf-bdeac574191c",
+      "name": "Tropisk juice",
+      "watchlistText": "Tropisk juice",
+      "fullURLPath": "Mejeri-Ost/Juice-Fruktdryck/Tropisk-juice",
+      "parentCategoryId": "c4e30eb9-a7e6-4a1b-9f99-9f60edc4cadd",
+      "departmentId": "7aac2fb3-4bf5-4763-9610-fd2ad3ef930a",
+      "retailerCategoryId": "2591",
+      "productCount": 14
+    },
+    {
+      "id": "76be5ba7-9372-47f9-bbc8-2f78dfbc72d5",
+      "name": "Trädgårdsskötsel",
+      "watchlistText": "Trädgårdsskötsel",
+      "fullURLPath": "Blommor-Trädgård/Trädgårdsskötsel",
+      "parentCategoryId": "71542409-5f2e-4ae3-9ad7-6751e10afb38",
+      "departmentId": "71542409-5f2e-4ae3-9ad7-6751e10afb38"
+    },
+    {
+      "id": "01af3097-edf4-4a5a-9b94-aa09ecad764e",
+      "name": "Träningsredskap",
+      "watchlistText": "Träningsredskap",
+      "fullURLPath": "Träning-Återhämtning/Träningsredskap",
+      "parentCategoryId": "e128adca-fd5e-4b7e-a34e-a0badfe367ac",
+      "departmentId": "e128adca-fd5e-4b7e-a34e-a0badfe367ac"
+    },
+    {
+      "id": "171f5aff-f65e-420d-9962-edda5d7c5817",
+      "name": "Tuggummi",
+      "watchlistText": "Tuggummi",
+      "fullURLPath": "Glass-Godis-Snacks/Tuggummi",
+      "parentCategoryId": "bb534c25-3729-48bc-b9cc-c4516145879c",
+      "departmentId": "bb534c25-3729-48bc-b9cc-c4516145879c"
+    },
+    {
+      "id": "4c3c9098-15d6-4a3b-84e8-1ea60123fa67",
+      "name": "Tvål, Dusch & Deodorant",
+      "watchlistText": "Tvål, Dusch & Deodorant",
+      "fullURLPath": "Apotek-Hälsa-Skönhet/Tvål-Dusch-Deodorant",
+      "parentCategoryId": "70e47511-1892-45c5-8b0a-c5340ef8e518",
+      "departmentId": "70e47511-1892-45c5-8b0a-c5340ef8e518"
+    },
+    {
+      "id": "11399572-dd03-401b-be0a-5f136dc0fc80",
+      "name": "Tvätt",
+      "watchlistText": "Tvätt",
+      "fullURLPath": "Städ-Tvätt-Papper/Tvätt",
+      "parentCategoryId": "563524de-aa3c-49b6-a9d0-27924320f035",
+      "departmentId": "563524de-aa3c-49b6-a9d0-27924320f035"
+    },
+    {
+      "id": "bbe1a0e2-b997-4c0a-9379-5c2f0791aafa",
+      "name": "Tändare & Tändstickor",
+      "watchlistText": "Tändare & Tändstickor",
+      "fullURLPath": "Tobak/Tändare-Tändstickor",
+      "parentCategoryId": "4d09b54a-c6f7-4898-8aac-b089712f7e76",
+      "departmentId": "4d09b54a-c6f7-4898-8aac-b089712f7e76"
+    },
+    {
+      "id": "d241af10-e144-4810-bec1-665eb465dce7",
+      "name": "Ugnsformar & Bakformar",
+      "watchlistText": "Ugnsformar & Bakformar",
+      "fullURLPath": "Kök/Ugnsformar-Bakformar",
+      "parentCategoryId": "a0bceaa9-e61a-470f-9566-d46aae9b5b74",
+      "departmentId": "a0bceaa9-e61a-470f-9566-d46aae9b5b74"
+    },
+    {
+      "id": "4cdef177-2bf9-4b0d-88bf-fe41104960cf",
+      "name": "Uteliv",
+      "watchlistText": "Uteliv",
+      "fullURLPath": "Fritid/Uteliv",
+      "parentCategoryId": "a45a055c-66e1-4edc-a02a-2098bb2e9e46",
+      "departmentId": "a45a055c-66e1-4edc-a02a-2098bb2e9e46"
+    },
+    {
+      "id": "31c36dbe-1244-45dc-8672-3ff62219b5e4",
+      "name": "Uteplats",
+      "watchlistText": "Uteplats",
+      "fullURLPath": "Blommor-Trädgård/Uteplats",
+      "parentCategoryId": "71542409-5f2e-4ae3-9ad7-6751e10afb38",
+      "departmentId": "71542409-5f2e-4ae3-9ad7-6751e10afb38"
+    },
+    {
+      "id": "f42f5b5a-efc7-47db-ad67-6972cbefd67b",
+      "name": "Utomhusväxter",
+      "watchlistText": "Utomhusväxter",
+      "fullURLPath": "Blommor-Trädgård/Utomhusväxter",
+      "parentCategoryId": "71542409-5f2e-4ae3-9ad7-6751e10afb38",
+      "departmentId": "71542409-5f2e-4ae3-9ad7-6751e10afb38"
+    },
+    {
+      "id": "4b2e20ef-71bc-4dea-9129-bfa0b8909698",
+      "name": "Varmkorv",
+      "watchlistText": "Varmkorv",
+      "fullURLPath": "Kött-Chark-Fågel/Korv/Varmkorv",
+      "parentCategoryId": "68ed3c20-58e3-44d6-a95b-24ece4612260",
+      "departmentId": "c0a4a3ed-f97c-4b2f-81ca-dcc9a7e044f7",
+      "retailerCategoryId": "54",
+      "productCount": 18
+    },
+    {
+      "id": "dc6130bd-074e-4f8f-bab0-2038b54d914b",
+      "name": "Vatten",
+      "watchlistText": "Vatten",
+      "fullURLPath": "Dryck/Vatten",
+      "parentCategoryId": "34948432-df3c-4468-991b-f0db32126003",
+      "departmentId": "34948432-df3c-4468-991b-f0db32126003"
+    },
+    {
+      "id": "c324b74e-8221-4ddd-a6b2-a662420e7350",
+      "name": "Vegansk glass",
+      "watchlistText": "Vegansk glass",
+      "fullURLPath": "Vegetariskt/Vegansk-glass",
+      "parentCategoryId": "442f3f18-3b3a-484a-ae0d-700be34148ed",
+      "departmentId": "442f3f18-3b3a-484a-ae0d-700be34148ed"
+    },
+    {
+      "id": "4f24b8aa-8b10-4186-82f6-1080b7eed4aa",
+      "name": "Vegansk Ost",
+      "watchlistText": "Vegansk Ost",
+      "fullURLPath": "Mejeri-Ost/Ost/Vegansk-Ost",
+      "parentCategoryId": "342706ff-6dd8-4e9d-9ab3-8ff5aac99dd1",
+      "departmentId": "7aac2fb3-4bf5-4763-9610-fd2ad3ef930a",
+      "retailerCategoryId": "2324",
+      "productCount": 15
+    },
+    {
+      "id": "eb21f730-b591-4849-96ae-b31acc087dc1",
+      "name": "Vegansk ost & pålägg",
+      "watchlistText": "Vegansk ost & pålägg",
+      "fullURLPath": "Vegetariskt/Vegansk-ost-pålägg",
+      "parentCategoryId": "442f3f18-3b3a-484a-ae0d-700be34148ed",
+      "departmentId": "442f3f18-3b3a-484a-ae0d-700be34148ed"
+    },
+    {
+      "id": "c5f65b8a-5828-469b-9935-6bdd29e3b172",
+      "name": "Veganska såser & Röror",
+      "watchlistText": "Veganska såser & Röror",
+      "fullURLPath": "Vegetariskt/Veganska-såser-Röror",
+      "parentCategoryId": "442f3f18-3b3a-484a-ae0d-700be34148ed",
+      "departmentId": "442f3f18-3b3a-484a-ae0d-700be34148ed"
+    },
+    {
+      "id": "126d83e0-00ea-4bb3-8844-611b4b0a82ba",
+      "name": "Veganskt godis & choklad",
+      "watchlistText": "Veganskt godis & choklad",
+      "fullURLPath": "Vegetariskt/Veganskt-godis-choklad",
+      "parentCategoryId": "442f3f18-3b3a-484a-ae0d-700be34148ed",
+      "departmentId": "442f3f18-3b3a-484a-ae0d-700be34148ed"
+    },
+    {
+      "id": "55f2bab3-8593-47cb-a059-b44acb7721fd",
+      "name": "Vilt",
+      "watchlistText": "Vilt",
+      "fullURLPath": "Kött-Chark-Fågel/Kött/Vilt",
+      "parentCategoryId": "b4b30a51-2c01-45c4-b449-33bf5481d6c1",
+      "departmentId": "c0a4a3ed-f97c-4b2f-81ca-dcc9a7e044f7",
+      "retailerCategoryId": "4934",
+      "productCount": 11
+    },
+    {
+      "id": "2d3b941a-588f-4f77-b10b-cadb9debd1c4",
+      "name": "Viltfärs",
+      "watchlistText": "Viltfärs",
+      "fullURLPath": "Kött-Chark-Fågel/Köttfärs/Viltfärs",
+      "parentCategoryId": "68c65d92-4160-4761-a547-6e5fcec34466",
+      "departmentId": "c0a4a3ed-f97c-4b2f-81ca-dcc9a7e044f7",
+      "retailerCategoryId": "4935",
+      "productCount": 3
+    },
+    {
+      "id": "cb83379a-e5b5-4e56-bdf8-beb8ad78789e",
+      "name": "Vin",
+      "watchlistText": "Vin",
+      "fullURLPath": "Dryck/Vin",
+      "parentCategoryId": "34948432-df3c-4468-991b-f0db32126003",
+      "departmentId": "34948432-df3c-4468-991b-f0db32126003"
+    },
+    {
+      "id": "befdb240-339f-4c02-a327-ef5c611495df",
+      "name": "Vitaminer & Hälsokost",
+      "watchlistText": "Vitaminer & Hälsokost",
+      "fullURLPath": "Apotek-Hälsa-Skönhet/Vitaminer-Hälsokost",
+      "parentCategoryId": "70e47511-1892-45c5-8b0a-c5340ef8e518",
+      "departmentId": "70e47511-1892-45c5-8b0a-c5340ef8e518"
+    },
+    {
+      "id": "9539ffa9-5652-43d6-94ce-3d0e913e796c",
+      "name": "Vitkål",
+      "watchlistText": "Vitkål",
+      "fullURLPath": "Frukt-Grönt/Kål/Vitkål",
+      "parentCategoryId": "1db9c37c-87ea-4d92-84d4-5670eaaeb018",
+      "departmentId": "f82845b1-7be6-4e08-8b5d-7f2c0f0a7d38",
+      "retailerCategoryId": "4532",
+      "productCount": 3
+    },
+    {
+      "id": "fe0ff50e-9ece-4d53-96f1-30fc5b191ea4",
+      "name": "Vitlök",
+      "watchlistText": "Vitlök",
+      "fullURLPath": "Frukt-Grönt/Lök/Vitlök",
+      "parentCategoryId": "9a66038b-f95a-45b6-9a50-76a43c494031",
+      "departmentId": "f82845b1-7be6-4e08-8b5d-7f2c0f0a7d38",
+      "retailerCategoryId": "1264",
+      "productCount": 6
+    },
+    {
+      "id": "5e6b1e51-71ba-4753-9b38-afc467d54084",
+      "name": "Väskor & Accessoarer",
+      "watchlistText": "Väskor & Accessoarer",
+      "fullURLPath": "Kläder-Accessoarer/Väskor-Accessoarer",
+      "parentCategoryId": "a6c5191e-77ac-4dae-a6e8-da5b0aba93e0",
+      "departmentId": "a6c5191e-77ac-4dae-a6e8-da5b0aba93e0"
+    },
+    {
+      "id": "f6ba37a6-a690-4259-bb98-5bef15f93a91",
+      "name": "Vätskeersättning",
+      "watchlistText": "Vätskeersättning",
+      "fullURLPath": "Träning-Återhämtning/Vätskeersättning",
+      "parentCategoryId": "34948432-df3c-4468-991b-f0db32126003",
+      "departmentId": "34948432-df3c-4468-991b-f0db32126003"
+    },
+    {
+      "id": "b005a72e-1c78-48c5-b957-e041cd7cc825",
+      "name": "Yoghurt portionsförpackning",
+      "watchlistText": "Yoghurt portionsförpackning",
+      "fullURLPath": "Mejeri-Ost/Yoghurt/Yoghurt-portionsförpackning",
+      "parentCategoryId": "f6a0d5e7-b4c8-435b-9eb4-14cbafd8409b",
+      "departmentId": "7aac2fb3-4bf5-4763-9610-fd2ad3ef930a",
+      "retailerCategoryId": "4667",
+      "productCount": 24
+    },
+    {
+      "id": "71c9820d-eec9-4544-82b6-b40837198c0c",
+      "name": "Yoghurtkvarg",
+      "watchlistText": "Yoghurtkvarg",
+      "fullURLPath": "Mejeri-Ost/Yoghurt/Yoghurtkvarg",
+      "parentCategoryId": "f6a0d5e7-b4c8-435b-9eb4-14cbafd8409b",
+      "departmentId": "7aac2fb3-4bf5-4763-9610-fd2ad3ef930a",
+      "retailerCategoryId": "4666",
+      "productCount": 7
+    },
+    {
+      "id": "cfd8ba11-d731-4b74-8760-3d7e54ce368c",
+      "name": "Zucchini",
+      "watchlistText": "Zucchini",
+      "fullURLPath": "Frukt-Grönt/Grönsaker/Zucchini",
+      "parentCategoryId": "6395d7ab-beee-4895-b733-cbfe2b63c069",
+      "departmentId": "f82845b1-7be6-4e08-8b5d-7f2c0f0a7d38",
+      "retailerCategoryId": "4531",
+      "productCount": 2
+    },
+    {
+      "id": "9c298b4b-8ef2-4771-bc4e-fdf19b9b6163",
+      "name": "Återhämtning",
+      "watchlistText": "Återhämtning",
+      "fullURLPath": "Träning-Återhämtning/Återhämtning",
+      "parentCategoryId": "e128adca-fd5e-4b7e-a34e-a0badfe367ac",
+      "departmentId": "e128adca-fd5e-4b7e-a34e-a0badfe367ac"
+    },
+    {
+      "id": "8c3065a8-2ec4-4419-8948-c9d9b8facd58",
+      "name": "Ägg",
+      "watchlistText": "Ägg",
+      "fullURLPath": "Mejeri-Ost/Ägg-Jäst/Ägg",
+      "parentCategoryId": "2d99b8cd-01f7-4ba9-8a19-1e059a158f7a",
+      "departmentId": "7aac2fb3-4bf5-4763-9610-fd2ad3ef930a",
+      "retailerCategoryId": "287",
+      "productCount": 28
+    },
+    {
+      "id": "657cfc8b-636b-4002-9fc6-dc926aa00f6b",
+      "name": "Äppeljuice",
+      "watchlistText": "Äppeljuice",
+      "fullURLPath": "Mejeri-Ost/Juice-Fruktdryck/Äppeljuice",
+      "parentCategoryId": "c4e30eb9-a7e6-4a1b-9f99-9f60edc4cadd",
+      "departmentId": "7aac2fb3-4bf5-4763-9610-fd2ad3ef930a",
+      "retailerCategoryId": "2589",
+      "productCount": 19
+    },
+    {
+      "id": "5f255f68-426a-4d1c-bb13-651aed5e2722",
+      "name": "Äpple",
+      "watchlistText": "Äpple",
+      "fullURLPath": "Frukt-Grönt/Frukt/Äpple",
+      "parentCategoryId": "18d60b20-1c1a-4023-92f4-6c18facf3915",
+      "departmentId": "f82845b1-7be6-4e08-8b5d-7f2c0f0a7d38",
+      "retailerCategoryId": "676",
+      "productCount": 16
+    },
+    {
+      "id": "50d9fcf5-079a-4372-ae3e-4a75472b2127",
+      "name": "Ärtor & Bönor",
+      "watchlistText": "Ärtor & Bönor",
+      "fullURLPath": "Frukt-Grönt/Grönsaker/Ärtor-Bönor",
+      "parentCategoryId": "6395d7ab-beee-4895-b733-cbfe2b63c069",
+      "departmentId": "f82845b1-7be6-4e08-8b5d-7f2c0f0a7d38",
+      "retailerCategoryId": "4600",
+      "productCount": 3
+    },
+    {
+      "id": "e5c51017-dd48-45b7-a0a4-95d22174a6f4",
+      "name": "Äta ute",
+      "watchlistText": "Äta ute",
+      "fullURLPath": "Kök/Äta-ute",
+      "parentCategoryId": "a0bceaa9-e61a-470f-9566-d46aae9b5b74",
+      "departmentId": "a0bceaa9-e61a-470f-9566-d46aae9b5b74"
+    },
+    {
+      "id": "ed2f3a2b-ec05-46d9-a0a7-f9ff0ffc1002",
+      "name": "Ögon & Öron",
+      "watchlistText": "Ögon & Öron",
+      "fullURLPath": "Apotek-Hälsa-Skönhet/Ögon-Öron",
+      "parentCategoryId": "70e47511-1892-45c5-8b0a-c5340ef8e518",
+      "departmentId": "70e47511-1892-45c5-8b0a-c5340ef8e518"
+    },
+    {
+      "id": "0dcfe4a9-cee4-4fd3-8a72-455c2a652b23",
+      "name": "Öl, cider & must",
+      "watchlistText": "Öl, cider & must",
+      "fullURLPath": "Dryck/Öl-cider-must",
+      "parentCategoryId": "34948432-df3c-4468-991b-f0db32126003",
+      "departmentId": "34948432-df3c-4468-991b-f0db32126003"
+    },
+    {
+      "id": "e70642a6-9ff4-429f-b28b-dc74d71eb022",
+      "name": "Ölkorv",
+      "watchlistText": "Ölkorv",
+      "fullURLPath": "Kött-Chark-Fågel/Delikatesschark/Ölkorv",
+      "parentCategoryId": "33926eaa-54a2-447b-a831-c269c8b0f73d",
+      "departmentId": "c0a4a3ed-f97c-4b2f-81ca-dcc9a7e044f7",
+      "retailerCategoryId": "2629",
+      "productCount": 36
+    },
+    {
+      "id": "93f3d0d1-3df8-4d8a-9204-6145d577d22d",
+      "name": "Övrig exotisk frukt",
+      "watchlistText": "Övrig exotisk frukt",
+      "fullURLPath": "Frukt-Grönt/Frukt/Exotisk-frukt/Övrig-exotisk-frukt",
+      "parentCategoryId": "83676072-0bbe-4b65-92ed-d09c14c452b9",
+      "departmentId": "f82845b1-7be6-4e08-8b5d-7f2c0f0a7d38",
+      "retailerCategoryId": "4882",
+      "productCount": 5
+    },
+    {
+      "id": "a959bf67-63f2-4d0f-acca-817ac732cd18",
+      "name": "Övrig heminredning",
+      "watchlistText": "Övrig heminredning",
+      "fullURLPath": "Hem-Inredning/Övrig-heminredning",
+      "parentCategoryId": "898d465a-1c6b-487a-9be1-31fac1cc4014",
+      "departmentId": "898d465a-1c6b-487a-9be1-31fac1cc4014"
+    },
+    {
+      "id": "5b725488-8840-4ea9-b1d5-aa6cc783f121",
+      "name": "Övrig inälvsmat",
+      "watchlistText": "Övrig inälvsmat",
+      "fullURLPath": "Kött-Chark-Fågel/Inälvsmat/Övrig-inälvsmat",
+      "parentCategoryId": "4f2418e6-c1bc-4161-9a77-892689973e49",
+      "departmentId": "c0a4a3ed-f97c-4b2f-81ca-dcc9a7e044f7",
+      "retailerCategoryId": "4763",
+      "productCount": 1
+    },
+    {
+      "id": "493e8d0c-d737-408f-a1de-215c0e2faadd",
+      "name": "Övrig kål",
+      "watchlistText": "Övrig kål",
+      "fullURLPath": "Frukt-Grönt/Kål/Övrig-kål",
+      "parentCategoryId": "1db9c37c-87ea-4d92-84d4-5670eaaeb018",
+      "departmentId": "f82845b1-7be6-4e08-8b5d-7f2c0f0a7d38",
+      "retailerCategoryId": "4539",
+      "productCount": 5
+    },
+    {
+      "id": "bae75f15-8a1e-4cee-8e2c-0ef94f5cf9a3",
+      "name": "Övrig lök",
+      "watchlistText": "Övrig lök",
+      "fullURLPath": "Frukt-Grönt/Lök/Övrig-lök",
+      "parentCategoryId": "9a66038b-f95a-45b6-9a50-76a43c494031",
+      "departmentId": "f82845b1-7be6-4e08-8b5d-7f2c0f0a7d38",
+      "retailerCategoryId": "4572",
+      "productCount": 1
+    },
+    {
+      "id": "036f0bbc-6256-4290-bd77-1c9258c55c2b",
+      "name": "Övrig sallad",
+      "watchlistText": "Övrig sallad",
+      "fullURLPath": "Frukt-Grönt/Grönsaker/Sallad/Övrig-sallad",
+      "parentCategoryId": "da43879d-6b3c-4835-922e-098e8fde7833",
+      "departmentId": "f82845b1-7be6-4e08-8b5d-7f2c0f0a7d38",
+      "retailerCategoryId": "4599",
+      "productCount": 3
+    },
+    {
+      "id": "eb38644f-ebd7-4814-8d3a-f7bcc404c2cb",
+      "name": "Övriga färska kryddor",
+      "watchlistText": "Övriga färska kryddor",
+      "fullURLPath": "Frukt-Grönt/Färska-kryddor/Övriga-färska-kryddor",
+      "parentCategoryId": "34ac4412-f004-47ef-ae7c-047841f42c24",
+      "departmentId": "f82845b1-7be6-4e08-8b5d-7f2c0f0a7d38",
+      "retailerCategoryId": "4559",
+      "productCount": 3
+    },
+    {
+      "id": "54ea6b0a-beae-4a06-89d9-8401f5bce2ca",
+      "name": "Övriga rotfrukter",
+      "watchlistText": "Övriga rotfrukter",
+      "fullURLPath": "Frukt-Grönt/Rotfrukter/Övriga-rotfrukter",
+      "parentCategoryId": "c03f7cb4-d742-46c2-8872-a79345413ce7",
+      "departmentId": "f82845b1-7be6-4e08-8b5d-7f2c0f0a7d38",
+      "retailerCategoryId": "4551",
+      "productCount": 2
+    },
+    {
+      "id": "64e44810-2b76-4c57-adae-070a311be68c",
+      "name": "Övrigt fläskkött",
+      "watchlistText": "Övrigt fläskkött",
+      "fullURLPath": "Kött-Chark-Fågel/Kött/Fläsk/Övrigt-fläskkött",
+      "parentCategoryId": "74dfbe91-d9b0-49d6-acc4-ebcb9614f73a",
+      "departmentId": "c0a4a3ed-f97c-4b2f-81ca-dcc9a7e044f7",
+      "retailerCategoryId": "4965",
+      "productCount": 2
+    },
+    {
+      "id": "4a0bc0b8-3610-4b41-be46-65a26348778a",
+      "name": "Övrigt nötkött",
+      "watchlistText": "Övrigt nötkött",
+      "fullURLPath": "Kött-Chark-Fågel/Kött/Nötkött/Övrigt-nötkött",
+      "parentCategoryId": "db4dd486-6cf9-496b-b7e2-f9b0f95aba2a",
+      "departmentId": "c0a4a3ed-f97c-4b2f-81ca-dcc9a7e044f7",
+      "retailerCategoryId": "4758",
+      "productCount": 6
+    }
+  ]
+}

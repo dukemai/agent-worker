@@ -1,0 +1,66 @@
+[
+  {
+    "id": "9a77ca64-c798-4c76-9e1f-3aa0567c6194",
+    "name": "Bordsask smör",
+    "productCount": 20,
+    "fullURLPath": "Mejeri-Ost/Smör-Margarin/Bordsask-smör",
+    "retailerCategoryId": "277",
+    "children": []
+  },
+  {
+    "id": "f77fbf7e-03d5-4201-8166-568ab367a643",
+    "name": "Bordsask margarin",
+    "productCount": 23,
+    "fullURLPath": "Mejeri-Ost/Smör-Margarin/Bordsask-margarin",
+    "retailerCategoryId": "4665",
+    "children": []
+  },
+  {
+    "id": "2ba08f2b-8fd9-42e8-b600-a89c4ba41e6c",
+    "name": "Flytande smör & margarin",
+    "productCount": 9,
+    "fullURLPath": "Mejeri-Ost/Smör-Margarin/Flytande-smör-margarin",
+    "retailerCategoryId": "278",
+    "children": []
+  },
+  {
+    "id": "3efc5634-8188-4ddc-abf1-8fe9a1e1fef8",
+    "name": "Matfett smör",
+    "productCount": 14,
+    "fullURLPath": "Mejeri-Ost/Smör-Margarin/Matfett-smör",
+    "retailerCategoryId": "1218",
+    "children": []
+  },
+  {
+    "id": "96714c60-da25-417b-bbbb-8e76b1a37078",
+    "name": "Matfett margarin",
+    "productCount": 7,
+    "fullURLPath": "Mejeri-Ost/Smör-Margarin/Matfett-margarin",
+    "retailerCategoryId": "1601",
+    "children": []
+  },
+  {
+    "id": "dda0825a-4b79-417f-9a89-7b3dbd07fc3d",
+    "name": "Matfett övrigt",
+    "productCount": 2,
+    "fullURLPath": "Mejeri-Ost/Smör-Margarin/Matfett-övrigt",
+    "retailerCategoryId": "4664",
+    "children": []
+  },
+  {
+    "id": "f733b5c2-19ec-480f-864f-e6daa5df1b35",
+    "name": "Laktosfritt smör & margarin",
+    "productCount": 11,
+    "fullURLPath": "Mejeri-Ost/Smör-Margarin/Laktosfritt-smör-margarin",
+    "retailerCategoryId": "2906",
+    "children": []
+  },
+  {
+    "id": "63210a68-b487-4ffd-bff9-0d39206d9427",
+    "name": "Kryddsmör",
+    "productCount": 8,
+    "fullURLPath": "Mejeri-Ost/Smör-Margarin/Kryddsmör",
+    "retailerCategoryId": "1984",
+    "children": []
+  }
+]

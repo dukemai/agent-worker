@@ -1,0 +1,58 @@
+[
+  {
+    "id": "7865e5fa-4c87-4eb8-baa0-1291b99b1c03",
+    "name": "Standardmjölk",
+    "productCount": 21,
+    "fullURLPath": "Mejeri-Ost/Mjölk/Standardmjölk",
+    "retailerCategoryId": "1248",
+    "children": []
+  },
+  {
+    "id": "b7d2e654-3124-4cd3-a6a7-583cb567bddd",
+    "name": "Mellanmjölk",
+    "productCount": 25,
+    "fullURLPath": "Mejeri-Ost/Mjölk/Mellanmjölk",
+    "retailerCategoryId": "1312",
+    "children": []
+  },
+  {
+    "id": "aee8a924-a3d1-4395-88a1-a91adb897e60",
+    "name": "Lättmjölk",
+    "productCount": 13,
+    "fullURLPath": "Mejeri-Ost/Mjölk/Lättmjölk",
+    "retailerCategoryId": "1313",
+    "children": []
+  },
+  {
+    "id": "7aa34780-2ced-4f61-9956-012385129fe0",
+    "name": "Minimjölk",
+    "productCount": 1,
+    "fullURLPath": "Mejeri-Ost/Mjölk/Minimjölk",
+    "retailerCategoryId": "1584",
+    "children": []
+  },
+  {
+    "id": "91d2ff49-e760-4944-8d92-ef525b783573",
+    "name": "Smaksatt mjölk",
+    "productCount": 18,
+    "fullURLPath": "Mejeri-Ost/Mjölk/Smaksatt-mjölk",
+    "retailerCategoryId": "1314",
+    "children": []
+  },
+  {
+    "id": "175c5b23-6659-4ee3-98fc-841215352537",
+    "name": "Laktosfri mjölk",
+    "productCount": 22,
+    "fullURLPath": "Mejeri-Ost/Mjölk/Laktosfri-mjölk",
+    "retailerCategoryId": "2840",
+    "children": []
+  },
+  {
+    "id": "6c7290c5-3f85-47f9-b389-acc2b3f1533a",
+    "name": "Mjölkfri dryck",
+    "productCount": 77,
+    "fullURLPath": "Mejeri-Ost/Mjölk/Mjölkfri-dryck",
+    "retailerCategoryId": "302",
+    "children": []
+  }
+]

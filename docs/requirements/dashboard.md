@@ -10,6 +10,7 @@ Mobile-first Next.js app. Primary interface for viewing and acting on tasks.
 - **Renewals** — Expiration reminders with escalation
 - **Learning** — Topic/category lessons
 - **Context** — Family preferences (shopping list, plant list, interests)
+- **Promo grocery watchlist** — Route `/promo-grocery-watchlist`; explicit grocery promo intent (`family_context.promo_watchlist`) for flyer/page matching (Phase 8)
 - **Growing** — Seasonal suggestions, sources, knowledge, windows
 
 ## Interactions

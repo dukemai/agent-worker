@@ -1,0 +1,58 @@
+[
+  {
+    "id": "c26df667-d884-4daf-94ae-45d0d58532f5",
+    "name": "Hel kyckling",
+    "productCount": 7,
+    "fullURLPath": "Kött-Chark-Fågel/Kyckling-Fågel/Hel-kyckling",
+    "retailerCategoryId": "30",
+    "children": []
+  },
+  {
+    "id": "6840862f-f574-47b1-bbf4-1ddd08c74af3",
+    "name": "Kycklingfilé",
+    "productCount": 44,
+    "fullURLPath": "Kött-Chark-Fågel/Kyckling-Fågel/Kycklingfilé",
+    "retailerCategoryId": "32",
+    "children": []
+  },
+  {
+    "id": "11bc4dab-eda7-4ab5-aba5-f475de7ed402",
+    "name": "Kycklingdelar",
+    "productCount": 29,
+    "fullURLPath": "Kött-Chark-Fågel/Kyckling-Fågel/Kycklingdelar",
+    "retailerCategoryId": "31",
+    "children": []
+  },
+  {
+    "id": "f160a06a-676c-4ac0-abac-d8b7c92233aa",
+    "name": "Kycklingfärs",
+    "productCount": 3,
+    "fullURLPath": "Kött-Chark-Fågel/Kyckling-Fågel/Kycklingfärs",
+    "retailerCategoryId": "33",
+    "children": []
+  },
+  {
+    "id": "ad152300-323c-4b1d-aeeb-f143626b3590",
+    "name": "Förberedd fågel",
+    "productCount": 29,
+    "fullURLPath": "Kött-Chark-Fågel/Kyckling-Fågel/Förberedd-fågel",
+    "retailerCategoryId": "1546",
+    "children": []
+  },
+  {
+    "id": "dffd1c20-4bb5-4121-a57f-bba5f316ab3d",
+    "name": "Anka & övrig fågel",
+    "productCount": 12,
+    "fullURLPath": "Kött-Chark-Fågel/Kyckling-Fågel/Anka-övrig-fågel",
+    "retailerCategoryId": "34",
+    "children": []
+  },
+  {
+    "id": "898d5458-9dd4-45d1-a196-084a8d81c71b",
+    "name": "Kalkon",
+    "productCount": 15,
+    "fullURLPath": "Kött-Chark-Fågel/Kyckling-Fågel/Kalkon",
+    "retailerCategoryId": "4886",
+    "children": []
+  }
+]

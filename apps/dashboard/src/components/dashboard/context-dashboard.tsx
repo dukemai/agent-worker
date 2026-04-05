@@ -2,10 +2,12 @@
 
 import { FormEvent, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { PROMO_WATCHLIST_KEY } from "@/lib/promo-watchlist";
 import type { FamilyContext } from "@/types/database";
 
 async function fetchContext(): Promise<FamilyContext[]> {
@@ -128,6 +130,16 @@ export function ContextDashboard() {
           <CardTitle>Current Context</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
+          <p className="text-sm text-muted-foreground">
+            <Link
+              href="/promo-grocery-watchlist"
+              className="font-medium text-primary underline underline-offset-4"
+            >
+              Promo grocery watchlist
+            </Link>{" "}
+            (<code className="rounded bg-muted px-1 text-xs">{PROMO_WATCHLIST_KEY}</code>) is
+            edited on its own page and not listed here.
+          </p>
           {loading ? <p>Loading context...</p> : null}
           {!loading && items.length === 0 ? (
             <p className="text-sm text-muted-foreground">No context values yet.</p>

@@ -1,0 +1,74 @@
+[
+  {
+    "id": "c1db2ab6-f049-44f3-81b7-fecfe2b05bfd",
+    "name": "Naturell yoghurt",
+    "productCount": 21,
+    "fullURLPath": "Mejeri-Ost/Yoghurt/Naturell-yoghurt",
+    "retailerCategoryId": "1233",
+    "children": []
+  },
+  {
+    "id": "125cf734-2d9b-4c6b-8aeb-9277cdd6d187",
+    "name": "Smaksatt yoghurt",
+    "productCount": 75,
+    "fullURLPath": "Mejeri-Ost/Yoghurt/Smaksatt-yoghurt",
+    "retailerCategoryId": "1234",
+    "children": []
+  },
+  {
+    "id": "b005a72e-1c78-48c5-b957-e041cd7cc825",
+    "name": "Yoghurt portionsförpackning",
+    "productCount": 24,
+    "fullURLPath": "Mejeri-Ost/Yoghurt/Yoghurt-portionsförpackning",
+    "retailerCategoryId": "4667",
+    "children": []
+  },
+  {
+    "id": "1a91939a-030e-49b5-b22f-ef0864ec7691",
+    "name": "Barnyoghurt",
+    "productCount": 10,
+    "fullURLPath": "Mejeri-Ost/Yoghurt/Barnyoghurt",
+    "retailerCategoryId": "1236",
+    "children": []
+  },
+  {
+    "id": "98b2145a-ca3d-47f6-8b87-ec9345e9ad93",
+    "name": "Drickyoghurt",
+    "productCount": 24,
+    "fullURLPath": "Mejeri-Ost/Yoghurt/Drickyoghurt",
+    "retailerCategoryId": "1728",
+    "children": []
+  },
+  {
+    "id": "71c9820d-eec9-4544-82b6-b40837198c0c",
+    "name": "Yoghurtkvarg",
+    "productCount": 7,
+    "fullURLPath": "Mejeri-Ost/Yoghurt/Yoghurtkvarg",
+    "retailerCategoryId": "4666",
+    "children": []
+  },
+  {
+    "id": "4e775a1f-9b9a-4ede-8f70-c3dc3bb70208",
+    "name": "Matlagningsyoghurt",
+    "productCount": 20,
+    "fullURLPath": "Mejeri-Ost/Yoghurt/Matlagningsyoghurt",
+    "retailerCategoryId": "4504",
+    "children": []
+  },
+  {
+    "id": "f3394082-466c-4a3c-9049-11a7d05e8ccb",
+    "name": "Laktosfri yoghurt",
+    "productCount": 50,
+    "fullURLPath": "Mejeri-Ost/Yoghurt/Laktosfri-yoghurt",
+    "retailerCategoryId": "4513",
+    "children": []
+  },
+  {
+    "id": "dbbdbc86-629c-490f-87be-727085463534",
+    "name": "Mjölkfri yoghurt",
+    "productCount": 21,
+    "fullURLPath": "Mejeri-Ost/Yoghurt/Mjölkfri-yoghurt",
+    "retailerCategoryId": "1893",
+    "children": []
+  }
+]

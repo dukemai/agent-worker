@@ -18,3 +18,4 @@ Promotions are `tasks` with `metadata.email_type = "promotion"`, `metadata.store
 
 - [Ingestion](ingestion.md) — extraction
 - [Daily Digest](daily-digest.md) — Deals for You section
+- [Promo watchlist](promo-watchlist.md) — explicit ICA / grocery intent list for scrape matching (Phase 8)

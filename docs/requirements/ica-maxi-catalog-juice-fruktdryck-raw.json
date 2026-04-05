@@ -1,0 +1,82 @@
+[
+  {
+    "id": "77ffb421-06f2-48dd-ac8d-8550e7c70232",
+    "name": "Nypressad Juice",
+    "productCount": 12,
+    "fullURLPath": "Mejeri-Ost/Juice-Fruktdryck/Nypressad-Juice",
+    "retailerCategoryId": "2586",
+    "children": []
+  },
+  {
+    "id": "c42c9de6-52b7-4363-98f0-f63ce9f53af2",
+    "name": "Apelsinjuice",
+    "productCount": 29,
+    "fullURLPath": "Mejeri-Ost/Juice-Fruktdryck/Apelsinjuice",
+    "retailerCategoryId": "2587",
+    "children": []
+  },
+  {
+    "id": "365feebb-1164-493b-8a20-47e203187e6d",
+    "name": "Citrusjuice & Lemonad",
+    "productCount": 12,
+    "fullURLPath": "Mejeri-Ost/Juice-Fruktdryck/Citrusjuice-Lemonad",
+    "retailerCategoryId": "2588",
+    "children": []
+  },
+  {
+    "id": "657cfc8b-636b-4002-9fc6-dc926aa00f6b",
+    "name": "Äppeljuice",
+    "productCount": 19,
+    "fullURLPath": "Mejeri-Ost/Juice-Fruktdryck/Äppeljuice",
+    "retailerCategoryId": "2589",
+    "children": []
+  },
+  {
+    "id": "2a46eb66-e9ce-40b7-9faf-bdeac574191c",
+    "name": "Tropisk juice",
+    "productCount": 14,
+    "fullURLPath": "Mejeri-Ost/Juice-Fruktdryck/Tropisk-juice",
+    "retailerCategoryId": "2591",
+    "children": []
+  },
+  {
+    "id": "2df07ec5-9db5-43e0-bf35-52cda27692bb",
+    "name": "Grönsaksjuice",
+    "productCount": 8,
+    "fullURLPath": "Mejeri-Ost/Juice-Fruktdryck/Grönsaksjuice",
+    "retailerCategoryId": "2592",
+    "children": []
+  },
+  {
+    "id": "4fa7bce2-6b53-43a8-af66-c405c3114e01",
+    "name": "Juice övriga smaker",
+    "productCount": 36,
+    "fullURLPath": "Mejeri-Ost/Juice-Fruktdryck/Juice-övriga-smaker",
+    "retailerCategoryId": "2593",
+    "children": []
+  },
+  {
+    "id": "067c3bea-298f-451a-b012-0c5e0d101b43",
+    "name": "Smoothie & Fruktshots",
+    "productCount": 40,
+    "fullURLPath": "Mejeri-Ost/Juice-Fruktdryck/Smoothie-Fruktshots",
+    "retailerCategoryId": "2597",
+    "children": []
+  },
+  {
+    "id": "eb556945-b2f7-4f8f-8fa0-727bb08e407a",
+    "name": "Måltidsdryck",
+    "productCount": 64,
+    "fullURLPath": "Mejeri-Ost/Juice-Fruktdryck/Måltidsdryck",
+    "retailerCategoryId": "2594",
+    "children": []
+  },
+  {
+    "id": "aac2b911-7a14-4881-9e71-01f473fb6dd0",
+    "name": "Fruktdryck",
+    "productCount": 67,
+    "fullURLPath": "Mejeri-Ost/Juice-Fruktdryck/Fruktdryck",
+    "retailerCategoryId": "2590",
+    "children": []
+  }
+]

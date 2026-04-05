@@ -172,3 +172,4 @@ dist
 
 # Cursor IDE
 .vercel
+.pnpm-store

@@ -1,0 +1,155 @@
+[
+  {
+    "id": "f9c0d07e-86e2-4daa-bff8-0a5a9ee97c6d",
+    "name": "Banan",
+    "productCount": 4,
+    "fullURLPath": "Frukt-Grönt/Frukt/Banan",
+    "retailerCategoryId": "675",
+    "children": []
+  },
+  {
+    "id": "5f255f68-426a-4d1c-bb13-651aed5e2722",
+    "name": "Äpple",
+    "productCount": 16,
+    "fullURLPath": "Frukt-Grönt/Frukt/Äpple",
+    "retailerCategoryId": "676",
+    "children": []
+  },
+  {
+    "id": "7279128f-e13e-47af-b2e2-94567d72768f",
+    "name": "Päron",
+    "productCount": 6,
+    "fullURLPath": "Frukt-Grönt/Frukt/Päron",
+    "retailerCategoryId": "677",
+    "children": []
+  },
+  {
+    "id": "a452d7a6-f1cc-4f9e-affa-49d6106a4c42",
+    "name": "Citrusfrukt",
+    "productCount": 14,
+    "fullURLPath": "Frukt-Grönt/Frukt/Citrusfrukt",
+    "retailerCategoryId": "4917",
+    "children": []
+  },
+  {
+    "id": "2c330185-7ae0-4044-b23c-13ff1f342d16",
+    "name": "Stenfrukt",
+    "productCount": 1,
+    "fullURLPath": "Frukt-Grönt/Frukt/Stenfrukt",
+    "retailerCategoryId": "4910",
+    "children": []
+  },
+  {
+    "id": "1afa0d24-5d93-4116-9ad7-0313fcc8ae9c",
+    "name": "Melon",
+    "productCount": 5,
+    "fullURLPath": "Frukt-Grönt/Frukt/Melon",
+    "retailerCategoryId": "4914",
+    "children": []
+  },
+  {
+    "id": "e47d117a-8382-4cc4-8154-48ab2602806f",
+    "name": "Druvor",
+    "productCount": 5,
+    "fullURLPath": "Frukt-Grönt/Frukt/Druvor",
+    "retailerCategoryId": "682",
+    "children": []
+  },
+  {
+    "id": "83676072-0bbe-4b65-92ed-d09c14c452b9",
+    "name": "Exotisk frukt",
+    "productCount": 34,
+    "fullURLPath": "Frukt-Grönt/Frukt/Exotisk-frukt",
+    "retailerCategoryId": "4885",
+    "children": [
+      {
+        "id": "5b4d2271-0048-4448-819d-ae30c0226d52",
+        "name": "Mango",
+        "productCount": 1,
+        "fullURLPath": "Frukt-Grönt/Frukt/Exotisk-frukt/Mango",
+        "retailerCategoryId": "4877",
+        "children": []
+      },
+      {
+        "id": "171ad091-7747-448c-beef-5fc5c7a9988a",
+        "name": "Ananas",
+        "productCount": 1,
+        "fullURLPath": "Frukt-Grönt/Frukt/Exotisk-frukt/Ananas",
+        "retailerCategoryId": "4878",
+        "children": []
+      },
+      {
+        "id": "4bbc68fa-9d11-4780-bf86-0d4b7d1bdf77",
+        "name": "Dadlar",
+        "productCount": 19,
+        "fullURLPath": "Frukt-Grönt/Frukt/Exotisk-frukt/Dadlar",
+        "retailerCategoryId": "4879",
+        "children": []
+      },
+      {
+        "id": "2f5e5ac9-76bd-489f-a654-dc8b3c057116",
+        "name": "Kiwi",
+        "productCount": 5,
+        "fullURLPath": "Frukt-Grönt/Frukt/Exotisk-frukt/Kiwi",
+        "retailerCategoryId": "4880",
+        "children": []
+      },
+      {
+        "id": "19dddb0b-d1a0-4fb2-8c97-51dd59df4248",
+        "name": "Passionsfrukt",
+        "productCount": 1,
+        "fullURLPath": "Frukt-Grönt/Frukt/Exotisk-frukt/Passionsfrukt",
+        "retailerCategoryId": "4881",
+        "children": []
+      },
+      {
+        "id": "a1a2559b-a2b5-41e3-a5f4-f31a1f120766",
+        "name": "Fikon",
+        "productCount": 1,
+        "fullURLPath": "Frukt-Grönt/Frukt/Exotisk-frukt/Fikon",
+        "retailerCategoryId": "4883",
+        "children": []
+      },
+      {
+        "id": "9600890f-9bfb-4cd5-96b9-4012ec0c7d6d",
+        "name": "Papaya",
+        "productCount": 1,
+        "fullURLPath": "Frukt-Grönt/Frukt/Exotisk-frukt/Papaya",
+        "retailerCategoryId": "4884",
+        "children": []
+      },
+      {
+        "id": "93f3d0d1-3df8-4d8a-9204-6145d577d22d",
+        "name": "Övrig exotisk frukt",
+        "productCount": 5,
+        "fullURLPath": "Frukt-Grönt/Frukt/Exotisk-frukt/Övrig-exotisk-frukt",
+        "retailerCategoryId": "4882",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "3a1d2f8e-0c4d-4f3d-ad25-0719d64707ce",
+    "name": "Avokado",
+    "productCount": 5,
+    "fullURLPath": "Frukt-Grönt/Frukt/Avokado",
+    "retailerCategoryId": "3415",
+    "children": []
+  },
+  {
+    "id": "2ca7d26d-dac9-42f0-88d7-b8e1b1f57822",
+    "name": "Rabarber",
+    "productCount": 1,
+    "fullURLPath": "Frukt-Grönt/Frukt/Rabarber",
+    "retailerCategoryId": "4606",
+    "children": []
+  },
+  {
+    "id": "1fa527d7-4927-4c3e-8893-798929a6e967",
+    "name": "Fruktpåsar",
+    "productCount": 10,
+    "fullURLPath": "Frukt-Grönt/Frukt/Fruktpåsar",
+    "retailerCategoryId": "2723",
+    "children": []
+  }
+]

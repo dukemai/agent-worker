@@ -1,0 +1,203 @@
+[
+  {
+    "id": "da43879d-6b3c-4835-922e-098e8fde7833",
+    "name": "Sallad",
+    "productCount": 34,
+    "fullURLPath": "Frukt-Grönt/Grönsaker/Sallad",
+    "retailerCategoryId": "4587",
+    "children": [
+      {
+        "id": "1e1153f0-7111-49cb-92c5-60d526ba764b",
+        "name": "Salladsmix",
+        "productCount": 18,
+        "fullURLPath": "Frukt-Grönt/Grönsaker/Sallad/Salladsmix",
+        "retailerCategoryId": "4591",
+        "children": []
+      },
+      {
+        "id": "8fb30fc8-0888-4ce1-837e-20e0d3c23b9f",
+        "name": "Spenat",
+        "productCount": 3,
+        "fullURLPath": "Frukt-Grönt/Grönsaker/Sallad/Spenat",
+        "retailerCategoryId": "4598",
+        "children": []
+      },
+      {
+        "id": "e815f30d-9bd7-4bd5-8672-ad12807fb518",
+        "name": "Rucola",
+        "productCount": 3,
+        "fullURLPath": "Frukt-Grönt/Grönsaker/Sallad/Rucola",
+        "retailerCategoryId": "4597",
+        "children": []
+      },
+      {
+        "id": "5d9e36b6-c4ed-49c6-a279-b933fa92b3d8",
+        "name": "Mache",
+        "productCount": 1,
+        "fullURLPath": "Frukt-Grönt/Grönsaker/Sallad/Mache",
+        "retailerCategoryId": "4595",
+        "children": []
+      },
+      {
+        "id": "927d9590-557b-42ba-ba52-595f6c7cd6c1",
+        "name": "Isbergssallad",
+        "productCount": 1,
+        "fullURLPath": "Frukt-Grönt/Grönsaker/Sallad/Isbergssallad",
+        "retailerCategoryId": "4593",
+        "children": []
+      },
+      {
+        "id": "cbceb008-06bd-4050-89a4-90c576ba4832",
+        "name": "Romansallad",
+        "productCount": 2,
+        "fullURLPath": "Frukt-Grönt/Grönsaker/Sallad/Romansallad",
+        "retailerCategoryId": "4596",
+        "children": []
+      },
+      {
+        "id": "2d4add7f-caae-451b-b85f-e0bc71ef6561",
+        "name": "Hjärtsallad",
+        "productCount": 1,
+        "fullURLPath": "Frukt-Grönt/Grönsaker/Sallad/Hjärtsallad",
+        "retailerCategoryId": "4592",
+        "children": []
+      },
+      {
+        "id": "5bd19e61-4ff1-4ef3-a884-8024ddcd7805",
+        "name": "Krispsallad",
+        "productCount": 1,
+        "fullURLPath": "Frukt-Grönt/Grönsaker/Sallad/Krispsallad",
+        "retailerCategoryId": "4594",
+        "children": []
+      },
+      {
+        "id": "eadb0914-c274-4d75-854d-8432a50ceeff",
+        "name": "Cosmopolitan",
+        "productCount": 1,
+        "fullURLPath": "Frukt-Grönt/Grönsaker/Sallad/Cosmopolitan",
+        "retailerCategoryId": "4588",
+        "children": []
+      },
+      {
+        "id": "2d27612b-5109-4eef-b5bb-fcbbb4cbbc88",
+        "name": "Crunchita",
+        "productCount": 1,
+        "fullURLPath": "Frukt-Grönt/Grönsaker/Sallad/Crunchita",
+        "retailerCategoryId": "4589",
+        "children": []
+      },
+      {
+        "id": "036f0bbc-6256-4290-bd77-1c9258c55c2b",
+        "name": "Övrig sallad",
+        "productCount": 3,
+        "fullURLPath": "Frukt-Grönt/Grönsaker/Sallad/Övrig-sallad",
+        "retailerCategoryId": "4599",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "b84aa1c3-cb92-4f6b-8acc-bef946a04605",
+    "name": "Gurka",
+    "productCount": 3,
+    "fullURLPath": "Frukt-Grönt/Grönsaker/Gurka",
+    "retailerCategoryId": "689",
+    "children": []
+  },
+  {
+    "id": "1313449e-b92d-4664-b507-aa9738c57516",
+    "name": "Tomat",
+    "productCount": 12,
+    "fullURLPath": "Frukt-Grönt/Grönsaker/Tomat",
+    "retailerCategoryId": "686",
+    "children": []
+  },
+  {
+    "id": "c436bce4-1cc3-4b75-8610-9b5e8d6ed914",
+    "name": "Paprika",
+    "productCount": 10,
+    "fullURLPath": "Frukt-Grönt/Grönsaker/Paprika",
+    "retailerCategoryId": "688",
+    "children": []
+  },
+  {
+    "id": "3a1d2f8e-0c4d-4f3d-ad25-0719d64707ce",
+    "name": "Avokado",
+    "productCount": 5,
+    "fullURLPath": "Frukt-Grönt/Grönsaker/Avokado",
+    "retailerCategoryId": "3415",
+    "children": []
+  },
+  {
+    "id": "9d32a56a-aad2-4c69-a8db-640657dc43b1",
+    "name": "Aubergine",
+    "productCount": 2,
+    "fullURLPath": "Frukt-Grönt/Grönsaker/Aubergine",
+    "retailerCategoryId": "4530",
+    "children": []
+  },
+  {
+    "id": "cfd8ba11-d731-4b74-8760-3d7e54ce368c",
+    "name": "Zucchini",
+    "productCount": 2,
+    "fullURLPath": "Frukt-Grönt/Grönsaker/Zucchini",
+    "retailerCategoryId": "4531",
+    "children": []
+  },
+  {
+    "id": "50d9fcf5-079a-4372-ae3e-4a75472b2127",
+    "name": "Ärtor & Bönor",
+    "productCount": 3,
+    "fullURLPath": "Frukt-Grönt/Grönsaker/Ärtor-Bönor",
+    "retailerCategoryId": "4600",
+    "children": []
+  },
+  {
+    "id": "8f88db23-7610-4f2e-b13d-207446efac3f",
+    "name": "Groddar",
+    "productCount": 4,
+    "fullURLPath": "Frukt-Grönt/Grönsaker/Groddar",
+    "retailerCategoryId": "4581",
+    "children": []
+  },
+  {
+    "id": "f83cb438-7298-4b9c-ac82-f72114a1ff55",
+    "name": "Majs",
+    "productCount": 2,
+    "fullURLPath": "Frukt-Grönt/Grönsaker/Majs",
+    "retailerCategoryId": "4583",
+    "children": []
+  },
+  {
+    "id": "1ae52516-747f-4570-ba2b-386cfef57867",
+    "name": "Rädisor",
+    "productCount": 3,
+    "fullURLPath": "Frukt-Grönt/Grönsaker/Rädisor",
+    "retailerCategoryId": "4584",
+    "children": []
+  },
+  {
+    "id": "fa51da84-b493-4037-b742-307342aca735",
+    "name": "Sparris",
+    "productCount": 4,
+    "fullURLPath": "Frukt-Grönt/Grönsaker/Sparris",
+    "retailerCategoryId": "4585",
+    "children": []
+  },
+  {
+    "id": "2851e059-7537-486f-bf75-1d15c417be2a",
+    "name": "Stjälkselleri",
+    "productCount": 2,
+    "fullURLPath": "Frukt-Grönt/Grönsaker/Stjälkselleri",
+    "retailerCategoryId": "4586",
+    "children": []
+  },
+  {
+    "id": "2ca7d26d-dac9-42f0-88d7-b8e1b1f57822",
+    "name": "Rabarber",
+    "productCount": 1,
+    "fullURLPath": "Frukt-Grönt/Grönsaker/Rabarber",
+    "retailerCategoryId": "4606",
+    "children": []
+  }
+]

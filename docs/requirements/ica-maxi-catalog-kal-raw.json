@@ -1,0 +1,90 @@
+[
+  {
+    "id": "a59d40b5-08f2-4fd4-859c-d85eb44e09d8",
+    "name": "Broccoli",
+    "productCount": 3,
+    "fullURLPath": "Frukt-Grönt/Kål/Broccoli",
+    "retailerCategoryId": "4529",
+    "children": []
+  },
+  {
+    "id": "04c39a8e-b793-4d76-b1e6-53b2018cfcaf",
+    "name": "Blomkål",
+    "productCount": 1,
+    "fullURLPath": "Frukt-Grönt/Kål/Blomkål",
+    "retailerCategoryId": "4528",
+    "children": []
+  },
+  {
+    "id": "2072b799-566c-4ba5-a72c-451ca86eec7d",
+    "name": "Kålrot",
+    "productCount": 1,
+    "fullURLPath": "Frukt-Grönt/Kål/Kålrot",
+    "retailerCategoryId": "4538",
+    "children": []
+  },
+  {
+    "id": "9539ffa9-5652-43d6-94ce-3d0e913e796c",
+    "name": "Vitkål",
+    "productCount": 3,
+    "fullURLPath": "Frukt-Grönt/Kål/Vitkål",
+    "retailerCategoryId": "4532",
+    "children": []
+  },
+  {
+    "id": "73bad600-c506-427b-ac3c-84d8f4f5f11a",
+    "name": "Rödkål",
+    "productCount": 2,
+    "fullURLPath": "Frukt-Grönt/Kål/Rödkål",
+    "retailerCategoryId": "4533",
+    "children": []
+  },
+  {
+    "id": "1d294748-7b93-44c2-83d7-4e6126996b39",
+    "name": "Spetskål",
+    "productCount": 2,
+    "fullURLPath": "Frukt-Grönt/Kål/Spetskål",
+    "retailerCategoryId": "4534",
+    "children": []
+  },
+  {
+    "id": "adb7da02-abb2-41fc-93d8-cc1d85035c51",
+    "name": "Grönkål",
+    "productCount": 2,
+    "fullURLPath": "Frukt-Grönt/Kål/Grönkål",
+    "retailerCategoryId": "4535",
+    "children": []
+  },
+  {
+    "id": "623575d3-4d06-463d-b5b2-d04035e58565",
+    "name": "Fänkål",
+    "productCount": 1,
+    "fullURLPath": "Frukt-Grönt/Kål/Fänkål",
+    "retailerCategoryId": "4537",
+    "children": []
+  },
+  {
+    "id": "2510b47b-59c2-4ebd-95dc-3ffece8768b9",
+    "name": "Salladskål",
+    "productCount": 1,
+    "fullURLPath": "Frukt-Grönt/Kål/Salladskål",
+    "retailerCategoryId": "4540",
+    "children": []
+  },
+  {
+    "id": "4ec92291-5b9b-4393-a86d-89939050eff5",
+    "name": "Surkål",
+    "productCount": 7,
+    "fullURLPath": "Frukt-Grönt/Kål/Surkål",
+    "retailerCategoryId": "4543",
+    "children": []
+  },
+  {
+    "id": "493e8d0c-d737-408f-a1de-215c0e2faadd",
+    "name": "Övrig kål",
+    "productCount": 5,
+    "fullURLPath": "Frukt-Grönt/Kål/Övrig-kål",
+    "retailerCategoryId": "4539",
+    "children": []
+  }
+]

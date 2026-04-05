@@ -1,0 +1,114 @@
+[
+  {
+    "id": "a4bda5a2-68ab-41db-9008-1fd05c4e388a",
+    "name": "Gräslök",
+    "productCount": 2,
+    "fullURLPath": "Frukt-Grönt/Färska-kryddor/Gräslök",
+    "retailerCategoryId": "1071",
+    "children": []
+  },
+  {
+    "id": "18732480-dc49-48e3-824e-a65de9f2174b",
+    "name": "Dill",
+    "productCount": 2,
+    "fullURLPath": "Frukt-Grönt/Färska-kryddor/Dill",
+    "retailerCategoryId": "1072",
+    "children": []
+  },
+  {
+    "id": "c1e1259b-3809-4054-ac8b-74398c24b523",
+    "name": "Persilja",
+    "productCount": 5,
+    "fullURLPath": "Frukt-Grönt/Färska-kryddor/Persilja",
+    "retailerCategoryId": "1073",
+    "children": []
+  },
+  {
+    "id": "6a8362a7-859c-47f7-9737-800f8d81113a",
+    "name": "Basilika",
+    "productCount": 4,
+    "fullURLPath": "Frukt-Grönt/Färska-kryddor/Basilika",
+    "retailerCategoryId": "1074",
+    "children": []
+  },
+  {
+    "id": "76e80a41-7b91-4653-b35a-a716ccfad8ff",
+    "name": "Timjan",
+    "productCount": 2,
+    "fullURLPath": "Frukt-Grönt/Färska-kryddor/Timjan",
+    "retailerCategoryId": "4553",
+    "children": []
+  },
+  {
+    "id": "7c39b8db-bc15-4e82-b53e-571ead857fad",
+    "name": "Oregano",
+    "productCount": 2,
+    "fullURLPath": "Frukt-Grönt/Färska-kryddor/Oregano",
+    "retailerCategoryId": "4561",
+    "children": []
+  },
+  {
+    "id": "97645390-1910-4daa-8517-1e9073fdceae",
+    "name": "Rosmarin",
+    "productCount": 1,
+    "fullURLPath": "Frukt-Grönt/Färska-kryddor/Rosmarin",
+    "retailerCategoryId": "4554",
+    "children": []
+  },
+  {
+    "id": "49bcfaec-6c0e-48d5-8007-1fc659010521",
+    "name": "Koriander",
+    "productCount": 2,
+    "fullURLPath": "Frukt-Grönt/Färska-kryddor/Koriander",
+    "retailerCategoryId": "4555",
+    "children": []
+  },
+  {
+    "id": "096a82ae-71c4-498d-9976-b9e836a7ad3c",
+    "name": "Mynta",
+    "productCount": 1,
+    "fullURLPath": "Frukt-Grönt/Färska-kryddor/Mynta",
+    "retailerCategoryId": "4556",
+    "children": []
+  },
+  {
+    "id": "f15158b2-6d01-4b54-9fe2-0500c0b7cfa2",
+    "name": "Dragon",
+    "productCount": 1,
+    "fullURLPath": "Frukt-Grönt/Färska-kryddor/Dragon",
+    "retailerCategoryId": "4557",
+    "children": []
+  },
+  {
+    "id": "44f4c403-70ca-415a-97df-9cd8ad863dd0",
+    "name": "Citronmeliss",
+    "productCount": 2,
+    "fullURLPath": "Frukt-Grönt/Färska-kryddor/Citronmeliss",
+    "retailerCategoryId": "4560",
+    "children": []
+  },
+  {
+    "id": "6ba2dde1-c8a5-4e3c-bfbb-d54feb33525b",
+    "name": "Färsk chilipeppar",
+    "productCount": 6,
+    "fullURLPath": "Frukt-Grönt/Färska-kryddor/Färsk-chilipeppar",
+    "retailerCategoryId": "1651",
+    "children": []
+  },
+  {
+    "id": "3fee4ee6-7bc8-4599-aa04-2e266ab69bfa",
+    "name": "Ingefära",
+    "productCount": 2,
+    "fullURLPath": "Frukt-Grönt/Färska-kryddor/Ingefära",
+    "retailerCategoryId": "4552",
+    "children": []
+  },
+  {
+    "id": "eb38644f-ebd7-4814-8d3a-f7bcc404c2cb",
+    "name": "Övriga färska kryddor",
+    "productCount": 3,
+    "fullURLPath": "Frukt-Grönt/Färska-kryddor/Övriga-färska-kryddor",
+    "retailerCategoryId": "4559",
+    "children": []
+  }
+]

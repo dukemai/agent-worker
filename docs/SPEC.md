@@ -23,7 +23,8 @@ One user: a busy dad in Stockholm who checks email every morning and has fragmen
 | Renewals | [requirements/renewals.md](requirements/renewals.md) | Expiration reminders, escalation, recurrence |
 | Growing | [requirements/growing.md](requirements/growing.md) | Seasonal tracker, sources, suggestions |
 | Promotions | [requirements/promotions.md](requirements/promotions.md) | Deal extraction and matching |
-| Learning | [requirements/learning.md](requirements/learning.md) | Topic/category lessons (deferred: agents) |
+| Promo grocery watchlist | [requirements/promo-watchlist.md](requirements/promo-watchlist.md) | Route `/promo-grocery-watchlist`; `promo_watchlist` + scrape export |
+| Learning | [requirements/learning.md](requirements/learning.md) | Topic/category lessons; multi-agent specialization → Phase 10 (`docs/phases/10-learning-agents/`) |
 
 ## Data Schema (Supabase)
 
@@ -38,7 +39,7 @@ One user: a busy dad in Stockholm who checks email every morning and has fragmen
 | `growing_sources` | id, url, transcript, status | YouTube/blog sources |
 | `growing_windows` | id, item_name, suggestion_kind, start_month, end_month, stockholm_note | Seasonal activity catalog |
 | `growing_knowledge` | id, source_id, title, content, category | Reference nuggets from sources |
-| `growing_suggestions_log` | id, window_id, title, details, status, converted_task_id | Weekly suggestion lifecycle |
+| `growing_suggestions_log` | id, window_id, week_number, title, details, status, converted_task_id | Weekly suggestion lifecycle (ISO week number) |
 
 Renewals: `tasks` with `metadata.item_type = "renewal"`. Promotions: `tasks` with `metadata.email_type = "promotion"`.
 

@@ -1,0 +1,26 @@
+[
+    {
+      "id": "4ce51888-a1fa-46f5-86b1-4ddbd54d8cff",
+      "name": "Jordgubbar",
+      "productCount": 4,
+      "fullURLPath": "Frukt-Grönt/Färska-bär/Jordgubbar",
+      "retailerCategoryId": "1375",
+      "children": []
+    },
+    {
+      "id": "a74f6d3b-3f1e-4ab2-9c24-5c740b0541b0",
+      "name": "Hallon",
+      "productCount": 1,
+      "fullURLPath": "Frukt-Grönt/Färska-bär/Hallon",
+      "retailerCategoryId": "1376",
+      "children": []
+    },
+    {
+      "id": "911f287b-a861-465e-8ed6-ed324be687aa",
+      "name": "Blåbär",
+      "productCount": 4,
+      "fullURLPath": "Frukt-Grönt/Färska-bär/Blåbär",
+      "retailerCategoryId": "1377",
+      "children": []
+    }
+  ]

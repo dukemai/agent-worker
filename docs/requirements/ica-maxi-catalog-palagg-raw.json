@@ -1,0 +1,58 @@
+[
+  {
+    "id": "cb0756d2-985b-45de-89af-bd068eb7de5a",
+    "name": "Påläggskorv",
+    "productCount": 26,
+    "fullURLPath": "Kött-Chark-Fågel/Pålägg/Påläggskorv",
+    "retailerCategoryId": "42",
+    "children": []
+  },
+  {
+    "id": "ecf70a00-ea5f-404b-bf3a-4ef5c68805f5",
+    "name": "Salami",
+    "productCount": 63,
+    "fullURLPath": "Kött-Chark-Fågel/Pålägg/Salami",
+    "retailerCategoryId": "43",
+    "children": []
+  },
+  {
+    "id": "f857880f-3617-4c15-b2c0-453c80c55508",
+    "name": "Skinka",
+    "productCount": 57,
+    "fullURLPath": "Kött-Chark-Fågel/Pålägg/Skinka",
+    "retailerCategoryId": "44",
+    "children": []
+  },
+  {
+    "id": "e233c2e5-67b7-4a4b-afd7-fab9c81c902f",
+    "name": "Rostbiff & pastrami",
+    "productCount": 4,
+    "fullURLPath": "Kött-Chark-Fågel/Pålägg/Rostbiff-pastrami",
+    "retailerCategoryId": "46",
+    "children": []
+  },
+  {
+    "id": "7c0f88c1-7ca3-4306-b0e1-a4d72639024b",
+    "name": "Hamburgerkött & vilt",
+    "productCount": 2,
+    "fullURLPath": "Kött-Chark-Fågel/Pålägg/Hamburgerkött-vilt",
+    "retailerCategoryId": "48",
+    "children": []
+  },
+  {
+    "id": "f54ac1da-b421-4d27-9f90-7c81c4333703",
+    "name": "Pastej & paté",
+    "productCount": 40,
+    "fullURLPath": "Kött-Chark-Fågel/Pålägg/Pastej-paté",
+    "retailerCategoryId": "49",
+    "children": []
+  },
+  {
+    "id": "c2122836-66fb-4f52-b9fd-a272c525a5f0",
+    "name": "Fågel",
+    "productCount": 34,
+    "fullURLPath": "Kött-Chark-Fågel/Pålägg/Fågel",
+    "retailerCategoryId": "45",
+    "children": []
+  }
+]

@@ -1,0 +1,18 @@
+[
+  {
+    "id": "8c3065a8-2ec4-4419-8948-c9d9b8facd58",
+    "name": "Ägg",
+    "productCount": 28,
+    "fullURLPath": "Mejeri-Ost/Ägg-Jäst/Ägg",
+    "retailerCategoryId": "287",
+    "children": []
+  },
+  {
+    "id": "d39dcef6-fc0d-46be-b2be-865da03c2789",
+    "name": "Jäst",
+    "productCount": 7,
+    "fullURLPath": "Mejeri-Ost/Ägg-Jäst/Jäst",
+    "retailerCategoryId": "4515",
+    "children": []
+  }
+]
