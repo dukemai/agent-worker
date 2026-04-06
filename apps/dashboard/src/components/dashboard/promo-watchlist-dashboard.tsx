@@ -19,6 +19,7 @@ import {
   serializePromoWatchlist,
 } from "@/lib/promo-watchlist";
 import type { PromoPickerCatalog, PromoPickerItem } from "@/types/promo-picker-catalog";
+import { PromoWeeklyMatchesSection } from "@/components/dashboard/promo-weekly-matches-section";
 
 async function fetchPromoWatchlist(): Promise<string[]> {
   const response = await fetch(
@@ -400,6 +401,8 @@ export function PromoWatchlistDashboard() {
           ) : null}
         </CardContent>
       </Card>
+
+      <PromoWeeklyMatchesSection />
     </main>
   );
 }

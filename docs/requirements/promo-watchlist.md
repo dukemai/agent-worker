@@ -38,10 +38,20 @@ This doc covers **dashboard UI + persistence**. Scrape and match algorithms live
 
 Dashboard UI uses **cookie auth** via existing context routes; scrapers use the **scrape** route after `pnpm promo:download-watchlist`.
 
-## UI (planned)
+### Promo match import (weekly offers you matched offline)
+
+| Method | Path | Use |
+|--------|------|-----|
+| POST | `/api/promo-matches/import` | **Cookie-auth session.** Body: `application/json` matching Playwright **`watchlist-matches-only.json`**, or **`multipart/form-data`** with field **`file`** (same JSON). Creates a **`promo_match_runs`** row and **`promo_match_items`** rows. Response: `{ runId, itemCount, storeKey }`. |
+| GET | `/api/promo-matches/latest` | **Cookie-auth.** Returns `{ run, items }` for the most recent import by `created_at`, or `{ run: null, items: [] }`. |
+
+After running the ICA extract test with a non-empty local watchlist, upload **`apps/playwright-tools/data/promo-run/watchlist-matches-only.json`** from the Promo grocery watchlist page. Each upload appends a new run; the UI shows the **latest** run only (older runs remain in DB for future “history” if needed). Each **`promo_match_items`** row stores **`week_number`** (ISO week, UTC) at import time for filtering and meal planning later.
+
+## UI (planned / partial)
 
 - **Route (decided):** **`/promo-grocery-watchlist`** — kebab-case URL, parallel to `/context`, `/growing`.
 - **Nav / title:** **Promo grocery watchlist** — general-purpose wording (not retailer-specific).
+- **Weekly matched offers (shipped):** Second panel on the same page — upload `watchlist-matches-only.json`, list latest import from DB (see import APIs above).
 - **Primary editor**: Dedicated page—not only the generic Context key-value grid.
 - **Item list layout:** **`table`** (not a loose bullet list). Suggested columns: **`#`** (1-based row index), **`Item`** (product phrase), **`Actions`** (remove row). Header row for clarity; empty state when there are no rows. On **narrow viewports**, allow **horizontal scroll** for the table or use a compact pattern that preserves row/column semantics (e.g. `role="grid"` / proper `<th>` scope) so assistive tech still understands structure.
 - **Controls**: Add new entry above or below the table: input + add button; per-row delete in **Actions**; optional clear-all with confirm (outside the table).
@@ -69,6 +79,8 @@ Local flow (see `apps/playwright-tools`):
 1. **Download watchlist** — with dashboard running and env set: `pnpm promo:download-watchlist` (writes `apps/playwright-tools/data/promo-watchlist.json`; gitignored).
 2. **Scrape ICA offers** — `pnpm playwright:test -- tests/ica-maxi-extract-promotions.spec.ts` (network; uses [`ica-maxi-barkarbystaden`](../../apps/playwright-tools/src/strategies/ica-maxi-barkarbystaden.ts): maps `data/promo-watchlist.json` items to departments via [`ica-maxi-promo-picker-catalog.json`](ica-maxi-promo-picker-catalog.json), then clicks weekly-offers filter chips per department before scraping tiles).
 3. **Rule-based match** — [`match-promotions.ts`](../../apps/playwright-tools/src/match-promotions.ts) scores each `ScrapedPromotion` against every watchlist string (full substring after Swedish case-fold, or all tokens ≥2 chars). The extract test attaches **`watchlist-matches.json`** when `data/promo-watchlist.json` exists. A second test runs scrape + match only if that file is present (skipped otherwise).
+
+**On-disk outputs (no report download):** under **`apps/playwright-tools/data/promo-run/`** — **`watchlist-matches-only.json`** (`{ interests, matches }`, same as the report attachment) whenever the watchlist file has items; **`watchlist-matches.json`** (slim summary + `watchlist-matches.json`-style rows) from the main extract test; the rank-only test overwrites **`watchlist-matches-only.json`** if both run. Full **`scraped-promotions.json`** stays a Playwright attachment only unless you copy from the report. Set **`PROMO_NO_DISK_OUTPUT=1`** to skip disk writes.
 
 Tuning: add broader or narrower phrases on the dashboard; optional `minScore` (default 50) when calling `matchPromotionsToWatchlist`.
 

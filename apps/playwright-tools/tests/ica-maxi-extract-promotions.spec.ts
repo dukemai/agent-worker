@@ -3,6 +3,7 @@ import * as path from "node:path";
 import { test, expect } from "@playwright/test";
 import { matchPromotionsToWatchlist } from "../src/match-promotions";
 import { icaMaxiBarkarbystadenStrategy } from "../src/strategies/ica-maxi-barkarbystaden";
+import { writePromoRunJson } from "./helpers/write-promo-run-output";
 
 const watchlistJsonPath = path.join(__dirname, "..", "data", "promo-watchlist.json");
 
@@ -50,18 +51,13 @@ test.describe("ICA Maxi Barkarbystaden — extract promotions", () => {
       JSON.stringify(promotions.slice(0, 3), null, 2),
     );
 
+    const scrapedPayload = {
+      storeKey: icaMaxiBarkarbystadenStrategy.storeKey,
+      count: promotions.length,
+      promotions,
+    };
     test.info().attach("scraped-promotions.json", {
-      body: Buffer.from(
-        JSON.stringify(
-          {
-            storeKey: icaMaxiBarkarbystadenStrategy.storeKey,
-            count: promotions.length,
-            promotions,
-          },
-          null,
-          2,
-        ),
-      ),
+      body: Buffer.from(JSON.stringify(scrapedPayload, null, 2)),
       contentType: "application/json",
     });
 
@@ -82,29 +78,37 @@ test.describe("ICA Maxi Barkarbystaden — extract promotions", () => {
       const matches = matchPromotionsToWatchlist(promotions, interests, {
         minScore: 50,
       });
+      const matchesPayload = {
+        storeKey: icaMaxiBarkarbystadenStrategy.storeKey,
+        watchlistItemCount: interests.length,
+        promotionCount: promotions.length,
+        matchCount: matches.length,
+        matches: matches.map((m) => ({
+          interest: m.interest,
+          score: m.score,
+          promotionIndex: m.promotion.index,
+          title: m.promotion.title,
+          priceHint: m.promotion.priceHint,
+          imageUrl: m.promotion.imageUrl,
+        })),
+      };
       test.info().attach("watchlist-matches.json", {
-        body: Buffer.from(
-          JSON.stringify(
-            {
-              storeKey: icaMaxiBarkarbystadenStrategy.storeKey,
-              watchlistItemCount: interests.length,
-              promotionCount: promotions.length,
-              matchCount: matches.length,
-              matches: matches.map((m) => ({
-                interest: m.interest,
-                score: m.score,
-                promotionIndex: m.promotion.index,
-                title: m.promotion.title,
-                priceHint: m.promotion.priceHint,
-                imageUrl: m.promotion.imageUrl,
-              })),
-            },
-            null,
-            2,
-          ),
-        ),
+        body: Buffer.from(JSON.stringify(matchesPayload, null, 2)),
         contentType: "application/json",
       });
+      const matchesPath = writePromoRunJson("watchlist-matches.json", matchesPayload);
+      if (matchesPath) {
+        console.log(`[promo-run] wrote ${matchesPath}`);
+      }
+
+      const matchesOnlyPath = writePromoRunJson("watchlist-matches-only.json", {
+        interests,
+        matches,
+      });
+      if (matchesOnlyPath) {
+        console.log(`[promo-run] wrote ${matchesOnlyPath}`);
+      }
+
       console.log(
         `[${icaMaxiBarkarbystadenStrategy.storeKey}] watchlist matches: ${matches.length} (from ${interests.length} interests, ${promotions.length} promos)`,
       );
@@ -133,9 +137,14 @@ test.describe("ICA Maxi Barkarbystaden — extract promotions", () => {
     const matches = matchPromotionsToWatchlist(promotions, interests);
     expect(promotions.length).toBeGreaterThan(0);
 
+    const rankPayload = { interests, matches };
     test.info().attach("watchlist-matches-only.json", {
-      body: Buffer.from(JSON.stringify({ interests, matches }, null, 2)),
+      body: Buffer.from(JSON.stringify(rankPayload, null, 2)),
       contentType: "application/json",
     });
+    const onlyPath = writePromoRunJson("watchlist-matches-only.json", rankPayload);
+    if (onlyPath) {
+      console.log(`[promo-run] wrote ${onlyPath}`);
+    }
   });
 });

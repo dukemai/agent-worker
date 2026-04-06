@@ -6,5 +6,8 @@ playwright/.cache/
 # Local snapshot from dashboard API (do not commit shopping intent)
 data/promo-watchlist.json
 
+# Last Playwright scrape + match JSON (same payloads as report attachments)
+data/promo-run/
+
 # Local API credentials (copy from .env.example)
 .env

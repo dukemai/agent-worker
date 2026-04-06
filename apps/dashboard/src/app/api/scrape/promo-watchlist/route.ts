@@ -47,12 +47,12 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  const missingEnv: string[] = [];
-  if (!url?.trim()) missingEnv.push("NEXT_PUBLIC_SUPABASE_URL");
-  if (!serviceKey?.trim()) missingEnv.push("SUPABASE_SERVICE_ROLE_KEY");
-  if (missingEnv.length > 0) {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim();
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY?.trim();
+  if (!url || !serviceKey) {
+    const missingEnv: string[] = [];
+    if (!url) missingEnv.push("NEXT_PUBLIC_SUPABASE_URL");
+    if (!serviceKey) missingEnv.push("SUPABASE_SERVICE_ROLE_KEY");
     return NextResponse.json(
       {
         error: "Supabase server env not configured for scrape export",

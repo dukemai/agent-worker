@@ -40,7 +40,16 @@ Time-boxed order for **grocery intent UI** + docs touchpoints; scrape/match hard
 - [ ] Loading/error states (TanStack Query) consistent with other dashboards.
 - [ ] Cap list length + trim validation; toast or inline error on failure.
 
-## 5. Follow-on (same phase, after UI ships)
+## 5. Weekly promo import (Option A — manual upload → DB → dashboard)
+
+- [x] Migrations `017_promo_match_import.sql` + `018_promo_match_items_week_number.sql` — runs/items tables, RLS, `promo_match_items.week_number` (ISO, UTC).
+- [x] Parser / types — `apps/dashboard/src/lib/promo-matches-import.ts` (`watchlist-matches-only.json` shape).
+- [x] `POST /api/promo-matches/import` — JSON or multipart `file`; inserts run + items; rolls back run on item failure.
+- [x] `GET /api/promo-matches/latest` — latest run by `created_at` + ordered items.
+- [x] Dashboard UI on `/promo-grocery-watchlist` — `PromoWeeklyMatchesSection` (upload, TanStack Query, table with image / title / interest / score / link).
+- [ ] **Verify**: run `supabase db push` (or equivalent) on target project; sign in → upload sample `apps/playwright-tools/data/promo-run/watchlist-matches-only.json` → rows appear with `week_number` set; refresh shows same latest run.
+
+## 6. Follow-on (same phase, after UI ships)
 
 - [x] Playwright: read `data/promo-watchlist.json` and rank `ScrapedPromotion[]` — [`match-promotions.ts`](../../apps/playwright-tools/src/match-promotions.ts), tests in `apps/playwright-tools/tests/match-promotions.spec.ts`; ICA extract spec attaches matches when the watchlist file exists.
 - [ ] Lazy-load / scroll ICA strategy for full offer grid (~180 items).

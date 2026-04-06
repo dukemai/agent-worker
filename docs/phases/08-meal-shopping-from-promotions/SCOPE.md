@@ -23,15 +23,22 @@ Turn retailer promotions into **actionable grocery planning**: the user maintain
 - Load local watchlist JSON; **score/filter** promotions (rules first; optional LLM later).
 - Improve coverage: scroll / lazy-load for full weekly grid.
 
-### Slice C — Planning output (later in phase)
+### Slice C — Manual import → dashboard DB (Option A, in progress)
 
-- Meal sketch + shopping list grouped by store; digest or dashboard panel; traceability to sources.
+1. **Migration** (`017_promo_match_import.sql`): `promo_match_runs` (metadata + full `raw_json`) and `promo_match_items` (normalized rows per matched offer). RLS: `authenticated` full access (single-user model).
+2. **API**: `POST /api/promo-matches/import` — JSON body or multipart `file` (`watchlist-matches-only.json`); `GET /api/promo-matches/latest` — latest run + ordered items.
+3. **UI**: On **`/promo-grocery-watchlist`**, upload control + table (photo, title, interest, score, link) sourced from DB via TanStack Query.
+
+### Slice D — Planning output (later in phase)
+
+- Meal sketch + shopping list grouped by store; digest or dashboard panel; traceability to sources; can consume `promo_match_*` rows for “this week’s buyables.”
 
 ## Planned deliverables (initial)
 
 - **Watchlist UI**: CRUD for `promo_watchlist` + user-facing help for Maxi URL and download script.
 - **Extraction**: Playwright strategies + local watchlist file; optional category filters (Mejeri, Bröd, etc.).
-- **Planning output** (follow-on): Meal plan sketch + shopping list; digest section TBD.
+- **Import path** (Option A): User uploads Playwright `watchlist-matches-only.json`; dashboard validates, persists run + items, displays latest import.
+- **Planning output** (follow-on, Slice D): Meal plan sketch + shopping list; digest section TBD.
 - **Traceability**: Link matches back to offer text / store URL.
 
 ## Out of scope (v1)
@@ -44,7 +51,7 @@ Turn retailer promotions into **actionable grocery planning**: the user maintain
 
 - **Slice A**: Hide `promo_watchlist` from generic Context page vs. read-only duplicate?
 - **Slice B**: Store preferred ICA offers URL in `family_context` (`ica_maxi_offers_url`) for copy-paste-free scraper defaults?
-- **Slice C**: Trigger: on-demand only vs. digest section?
+- **Slice D**: Trigger: on-demand only vs. digest section?
 
 ## Prerequisites
 

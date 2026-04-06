@@ -322,10 +322,14 @@ async function scrapePromotionTilesOnPage(page: Page): Promise<ScrapedPromotion[
         .map(normalize)
         .filter((l) => l.length > 0 && !/lägg\s+i\s+inköpslista/i.test(l));
 
+      const titleEl = card.querySelector("p.offer-card__title");
+      const titleFromOffer = normalize(titleEl?.textContent ?? "");
       const title =
-        lines.find((l) => l.length > 4 && !/^\d/.test(l)) ??
-        lines[0] ??
-        cardText.slice(0, 120);
+        titleFromOffer.length > 0
+          ? titleFromOffer
+          : (lines.find((l) => l.length > 4 && !/^\d/.test(l)) ??
+              lines[0] ??
+              cardText.slice(0, 120));
 
       const priceHint = lines.find(
         (l) =>
