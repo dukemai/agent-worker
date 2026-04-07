@@ -13,6 +13,7 @@ Doc routing for feature-specific specs. Use [GLOSSARY.md](../GLOSSARY.md) for do
 | [promotions.md](promotions.md) | Deal extraction, matching |
 | [promotions-find-strategy.md](promotions-find-strategy.md) | Playwright store strategies, ICA tile extraction, watchlist matching rules |
 | [promo-watchlist.md](promo-watchlist.md) | Promo grocery watchlist UI (`/promo-grocery-watchlist`), `promo_watchlist`, scrape export |
+| [promo-meal-plan.md](promo-meal-plan.md) | AI meal plan from latest `promo_match_*` import (Gemini, JSON schema, POST meal-plan) |
 | [ica-maxi-picker-catalog-source.md](ica-maxi-picker-catalog-source.md) | ICA Maxi Handla **category** tree from `ica-maxi-initial-state-raw.json`; regenerate via `scripts/build-ica-maxi-category-menu.mjs` |
 | [ica-maxi-promo-picker-catalog.json](ica-maxi-promo-picker-catalog.json) | Generated picker catalog (`pnpm promo:picker-catalog`): `categories` + `items` with `watchlistText` for promo watchlist |
 | [learning.md](learning.md) | Profiles, lessons, feedback (deferred items) |

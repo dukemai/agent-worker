@@ -117,7 +117,7 @@ export async function generateWeeklySuggestions(
   });
 
   // 5) Keep action windows only and take top 10
-  const topActions = sortedWindows.filter((w) => w.suggestion_kind === "action").slice(0, 10);
+  const topActions = sortedWindows.filter((w) => w.suggestion_kind === "action").slice(0, 20);
   const toInsert = [...topActions];
   // 6) Upsert for this week using composite key (week_number, window_id)
   if (toInsert.length > 0) {

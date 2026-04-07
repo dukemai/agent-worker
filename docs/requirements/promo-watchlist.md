@@ -44,6 +44,7 @@ Dashboard UI uses **cookie auth** via existing context routes; scrapers use the 
 |--------|------|-----|
 | POST | `/api/promo-matches/import` | **Cookie-auth session.** Body: `application/json` matching Playwright **`watchlist-matches-only.json`**, or **`multipart/form-data`** with field **`file`** (same JSON). Creates a **`promo_match_runs`** row and **`promo_match_items`** rows. Response: `{ runId, itemCount, storeKey }`. |
 | GET | `/api/promo-matches/latest` | **Cookie-auth.** Returns `{ run, items }` for the most recent import by `created_at`, or `{ run: null, items: [] }`. |
+| POST | `/api/promo-matches/meal-plan` | **Cookie-auth.** Builds a Swedish 7-day meal sketch from the **latest** import via Gemini; requires `GEMINI_API_KEY` on the server. See [promo-meal-plan.md](promo-meal-plan.md). |
 
 After running the ICA extract test with a non-empty local watchlist, upload **`apps/playwright-tools/data/promo-run/watchlist-matches-only.json`** from the Promo grocery watchlist page. Each upload appends a new run; the UI shows the **latest** run only (older runs remain in DB for future “history” if needed). Each **`promo_match_items`** row stores **`week_number`** (ISO week, UTC) at import time for filtering and meal planning later.
 
@@ -86,6 +87,7 @@ Tuning: add broader or narrower phrases on the dashboard; optional `minScore` (d
 
 ## Related
 
+- [promo-meal-plan.md](promo-meal-plan.md) — AI meal plan logic (data flow, schema, API, env)
 - [promotions-find-strategy.md](promotions-find-strategy.md) — how scrapers find offer tiles and match the watchlist
 - [promotions.md](promotions.md) — email deal extraction
 - [dashboard.md](dashboard.md) — app shell

@@ -5,6 +5,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Select,
   SelectContent,
@@ -213,196 +214,222 @@ export function PromoWatchlistDashboard() {
   const error = localError ?? mutationError ?? clearError ?? catalogError ?? listError;
 
   return (
-    <main className="mx-auto w-full max-w-5xl space-y-6 px-4 py-6">
-      <Card>
-        <CardHeader>
-          <CardTitle>Promo grocery watchlist</CardTitle>
-          <CardDescription>
-            Items you want to watch for on weekly offers. Stored as{" "}
-            <code className="rounded bg-muted px-1 text-xs">{PROMO_WATCHLIST_KEY}</code> in
-            family context. Example store (ICA Maxi):{" "}
-            <a
-              className="text-primary underline underline-offset-4"
-              href="https://www.ica.se/erbjudanden/maxi-ica-stormarknad-barkarbystaden-1003408/"
-              target="_blank"
-              rel="noreferrer"
-            >
-              Barkarbystaden erbjudanden
-            </a>
-            . Scraper sync:{" "}
-            <code className="rounded bg-muted px-1 text-xs">pnpm promo:download-watchlist</code>.
-          </CardDescription>
-        </CardHeader>
-      </Card>
-
-      <Card>
-        <CardHeader>
-          <CardTitle>Add items</CardTitle>
-          <CardDescription>
-            Pick from the ICA Maxi category catalog or add your own phrase. Max{" "}
-            {MAX_PROMO_WATCHLIST_ITEMS} items.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {catalogQuery.isLoading ? (
-            <p className="text-sm text-muted-foreground">Loading catalog…</p>
-          ) : null}
-          <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end">
-            <div className="space-y-1.5">
-              <span className="text-xs font-medium text-muted-foreground" id="dept-label">
-                Department filter
-              </span>
-              <Select
-                value={departmentId}
-                onValueChange={setDepartmentId}
-                disabled={!catalogQuery.data}
-              >
-                <SelectTrigger className="w-full min-w-[12rem] sm:w-64" aria-labelledby="dept-label">
-                  <SelectValue placeholder="All departments" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value={ALL_DEPARTMENTS}>All departments</SelectItem>
-                  {departments.map((d) => (
-                    <SelectItem key={d.id} value={d.id}>
-                      {d.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="min-w-0 flex-1 space-y-1.5">
-              <span className="text-xs font-medium text-muted-foreground" id="search-label">
-                Search catalog
-              </span>
-              <Input
-                aria-labelledby="search-label"
-                placeholder="Filter by name…"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                disabled={!catalogQuery.data}
-              />
-            </div>
-          </div>
-          <div className="max-h-64 overflow-y-auto rounded-md border p-2">
-            {filteredPickerItems.length === 0 ? (
-              <p className="px-2 py-4 text-center text-sm text-muted-foreground">
-                No catalog matches. Try another department or search.
-              </p>
-            ) : (
-              <ul className="flex flex-wrap gap-2" role="list">
-                {filteredPickerItems.map((it) => (
-                  <li key={it.id}>
-                    <Button
-                      type="button"
-                      variant="secondary"
-                      size="sm"
-                      className="h-auto min-h-9 max-w-full whitespace-normal text-left"
-                      disabled={busy || items.includes(it.watchlistText.trim())}
-                      onClick={() => void addFromCatalog(it)}
-                    >
-                      {it.watchlistText}
-                    </Button>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
-          <form className="flex flex-col gap-2 sm:flex-row sm:items-end" onSubmit={addCustom}>
-            <div className="min-w-0 flex-1 space-y-1.5">
-              <span className="text-xs font-medium text-muted-foreground" id="custom-label">
-                Your own text
-              </span>
-              <Input
-                aria-labelledby="custom-label"
-                placeholder='e.g. "Arla smör 500g"'
-                value={customText}
-                onChange={(e) => setCustomText(e.target.value)}
-                disabled={busy}
-              />
-            </div>
-            <Button type="submit" disabled={busy} className="min-h-11 shrink-0">
-              Add my own text
-            </Button>
-          </form>
-          {error ? <p className="text-sm text-red-600">{error}</p> : null}
-          <p className="text-xs text-muted-foreground">
-            {items.length} / {MAX_PROMO_WATCHLIST_ITEMS} items
-          </p>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardHeader className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <CardTitle>Current list</CardTitle>
-            <CardDescription>
-              These strings are what scrapers match against promotions (rough text match later).
-            </CardDescription>
-          </div>
-          <Button
-            type="button"
-            variant="outline"
-            className="min-h-11 w-full shrink-0 sm:w-auto"
-            disabled={busy || items.length === 0}
-            onClick={() => void clearAll()}
+    <main className="mx-auto w-full max-w-5xl space-y-4 px-4 py-6">
+      <Tabs defaultValue="watchlist" className="space-y-4">
+        <TabsList className="grid w-full grid-cols-2 items-stretch gap-1 group-data-[orientation=horizontal]/tabs:!h-auto group-data-[orientation=horizontal]/tabs:min-h-11 sm:w-full">
+          <TabsTrigger
+            value="watchlist"
+            className="!h-auto min-h-11 justify-center py-2.5 whitespace-normal shadow-none data-[state=active]:shadow-none"
           >
-            Clear entire list
-          </Button>
-        </CardHeader>
-        <CardContent>
-          {watchlistQuery.isLoading ? (
-            <p className="text-sm text-muted-foreground">Loading watchlist…</p>
-          ) : null}
-          {!watchlistQuery.isLoading && items.length === 0 ? (
-            <p className="text-sm text-muted-foreground">No items yet. Add from the catalog above.</p>
-          ) : null}
-          {items.length > 0 ? (
-            <div className="overflow-x-auto rounded-md border">
-              <table className="w-full min-w-[20rem] border-collapse text-sm">
-                <caption className="sr-only">Promo grocery watchlist items</caption>
-                <thead>
-                  <tr className="border-b bg-muted/50">
-                    <th scope="col" className="px-3 py-2 text-left font-medium">
-                      #
-                    </th>
-                    <th scope="col" className="px-3 py-2 text-left font-medium">
-                      Item
-                    </th>
-                    <th scope="col" className="px-3 py-2 text-right font-medium">
-                      Actions
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {items.map((label, index) => (
-                    <tr key={`${label}-${index}`} className="border-b last:border-0">
-                      <td className="px-3 py-2 tabular-nums text-muted-foreground">
-                        {index + 1}
-                      </td>
-                      <td className="px-3 py-2">{label}</td>
-                      <td className="px-3 py-2 text-right">
+            Watchlist
+          </TabsTrigger>
+          <TabsTrigger
+            value="matches"
+            className="!h-auto min-h-11 justify-center py-2.5 whitespace-normal shadow-none data-[state=active]:shadow-none"
+          >
+            Matched offers
+          </TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="watchlist" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Promo grocery watchlist</CardTitle>
+              <CardDescription>
+                Items you want to watch for on weekly offers. Stored as{" "}
+                <code className="rounded bg-muted px-1 text-xs">{PROMO_WATCHLIST_KEY}</code> in
+                family context. Example store (ICA Maxi):{" "}
+                <a
+                  className="text-primary underline underline-offset-4"
+                  href="https://www.ica.se/erbjudanden/maxi-ica-stormarknad-barkarbystaden-1003408/"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Barkarbystaden erbjudanden
+                </a>
+                . Scraper sync:{" "}
+                <code className="rounded bg-muted px-1 text-xs">pnpm promo:download-watchlist</code>.
+              </CardDescription>
+            </CardHeader>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Add items</CardTitle>
+              <CardDescription>
+                Pick from the ICA Maxi category catalog or add your own phrase. Max{" "}
+                {MAX_PROMO_WATCHLIST_ITEMS} items.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {catalogQuery.isLoading ? (
+                <p className="text-sm text-muted-foreground">Loading catalog…</p>
+              ) : null}
+              <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end">
+                <div className="space-y-1.5">
+                  <span className="text-xs font-medium text-muted-foreground" id="dept-label">
+                    Department filter
+                  </span>
+                  <Select
+                    value={departmentId}
+                    onValueChange={setDepartmentId}
+                    disabled={!catalogQuery.data}
+                  >
+                    <SelectTrigger
+                      className="w-full min-w-[12rem] sm:w-64"
+                      aria-labelledby="dept-label"
+                    >
+                      <SelectValue placeholder="All departments" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value={ALL_DEPARTMENTS}>All departments</SelectItem>
+                      {departments.map((d) => (
+                        <SelectItem key={d.id} value={d.id}>
+                          {d.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="min-w-0 flex-1 space-y-1.5">
+                  <span className="text-xs font-medium text-muted-foreground" id="search-label">
+                    Search catalog
+                  </span>
+                  <Input
+                    aria-labelledby="search-label"
+                    placeholder="Filter by name…"
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                    disabled={!catalogQuery.data}
+                  />
+                </div>
+              </div>
+              <div className="max-h-64 overflow-y-auto rounded-md border p-2">
+                {filteredPickerItems.length === 0 ? (
+                  <p className="px-2 py-4 text-center text-sm text-muted-foreground">
+                    No catalog matches. Try another department or search.
+                  </p>
+                ) : (
+                  <ul className="flex flex-wrap gap-2" role="list">
+                    {filteredPickerItems.map((it) => (
+                      <li key={it.id}>
                         <Button
                           type="button"
-                          variant="ghost"
+                          variant="secondary"
                           size="sm"
-                          className="h-auto min-h-11 py-2"
-                          disabled={busy}
-                          aria-label={`Remove ${label}`}
-                          onClick={() => void removeAt(index)}
+                          className="h-auto min-h-9 max-w-full whitespace-normal text-left"
+                          disabled={busy || items.includes(it.watchlistText.trim())}
+                          onClick={() => void addFromCatalog(it)}
                         >
-                          Remove
+                          {it.watchlistText}
                         </Button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          ) : null}
-        </CardContent>
-      </Card>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+              <form className="flex flex-col gap-2 sm:flex-row sm:items-end" onSubmit={addCustom}>
+                <div className="min-w-0 flex-1 space-y-1.5">
+                  <span className="text-xs font-medium text-muted-foreground" id="custom-label">
+                    Your own text
+                  </span>
+                  <Input
+                    aria-labelledby="custom-label"
+                    placeholder='e.g. "Arla smör 500g"'
+                    value={customText}
+                    onChange={(e) => setCustomText(e.target.value)}
+                    disabled={busy}
+                  />
+                </div>
+                <Button type="submit" disabled={busy} className="min-h-11 shrink-0">
+                  Add my own text
+                </Button>
+              </form>
+              {error ? <p className="text-sm text-red-600">{error}</p> : null}
+              <p className="text-xs text-muted-foreground">
+                {items.length} / {MAX_PROMO_WATCHLIST_ITEMS} items
+              </p>
+            </CardContent>
+          </Card>
 
-      <PromoWeeklyMatchesSection />
+          <Card>
+            <CardHeader className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <CardTitle>Current list</CardTitle>
+                <CardDescription>
+                  These strings are what scrapers match against promotions (rough text match later).
+                </CardDescription>
+              </div>
+              <Button
+                type="button"
+                variant="outline"
+                className="min-h-11 w-full shrink-0 sm:w-auto"
+                disabled={busy || items.length === 0}
+                onClick={() => void clearAll()}
+              >
+                Clear entire list
+              </Button>
+            </CardHeader>
+            <CardContent>
+              {watchlistQuery.isLoading ? (
+                <p className="text-sm text-muted-foreground">Loading watchlist…</p>
+              ) : null}
+              {!watchlistQuery.isLoading && items.length === 0 ? (
+                <p className="text-sm text-muted-foreground">
+                  No items yet. Add from the catalog above.
+                </p>
+              ) : null}
+              {items.length > 0 ? (
+                <div className="overflow-x-auto rounded-md border">
+                  <table className="w-full min-w-[20rem] border-collapse text-sm">
+                    <caption className="sr-only">Promo grocery watchlist items</caption>
+                    <thead>
+                      <tr className="border-b bg-muted/50">
+                        <th scope="col" className="px-3 py-2 text-left font-medium">
+                          #
+                        </th>
+                        <th scope="col" className="px-3 py-2 text-left font-medium">
+                          Item
+                        </th>
+                        <th scope="col" className="px-3 py-2 text-right font-medium">
+                          Actions
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {items.map((label, index) => (
+                        <tr key={`${label}-${index}`} className="border-b last:border-0">
+                          <td className="px-3 py-2 tabular-nums text-muted-foreground">
+                            {index + 1}
+                          </td>
+                          <td className="px-3 py-2">{label}</td>
+                          <td className="px-3 py-2 text-right">
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              className="h-auto min-h-11 py-2"
+                              disabled={busy}
+                              aria-label={`Remove ${label}`}
+                              onClick={() => void removeAt(index)}
+                            >
+                              Remove
+                            </Button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ) : null}
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="matches" className="space-y-6">
+          <PromoWeeklyMatchesSection />
+        </TabsContent>
+      </Tabs>
     </main>
   );
 }
