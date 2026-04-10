@@ -5,6 +5,8 @@ export type PromoMealPlanResponseMeta = {
   promotion_count: number;
   store_key: string;
   generated_at: string;
+  /** `promo_match_runs.id` used for this generation. */
+  run_id: string;
 };
 
 export type PromoMealPlanApiResponse = {

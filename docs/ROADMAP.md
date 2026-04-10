@@ -50,20 +50,24 @@
 - [x] Dashboard/tasks/growing UX polish (dialogs, filters, sorts, layout)
 - [x] Docs and contracts aligned (`growing-api`, weekly generation notes)
 
-### Phase 8: Meal & Shopping Plan from Promotions — planned
-- [ ] Structured extraction from promotion emails / deal metadata toward meal + shopping outputs
-- [ ] Family-context-aware suggestions with traceability to source promotions
-- [ ] Dashboard and/or digest surface for the plan (scope TBD in `docs/phases/08-meal-shopping-from-promotions/SCOPE.md`)
+### Phase 8: Meal & Shopping Plan from Promotions — done
+- [x] Promo grocery watchlist UI + `family_context.promo_watchlist` + machine export for Playwright
+- [x] Manual import of matched weekly offers → `promo_match_*` + dashboard (latest run)
+- [x] Meal plan API + UI (10 Swedish meal suggestions from a chosen import); follow-ons in `docs/phases/08-meal-shopping-from-promotions/TASKS.md`
 
-### Phase 9: YouTube Knowledge Extraction — planned
+### Phase 9: Recipe generator & library (Sweden-oriented) — planned
+- [ ] Ingredients + food-type UI → Gemini structured recipes → add chosen rows to `saved_recipes` with **tested** toggle (`docs/phases/09-recipe-sources-sweden/SCOPE.md`, [`recipe-generator.md`](requirements/recipe-generator.md))
+- [ ] Optional later: curated corpus / RAG grounding (same phase folder)
+
+### Phase 10: YouTube Knowledge Extraction — planned
 - [ ] Reliable transcript/caption pipeline into `growing_knowledge`
 - [ ] Enrichment (tags, titles) and Sources tab status/re-extract UX
 - [ ] Guardrails for failures, length, and dedupe
 
-### Phase 10: Learning Agent Specialization — planned
+### Phase 11: Learning Agent Specialization — planned
 - [ ] Dedicated agents per topic (economy, deep AI, growing) with independent cadence
 - [ ] Agent-specific progression memory and feedback / difficulty loops
-- [ ] Prompt tuning and eval fixtures per agent as needed (see `docs/phases/10-learning-agents/SCOPE.md`)
+- [ ] Prompt tuning and eval fixtures per agent as needed (see `docs/phases/11-learning-agents/SCOPE.md`)
 
 ### Deferred (not scheduled as numbered phases)
 - **State tracker mobile app** (was `08-state-tracker`): resumable work/learning states—parked until reprioritized

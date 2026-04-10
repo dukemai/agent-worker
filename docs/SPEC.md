@@ -24,7 +24,7 @@ One user: a busy dad in Stockholm who checks email every morning and has fragmen
 | Growing | [requirements/growing.md](requirements/growing.md) | Seasonal tracker, sources, suggestions |
 | Promotions | [requirements/promotions.md](requirements/promotions.md) | Deal extraction and matching |
 | Promo grocery watchlist | [requirements/promo-watchlist.md](requirements/promo-watchlist.md) | Route `/promo-grocery-watchlist`; `promo_watchlist` + scrape export |
-| Learning | [requirements/learning.md](requirements/learning.md) | Topic/category lessons; multi-agent specialization → Phase 10 (`docs/phases/10-learning-agents/`) |
+| Learning | [requirements/learning.md](requirements/learning.md) | Topic/category lessons; multi-agent specialization → Phase 11 (`docs/phases/11-learning-agents/`) |
 
 ## Data Schema (Supabase)
 

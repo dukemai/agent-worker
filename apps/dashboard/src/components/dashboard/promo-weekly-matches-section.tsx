@@ -34,8 +34,12 @@ export function PromoWeeklyMatchesSection() {
   });
 
   const mealPlanMutation = useMutation({
-    mutationFn: async () => {
-      const response = await fetch("/api/promo-matches/meal-plan", { method: "POST" });
+    mutationFn: async (runId: string) => {
+      const response = await fetch("/api/promo-matches/meal-plan", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ runId }),
+      });
       const json = (await response.json().catch(() => ({}))) as {
         error?: string;
         plan?: PromoMealPlanResult;
@@ -51,6 +55,21 @@ export function PromoWeeklyMatchesSection() {
     },
     onSuccess: () => {
       setShowSampleMealPlan(false);
+    },
+  });
+
+  const deleteRunMutation = useMutation({
+    mutationFn: async (runId: string) => {
+      const response = await fetch(`/api/promo-matches/run/${runId}`, { method: "DELETE" });
+      const json = (await response.json().catch(() => ({}))) as { error?: string };
+      if (!response.ok) {
+        throw new Error(json.error ?? "Failed to remove import");
+      }
+    },
+    onSuccess: async () => {
+      mealPlanMutation.reset();
+      setShowSampleMealPlan(false);
+      await queryClient.invalidateQueries({ queryKey: ["promo-matches-latest"] });
     },
   });
 
@@ -82,11 +101,13 @@ export function PromoWeeklyMatchesSection() {
   const run = latestQuery.data?.run ?? null;
   const items = latestQuery.data?.items ?? [];
   const summaryWeek =
-    items.length > 0
-      ? items[0].week_number
-      : run
-        ? getISOWeekNumber(new Date(run.created_at))
-        : null;
+    run != null && typeof run.week_number === "number" && Number.isFinite(run.week_number)
+      ? run.week_number
+      : items.length > 0
+        ? items[0].week_number
+        : run
+          ? getISOWeekNumber(new Date(run.created_at))
+          : null;
 
   const weekLabelId = "promo-matches-iso-week";
 
@@ -124,8 +145,9 @@ export function PromoWeeklyMatchesSection() {
           <code className="rounded bg-muted px-1 text-xs">
             apps/playwright-tools/data/promo-run/
           </code>{" "}
-          after running the ICA extract test. With offers imported, you can ask the AI for a Swedish
-          week meal sketch based on this list.
+          after running the ICA extract test. With offers imported, you can generate a Swedish meal
+          plan from this list (Gemini) or use Preview sample week to see the layout without calling the
+          API.
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -172,13 +194,47 @@ export function PromoWeeklyMatchesSection() {
           </p>
         ) : null}
         {run ? (
-          <p className="text-xs text-muted-foreground">
-            Latest import:{" "}
-            {new Date(run.created_at).toLocaleString("sv-SE", {
-              dateStyle: "medium",
-              timeStyle: "short",
-            })}{" "}
-            · {run.store_key} · {(run.interests as string[])?.length ?? 0} watchlist interests
+          <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
+            <p className="text-xs text-muted-foreground">
+              Latest import:{" "}
+              {new Date(run.created_at).toLocaleString("sv-SE", {
+                dateStyle: "medium",
+                timeStyle: "short",
+              })}{" "}
+              {typeof run.week_number === "number" ? (
+                <>
+                  {" "}
+                  · <span className="font-medium text-foreground">ISO week {run.week_number}</span>
+                </>
+              ) : null}{" "}
+              · {run.store_key} · {(run.interests as string[])?.length ?? 0} watchlist interests
+            </p>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="w-full shrink-0 sm:w-auto"
+              disabled={deleteRunMutation.isPending || importMutation.isPending}
+              onClick={() => {
+                if (
+                  !window.confirm(
+                    "Remove this import from the database? Offer rows for this run will be deleted. This cannot be undone.",
+                  )
+                ) {
+                  return;
+                }
+                deleteRunMutation.mutate(run.id);
+              }}
+            >
+              {deleteRunMutation.isPending ? "Removing…" : "Remove import"}
+            </Button>
+          </div>
+        ) : null}
+        {deleteRunMutation.isError ? (
+          <p className="text-sm text-red-600">
+            {deleteRunMutation.error instanceof Error
+              ? deleteRunMutation.error.message
+              : "Remove failed"}
           </p>
         ) : null}
         {items.length > 0 && summaryWeek != null ? (
@@ -201,20 +257,24 @@ export function PromoWeeklyMatchesSection() {
               <div className="min-w-0 space-y-1">
                 <h3 className="text-sm font-medium text-foreground">AI meal plan</h3>
                 <p className="text-xs text-muted-foreground leading-snug">
-                  Sends this promotion list to Gemini and returns lunch/dinner ideas for the week
-                  (Swedish). Requires{" "}
-                  <code className="rounded bg-muted px-1">GEMINI_API_KEY</code>
-                  on the server. Use “Preview sample week” to see the layout before calling the API.
+                  Sends the current import&apos;s offers (by run id) to Gemini and returns 10 meal
+                  ideas (promotions + your watchlist interests, ingredients for Sweden). Requires{" "}
+                  <code className="rounded bg-muted px-1">GEMINI_API_KEY</code> on the server. Use
+                  Preview sample week to see the layout before calling the API.
                 </p>
               </div>
               <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
                 <Button
                   type="button"
                   className="w-full sm:w-auto"
-                  disabled={mealPlanMutation.isPending || importMutation.isPending}
-                  onClick={() => mealPlanMutation.mutate()}
+                  disabled={
+                    mealPlanMutation.isPending || importMutation.isPending || run == null
+                  }
+                  onClick={() => {
+                    if (run) mealPlanMutation.mutate(run.id);
+                  }}
                 >
-                  {mealPlanMutation.isPending ? "Planning…" : "Plan meals for this week"}
+                  {mealPlanMutation.isPending ? "Planning…" : "Plan meals only"}
                 </Button>
                 <Button
                   type="button"

@@ -1,5 +1,19 @@
 # Dad-Ops Agent — Decision Log
 
+## 2026-04-08: [Roadmap] Phase 09 — Swedish recipe sources; renumber YouTube → 10, learning agents → 11
+
+**Context**: Meal planning from promos benefits from a deliberate recipe corpus for Sweden; YouTube extraction and learning agents were already numbered 9 and 10.
+**Decision**: Insert **Phase 9: Swedish recipe sources & grounding** (`docs/phases/09-recipe-sources-sweden/`). Renumber **YouTube knowledge extraction** to **Phase 10** (`docs/phases/10-youtube-knowledge-extraction/`) and **Learning agent specialization** to **Phase 11** (`docs/phases/11-learning-agents/`). Earlier decisions that refer to “Phase 9 = YouTube” and “Phase 10 = learning agents” describe the pre-2026-04-08 numbering.
+**Alternatives considered**: Fold recipe work into Phase 8 (rejected: Phase 8 is watchlist + promo import + meal-plan v1); defer recipe phase without a number (rejected: you want it scheduled explicitly).
+**Status**: accepted
+
+## 2026-04-03: [Phase 8] Prioritize 10 meal suggestions over a 7-day meal plan (near-term)
+
+**Context**: A full weekly calendar meal plan is a larger UX and model surface; promotions-based value can start with a scannable list of ideas.
+**Decision**: Specify [**10 meal suggestions**](requirements/promo-meal-suggestions.md) from the imported offer list as the near-term direction (UI **mockup** with static data first, **Gemini API** afterward). The existing **[7-day meal sketch](requirements/promo-meal-plan.md)** and `POST /api/promo-matches/meal-plan` stay in the codebase but are **deferred** in product priority.
+**Alternatives considered**: Delete the week-plan UI and API now (rejected: still useful later); ship only docs without a visual (rejected: need to validate density and layout).
+**Status**: accepted
+
 ## 2026-04-03: [Roadmap] Phase 10 — learning agent specialization after Phase 9
 
 **Context**: After re-scoping phases 8–9, learning agent specialization no longer had a numbered phase.

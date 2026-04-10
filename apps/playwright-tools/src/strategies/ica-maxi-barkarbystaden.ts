@@ -145,6 +145,34 @@ async function waitForOfferTiles(page: Page): Promise<void> {
 }
 
 /**
+ * Weekly offers PLP lazy-loads more tiles as the user scrolls. Scroll until the
+ * “Lägg i inköpslista” count stops growing so ~full grids (e.g. ~180 items) are captured.
+ */
+async function expandLazyLoadedOfferTiles(page: Page): Promise<void> {
+  const listRx = /lägg\s+i\s+inköpslista/i;
+  let lastCount = await page.getByText(listRx).count();
+  let noIncreaseStreak = 0;
+  const maxPasses = 80;
+
+  for (let i = 0; i < maxPasses; i++) {
+    await page.evaluate(() => {
+      window.scrollTo(0, document.documentElement.scrollHeight);
+    });
+    await page.waitForTimeout(450);
+    const count = await page.getByText(listRx).count();
+    if (count <= lastCount) {
+      noIncreaseStreak += 1;
+      if (noIncreaseStreak >= 5 && lastCount > 0) {
+        break;
+      }
+    } else {
+      noIncreaseStreak = 0;
+    }
+    lastCount = count;
+  }
+}
+
+/**
  * Category chip labels inside `.categoriesContainer` (prefers `aria-label` when present so
  * labels align with `getByRole` / accessible name, e.g. `Frukt & Grönt, 10 erbjudanden.`).
  */
@@ -251,6 +279,7 @@ async function clickOffersCategoryChipByResolvedLabel(
  */
 async function scrapePromotionTilesOnPage(page: Page): Promise<ScrapedPromotion[]> {
   const sourceUrl = page.url();
+  await expandLazyLoadedOfferTiles(page);
 
   const rows = await page.evaluate(() => {
     const normalize = (s: string) =>

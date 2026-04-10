@@ -151,6 +151,6 @@ A simple key-value store for cross-cutting user preferences.
 
 #### `promo_match_runs` & `promo_match_items`
 Normalized storage for **manual imports** of Playwright output `watchlist-matches-only.json` (weekly promo tiles scored against `promo_watchlist`).
-- **`promo_match_runs`**: One row per upload — `store_key`, `interests` (JSONB), `raw_json` (full payload), `created_at`.
+- **`promo_match_runs`**: One row per upload — `store_key`, `interests` (JSONB), `raw_json` (full payload), `created_at`, **`week_number`** (ISO week 1–53 at import, UTC; mirrors items for quick filtering without scanning children).
 - **`promo_match_items`**: Child rows — `run_id`, `sort_order`, `week_number` (ISO week 1–53, UTC; same semantics as `growing_suggestions_log.week_number`), `interest`, `score`, `promotion_index`, `title`, `card_text`, `price_hint`, `image_url`, `source_url`, `store_key`. `ON DELETE CASCADE` from run.
 - **RLS**: Same pattern as other single-user tables — `authenticated` full access.

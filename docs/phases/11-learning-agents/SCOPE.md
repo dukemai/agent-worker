@@ -1,10 +1,10 @@
-# Phase 10: Learning Agent Specialization — Scope
+# Phase 11: Learning Agent Specialization — Scope
 
-**Status**: planned (after [Phase 9: YouTube knowledge extraction](../09-youtube-knowledge-extraction/SCOPE.md))
+**Status**: planned (after [Phase 10: YouTube knowledge extraction](../10-youtube-knowledge-extraction/SCOPE.md))
 
 ## Goal
 
-Create dedicated learning agents per topic with independent cadence, content generation, and progression tracking—building on the single-profile learning loop from Phase 4 and (by Phase 10) stronger knowledge ingestion from Phase 9.
+Create dedicated learning agents per topic with independent cadence, content generation, and progression tracking—building on the single-profile learning loop from Phase 4 and (by Phase 11) stronger knowledge ingestion from Phase 10.
 
 ## Planned Deliverables
 
@@ -17,7 +17,7 @@ Create dedicated learning agents per topic with independent cadence, content gen
 ## Prerequisites
 
 - Phase 5 daily ops and reminders solid (done).
-- Phase 9 delivers reliable YouTube → `growing_knowledge` (and operator UX) so growing-oriented agents can lean on a cleaner corpus.
+- Phase 10 delivers reliable YouTube → `growing_knowledge` (and operator UX) so growing-oriented agents can lean on a cleaner corpus.
 - Each agent may need its own prompt tuning and evaluation fixtures.
 
 ## Out of scope (initial)

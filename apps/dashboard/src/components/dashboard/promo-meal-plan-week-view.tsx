@@ -1,6 +1,6 @@
 "use client";
 
-import type { PromoMealPlanDay, PromoMealPlanResult } from "@agent/shared";
+import type { PromoMealPlanMeal, PromoMealPlanMealKind, PromoMealPlanResult } from "@agent/shared";
 import { ChevronDown } from "lucide-react";
 import { useCallback, useId, useState } from "react";
 import type { PromoMealPlanResponseMeta } from "@/types/promo-meal-plan";
@@ -16,14 +16,13 @@ type PromoMealPlanWeekViewProps = {
   className?: string;
 };
 
-function mealToggleClass(active: boolean) {
-  return active
-    ? cn(
-        "cursor-pointer rounded-md px-0.5 py-0.5 outline-none transition-colors -mx-0.5",
-        "hover:bg-muted/45 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
-      )
-    : undefined;
-}
+const MEAL_KIND_LABEL: Record<PromoMealPlanMealKind, string> = {
+  lunch: "Lunch",
+  dinner: "Middag",
+  either: "Lunch eller middag",
+  snack: "Mellanmål",
+  other: "Övrigt",
+};
 
 function MealIngredientLines({ items }: { items: string[] }) {
   const lines = items.map((s) => s.trim()).filter(Boolean);
@@ -42,157 +41,79 @@ function MealIngredientLines({ items }: { items: string[] }) {
   );
 }
 
-function MealPlanDayCard({ day }: { day: PromoMealPlanDay }) {
-  const lunchCook = day.lunch_cooking_note?.trim() ?? "";
-  const dinnerCook = day.dinner_cooking_note?.trim() ?? "";
-  const hasLunchCooking = Boolean(lunchCook);
-  const hasDinnerCooking = Boolean(dinnerCook);
-  const [openLunch, setOpenLunch] = useState(false);
-  const [openDinner, setOpenDinner] = useState(false);
-  const baseId = useId();
-  const lunchPanelId = `${baseId}-lunch`;
-  const dinnerPanelId = `${baseId}-dinner`;
+function MealPlanMealCard({ meal, index }: { meal: PromoMealPlanMeal; index: number }) {
+  const cook = meal.cooking_note?.trim() ?? "";
+  const hasCooking = Boolean(cook);
+  const [open, setOpen] = useState(false);
+  const panelId = useId();
 
-  const toggleLunch = useCallback(() => {
-    if (hasLunchCooking) setOpenLunch((v) => !v);
-  }, [hasLunchCooking]);
-  const toggleDinner = useCallback(() => {
-    if (hasDinnerCooking) setOpenDinner((v) => !v);
-  }, [hasDinnerCooking]);
+  const toggle = useCallback(() => {
+    if (hasCooking) setOpen((v) => !v);
+  }, [hasCooking]);
 
   return (
     <article
       role="listitem"
       className={cn(
         "flex w-[min(20rem,calc(100vw-3rem))] shrink-0 snap-start flex-col rounded-xl border border-border/80 bg-card p-3 shadow-sm ring-1 ring-black/5 dark:ring-white/10 sm:w-80",
-        "max-h-[min(32rem,70vh)] overflow-y-auto",
+        "max-h-[min(36rem,75vh)] overflow-y-auto",
       )}
     >
-      <h4 className="text-sm font-semibold tracking-tight text-primary">{day.day_label}</h4>
-      <div className="mt-3 flex flex-1 flex-col gap-3 text-sm">
-        {day.breakfast?.trim() ? (
-          <div>
-            <p className="text-[0.65rem] font-semibold uppercase tracking-wider text-muted-foreground">
-              Frukost
-            </p>
-            <p className="mt-0.5 leading-snug text-foreground/90">{day.breakfast}</p>
-            <MealIngredientLines items={day.breakfast_ingredients ?? []} />
-          </div>
-        ) : null}
-        <div className="space-y-1.5">
-          <p className="text-[0.65rem] font-semibold uppercase tracking-wider text-muted-foreground">
-            Lunch
-          </p>
-          <p className="leading-snug text-foreground/90">{day.lunch}</p>
-          <MealIngredientLines items={day.lunch_ingredients ?? []} />
-          {hasLunchCooking ? (
-            <button
-              type="button"
-              className={cn(
-                mealToggleClass(true),
-                "w-full border-0 bg-transparent text-left font-inherit",
-              )}
-              aria-expanded={openLunch}
-              aria-controls={lunchPanelId}
-              aria-label={
-                openLunch
-                  ? `Dölj tillagning lunch ${day.day_label}`
-                  : `Visa tillagning lunch ${day.day_label}`
-              }
-              onClick={toggleLunch}
-            >
-              <div className="flex items-center justify-between gap-2">
-                <span className="text-[0.65rem] text-muted-foreground">
-                  {openLunch ? "Dölj tillagning" : "Visa tillagning · lunch"}
-                </span>
-                <ChevronDown
-                  className={cn(
-                    "size-4 shrink-0 text-muted-foreground transition-transform duration-200",
-                    openLunch && "rotate-180",
-                  )}
-                  aria-hidden
-                />
-              </div>
-            </button>
-          ) : null}
-        </div>
-        {hasLunchCooking ? (
-          <div
-            id={lunchPanelId}
-            role="region"
-            aria-label={`Tillagning lunch ${day.day_label}`}
-            hidden={!openLunch}
-          >
-            <div className="rounded-md bg-muted/50 px-2 py-2">
-              <p className="text-[0.65rem] font-semibold uppercase tracking-wider text-muted-foreground">
-                Tillagning · lunch
-              </p>
-              <p className="mt-1 text-xs leading-relaxed text-foreground/95 whitespace-pre-wrap">
-                {lunchCook}
-              </p>
-            </div>
-          </div>
-        ) : null}
-        <div className="space-y-1.5">
-          <p className="text-[0.65rem] font-semibold uppercase tracking-wider text-muted-foreground">
-            Middag
-          </p>
-          <p className="font-medium leading-snug text-foreground">{day.dinner}</p>
-          <MealIngredientLines items={day.dinner_ingredients ?? []} />
-          {hasDinnerCooking ? (
-            <button
-              type="button"
-              className={cn(
-                mealToggleClass(true),
-                "w-full border-0 bg-transparent text-left font-inherit",
-              )}
-              aria-expanded={openDinner}
-              aria-controls={dinnerPanelId}
-              aria-label={
-                openDinner
-                  ? `Dölj tillagning middag ${day.day_label}`
-                  : `Visa tillagning middag ${day.day_label}`
-              }
-              onClick={toggleDinner}
-            >
-              <div className="flex items-center justify-between gap-2">
-                <span className="text-[0.65rem] text-muted-foreground">
-                  {openDinner ? "Dölj tillagning" : "Visa tillagning · middag"}
-                </span>
-                <ChevronDown
-                  className={cn(
-                    "size-4 shrink-0 text-muted-foreground transition-transform duration-200",
-                    openDinner && "rotate-180",
-                  )}
-                  aria-hidden
-                />
-              </div>
-            </button>
-          ) : null}
-        </div>
-        {hasDinnerCooking ? (
-          <div
-            id={dinnerPanelId}
-            role="region"
-            aria-label={`Tillagning middag ${day.day_label}`}
-            hidden={!openDinner}
-          >
-            <div className="rounded-md bg-muted/50 px-2 py-2">
-              <p className="text-[0.65rem] font-semibold uppercase tracking-wider text-muted-foreground">
-                Tillagning · middag
-              </p>
-              <p className="mt-1 text-xs leading-relaxed text-foreground/95 whitespace-pre-wrap">
-                {dinnerCook}
-              </p>
-            </div>
-          </div>
-        ) : null}
+      <div className="flex items-start justify-between gap-2">
+        <p className="text-[0.65rem] font-semibold tabular-nums text-muted-foreground">
+          {index + 1}/10
+        </p>
+        <Badge variant="secondary" className="shrink-0 text-[0.65rem] font-medium">
+          {MEAL_KIND_LABEL[meal.meal_kind]}
+        </Badge>
       </div>
-      {day.uses_promotion_titles.length > 0 ? (
+      <h4 className="mt-1 text-sm font-semibold leading-snug tracking-tight text-primary">
+        {meal.title}
+      </h4>
+      {meal.cuisine_style ? (
+        <p className="mt-0.5 text-[0.65rem] text-muted-foreground">{meal.cuisine_style}</p>
+      ) : null}
+      <p className="mt-2 text-sm leading-snug text-foreground/90">{meal.summary}</p>
+      <MealIngredientLines items={meal.ingredients ?? []} />
+      {hasCooking ? (
+        <button
+          type="button"
+          className={cn(
+            "mt-2 w-full border-0 bg-transparent text-left font-inherit",
+            "cursor-pointer rounded-md px-0.5 py-1 outline-none transition-colors -mx-0.5",
+            "hover:bg-muted/45 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
+          )}
+          aria-expanded={open}
+          aria-controls={panelId}
+          aria-label={open ? "Dölj tillagning" : "Visa tillagning"}
+          onClick={toggle}
+        >
+          <div className="flex items-center justify-between gap-2">
+            <span className="text-[0.65rem] text-muted-foreground">
+              {open ? "Dölj tillagning" : "Visa tillagning"}
+            </span>
+            <ChevronDown
+              className={cn(
+                "size-4 shrink-0 text-muted-foreground transition-transform duration-200",
+                open && "rotate-180",
+              )}
+              aria-hidden
+            />
+          </div>
+        </button>
+      ) : null}
+      {hasCooking ? (
+        <div id={panelId} role="region" aria-label="Tillagning" hidden={!open}>
+          <div className="mt-2 rounded-md bg-muted/50 px-2 py-2">
+            <p className="text-xs leading-relaxed text-foreground/95 whitespace-pre-wrap">{cook}</p>
+          </div>
+        </div>
+      ) : null}
+      {meal.uses_promotion_titles.length > 0 ? (
         <div className="mt-3 flex flex-wrap gap-1 border-t border-border/60 pt-2">
-          {day.uses_promotion_titles.map((t) => (
+          {meal.uses_promotion_titles.map((t) => (
             <Badge
-              key={`${day.day_label}-${t}`}
+              key={`${meal.title}-${t}`}
               variant="outline"
               className="max-w-full truncate px-1.5 py-0 text-[0.65rem] font-normal"
               title={t}
@@ -226,7 +147,7 @@ export function PromoMealPlanWeekView({
   return (
     <section
       className={cn("space-y-6", className)}
-      aria-label={sample ? "Exempel på veckoplan" : "Veckoplan för måltider"}
+      aria-label={sample ? "Exempel på måltidsförslag" : "Måltidsförslag från kampanjer"}
     >
       <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
         <div className="flex flex-wrap items-center gap-2">
@@ -246,6 +167,15 @@ export function PromoMealPlanWeekView({
             {sample ? "Example metadata · " : null}
             {!sample ? <>Generated {formatGeneratedAt(meta.generated_at)} · </> : null}
             {meta.promotion_count} offers · {meta.store_key}
+            {meta.run_id ? (
+              <>
+                {" "}
+                · run{" "}
+                <code className="rounded bg-muted px-1 text-[0.65rem]" title={meta.run_id}>
+                  {meta.run_id.slice(0, 8)}…
+                </code>
+              </>
+            ) : null}
           </p>
         ) : null}
       </div>
@@ -256,12 +186,10 @@ export function PromoMealPlanWeekView({
 
       <div>
         <div className="mb-2 flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
-          <h3 className="text-sm font-medium text-muted-foreground">Week at a glance</h3>
+          <h3 className="text-sm font-medium text-muted-foreground">10 måltidsförslag</h3>
           <p className="text-[0.7rem] text-muted-foreground sm:text-xs">
-            Scroll sideways — <span className="font-medium text-foreground/80">Ingredienser</span>{" "}
-            listas under varje måltid; använd{" "}
-            <span className="font-medium text-foreground/80">Visa tillagning</span> för lunch/middag
-            när det finns steg.
+            Scroll sideways — varje kort är en rätt med ingredienser i Sverige; kampanjer kan vara
+            del av inköpslistan.
           </p>
         </div>
         <div
@@ -273,10 +201,10 @@ export function PromoMealPlanWeekView({
           <div
             className="flex w-max min-w-full snap-x snap-mandatory gap-3 pb-1"
             role="list"
-            aria-label="Dagar i veckoplanen, scrolla horisontellt"
+            aria-label="Tio måltider, scrolla horisontellt"
           >
-            {plan.days.map((day, i) => (
-              <MealPlanDayCard key={`${day.day_label}-${i}`} day={day} />
+            {plan.meals.map((meal, i) => (
+              <MealPlanMealCard key={`${meal.title}-${i}`} meal={meal} index={i} />
             ))}
           </div>
         </div>

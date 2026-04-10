@@ -1,6 +1,6 @@
 # Phase 08: Meal & Shopping Plan from Promotion Letters — Scope
 
-**Status**: planned
+**Status**: done (operator checklist: [TASKS.md §5](./TASKS.md) Supabase verify on deploy)
 
 **Requirements**: [promo-watchlist.md](../../requirements/promo-watchlist.md) (ICA Maxi grocery intent UI + persistence) — complements email deals in [promotions.md](../../requirements/promotions.md).
 
@@ -10,7 +10,7 @@ Turn retailer promotions into **actionable grocery planning**: the user maintain
 
 ## Development plan (prioritized)
 
-### Slice A — Promo watchlist UI (current focus)
+### Slice A — Promo watchlist UI (shipped)
 
 1. **Persistence**: Single `family_context` row `promo_watchlist` — JSON array of strings (product names / phrases). Documented in [promo-watchlist.md](../../requirements/promo-watchlist.md).
 2. **Dashboard**: Page **`/promo-grocery-watchlist`** (“**Promo grocery watchlist**” in nav)—general naming; ICA is example copy only. Add/remove list items (no raw JSON), mobile-friendly, TanStack Query patterns.
@@ -23,7 +23,7 @@ Turn retailer promotions into **actionable grocery planning**: the user maintain
 - Load local watchlist JSON; **score/filter** promotions (rules first; optional LLM later).
 - Improve coverage: scroll / lazy-load for full weekly grid.
 
-### Slice C — Manual import → dashboard DB (Option A, in progress)
+### Slice C — Manual import → dashboard DB (Option A, shipped)
 
 1. **Migration** (`017_promo_match_import.sql`): `promo_match_runs` (metadata + full `raw_json`) and `promo_match_items` (normalized rows per matched offer). RLS: `authenticated` full access (single-user model).
 2. **API**: `POST /api/promo-matches/import` — JSON body or multipart `file` (`watchlist-matches-only.json`); `GET /api/promo-matches/latest` — latest run + ordered items.
@@ -43,7 +43,7 @@ Turn retailer promotions into **actionable grocery planning**: the user maintain
 
 ## Out of scope (v1)
 
-- Full recipe database or nutrition optimization.
+- Full recipe database or nutrition optimization — see [Phase 9: Swedish recipe sources](../09-recipe-sources-sweden/SCOPE.md).
 - Automatic checkout or cart integration with retailers.
 - Multi-user / multi-family watchlists.
 

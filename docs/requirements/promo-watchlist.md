@@ -38,27 +38,38 @@ This doc covers **dashboard UI + persistence**. Scrape and match algorithms live
 
 Dashboard UI uses **cookie auth** via existing context routes; scrapers use the **scrape** route after `pnpm promo:download-watchlist`.
 
+### Environment (dashboard + machine export)
+
+| Variable | Where | Role |
+|----------|--------|------|
+| `SCRAPE_SYNC_SECRET` | Dashboard server env (e.g. `.env.local`) | Bearer secret for `GET /api/scrape/promo-watchlist`; must match the value used by the download script |
+| `SUPABASE_SERVICE_ROLE_KEY` | Dashboard server env | Lets the scrape route read `family_context` with service role |
+| `DASHBOARD_BASE_URL` | Shell / `.env` when running `pnpm promo:download-watchlist` | Base URL of the running dashboard (e.g. `http://localhost:3000`, no trailing slash) |
+| `SCRAPE_SYNC_SECRET` | Same as above, in the shell that runs the script | Passed as `Authorization: Bearer …` by [`download-promo-watchlist.mjs`](../../apps/playwright-tools/scripts/download-promo-watchlist.mjs) |
+
 ### Promo match import (weekly offers you matched offline)
 
 | Method | Path | Use |
 |--------|------|-----|
-| POST | `/api/promo-matches/import` | **Cookie-auth session.** Body: `application/json` matching Playwright **`watchlist-matches-only.json`**, or **`multipart/form-data`** with field **`file`** (same JSON). Creates a **`promo_match_runs`** row and **`promo_match_items`** rows. Response: `{ runId, itemCount, storeKey }`. |
-| GET | `/api/promo-matches/latest` | **Cookie-auth.** Returns `{ run, items }` for the most recent import by `created_at`, or `{ run: null, items: [] }`. |
-| POST | `/api/promo-matches/meal-plan` | **Cookie-auth.** Builds a Swedish 7-day meal sketch from the **latest** import via Gemini; requires `GEMINI_API_KEY` on the server. See [promo-meal-plan.md](promo-meal-plan.md). |
+| POST | `/api/promo-matches/import` | **Cookie-auth session.** Body: `application/json` matching Playwright **`watchlist-matches-only.json`**, or **`multipart/form-data`** with field **`file`** (same JSON). Creates a **`promo_match_runs`** row (with **`week_number`**) and **`promo_match_items`** rows. Response: `{ runId, itemCount, storeKey }`. |
+| GET | `/api/promo-matches/latest` | **Cookie-auth.** Returns `{ run, items }` for the most recent import by `created_at`, or `{ run: null, items: [] }`. **`run`** includes **`week_number`** (ISO week at import). |
+| DELETE | `/api/promo-matches/run/[runId]` | **Cookie-auth.** Deletes that import run and its items (CASCADE). Use when clearing the current import. Response: `{ deleted: true, runId }`. |
+| POST | `/api/promo-matches/meal-plan` | **Cookie-auth.** JSON **`{ "runId": "<uuid>" }`** — builds a Swedish 7-day meal sketch from that import’s offers via Gemini; requires `GEMINI_API_KEY` on the server. See [promo-meal-plan.md](promo-meal-plan.md). |
 
-After running the ICA extract test with a non-empty local watchlist, upload **`apps/playwright-tools/data/promo-run/watchlist-matches-only.json`** from the Promo grocery watchlist page. Each upload appends a new run; the UI shows the **latest** run only (older runs remain in DB for future “history” if needed). Each **`promo_match_items`** row stores **`week_number`** (ISO week, UTC) at import time for filtering and meal planning later.
+After running the ICA extract test with a non-empty local watchlist, upload **`apps/playwright-tools/data/promo-run/watchlist-matches-only.json`** from the Promo grocery watchlist page. Each upload appends a new run; the UI shows the **latest** run only (older runs remain in DB for future “history” if needed). **`promo_match_runs.week_number`** and each **`promo_match_items.week_number`** store the ISO week (UTC) at import time for filtering and meal planning later.
 
-## UI (planned / partial)
+Server helper **`deletePromoMatchRun`** in `apps/dashboard/src/lib/promo-matches-run.ts` performs the DELETE used by the API route.
 
-- **Route (decided):** **`/promo-grocery-watchlist`** — kebab-case URL, parallel to `/context`, `/growing`.
+## UI (shipped)
+
+- **Route:** **`/promo-grocery-watchlist`** — kebab-case URL, parallel to `/context`, `/growing`.
 - **Nav / title:** **Promo grocery watchlist** — general-purpose wording (not retailer-specific).
-- **Weekly matched offers (shipped):** Second panel on the same page — upload `watchlist-matches-only.json`, list latest import from DB (see import APIs above).
-- **Primary editor**: Dedicated page—not only the generic Context key-value grid.
-- **Item list layout:** **`table`** (not a loose bullet list). Suggested columns: **`#`** (1-based row index), **`Item`** (product phrase), **`Actions`** (remove row). Header row for clarity; empty state when there are no rows. On **narrow viewports**, allow **horizontal scroll** for the table or use a compact pattern that preserves row/column semantics (e.g. `role="grid"` / proper `<th>` scope) so assistive tech still understands structure.
-- **Controls**: Add new entry above or below the table: input + add button; per-row delete in **Actions**; optional clear-all with confirm (outside the table).
-- **Persistence**: Prefer immediate save per add/remove (TanStack Query), same as other dashboards.
-- **Copy**: Short help—**example** weekly offers link (ICA Maxi Barkarbystaden), `pnpm promo:download-watchlist`, note that per-store scrapers read the same list.
-- **Accessibility**: Table captions or `aria-labelledby` if helpful; focus order: add flow then table; remove buttons have discernible names (e.g. “Remove {item}”). Align with `DESIGN-SYSTEM.md`.
+- **Weekly matched offers:** Second tab on the same page — upload `watchlist-matches-only.json`, list latest import from DB (see import APIs above); meal plan from chosen run.
+- **Primary editor**: Dedicated page; generic Context page links here and does not list `promo_watchlist` rows.
+- **Item list layout:** **`table`** with **`#`**, **`Item`**, **`Actions`** (remove); horizontal scroll on small viewports; table caption for assistive tech.
+- **Add flow:** ICA-aligned picker catalog (`apps/dashboard/public/data/ica-maxi-promo-picker-catalog.json`, runtime-validated) plus **Add my own text**; clear-all with confirm (`DELETE` the context row).
+- **Persistence**: Immediate save per add/remove (TanStack Query).
+- **Copy**: Example weekly offers link (ICA Maxi Barkarbystaden), `pnpm promo:download-watchlist`, note that per-store scrapers read the same list.
 
 ## Out of scope (this requirement)
 
@@ -69,7 +80,7 @@ After running the ICA extract test with a non-empty local watchlist, upload **`a
 ## Acceptance criteria
 
 1. User can maintain `promo_watchlist` entirely from the new UI; values round-trip as JSON array in DB.
-2. Generic Context page may still show `promo_watchlist` or we hide that key from generic list to avoid duplicate editors—**one** canonical editor (decision during implementation).
+2. Generic Context page does **not** list `promo_watchlist`; **one** canonical editor on `/promo-grocery-watchlist`.
 3. `GET /api/scrape/promo-watchlist` with valid bearer returns the same logical items as the UI shows after save.
 4. Mobile layout is usable: table remains readable (scroll or compact table pattern), tappable **Actions** targets.
 
@@ -87,7 +98,8 @@ Tuning: add broader or narrower phrases on the dashboard; optional `minScore` (d
 
 ## Related
 
-- [promo-meal-plan.md](promo-meal-plan.md) — AI meal plan logic (data flow, schema, API, env)
+- [promo-meal-suggestions.md](promo-meal-suggestions.md) — 10 meal ideas from imports (near-term; mockup + future API)
+- [promo-meal-plan.md](promo-meal-plan.md) — deferred 7-day AI meal sketch (data flow, schema, API, env)
 - [promotions-find-strategy.md](promotions-find-strategy.md) — how scrapers find offer tiles and match the watchlist
 - [promotions.md](promotions.md) — email deal extraction
 - [dashboard.md](dashboard.md) — app shell

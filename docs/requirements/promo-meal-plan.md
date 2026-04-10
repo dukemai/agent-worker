@@ -1,63 +1,75 @@
-# Promo meal plan (AI week sketch)
+# Promo meal plan (AI — 10 måltider)
+
+## Status (direction)
+
+The live **`POST /api/promo-matches/meal-plan`** flow returns **exactly 10 meal ideas** (not a Mon–Sun calendar). A separate [**10-meal UI mockup**](promo-meal-suggestions.md) explored layout earlier; the **PromoMealPlanWeekView** component now renders the **same 10-card** pattern for the API result.
 
 ## Purpose
 
-Turn the **latest imported weekly promotion matches** (`promo_match_runs` / `promo_match_items`) into a **practical 7-day meal sketch** in **Swedish**, using **Gemini** with a **fixed JSON schema**. This is **assistive planning**, not automated shopping or nutrition advice.
+Turn a chosen import’s **weekly promotion matches** (`promo_match_runs` / `promo_match_items`, keyed by **`runId`**) into **10 shoppable meal suggestions** in **Swedish**, using **Gemini** with a **fixed JSON schema**. The model is instructed to:
 
-**Prerequisites:** the user has imported `watchlist-matches-only.json` so `/api/promo-matches/latest` has at least one matched offer row with `**week_number`** set.
+- **Leverage promotions** (offers can be the star ingredient or only part of the dish).
+- Respect **user / watchlist interests** as **cuisine direction** (e.g. asiatiskt, vietnamesiskt, svensk husman, italienskt).
+- List **ingredients realistic in Sweden** (typical supermarkets + common “world food” availability).
+- Return **exactly 10** meals in **`meals`**.
+
+This is **assistive planning**, not automated shopping or nutrition advice.
+
+**Prerequisites:** imported `watchlist-matches-only.json` so the chosen run has matched offer rows with **`week_number`** where applicable.
 
 ## Data flow
 
-1. **Source of truth:** newest `promo_match_runs` row by `created_at`, with child `promo_match_items` ordered by `sort_order`.
-2. **Server** (`POST /api/promo-matches/meal-plan`): loads that run + items; builds a compact payload (title, truncated `card_text`, `price_hint`, `interest` as watchlist match label); passes `**iso_week`** from `promo_match_items.week_number` (consistent across rows for a given import).
-3. **Model:** `[generatePromoMealPlanForWeek](../../packages/shared/src/gemini.ts)` → `gemini-2.5-flash`, `responseMimeType: application/json` + response schema.
-4. **Response:** `{ plan, meta }` where `meta` includes `iso_week`, `promotion_count`, `store_key`, `generated_at`. **Not persisted** in the database in v1; the dashboard holds the result in React state until refresh or a new promo import (which resets the meal-plan UI state).
+1. **Source of truth:** a specific **`promo_match_runs.id`** from the client (usually latest from `/api/promo-matches/latest`), with child `promo_match_items` ordered by `sort_order`.
+2. **Server** (`POST /api/promo-matches/meal-plan` with JSON `{ "runId": "<uuid>" }`): loads that run + items; builds a compact payload (`watchlist_interests` + promotions with `title`, `card_text`, `price_hint`, `matched_interest`); passes **`iso_week`** from `promo_match_runs.week_number` or items.
+3. **Model:** [`generatePromoMealPlanForWeek`](../../packages/shared/src/gemini.ts) → `gemini-2.5-flash`, `responseMimeType: application/json` + response schema.
+4. **Response:** `{ plan, meta }` where **`plan`** is `PromoMealPlanResult` (**`meals` length 10**); **`meta`** includes `iso_week`, `promotion_count`, `store_key`, `generated_at`, **`run_id`**. **Not persisted** in v1.
 
 ## Structured output (`PromoMealPlanResult`)
 
 
-| Field                | Meaning                                                                                                                                                                     |
-| -------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `intro`              | Short Swedish intro (1–3 sentences).                                                                                                                                        |
-| `days`               | Up to **7** entries; each has `day_label`, **`breakfast`**, **`breakfast_ingredients`**, `lunch`, **`lunch_ingredients`**, `dinner`, **`dinner_ingredients`** (short Swedish shopping lines per meal; arrays may be empty when nothing extra to buy), **`lunch_cooking_note`**, **`dinner_cooking_note`**, `uses_promotion_titles`. Legacy **`cooking_note`** is mapped to `dinner_cooking_note` when the new fields are absent. |
-| `shopping_reminders` | Short Swedish bullets (e.g. buy sides, check fridge).                                                                                                                       |
+| Field                | Meaning |
+| -------------------- | ------- |
+| `intro`              | Short Swedish intro (1–3 sentences). |
+| `meals`              | **Exactly 10** objects: `title`, `summary`, `meal_kind`, `ingredients[]`, `cooking_note`, `uses_promotion_titles[]`, `cuisine_style` (Swedish tag, e.g. vietnamesiskt, italienskt). |
+| `shopping_reminders` | Short Swedish bullets. |
 
 
-The schema requires `uses_promotion_titles` per day so the plan stays **traceable** to imported offers.
+Sanitization enforces **exactly 10** meals after mapping; otherwise the API returns **502** with an error.
 
 ## Prompt logic (high level)
 
-- **Role:** home cook in Sweden; offers are ICA-like weekly deals.
-- **Constraints:** each day includes **breakfast**, lunch, dinner, **`breakfast_ingredients`**, **`lunch_ingredients`**, **`dinner_ingredients`** (what to shop for each meal), **`lunch_cooking_note`**, **`dinner_cooking_note`**; prioritize promotions where reasonable; **do not invent products** beyond what the list supports; neutral staples (rice, potatoes, salad) allowed as complements.
-- **Language:** Swedish for all user-facing strings in the JSON.
-- **Truncation:** long `card_text` / `price_hint` are shortened server-side before the model call to cap prompt size.
+- **Role:** home cook in **Sweden**; ICA-like weekly deals.
+- **Promotions:** use offers actively; they may be **partial** inputs to a recipe.
+- **Interests:** `watchlist_interests` steer **variety of cuisines** (examples in prompt: asiatiskt, vietnamesiskt, svenskt, italienskt).
+- **Ingredients:** Swedish grocery realism; Swedish strings.
+- **Truncation:** long `card_text` / `price_hint` shortened server-side before the model call.
 
 ## API
 
 
 | Method | Path                           | Auth           | Notes                                                                                                                                                          |
 | ------ | ------------------------------ | -------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| POST   | `/api/promo-matches/meal-plan` | Cookie session | **503** if `GEMINI_API_KEY` is unset on the dashboard server; **404** if no promo import; **400** if latest run has no items; **502** on model/parse failures. |
+| POST   | `/api/promo-matches/meal-plan` | Cookie session | Body: **`{ "runId": "<uuid>" }`**. **400** if body/`runId` invalid or run has no items; **404** if run not found; **503** if `GEMINI_API_KEY` unset; **502** on model/parse failures (including if the model does not return 10 meals). |
 
 
 ## Dashboard UI
 
-- **Matched offers** tab: after the week highlight strip, **“Plan meals for this week”** calls the POST route. **`PromoMealPlanWeekView`** renders the result: intro quote block, **horizontally scrollable** week rail (snap cards), per-day **frukost**, **Lunch** and **Middag** with an **Ingredienser** bullet list under each (always visible when non-empty), optional **Visa tillagning** for lunch/middag when cooking notes exist, offer **badges**, and **Inköp & påminnelser** card. Tall cards scroll vertically inside if needed (`max-h` + `overflow-y-auto`).
-- **“Preview sample week”** toggles static **`PROMO_MEAL_PLAN_SAMPLE`** (same JSON shape) with a **Sample preview** ribbon—use to refine layout before `GEMINI_API_KEY` is wired.
-- **New JSON import** clears the AI meal-plan mutation; a successful **Plan meals** run clears the sample toggle so the live plan is shown.
+- **Matched offers:** **Plan meals only** sends **`runId`**. **`PromoMealPlanWeekView`** shows intro, a **horizontal rail of 10 cards** (snap scroll), each with **cuisine_style**, **ingredients**, optional **Visa tillagning**, promotion **badges**, and **Inköp & påminnelser**.
+- **Preview sample week** uses **`PROMO_MEAL_PLAN_SAMPLE`** (10 meals) with a **Sample preview** ribbon.
 
 ## Environment
 
-- `**GEMINI_API_KEY`**: required on the **Next.js dashboard** host (e.g. `.env.local`), same family of key as the worker’s Gemini usage.
+- **`GEMINI_API_KEY`**: required on the **Next.js dashboard** host (e.g. `.env.local`).
 
 ## Out of scope (v1)
 
-- Persisting meal plans in Supabase or syncing to tasks / shopping lists.
+- Persisting meal plans in Supabase or syncing to shopping lists.
 - Recalculating when the user edits only the watchlist without re-importing promos.
 - Multi-store or multi-user plans.
 
 ## Related
 
-- [promo-watchlist.md](promo-watchlist.md) — watchlist, import, `/api/promo-matches/`* except meal-plan detail above.
+- [promo-watchlist.md](promo-watchlist.md) — watchlist, import, `/api/promo-matches/*`
+- [promo-meal-suggestions.md](promo-meal-suggestions.md) — earlier mockup-only spec (optional overlap with this flow)
 - Phase 8: [../phases/08-meal-shopping-from-promotions/SCOPE.md](../phases/08-meal-shopping-from-promotions/SCOPE.md)
-
+- Phase 9 (recipe corpus / grounding): [../phases/09-recipe-sources-sweden/SCOPE.md](../phases/09-recipe-sources-sweden/SCOPE.md)

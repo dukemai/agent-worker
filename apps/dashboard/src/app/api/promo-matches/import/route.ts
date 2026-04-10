@@ -58,12 +58,15 @@ export async function POST(request: Request) {
   const storeKey = storeKeyFromPayload(data);
   const rawJson = raw as Record<string, unknown>;
 
+  const weekNumber = getISOWeekNumber();
+
   const { data: run, error: runErr } = await supabase
     .from("promo_match_runs")
     .insert({
       store_key: storeKey,
       interests: data.interests,
       raw_json: rawJson,
+      week_number: weekNumber,
     })
     .select("id")
     .single();
@@ -73,7 +76,6 @@ export async function POST(request: Request) {
   }
 
   const runId = run.id;
-  const weekNumber = getISOWeekNumber();
 
   if (data.matches.length > 0) {
     const rows = data.matches.map((m, sortOrder) => ({

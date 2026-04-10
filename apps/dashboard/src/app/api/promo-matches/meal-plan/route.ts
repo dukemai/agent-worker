@@ -3,14 +3,32 @@ import { NextResponse } from "next/server";
 import { errorResponse, getAuthedSupabase } from "@/lib/api";
 import type { PromoMealPlanResponseMeta } from "@/types/promo-meal-plan";
 
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 /**
- * POST: build a Swedish week meal sketch from the latest imported `promo_match_*` rows (Gemini).
+ * POST JSON `{ runId }`: build a Swedish week meal sketch from that import’s `promo_match_*` rows (Gemini).
  * Requires `GEMINI_API_KEY` on the dashboard server.
  */
-export async function POST() {
+export async function POST(request: Request) {
   const auth = await getAuthedSupabase();
   if (auth.error || !auth.supabase) {
     return auth.error;
+  }
+
+  let body: unknown;
+  try {
+    body = await request.json();
+  } catch {
+    return errorResponse("Expected JSON body with runId", 400);
+  }
+
+  const runIdRaw =
+    typeof body === "object" && body !== null && "runId" in body
+      ? (body as { runId: unknown }).runId
+      : undefined;
+  const runId = typeof runIdRaw === "string" ? runIdRaw.trim() : "";
+  if (!runId || !UUID_RE.test(runId)) {
+    return errorResponse("Body must include runId (UUID of a promo_match_runs row).", 400);
   }
 
   const apiKey = process.env.GEMINI_API_KEY?.trim();
@@ -23,9 +41,8 @@ export async function POST() {
 
   const { data: run, error: runErr } = await auth.supabase
     .from("promo_match_runs")
-    .select("id, store_key, interests")
-    .order("created_at", { ascending: false })
-    .limit(1)
+    .select("id, store_key, interests, week_number")
+    .eq("id", runId)
     .maybeSingle();
 
   if (runErr) {
@@ -33,7 +50,7 @@ export async function POST() {
   }
 
   if (!run) {
-    return errorResponse("No promo import found. Import watchlist-matches-only.json first.", 404);
+    return errorResponse("No promo import found for that runId.", 404);
   }
 
   const { data: items, error: itemsErr } = await auth.supabase
@@ -48,12 +65,15 @@ export async function POST() {
 
   const list = items ?? [];
   if (list.length === 0) {
-    return errorResponse("Latest import has no matched offers to plan from.", 400);
+    return errorResponse("This import has no matched offers to plan from.", 400);
   }
 
-  const isoWeek = list[0]?.week_number;
-  if (typeof isoWeek !== "number") {
-    return errorResponse("Promotion rows are missing week_number.", 500);
+  const isoWeek =
+    typeof run.week_number === "number" && Number.isFinite(run.week_number)
+      ? run.week_number
+      : list[0]?.week_number;
+  if (typeof isoWeek !== "number" || !Number.isFinite(isoWeek)) {
+    return errorResponse("Could not determine ISO week for this import.", 500);
   }
 
   const interestsUnknown = run.interests;
@@ -79,6 +99,7 @@ export async function POST() {
       promotion_count: list.length,
       store_key: run.store_key,
       generated_at: new Date().toISOString(),
+      run_id: run.id,
     };
 
     return NextResponse.json({ plan, meta });

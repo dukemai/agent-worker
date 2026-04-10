@@ -21,6 +21,8 @@ export type PromoMatchRunRow = {
   created_at: string;
   store_key: string;
   interests: unknown;
+  /** ISO week (1–53) at import time; mirrors items’ week_number. */
+  week_number: number | null;
 };
 
 /** Latest imported weekly promo match run + items (by created_at). */
@@ -32,7 +34,7 @@ export async function GET() {
 
   const { data: run, error: runErr } = await auth.supabase
     .from("promo_match_runs")
-    .select("id, created_at, store_key, interests")
+    .select("id, created_at, store_key, interests, week_number")
     .order("created_at", { ascending: false })
     .limit(1)
     .maybeSingle();
