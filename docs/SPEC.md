@@ -24,6 +24,8 @@ One user: a busy dad in Stockholm who checks email every morning and has fragmen
 | Growing | [requirements/growing.md](requirements/growing.md) | Seasonal tracker, sources, suggestions |
 | Promotions | [requirements/promotions.md](requirements/promotions.md) | Deal extraction and matching |
 | Promo grocery watchlist | [requirements/promo-watchlist.md](requirements/promo-watchlist.md) | Route `/promo-grocery-watchlist`; `promo_watchlist` + scrape export |
+| Shared shopping list / cook plan | [requirements/shared-shopping-list.md](requirements/shared-shopping-list.md) | Recipes → plan to cook → prepare → shopping list; share via opaque URL (`/shop/[slug]`); planned tables |
+| Promo shopping pipeline (phases) | [requirements/promo-shopping-pipeline-phases.md](requirements/promo-shopping-pipeline-phases.md) | Later sub-phases B–G (crawl, DB, matching, meals) around promos + shared list |
 | Learning | [requirements/learning.md](requirements/learning.md) | Topic/category lessons; multi-agent specialization → Phase 11 (`docs/phases/11-learning-agents/`) |
 
 ## Data Schema (Supabase)
@@ -40,6 +42,8 @@ One user: a busy dad in Stockholm who checks email every morning and has fragmen
 | `growing_windows` | id, item_name, suggestion_kind, start_month, end_month, stockholm_note | Seasonal activity catalog |
 | `growing_knowledge` | id, source_id, title, content, category | Reference nuggets from sources |
 | `growing_suggestions_log` | id, window_id, week_number, title, details, status, converted_task_id | Weekly suggestion lifecycle (ISO week number) |
+| `cook_plans` / `cook_plan_items` | (planned) user’s **plan to cook**; FK to `saved_recipes` | [shared-shopping-list.md](requirements/shared-shopping-list.md) |
+| `shared_shopping_lists` / `shared_shopping_list_items` | (planned) opaque `public_slug`; items: label, line state, optional `source_recipe_id` | Output of prepare; shareable buy list |
 
 Renewals: `tasks` with `metadata.item_type = "renewal"`. Promotions: `tasks` with `metadata.email_type = "promotion"`.
 

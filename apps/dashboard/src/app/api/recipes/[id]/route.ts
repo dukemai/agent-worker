@@ -1,11 +1,42 @@
 import { NextResponse } from "next/server";
 import { errorResponse, getAuthedSupabase } from "@/lib/api";
-import { parseRecipePartialUpdate } from "@/lib/recipe-request";
+import { parseFeedbackPatch, parseRecipePartialUpdate } from "@/lib/recipe-request";
+import { SAVED_RECIPE_COLUMNS } from "@/lib/saved-recipe-columns";
 import { parseSimilarRecipeUrl } from "@/lib/recipe-source";
 
 type Params = { params: Promise<{ id: string }> };
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+const RECIPE_SELECT = SAVED_RECIPE_COLUMNS;
+
+export async function GET(_: Request, { params }: Params) {
+  const auth = await getAuthedSupabase();
+  if (auth.error || !auth.supabase || !auth.user) {
+    return auth.error;
+  }
+
+  const { id } = await params;
+  if (!id || !UUID_RE.test(id)) {
+    return errorResponse("Invalid id", 400);
+  }
+
+  const { data, error } = await auth.supabase
+    .from("saved_recipes")
+    .select(RECIPE_SELECT)
+    .eq("id", id)
+    .eq("user_id", auth.user.id)
+    .maybeSingle();
+
+  if (error) {
+    return errorResponse(error.message, 500);
+  }
+  if (!data) {
+    return errorResponse("Recipe not found", 404);
+  }
+
+  return NextResponse.json({ recipe: data });
+}
 
 export async function PATCH(request: Request, { params }: Params) {
   const auth = await getAuthedSupabase();
@@ -54,6 +85,12 @@ export async function PATCH(request: Request, { params }: Params) {
   }
   Object.assign(patch, recipePartial.patch);
 
+  const feedbackPartial = parseFeedbackPatch(o);
+  if ("error" in feedbackPartial) {
+    return errorResponse(feedbackPartial.error, 400);
+  }
+  Object.assign(patch, feedbackPartial.patch);
+
   const patchKeys = Object.keys(patch).filter((k) => k !== "updated_at");
   if (patchKeys.length === 0) {
     return errorResponse(
@@ -67,9 +104,7 @@ export async function PATCH(request: Request, { params }: Params) {
     .update(patch)
     .eq("id", id)
     .eq("user_id", auth.user.id)
-    .select(
-      "id, title, title_en, title_vi, summary, meal_kind, ingredients, steps, food_type_id, vegetarian, ingredient_picks, tested, want_to_try, estimated_cook_time, source, similar_recipe_url, created_at, updated_at",
-    )
+    .select(RECIPE_SELECT)
     .maybeSingle();
 
   if (error) {

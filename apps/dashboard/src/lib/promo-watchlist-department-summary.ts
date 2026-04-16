@@ -73,3 +73,88 @@ export function summarizeWatchlistByDepartment(
 
   return { byDepartment, unmatchedCount: unmatched };
 }
+
+export type WatchlistGroupEntry = {
+  label: string;
+  /** Index in the persisted `items` array (for remove). */
+  index: number;
+};
+
+export type WatchlistDepartmentGroup = {
+  departmentId: string;
+  departmentName: string;
+  entries: WatchlistGroupEntry[];
+};
+
+/**
+ * Buckets watchlist strings by ICA top-level department (same mapping as {@link summarizeWatchlistByDepartment}).
+ * Order within each group follows first appearance in `items`. Groups are sorted by name (sv); `Not in catalog` last.
+ */
+export function groupWatchlistByDepartment(
+  items: string[],
+  catalog: PromoPickerCatalog | undefined,
+): WatchlistDepartmentGroup[] {
+  if (!catalog?.items?.length) {
+    return [
+      {
+        departmentId: "__all__",
+        departmentName: "All items",
+        entries: items.map((label, index) => ({ label, index })),
+      },
+    ];
+  }
+
+  const byWatchlistText = new Map<string, PromoPickerItem>();
+  for (const it of catalog.items) {
+    const key = it.watchlistText.trim();
+    if (!byWatchlistText.has(key)) {
+      byWatchlistText.set(key, it);
+    }
+  }
+
+  const categoryById = new Map(catalog.categories.map((c) => [c.id, c]));
+  const topLevelNameByDeptId = new Map<string, string>();
+  for (const c of catalog.categories) {
+    if (c.parentId === null) {
+      topLevelNameByDeptId.set(c.id, c.name);
+    }
+  }
+
+  function departmentLabel(departmentId: string): string {
+    const top = topLevelNameByDeptId.get(departmentId);
+    if (top) {
+      return top;
+    }
+    return categoryById.get(departmentId)?.name ?? "Unknown department";
+  }
+
+  const UNMATCHED_ID = "__unmatched__";
+  const UNMATCHED_NAME = "Not in catalog";
+
+  const bucketMap = new Map<string, WatchlistDepartmentGroup>();
+
+  for (let index = 0; index < items.length; index++) {
+    const label = items[index];
+    const text = label.trim();
+    const item = byWatchlistText.get(text);
+    const departmentId = item ? item.departmentId : UNMATCHED_ID;
+    const departmentName = item ? departmentLabel(departmentId) : UNMATCHED_NAME;
+
+    let g = bucketMap.get(departmentId);
+    if (!g) {
+      g = { departmentId, departmentName, entries: [] };
+      bucketMap.set(departmentId, g);
+    }
+    g.entries.push({ label, index });
+  }
+
+  const groups = [...bucketMap.values()].filter((g) => g.entries.length > 0);
+  const matched = groups.filter((g) => g.departmentId !== UNMATCHED_ID);
+  const unmatched = groups.find((g) => g.departmentId === UNMATCHED_ID);
+
+  matched.sort((a, b) =>
+    a.departmentName.localeCompare(b.departmentName, "sv", { sensitivity: "base" }),
+  );
+
+  return unmatched ? [...matched, unmatched] : matched;
+}

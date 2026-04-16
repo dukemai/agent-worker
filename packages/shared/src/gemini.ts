@@ -564,7 +564,10 @@ export interface RecipeIngredient {
   amount: string;
 }
 
-/** One AI-generated recipe suggestion (recipe generator). */
+/**
+ * One AI-generated **suggestion** (recipe generator): dish names + shopping-style ingredients.
+ * Cooking steps are **not** from the model — the user pastes markdown from a trusted source.
+ */
 export interface RecipeGeneratorMeal {
   /** Dish name in Swedish (primary). */
   title: string;
@@ -572,11 +575,13 @@ export interface RecipeGeneratorMeal {
   title_en: string;
   /** Same dish in Vietnamese (family communication). */
   title_vi: string;
+  /** Optional one-line hint; full prose comes from the user’s pasted source. */
   summary: string;
   meal_kind: PromoMealPlanMealKind;
   /** Approx. active + light waiting time until serving, e.g. "ca 35 min" (Swedish). */
   estimated_cook_time: string;
   ingredients: RecipeIngredient[];
+  /** Always empty from AI; filled when the user pastes source markdown in the dashboard. */
   steps: string[];
   uses_ingredient_picks: string[];
 }
@@ -593,8 +598,11 @@ const RECIPE_STEP_CAP = 24;
 /** Model id for dashboard recipe generator (`generateRecipeIdeasFromIngredients`). */
 export const RECIPE_GENERATOR_MODEL_ID = "gemini-2.5-flash";
 
-/** Stored on `saved_recipes.source` when saving from the recipe generator. */
-export const RECIPE_GENERATOR_SOURCE_LABEL = "Gemini 2.5 Flash (AI recipe generator)";
+/** Stored on `saved_recipes.source` when saving a suggestion-only row from the generator. */
+export const RECIPE_GENERATOR_SOURCE_LABEL = "Gemini 2.5 Flash (AI recipe suggestions)";
+
+/** Stored when the user pastes markdown from an external recipe to fulfill a suggestion. */
+export const RECIPE_SOURCE_MANUAL_MARKDOWN = "Manual (markdown from source)";
 
 const RECIPE_INGREDIENT_ITEM_SCHEMA: ObjectSchema = {
   type: SchemaType.OBJECT,
@@ -629,7 +637,8 @@ const RECIPE_GENERATOR_MEAL_ITEM_SCHEMA: ObjectSchema = {
     } as Schema,
     summary: {
       type: SchemaType.STRING,
-      description: "1–2 sentences in Swedish: what it is and how it uses the ingredients.",
+      description:
+        "Optional: one short Swedish line (or empty). Do not write full recipes — only a hint if needed.",
     } as Schema,
     meal_kind: {
       type: SchemaType.STRING,
@@ -637,12 +646,12 @@ const RECIPE_GENERATOR_MEAL_ITEM_SCHEMA: ObjectSchema = {
     } as Schema,
     ingredients: {
       type: SchemaType.ARRAY,
-      description: "Structured ingredient rows",
+      description: "Structured ingredient rows the cook would shop for (Swedish)",
       items: RECIPE_INGREDIENT_ITEM_SCHEMA,
     } as Schema,
     steps: {
       type: SchemaType.ARRAY,
-      description: "Ordered cooking steps in Swedish, one short sentence per item",
+      description: "Must be an empty array — do not output cooking steps",
       items: { type: SchemaType.STRING } as Schema,
     } as Schema,
     uses_ingredient_picks: {
@@ -660,7 +669,6 @@ const RECIPE_GENERATOR_MEAL_ITEM_SCHEMA: ObjectSchema = {
     "title",
     "title_en",
     "title_vi",
-    "summary",
     "meal_kind",
     "ingredients",
     "steps",
@@ -709,7 +717,7 @@ function sanitizeRecipeGeneratorMeal(raw: unknown): RecipeGeneratorMeal | null {
     typeof m.title_vi === "string" ? m.title_vi.replace(/\s+/g, " ").trim().slice(0, 160) : "";
   const summary =
     typeof m.summary === "string" ? m.summary.replace(/\s+/g, " ").trim().slice(0, 600) : "";
-  if (!title || !summary) return null;
+  if (!title) return null;
 
   const ingRaw = Array.isArray(m.ingredients) ? m.ingredients : [];
   const ingredients: RecipeIngredient[] = [];
@@ -720,15 +728,8 @@ function sanitizeRecipeGeneratorMeal(raw: unknown): RecipeGeneratorMeal | null {
   }
   if (ingredients.length === 0) return null;
 
-  const stepsRaw = Array.isArray(m.steps) ? m.steps : [];
-  const steps = stepsRaw
-    .filter((s): s is string => typeof s === "string")
-    .map((s) => s.replace(/\s+/g, " ").trim())
-    .filter(Boolean)
-    .map((s) => (s.length > 800 ? `${s.slice(0, 800)}…` : s))
-    .slice(0, RECIPE_STEP_CAP);
-
-  if (steps.length === 0) return null;
+  /** Suggestions never include cooking steps from the model — user pastes a trusted source later. */
+  const steps: string[] = [];
 
   const estimated_cook_time =
     typeof m.estimated_cook_time === "string"
@@ -787,20 +788,23 @@ export async function generateRecipeIdeasFromIngredients(
     ? `\n## Vegetariskt\n- Föreslå **endast vegetariska** rätter: **ingen** kött, fisk, skaldjur, gelatin eller djur löpe.\n- Ägg och mejeri är tillåtet om det passar.\n`
     : "";
 
-  const systemPreamble = `Du är en praktisk kockassistent för ett hushåll i **Sverige**.
+  const systemPreamble = `Du hjälper ett hushåll i **Sverige** att välja **rätter** utifrån valda råvaror.
 
 ## Uppgift
-Föreslå **högst ${RECIPE_GENERATOR_MAX_MEALS}** måltider (receptidéer) utifrån användarens **valda ingredienser** (ICA-liknande etiketter) och vald **matstil**.
+Föreslå **högst ${RECIPE_GENERATOR_MAX_MEALS}** **rättnamn + inköpslista** (ingrediensrader) utifrån användarens **valda ingredienser** och **matstil**.
+
+## Viktigt: ingen tillagning från modellen
+- **Skriv inte** tillagningssteg, metod eller detaljerade recept. Användaren hämtar det pålitlig text från bloggar, böcker eller sidor och klistrar in den själv.
+- Fältet **steps** ska alltid vara en **tom lista []**.
+- **summary** är valfri: högst **en kort rad** på svenska (eller tom sträng) — t.ex. stil på rätten. **Ingen** längre beskrivning.
 
 ## Regler
-- **Svenska** som huvudspråk för **title**, **summary**, **ingredients**, **steps**. Ingredienser i **realistiska svenska butiksmängder** (g, kg, dl, ml, st, krm) där det passar.
-- **title_en**: samma rätt på **engelska** (naturligt namn).
-- **title_vi**: samma rätt på **vietnamesiska** (naturligt namn för familjekommunikation).
-- **ingredients**: varje rad har **text** (full rad), **ingredient_label** (kort namn, gärna nära användarens val), **amount** (mängd eller "efter smak").
-- **steps**: numrerad logik som korta meningar; en punkt per steg.
+- **Svenska** för **title**, **ingredients** (och valfri **summary**). Ingredienser i **realistiska svenska butiksmängder** (g, kg, dl, ml, st, krm).
+- **title_en** / **title_vi**: samma rätt, naturliga namn (för sök och familj).
+- **ingredients**: varje rad har **text** (full rad), **ingredient_label** (kort, gärna nära användarens val), **amount**.
 - **meal_kind**: lunch | dinner | either | snack | other.
-- **estimated_cook_time**: ungefärlig tid till servering (kort svensk text, t.ex. "ca 30 min", "25–40 min").
-- **uses_ingredient_picks**: lista vilka av användarens ingredienser som är centrala (exakta strängar från listan när möjligt).
+- **estimated_cook_time**: grov uppskattning (t.ex. "ca 30 min") — bara vägledning.
+- **uses_ingredient_picks**: vilka av användarens ingredienser som är centrala (exakta strängar från listan när möjligt).
 ${vegBlock}${excludeBlock}
 `;
 
@@ -852,7 +856,580 @@ ${vegBlock}${excludeBlock}
   }
 
   return {
-    intro: intro || "Här är förslag baserat på dina ingredienser och valda matstil.",
+    intro:
+      intro ||
+      "Här är rättförslag och inköpsrader. Klistra in tillagning från en källa du litar på när du sparar.",
     meals,
   };
+}
+
+/** Full recipe text in one target language (cached in `saved_recipes.i18n`). */
+export interface SavedRecipeTranslationPayload {
+  title: string;
+  summary: string;
+  ingredients: RecipeIngredient[];
+  steps: string[];
+}
+
+const RECIPE_TRANSLATE_RESULT_SCHEMA: ObjectSchema = {
+  type: SchemaType.OBJECT,
+  properties: {
+    title: {
+      type: SchemaType.STRING,
+      description: "Dish name in the target language (natural, concise)",
+    } as Schema,
+    summary: {
+      type: SchemaType.STRING,
+      description: "1–2 sentences in the target language: what the dish is",
+    } as Schema,
+    ingredients: {
+      type: SchemaType.ARRAY,
+      description: "Same rows as source, translated",
+      items: RECIPE_INGREDIENT_ITEM_SCHEMA,
+    } as Schema,
+    steps: {
+      type: SchemaType.ARRAY,
+      description: "Cooking steps in the target language, one short sentence each",
+      items: { type: SchemaType.STRING } as Schema,
+    } as Schema,
+  },
+  required: ["title", "summary", "ingredients", "steps"],
+};
+
+function sanitizeSavedRecipeTranslationPayload(raw: unknown): SavedRecipeTranslationPayload | null {
+  if (!raw || typeof raw !== "object") {
+    return null;
+  }
+  const m = raw as Record<string, unknown>;
+  const title =
+    typeof m.title === "string" ? m.title.replace(/\s+/g, " ").trim().slice(0, 200) : "";
+  const summary =
+    typeof m.summary === "string" ? m.summary.replace(/\s+/g, " ").trim().slice(0, 800) : "";
+  if (!title || !summary) {
+    return null;
+  }
+  const ingRaw = Array.isArray(m.ingredients) ? m.ingredients : [];
+  const ingredients: RecipeIngredient[] = [];
+  for (const row of ingRaw) {
+    const s = sanitizeRecipeIngredientRow(row);
+    if (s) {
+      ingredients.push(s);
+    }
+    if (ingredients.length >= RECIPE_INGREDIENT_ROW_CAP) {
+      break;
+    }
+  }
+  if (ingredients.length === 0) {
+    return null;
+  }
+  const stepsRaw = Array.isArray(m.steps) ? m.steps : [];
+  const steps = stepsRaw
+    .filter((s): s is string => typeof s === "string")
+    .map((s) => s.replace(/\s+/g, " ").trim())
+    .filter(Boolean)
+    .map((s) => (s.length > 800 ? `${s.slice(0, 800)}…` : s))
+    .slice(0, RECIPE_STEP_CAP);
+  if (steps.length === 0) {
+    return null;
+  }
+  return { title, summary, ingredients, steps };
+}
+
+/**
+ * Translate a saved recipe’s Swedish body (and title when needed) to English or Vietnamese.
+ * Prefer using existing `title_en` / `title_vi` as hints when provided.
+ */
+export async function translateSavedRecipeBody(
+  apiKey: string,
+  input: {
+    sourceTitle: string;
+    sourceSummary: string;
+    ingredients: RecipeIngredient[];
+    steps: string[];
+    existingTitleEn?: string;
+    existingTitleVi?: string;
+  },
+  target: "en" | "vi",
+): Promise<SavedRecipeTranslationPayload> {
+  const langName = target === "en" ? "English" : "Vietnamese";
+  const hint =
+    target === "en"
+      ? input.existingTitleEn?.trim()
+        ? `If appropriate, align the title with this existing English name (you may refine slightly): "${input.existingTitleEn.trim()}"`
+        : ""
+      : input.existingTitleVi?.trim()
+        ? `If appropriate, align the title with this existing Vietnamese name (you may refine slightly): "${input.existingTitleVi.trim()}"`
+        : "";
+
+  const sourceJson = JSON.stringify(
+    {
+      title_sv: input.sourceTitle,
+      summary_sv: input.sourceSummary,
+      ingredients_sv: input.ingredients,
+      steps_sv: input.steps,
+    },
+    null,
+    0,
+  );
+
+  const systemPreamble = `You translate home cooking recipes for a family in Sweden.
+
+## Task
+Translate the recipe into **${langName}** for kitchen use. Keep units realistic (g, kg, dl, ml, st, krm) and ingredient structure.
+
+## Rules
+- **title**: Natural dish name in ${langName} (not literal if awkward).
+- **summary**: 1–2 sentences in ${langName}.
+- **ingredients**: Same number of rows as source; each row has **text**, **ingredient_label**, **amount** — all in ${langName} where it makes sense (labels can stay short).
+- **steps**: Same step count and order as source; clear, short sentences in ${langName}.
+${hint ? `\n## Title hint\n${hint}\n` : ""}
+`;
+
+  const genAI = new GoogleGenerativeAI(apiKey);
+  const model = genAI.getGenerativeModel({
+    model: RECIPE_GENERATOR_MODEL_ID,
+    generationConfig: {
+      responseMimeType: "application/json",
+      responseSchema: RECIPE_TRANSLATE_RESULT_SCHEMA,
+    },
+  });
+
+  const fullPrompt = `${systemPreamble}\n## Source (JSON)\n${sourceJson}\n`;
+  const result = await model.generateContent(fullPrompt);
+  const text = result.response.text();
+  if (!text?.trim()) {
+    throw new Error("Gemini returned empty translation");
+  }
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(text) as unknown;
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e);
+    throw new Error(`Gemini returned invalid translation JSON: ${msg}`);
+  }
+  const out = sanitizeSavedRecipeTranslationPayload(parsed);
+  if (!out) {
+    throw new Error("Gemini translation failed validation");
+  }
+  return out;
+}
+
+/** Structured recipe extracted from pasted markdown (import flow). */
+export type ParsedRecipeFromMarkdownImport = {
+  summary: string;
+  ingredients: RecipeIngredient[];
+  steps: string[];
+  /** Swedish phrase, e.g. "ca 35 min", or empty. */
+  estimated_cook_time: string;
+};
+
+const RECIPE_MARKDOWN_IMPORT_RESULT_SCHEMA: ObjectSchema = {
+  type: SchemaType.OBJECT,
+  properties: {
+    summary: {
+      type: SchemaType.STRING,
+      description:
+        "1–2 sentences in Swedish describing the dish (what it is, not full instructions)",
+    } as Schema,
+    ingredients: {
+      type: SchemaType.ARRAY,
+      description: "Structured ingredient lines in Swedish for shopping",
+      items: RECIPE_INGREDIENT_ITEM_SCHEMA,
+    } as Schema,
+    steps: {
+      type: SchemaType.ARRAY,
+      description:
+        "Ordered cooking steps in Swedish, one clear sentence per step (no numbering in the string)",
+      items: { type: SchemaType.STRING } as Schema,
+    } as Schema,
+    estimated_cook_time: {
+      type: SchemaType.STRING,
+      description:
+        "Approximate total time in Swedish, e.g. ca 40 min or 25–35 min; empty string if unknown",
+    } as Schema,
+  },
+  required: ["summary", "ingredients", "steps"],
+};
+
+function sanitizeParsedRecipeMarkdownImport(raw: unknown): ParsedRecipeFromMarkdownImport | null {
+  if (!raw || typeof raw !== "object") {
+    return null;
+  }
+  const m = raw as Record<string, unknown>;
+  const summary =
+    typeof m.summary === "string" ? m.summary.replace(/\s+/g, " ").trim().slice(0, 800) : "";
+  if (!summary) {
+    return null;
+  }
+  const ingRaw = Array.isArray(m.ingredients) ? m.ingredients : [];
+  const ingredients: RecipeIngredient[] = [];
+  for (const row of ingRaw) {
+    const s = sanitizeRecipeIngredientRow(row);
+    if (s) {
+      ingredients.push(s);
+    }
+    if (ingredients.length >= RECIPE_INGREDIENT_ROW_CAP) {
+      break;
+    }
+  }
+  if (ingredients.length === 0) {
+    return null;
+  }
+  const stepsRaw = Array.isArray(m.steps) ? m.steps : [];
+  const steps = stepsRaw
+    .filter((s): s is string => typeof s === "string")
+    .map((s) => s.replace(/\s+/g, " ").trim())
+    .filter(Boolean)
+    .map((s) => (s.length > 800 ? `${s.slice(0, 800)}…` : s))
+    .slice(0, RECIPE_STEP_CAP);
+  if (steps.length === 0) {
+    return null;
+  }
+  const estimated_cook_time =
+    typeof m.estimated_cook_time === "string"
+      ? m.estimated_cook_time.replace(/\s+/g, " ").trim().slice(0, 120)
+      : "";
+
+  return {
+    summary,
+    ingredients,
+    steps,
+    estimated_cook_time,
+  };
+}
+
+const MAX_MARKDOWN_IMPORT_CHARS = 120_000;
+
+/**
+ * Extract structured Swedish recipe fields from arbitrary markdown (blog export, cookbook site clip, …).
+ * Use the saved recipe title as context so the model stays aligned with the dish being filled.
+ */
+export async function parseRecipeMarkdownForImport(
+  apiKey: string,
+  input: { markdown: string; contextTitle: string; contextSummary?: string },
+): Promise<ParsedRecipeFromMarkdownImport> {
+  const md = input.markdown.replace(/\r\n/g, "\n").trim().slice(0, MAX_MARKDOWN_IMPORT_CHARS);
+  if (!md) {
+    throw new Error("Markdown text is empty");
+  }
+  const titleHint = input.contextTitle.replace(/\s+/g, " ").trim().slice(0, 200);
+  const sumHint = (input.contextSummary ?? "").replace(/\s+/g, " ").trim().slice(0, 500);
+
+  const systemPreamble = `Du hjälper att fylla i ett **sparad recept** i Sverige utifrån inklistrad **markdown** från valfri källa.
+
+## Kontext (byt inte rätt)
+Användaren fyller receptet med titeln: **"${titleHint}"**
+${sumHint ? `Nuvarande kort beskrivning (får uppdateras om källan är tydligare):\n${sumHint}\n` : ""}
+
+## Uppgift
+- Tolka markdown och extrahera **ingredienser** och **tillagningssteg** på **svenska** (köksnära, realistiska mängder: g, kg, dl, ml, st, krm).
+- Ignorera annonser, navigering, kommentarsfält och irrelevant text.
+- **summary**: 1–2 meningar om vad rätten är.
+- **steps**: varje steg som en kort, numrerbar mening (ingen sifferpräfix i själva strängen).
+- **estimated_cook_time**: om tid nämns, kort svensk fras (t.ex. "ca 35 min"); annars tom sträng.
+
+Om vissa uppgifter saknas i texten: gör så mycket du kan; låt inte fälten bli tomma om det finns innehåll att hämta.
+`;
+
+  const userBlock = `## Inklistrad markdown\n\n${md}`;
+
+  const genAI = new GoogleGenerativeAI(apiKey);
+  const model = genAI.getGenerativeModel({
+    model: RECIPE_GENERATOR_MODEL_ID,
+    generationConfig: {
+      responseMimeType: "application/json",
+      responseSchema: RECIPE_MARKDOWN_IMPORT_RESULT_SCHEMA,
+    },
+  });
+
+  const fullPrompt = `${systemPreamble}\n\n${userBlock}`;
+  const result = await model.generateContent(fullPrompt);
+  const text = result.response.text();
+  if (!text?.trim()) {
+    throw new Error("Gemini returned empty recipe import response");
+  }
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(text) as unknown;
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e);
+    throw new Error(`Gemini returned invalid import JSON: ${msg}. Snippet: ${text.slice(0, 200)}`);
+  }
+  const out = sanitizeParsedRecipeMarkdownImport(parsed);
+  if (!out) {
+    throw new Error("Recipe import response failed validation (need summary, ingredients, and steps).");
+  }
+  return out;
+}
+
+/** Full structured recipe for “new dish” import from markdown (no existing row). */
+export type ParsedNewDishFromMarkdown = {
+  title: string;
+  title_en: string;
+  title_vi: string;
+  summary: string;
+  meal_kind: PromoMealPlanMealKind;
+  /** One of the preset food style ids supplied to the parser. */
+  food_type_id: string;
+  vegetarian: boolean;
+  /** Short shopping-style labels (ICA-like); at least one required for saved_recipes. */
+  ingredient_picks: string[];
+  ingredients: RecipeIngredient[];
+  steps: string[];
+  estimated_cook_time: string;
+};
+
+const NEW_DISH_MARKDOWN_IMPORT_SCHEMA: ObjectSchema = {
+  type: SchemaType.OBJECT,
+  properties: {
+    title: {
+      type: SchemaType.STRING,
+      description: "Dish name in Swedish (primary title for the recipe row).",
+    } as Schema,
+    title_en: {
+      type: SchemaType.STRING,
+      description: "Natural English name for the dish, or empty string if unsure.",
+    } as Schema,
+    title_vi: {
+      type: SchemaType.STRING,
+      description: "Natural Vietnamese name for the dish, or empty string if unsure.",
+    } as Schema,
+    summary: {
+      type: SchemaType.STRING,
+      description: "1–3 sentences in Swedish: what the dish is (not full step copy).",
+    } as Schema,
+    meal_kind: {
+      type: SchemaType.STRING,
+      format: "enum",
+      enum: ["lunch", "dinner", "either", "snack", "other"],
+      description: "When this meal fits best",
+    } as Schema,
+    food_type_id: {
+      type: SchemaType.STRING,
+      description:
+        "Exactly one `id` from the allowed food-style list given in the system prompt (English slug).",
+    } as Schema,
+    vegetarian: {
+      type: SchemaType.BOOLEAN,
+      description: "True if the recipe is vegetarian (no meat/fish; dairy/egg allowed).",
+    } as Schema,
+    ingredient_picks: {
+      type: SchemaType.ARRAY,
+      description:
+        "3–12 short ICA-style ingredient names in Swedish (key shopping items), no amounts.",
+      items: { type: SchemaType.STRING } as Schema,
+    } as Schema,
+    ingredients: {
+      type: SchemaType.ARRAY,
+      description: "Structured ingredient rows in Swedish for shopping/cooking",
+      items: RECIPE_INGREDIENT_ITEM_SCHEMA,
+    } as Schema,
+    steps: {
+      type: SchemaType.ARRAY,
+      description:
+        "Ordered cooking steps in Swedish, one clear sentence per step (no numbering in the string).",
+      items: { type: SchemaType.STRING } as Schema,
+    } as Schema,
+    estimated_cook_time: {
+      type: SchemaType.STRING,
+      description:
+        "Approximate total time in Swedish, e.g. ca 40 min; empty string if unknown",
+    } as Schema,
+  },
+  required: [
+    "title",
+    "title_en",
+    "title_vi",
+    "summary",
+    "meal_kind",
+    "food_type_id",
+    "vegetarian",
+    "ingredient_picks",
+    "ingredients",
+    "steps",
+    "estimated_cook_time",
+  ],
+};
+
+function pickFallbackFoodTypeId(allowed: Set<string>): string {
+  if (allowed.has("quick-weekday")) {
+    return "quick-weekday";
+  }
+  const first = allowed.values().next().value;
+  return first ?? "quick-weekday";
+}
+
+function sanitizeParsedNewDishFromMarkdown(
+  raw: unknown,
+  allowedFoodTypeIds: Set<string>,
+): ParsedNewDishFromMarkdown | null {
+  if (!raw || typeof raw !== "object") {
+    return null;
+  }
+  const m = raw as Record<string, unknown>;
+  const title = typeof m.title === "string" ? m.title.replace(/\s+/g, " ").trim().slice(0, 200) : "";
+  if (!title) {
+    return null;
+  }
+  const title_en =
+    typeof m.title_en === "string" ? m.title_en.replace(/\s+/g, " ").trim().slice(0, 200) : "";
+  const title_vi =
+    typeof m.title_vi === "string" ? m.title_vi.replace(/\s+/g, " ").trim().slice(0, 200) : "";
+  const summary =
+    typeof m.summary === "string" ? m.summary.replace(/\s+/g, " ").trim().slice(0, 2000) : "";
+  if (!summary) {
+    return null;
+  }
+  const meal_kind = sanitizeMealKind(m.meal_kind);
+  let food_type_id =
+    typeof m.food_type_id === "string"
+      ? m.food_type_id.replace(/\s+/g, " ").trim().slice(0, 80)
+      : "";
+  if (!allowedFoodTypeIds.has(food_type_id)) {
+    food_type_id = pickFallbackFoodTypeId(allowedFoodTypeIds);
+  }
+  const vegetarian = m.vegetarian === true;
+  const picksRaw = Array.isArray(m.ingredient_picks) ? m.ingredient_picks : [];
+  const ingredient_picks: string[] = [];
+  for (const p of picksRaw) {
+    if (typeof p !== "string") {
+      continue;
+    }
+    const t = p.replace(/\s+/g, " ").trim().slice(0, 120);
+    if (t) {
+      ingredient_picks.push(t);
+    }
+    if (ingredient_picks.length >= 15) {
+      break;
+    }
+  }
+  const ingRaw = Array.isArray(m.ingredients) ? m.ingredients : [];
+  const ingredients: RecipeIngredient[] = [];
+  for (const row of ingRaw) {
+    const s = sanitizeRecipeIngredientRow(row);
+    if (s) {
+      ingredients.push(s);
+    }
+    if (ingredients.length >= RECIPE_INGREDIENT_ROW_CAP) {
+      break;
+    }
+  }
+  if (ingredients.length === 0) {
+    return null;
+  }
+  if (ingredient_picks.length === 0) {
+    for (const row of ingredients) {
+      if (row.ingredient_label.trim()) {
+        ingredient_picks.push(row.ingredient_label.trim().slice(0, 120));
+      }
+      if (ingredient_picks.length >= 3) {
+        break;
+      }
+    }
+  }
+  if (ingredient_picks.length === 0) {
+    ingredient_picks.push(ingredients[0]!.ingredient_label.trim().slice(0, 120));
+  }
+  const stepsRaw = Array.isArray(m.steps) ? m.steps : [];
+  const steps = stepsRaw
+    .filter((s): s is string => typeof s === "string")
+    .map((s) => s.replace(/\s+/g, " ").trim())
+    .filter(Boolean)
+    .map((s) => (s.length > 800 ? `${s.slice(0, 800)}…` : s))
+    .slice(0, RECIPE_STEP_CAP);
+  if (steps.length === 0) {
+    return null;
+  }
+  const estimated_cook_time =
+    typeof m.estimated_cook_time === "string"
+      ? m.estimated_cook_time.replace(/\s+/g, " ").trim().slice(0, 120)
+      : "";
+
+  return {
+    title,
+    title_en,
+    title_vi,
+    summary,
+    meal_kind,
+    food_type_id,
+    vegetarian,
+    ingredient_picks,
+    ingredients,
+    steps,
+    estimated_cook_time,
+  };
+}
+
+export type NewDishMarkdownParseInput = {
+  markdown: string;
+  /** Preset food styles (id + Swedish label), e.g. from recipe-food-types.json */
+  foodTypeOptions: { id: string; label: string }[];
+};
+
+/**
+ * Parse arbitrary markdown into a full new-recipe shape: titles, meal kind, food style id,
+ * vegetarian flag, shopping picks, ingredients, steps, and time.
+ */
+export async function parseNewDishFromMarkdown(
+  apiKey: string,
+  input: NewDishMarkdownParseInput,
+): Promise<ParsedNewDishFromMarkdown> {
+  const md = input.markdown.replace(/\r\n/g, "\n").trim().slice(0, MAX_MARKDOWN_IMPORT_CHARS);
+  if (!md) {
+    throw new Error("Markdown text is empty");
+  }
+  const opts = input.foodTypeOptions.filter((o) => o.id?.trim() && o.label?.trim());
+  if (opts.length === 0) {
+    throw new Error("foodTypeOptions is empty");
+  }
+  const allowed = new Set(opts.map((o) => o.id.trim()));
+  const styleBlock = opts.map((o) => `- \`${o.id}\` — ${o.label}`).join("\n");
+
+  const systemPreamble = `Du är en köksassistent för ett **svenskt hem**. Användaren klistrar in **markdown** (blogg, tidning, receptsajt) om ett nytt recept som ska sparas som egen rätt.
+
+## Matstilar (välj exakt ett \`food_type_id\` från listan)
+${styleBlock}
+
+## Uppgift
+- Identifiera rättens namn: **title** på svenska; **title_en** och **title_vi** om det går, annars tom sträng.
+- **summary**: kort på svenska vad rätten är.
+- **meal_kind**: lunch | dinner | either | snack | other — vad som passar bäst.
+- **food_type_id**: exakt ett id från listan ovan som bäst matchar rättens stil (köket/stämningen).
+- **vegetarian**: sant om receptet är vegetariskt (ingen kött/fisk; mejeri/ägg ok).
+- **ingredient_picks**: 3–12 korta ICA-liknande benämningar (inga mängder), typiska råvaror man handlar.
+- **ingredients**: strukturerade rader: text, ingredient_label, amount på svenska.
+- **steps**: tillagningssteg i ordning, ett tydligt steg per sträng (ingen siffra i början av strängen).
+- **estimated_cook_time**: t.ex. "ca 35 min" om det går att avgöra; annars tom sträng.
+
+Ignorera annonser, navigering och irrelevant text. Om något saknas, gör ett rimligt bästa val utifrån texten.`;
+
+  const userBlock = `## Inklistrad markdown\n\n${md}`;
+
+  const genAI = new GoogleGenerativeAI(apiKey);
+  const model = genAI.getGenerativeModel({
+    model: RECIPE_GENERATOR_MODEL_ID,
+    generationConfig: {
+      responseMimeType: "application/json",
+      responseSchema: NEW_DISH_MARKDOWN_IMPORT_SCHEMA,
+    },
+  });
+
+  const fullPrompt = `${systemPreamble}\n\n${userBlock}`;
+  const result = await model.generateContent(fullPrompt);
+  const text = result.response.text();
+  if (!text?.trim()) {
+    throw new Error("Gemini returned empty new-dish import response");
+  }
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(text) as unknown;
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e);
+    throw new Error(`Gemini returned invalid new-dish JSON: ${msg}. Snippet: ${text.slice(0, 200)}`);
+  }
+  const out = sanitizeParsedNewDishFromMarkdown(parsed, allowed);
+  if (!out) {
+    throw new Error("New-dish import response failed validation.");
+  }
+  return out;
 }

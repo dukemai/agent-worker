@@ -2,7 +2,14 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import { getSupabaseEnv } from "./env";
 
-const PUBLIC_PATHS = ["/login", "/auth/callback", "/auth/confirm", "/api/auth/callback"];
+const PUBLIC_PATHS = [
+  "/login",
+  "/auth/callback",
+  "/auth/confirm",
+  "/api/auth/callback",
+  "/cookbook",
+  "/api/public/cookbook",
+];
 
 export async function updateSession(request: NextRequest) {
   const pathname = request.nextUrl.pathname;

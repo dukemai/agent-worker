@@ -98,6 +98,95 @@ export function DailyDigestEmail(props: Props) {
     recentGrowingKnowledge.length > 0 || recentGrowingWindows.length > 0;
   const TASK_COUNT_HIGHLIGHT_REGEX =
     /(\d+\s+uppgift(?:er)?\s+för idag|\d+\s+uppgift(?:er)?\s+senare den här veckan)/g;
+
+  const renderBriefingParagraph = (p: string, idx: number, arr: string[]) => {
+    // Task deadline must run before the holiday branch — both start with "Det är … kvar till …".
+    const taskFuture = p.match(/^Det är (\d+)\s+(dag|dagar)\s+kvar till deadline för (.+)\.$/);
+    if (taskFuture) {
+      const [, days, unit, subject] = taskFuture;
+      return (
+        <Text
+          key={idx}
+          className={`m-0 text-[16px] text-gray-700 leading-[26px] ${idx === arr.length - 1 ? "" : "mb-[16px]"}`}
+        >
+          Det är{" "}
+          <span className="text-red-700 font-bold">
+            {days} {unit}
+          </span>{" "}
+          kvar till deadline för{" "}
+          <span className="text-red-700 font-bold">{subject}</span>.
+        </Text>
+      );
+    }
+
+    const holidayCountdown = p.match(/^Det är (\d+)\s+(dag|dagar)\s+kvar till\s+(.+)\.$/);
+    if (holidayCountdown) {
+      const [, days, unit, holidayName] = holidayCountdown;
+      return (
+        <Text
+          key={idx}
+          className={`m-0 text-[16px] text-gray-700 leading-[26px] ${idx === arr.length - 1 ? "" : "mb-[16px]"}`}
+        >
+          Det är{" "}
+          <span className="text-red-700 font-bold">
+            {days} {unit}
+          </span>{" "}
+          kvar till{" "}
+          <span className="text-red-700 font-bold">{holidayName}</span>.
+        </Text>
+      );
+    }
+
+    const taskToday = p.match(/^Idag är deadline för (.+)\.$/);
+    if (taskToday) {
+      const [, subject] = taskToday;
+      return (
+        <Text
+          key={idx}
+          className={`m-0 text-[16px] text-gray-700 leading-[26px] ${idx === arr.length - 1 ? "" : "mb-[16px]"}`}
+        >
+          <span className="text-red-700 font-bold">Idag är deadline</span> för{" "}
+          <span className="text-red-700 font-bold">{subject}</span>.
+        </Text>
+      );
+    }
+
+    const taskOverdue = p.match(/^Deadline för (.+?) passerade för (\d+)\s+(dag|dagar) sedan\.$/);
+    if (taskOverdue) {
+      const [, subject, n, unit] = taskOverdue;
+      return (
+        <Text
+          key={idx}
+          className={`m-0 text-[16px] text-gray-700 leading-[26px] ${idx === arr.length - 1 ? "" : "mb-[16px]"}`}
+        >
+          Deadline för <span className="text-red-700 font-bold">{subject}</span> passerade för{" "}
+          <span className="text-red-700 font-bold">
+            {n} {unit}
+          </span>{" "}
+          sedan.
+        </Text>
+      );
+    }
+
+    const parts = p.split(TASK_COUNT_HIGHLIGHT_REGEX);
+    return (
+      <Text key={idx} className={`m-0 text-[16px] text-gray-700 leading-[26px] ${idx === arr.length - 1 ? "" : "mb-[16px]"}`}>
+        {parts.map((part, partIdx) => {
+          const shouldHighlight = TASK_COUNT_HIGHLIGHT_REGEX.test(part);
+          TASK_COUNT_HIGHLIGHT_REGEX.lastIndex = 0;
+          if (shouldHighlight) {
+            return (
+              <span key={`${idx}-${partIdx}`} className="font-bold text-gray-900">
+                {part}
+              </span>
+            );
+          }
+          return <span key={`${idx}-${partIdx}`}>{part}</span>;
+        })}
+      </Text>
+    );
+  };
+
   /** Knowledge is pre-scoped (derived from unfinished growing tasks linked via `window_id`). */
   const relatedKnowledgeForGrowingTasks = recentGrowingKnowledge.slice(0, 4);
 
@@ -142,43 +231,7 @@ export function DailyDigestEmail(props: Props) {
                 Today&apos;s Briefing
               </Heading>
               <Section className="bg-gray-50 rounded-xl p-[24px] border border-solid border-gray-100">
-                {narrative.split("\n\n").map((p, idx, arr) => {
-                  const countdownMatch = p.match(/^Det är (\d+)\s+(dag|dagar)\s+kvar till\s+(.+)\.$/);
-                  if (countdownMatch) {
-                    const [, days, unit, holidayName] = countdownMatch;
-                    return (
-                      <Text
-                        key={idx}
-                        className={`m-0 text-[16px] text-gray-700 leading-[26px] ${idx === arr.length - 1 ? "" : "mb-[16px]"}`}
-                      >
-                        Det är{" "}
-                        <span className="text-red-700 font-bold">
-                          {days} {unit}
-                        </span>{" "}
-                        kvar till{" "}
-                        <span className="text-red-700 font-bold">{holidayName}</span>.
-                      </Text>
-                    );
-                  }
-
-                  const parts = p.split(TASK_COUNT_HIGHLIGHT_REGEX);
-                  return (
-                    <Text key={idx} className={`m-0 text-[16px] text-gray-700 leading-[26px] ${idx === arr.length - 1 ? "" : "mb-[16px]"}`}>
-                      {parts.map((part, partIdx) => {
-                        const shouldHighlight = TASK_COUNT_HIGHLIGHT_REGEX.test(part);
-                        TASK_COUNT_HIGHLIGHT_REGEX.lastIndex = 0;
-                        if (shouldHighlight) {
-                          return (
-                            <span key={`${idx}-${partIdx}`} className="font-bold text-gray-900">
-                              {part}
-                            </span>
-                          );
-                        }
-                        return <span key={`${idx}-${partIdx}`}>{part}</span>;
-                      })}
-                    </Text>
-                  );
-                })}
+                {narrative.split("\n\n").map((p, idx, arr) => renderBriefingParagraph(p, idx, arr))}
               </Section>
             </Section>
 

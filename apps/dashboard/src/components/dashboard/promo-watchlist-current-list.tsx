@@ -1,9 +1,19 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { summarizeWatchlistByDepartment } from "@/lib/promo-watchlist-department-summary";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  groupWatchlistByDepartment,
+  summarizeWatchlistByDepartment,
+} from "@/lib/promo-watchlist-department-summary";
 import type { PromoPickerCatalog } from "@/types/promo-picker-catalog";
 
 export type PromoWatchlistCurrentListProps = {
@@ -26,29 +36,71 @@ export function PromoWatchlistCurrentList({
   catalog,
   catalogLoading,
 }: PromoWatchlistCurrentListProps) {
+  const [listLayout, setListLayout] = useState<"flat" | "byDepartment">("byDepartment");
+
   const departmentSummary = useMemo(
     () => summarizeWatchlistByDepartment(items, catalog),
     [items, catalog],
   );
 
+  const departmentGroups = useMemo(
+    () => groupWatchlistByDepartment(items, catalog),
+    [items, catalog],
+  );
+
   return (
     <Card>
-      <CardHeader className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <CardTitle>Current list</CardTitle>
-          <CardDescription>
-            These strings are what scrapers match against promotions (rough text match later).
-          </CardDescription>
+      <CardHeader className="space-y-4">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+          <div>
+            <CardTitle>Current list</CardTitle>
+            <CardDescription>
+              These strings are what scrapers match against promotions (rough text match later).
+              Use <strong>Grouped by department</strong> to browse by ICA food department — the same
+              grouping that powers recipe ingredient search.
+            </CardDescription>
+          </div>
+          <Button
+            type="button"
+            variant="destructive"
+            className="min-h-11 w-full shrink-0 sm:w-auto"
+            disabled={busy || items.length === 0}
+            onClick={() => void onClearAll()}
+          >
+            Clear entire list
+          </Button>
         </div>
-        <Button
-          type="button"
-          variant="destructive"
-          className="min-h-11 w-full shrink-0 sm:w-auto"
-          disabled={busy || items.length === 0}
-          onClick={() => void onClearAll()}
-        >
-          Clear entire list
-        </Button>
+        {items.length > 0 ? (
+          <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-end sm:justify-between">
+            <div className="space-y-1.5">
+              <span className="text-xs font-medium text-muted-foreground" id="watchlist-layout-label">
+                List layout
+              </span>
+              <Select
+                value={listLayout}
+                onValueChange={(v) => setListLayout(v as "flat" | "byDepartment")}
+                disabled={busy}
+              >
+                <SelectTrigger
+                  id="watchlist-layout"
+                  className="h-9 w-full min-w-[12rem] sm:w-56"
+                  aria-labelledby="watchlist-layout-label"
+                >
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="flat">Flat list</SelectItem>
+                  <SelectItem value="byDepartment">Grouped by department</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            {listLayout === "byDepartment" && !catalogLoading && !catalog ? (
+              <p className="text-xs text-amber-800 dark:text-amber-200/90">
+                Catalog not loaded — showing a single group until the map is available.
+              </p>
+            ) : null}
+          </div>
+        ) : null}
       </CardHeader>
       <CardContent>
         {isLoading ? (
@@ -120,30 +172,71 @@ export function PromoWatchlistCurrentList({
                   </th>
                 </tr>
               </thead>
-              <tbody>
-                {items.map((label, index) => (
-                  <tr
-                    key={`${label}-${index}`}
-                    className="border-b border-emerald-200/40 last:border-0 dark:border-emerald-900/35"
-                  >
-                    <td className="px-3 py-2 tabular-nums text-muted-foreground">{index + 1}</td>
-                    <td className="px-3 py-2 text-foreground">{label}</td>
-                    <td className="px-3 py-2 text-right">
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        className="h-auto min-h-11 py-2 text-destructive hover:bg-destructive/10 hover:text-destructive"
-                        disabled={busy}
-                        aria-label={`Remove ${label}`}
-                        onClick={() => void onRemoveAt(index)}
+              {listLayout === "flat" ? (
+                <tbody>
+                  {items.map((label, index) => (
+                    <tr
+                      key={`${label}-${index}`}
+                      className="border-b border-emerald-200/40 last:border-0 dark:border-emerald-900/35"
+                    >
+                      <td className="px-3 py-2 tabular-nums text-muted-foreground">{index + 1}</td>
+                      <td className="px-3 py-2 text-foreground">{label}</td>
+                      <td className="px-3 py-2 text-right">
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          className="h-auto min-h-11 py-2 text-destructive hover:bg-destructive/10 hover:text-destructive"
+                          disabled={busy}
+                          aria-label={`Remove ${label}`}
+                          onClick={() => void onRemoveAt(index)}
+                        >
+                          Remove
+                        </Button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              ) : (
+                departmentGroups.map((group) => (
+                  <tbody key={group.departmentId}>
+                    <tr className="border-b border-emerald-300/60 bg-emerald-200/35 dark:border-emerald-800/50 dark:bg-emerald-950/50">
+                      <th
+                        scope="colgroup"
+                        colSpan={3}
+                        className="px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-emerald-950 dark:text-emerald-100/95"
                       >
-                        Remove
-                      </Button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
+                        {group.departmentName}
+                        <span className="ml-2 font-normal normal-case tabular-nums text-emerald-800/90 dark:text-emerald-200/80">
+                          ({group.entries.length})
+                        </span>
+                      </th>
+                    </tr>
+                    {group.entries.map(({ label, index }) => (
+                      <tr
+                        key={`${label}-${index}`}
+                        className="border-b border-emerald-200/40 dark:border-emerald-900/35"
+                      >
+                        <td className="px-3 py-2 tabular-nums text-muted-foreground">{index + 1}</td>
+                        <td className="px-3 py-2 text-foreground">{label}</td>
+                        <td className="px-3 py-2 text-right">
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            className="h-auto min-h-11 py-2 text-destructive hover:bg-destructive/10 hover:text-destructive"
+                            disabled={busy}
+                            aria-label={`Remove ${label}`}
+                            onClick={() => void onRemoveAt(index)}
+                          >
+                            Remove
+                          </Button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                ))
+              )}
             </table>
           </div>
         ) : null}

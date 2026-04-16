@@ -1,5 +1,12 @@
 # Dad-Ops Agent — Decision Log
 
+## 2026-04-09: [Shared shopping list] Phase A — opaque URL, dedicated tables, read-only public
+
+**Context:** Need a shippable “mini buy list” share link before full weekly ICA crawl + promotions DB.
+**Decision:** Spec in [requirements/shared-shopping-list.md](requirements/shared-shopping-list.md). **Primary flow:** **saved recipes** → **plan to cook** → **prepare** (ingredient lines: at home / need) → **shopping list** → share. Tables include **`cook_plans` / `cook_plan_items`** plus **`shared_shopping_lists` / `shared_shopping_list_items`**. **Anonymous read** via **unguessable `public_slug`** (no recipient login). Public route **`/shop/[slug]`** (exact path TBD). Recipients **read-only** in MVP.
+**Alternatives considered:** Store lists only in `family_context` JSON (rejected: weak RLS, hard to share by opaque id cleanly); JWT in every URL (deferred: slug-only capability is enough for MVP); manual-only list without recipes (superseded by recipe-first plan).
+**Status:** accepted (spec); implementation pending.
+
 ## 2026-04-08: [Roadmap] Phase 09 — Swedish recipe sources; renumber YouTube → 10, learning agents → 11
 
 **Context**: Meal planning from promos benefits from a deliberate recipe corpus for Sweden; YouTube extraction and learning agents were already numbered 9 and 10.

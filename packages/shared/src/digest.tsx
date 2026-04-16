@@ -254,6 +254,46 @@ function getNextHoliday() {
   return null;
 }
 
+/** Calendar-day difference: due date minus today in UTC (aligns with YYYY-MM-DD due dates from the DB). */
+function utcCalendarDaysUntilDue(ymd: string, now: Date): number {
+  const [y, m, d] = ymd.split("-").map(Number);
+  const dueUtc = Date.UTC(y, m - 1, d);
+  const todayUtc = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate());
+  return Math.round((dueUtc - todayUtc) / (1000 * 60 * 60 * 24));
+}
+
+/**
+ * Swedish line for the nearest task deadline (excludes renewal reminders — they have their own digest section).
+ * Returns null when no pending task has a due date.
+ */
+export function formatTaskDeadlineCountdownLine(tasks: Task[], now: Date): string | null {
+  const eligible = tasks.filter(
+    (t) => t.due_date && t.metadata?.item_type !== "renewal"
+  );
+  if (eligible.length === 0) return null;
+
+  eligible.sort((a, b) => (a.due_date ?? "").localeCompare(b.due_date ?? ""));
+  const earliestYmd = eligible[0].due_date!.slice(0, 10);
+  const sameDay = eligible.filter((t) => t.due_date!.slice(0, 10) === earliestYmd);
+  const days = utcCalendarDaysUntilDue(earliestYmd, now);
+
+  const firstTitle = sameDay[0].title.trim() || "en uppgift";
+  const extra = sameDay.length - 1;
+  const subject =
+    extra === 0
+      ? firstTitle
+      : `${firstTitle} och ${extra} ${extra === 1 ? "uppgift" : "uppgifter"} till`;
+
+  if (days < 0) {
+    const abs = -days;
+    return `Deadline för ${subject} passerade för ${abs} ${abs === 1 ? "dag" : "dagar"} sedan.`;
+  }
+  if (days === 0) {
+    return `Idag är deadline för ${subject}.`;
+  }
+  return `Det är ${days} ${days === 1 ? "dag" : "dagar"} kvar till deadline för ${subject}.`;
+}
+
 /**
  * Generates the daily briefing narrative using a simple template (no AI calls).
  * Injects current date (sv-SE), weather summary, and task counts (today / this week / later).
@@ -295,6 +335,12 @@ export async function generateBriefingNarrative(
     } else {
       lines.push(`Det är ${days} ${days === 1 ? "dag" : "dagar"} kvar till ${nextHoliday.name}.`);
     }
+  }
+
+  const allBucketTasks = [...todayTasks, ...thisWeekTasks, ...laterTasks];
+  const taskDeadlineLine = formatTaskDeadlineCountdownLine(allBucketTasks, now);
+  if (taskDeadlineLine) {
+    lines.push(taskDeadlineLine);
   }
 
   lines.push(`Vädret i Stockholm: ${weatherSummary}`);

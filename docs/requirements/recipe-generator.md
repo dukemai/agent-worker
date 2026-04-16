@@ -20,6 +20,7 @@ This is **assistive cooking**, not medical or nutrition advice.
 6. **Generate** → structured **meals** (title, ingredients, steps, optional tags).
 7. User **adds** selected recipes to the library (not auto-save all).
 8. **Library** table: title, type of food, **Vegetarian** (whether the request was vegetarian—see data model), **Tested**, actions.
+9. **Plan to cook → prepare → shopping list** (Phase A — [shared-shopping-list.md](shared-shopping-list.md)): from the library, user adds **several saved recipes** to a **plan to cook**; opens **prepare** to mark ingredients **at home** vs **need**; generates a **shared shopping list** with a link for someone else to shop. Implementation order may start with **one recipe** before multi-recipe plans.
 
 ## Why ICA catalog for ingredients
 
@@ -282,6 +283,7 @@ Array of saved rows; each item includes `id`, `title`, `food_type_id`, `vegetari
 
 ## Related
 
+- [`shared-shopping-list.md`](shared-shopping-list.md) — **plan to cook**, prepare, shared buy list (recipe-first flow).
 - [`ica-maxi-picker-catalog-source.md`](ica-maxi-picker-catalog-source.md) — category tree source.
 - [`promo-watchlist.md`](promo-watchlist.md) — picker UX reference.
 - [`promo-meal-plan.md`](promo-meal-plan.md) — Gemini JSON patterns.

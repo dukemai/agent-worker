@@ -1,8 +1,19 @@
+import {
+  RECIPE_GENERATOR_SOURCE_LABEL,
+  RECIPE_SOURCE_MANUAL_MARKDOWN,
+} from "@agent/shared";
+
 /** Friendly label for `saved_recipes.source` (legacy `ai_generator` + newer full labels). */
 export function formatSavedRecipeSourceLabel(source: string): string {
   const s = source?.trim() ?? "";
   if (!s || s === "ai_generator") {
     return "AI recipe generator";
+  }
+  if (s === RECIPE_SOURCE_MANUAL_MARKDOWN) {
+    return "Markdown from trusted source";
+  }
+  if (s === RECIPE_GENERATOR_SOURCE_LABEL) {
+    return "AI recipe suggestions";
   }
   return s;
 }

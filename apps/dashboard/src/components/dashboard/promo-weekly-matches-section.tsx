@@ -2,6 +2,7 @@
 
 import { getISOWeekNumber, type PromoMealPlanResult } from "@agent/shared";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import Link from "next/link";
 import { useState } from "react";
 import type { PromoMealPlanResponseMeta } from "@/types/promo-meal-plan";
 import { PromoMealPlanWeekView } from "@/components/dashboard/promo-meal-plan-week-view";
@@ -9,7 +10,10 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import type { PromoMatchItemRow, PromoMatchRunRow } from "@/app/api/promo-matches/latest/route";
+import { isInterestFoodCatalogItem } from "@/lib/promo-match-interest-food";
 import { PROMO_MEAL_PLAN_SAMPLE, PROMO_MEAL_PLAN_SAMPLE_META } from "@/lib/promo-meal-plan-sample";
+import { parsePromoPickerCatalogJson } from "@/lib/promo-picker-catalog-validate";
+import type { PromoPickerCatalog } from "@/types/promo-picker-catalog";
 
 type LatestResponse = {
   run: PromoMatchRunRow | null;
@@ -25,12 +29,28 @@ async function fetchLatest(): Promise<LatestResponse> {
   return response.json() as Promise<LatestResponse>;
 }
 
+async function fetchPickerCatalog(): Promise<PromoPickerCatalog> {
+  const response = await fetch("/data/ica-maxi-promo-picker-catalog.json", {
+    cache: "no-store",
+  });
+  if (!response.ok) {
+    throw new Error("Failed to load picker catalog");
+  }
+  const raw: unknown = await response.json();
+  return parsePromoPickerCatalogJson(raw);
+}
+
 export function PromoWeeklyMatchesSection() {
   const [showSampleMealPlan, setShowSampleMealPlan] = useState(false);
   const queryClient = useQueryClient();
   const latestQuery = useQuery({
     queryKey: ["promo-matches-latest"],
     queryFn: fetchLatest,
+  });
+
+  const catalogQuery = useQuery({
+    queryKey: ["promo-picker-catalog"],
+    queryFn: fetchPickerCatalog,
   });
 
   const mealPlanMutation = useMutation({
@@ -311,7 +331,7 @@ export function PromoWeeklyMatchesSection() {
               className="overflow-x-auto"
               aria-describedby={summaryWeek != null ? weekLabelId : undefined}
             >
-              <table className="w-full min-w-[36rem] border-collapse text-sm">
+              <table className="w-full min-w-[44rem] border-collapse text-sm">
                 <caption className="sr-only">
                   Matched weekly promotions
                   {summaryWeek != null ? ` for ISO week ${summaryWeek}` : ""}
@@ -329,6 +349,9 @@ export function PromoWeeklyMatchesSection() {
                     </th>
                     <th scope="col" className="px-2 py-2 text-right font-medium">
                       Score
+                    </th>
+                    <th scope="col" className="px-2 py-2 text-right font-medium">
+                      Recipes
                     </th>
                   </tr>
                 </thead>
@@ -372,6 +395,25 @@ export function PromoWeeklyMatchesSection() {
                       </td>
                       <td className="px-2 py-2 align-top">{row.interest}</td>
                       <td className="px-2 py-2 align-top text-right tabular-nums">{row.score}</td>
+                      <td className="px-2 py-2 align-top text-right">
+                        {catalogQuery.isLoading ? (
+                          <span className="text-xs text-muted-foreground">…</span>
+                        ) : isInterestFoodCatalogItem(row.interest, catalogQuery.data) ? (
+                          <Link
+                            href={`/recipe-generator?pick=${encodeURIComponent(row.interest.trim())}`}
+                            className="text-sm font-medium text-primary underline underline-offset-2"
+                          >
+                            Find recipes
+                          </Link>
+                        ) : (
+                          <span
+                            className="text-xs text-muted-foreground"
+                            title="Only watchlist interests that match a food-aisle catalog chip get recipe search."
+                          >
+                            —
+                          </span>
+                        )}
+                      </td>
                     </tr>
                   ))}
                 </tbody>

@@ -1,8 +1,8 @@
-import { RECIPE_GENERATOR_SOURCE_LABEL } from "@agent/shared";
 import { NextResponse } from "next/server";
 import { errorResponse, getAuthedSupabase } from "@/lib/api";
 import { isValidFoodTypeId } from "@/lib/recipe-food-types";
 import { parseSaveRecipeBody } from "@/lib/recipe-request";
+import { SAVED_RECIPE_COLUMNS } from "@/lib/saved-recipe-columns";
 
 export async function GET() {
   const auth = await getAuthedSupabase();
@@ -12,9 +12,7 @@ export async function GET() {
 
   const { data, error } = await auth.supabase
     .from("saved_recipes")
-    .select(
-      "id, title, title_en, title_vi, summary, meal_kind, ingredients, steps, food_type_id, vegetarian, ingredient_picks, tested, want_to_try, estimated_cook_time, source, similar_recipe_url, created_at, updated_at",
-    )
+    .select(SAVED_RECIPE_COLUMNS)
     .order("created_at", { ascending: false });
 
   if (error) {
@@ -63,11 +61,11 @@ export async function POST(request: Request) {
       tested: false,
       want_to_try: false,
       estimated_cook_time: parsed.estimated_cook_time,
-      source: RECIPE_GENERATOR_SOURCE_LABEL,
+      source: parsed.source,
+      source_markdown: parsed.source_markdown,
+      similar_recipe_url: parsed.similar_recipe_url,
     })
-    .select(
-      "id, title, title_en, title_vi, summary, meal_kind, ingredients, steps, food_type_id, vegetarian, ingredient_picks, tested, want_to_try, estimated_cook_time, source, similar_recipe_url, created_at, updated_at",
-    )
+    .select(SAVED_RECIPE_COLUMNS)
     .single();
 
   if (error) {

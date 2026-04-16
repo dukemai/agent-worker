@@ -29,6 +29,13 @@ Open [http://localhost:3000](http://localhost:3000).
 | `/context` | Family context key-value editor |
 | `/growing` | Stockholm growing season suggestions |
 | `/login` | Supabase Auth login |
+| `/cookbook` | **Public** read-only recipe list (search, filters, recipe view, cooking mode) — requires env (see below) |
+
+### Shared cookbook (friends)
+
+1. Set `COOKBOOK_PUBLIC_USER_ID` to your Supabase `auth.users` UUID and `SUPABASE_SERVICE_ROLE_KEY` (server-only).
+2. Optional: `NEXT_PUBLIC_COOKBOOK_TITLE`, `NEXT_PUBLIC_COOKBOOK_SUBTITLE`, `NEXT_PUBLIC_COOKBOOK_FEEDBACK_EMAIL` for branding and a mailto link in the footer.
+3. Share the site URL + `/cookbook`. Anyone with the link can browse; raw `source_markdown` is not exposed in the public API.
 
 ## Key Patterns
 

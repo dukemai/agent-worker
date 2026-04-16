@@ -12,6 +12,7 @@ export const config = {
     "/auth/callback",
     "/auth/confirm",
     "/api/:path*",
+    "/cookbook/:path*",
     "/learning/:path*",
     "/context/:path*",
   ],
