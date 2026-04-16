@@ -87,7 +87,11 @@ export function AddTaskCard() {
       }}
     >
       <DialogTrigger asChild>
-        <Button type="button" className="gap-2">
+        <Button
+          type="button"
+          variant="ghost"
+          className="h-[calc(100%-1px)] rounded-md border border-transparent px-2 py-1 text-sm font-semibold text-foreground hover:bg-background/60"
+        >
           <PlusIcon className="size-4" aria-hidden />
           Add task
         </Button>

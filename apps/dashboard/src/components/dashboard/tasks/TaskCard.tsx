@@ -1,6 +1,6 @@
 "use client";
 
-import { CheckCircle2, Circle, ExternalLink, Trash2 } from "lucide-react";
+import { CheckCircle2, Circle, ExternalLink, Loader2, Trash2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import type { Task } from "@/types/database";
@@ -17,12 +17,13 @@ const MOVE_SHORT: Record<Bucket, string> = {
 type TaskCardProps = {
   task: Task;
   bucket: Bucket;
+  markDoneLoading?: boolean;
   onMove: (taskId: string, fromBucket: Bucket, toBucket: Bucket) => Promise<void> | void;
   onMarkDone: (taskId: string, status: Task["status"]) => Promise<void> | void;
   onDelete: (taskId: string) => Promise<void> | void;
 };
 
-export function TaskCard({ task, bucket, onMove, onMarkDone, onDelete }: TaskCardProps) {
+export function TaskCard({ task, bucket, markDoneLoading = false, onMove, onMarkDone, onDelete }: TaskCardProps) {
   const isDone = task.status === "done";
   const link = typeof task.metadata?.link === "string" && task.metadata.link.length > 0 ? task.metadata.link : null;
 
@@ -47,10 +48,18 @@ export function TaskCard({ task, bucket, onMove, onMarkDone, onDelete }: TaskCar
           variant="ghost"
           size="icon-sm"
           className={cn("shrink-0", isDone ? "text-emerald-600 dark:text-emerald-400" : "text-muted-foreground")}
-          aria-label={isDone ? "Mark as pending" : "Mark as done"}
+          aria-label={markDoneLoading ? "Updating task status" : isDone ? "Mark as pending" : "Mark as done"}
+          aria-busy={markDoneLoading}
+          disabled={markDoneLoading}
           onClick={() => onMarkDone(task.id, task.status)}
         >
-          {isDone ? <CheckCircle2 className="size-5" strokeWidth={2} /> : <Circle className="size-5" strokeWidth={1.75} />}
+          {markDoneLoading ? (
+            <Loader2 className="size-5 animate-spin" aria-hidden />
+          ) : isDone ? (
+            <CheckCircle2 className="size-5" strokeWidth={2} />
+          ) : (
+            <Circle className="size-5" strokeWidth={1.75} />
+          )}
         </Button>
 
         <div className="min-w-0 flex-1 space-y-2">
@@ -115,7 +124,7 @@ export function TaskCard({ task, bucket, onMove, onMarkDone, onDelete }: TaskCar
 
           {task.original_body ? (
             <details className="text-xs">
-              <summary className="cursor-pointer text-muted-foreground hover:text-foreground">View original email body</summary>
+              <summary className="cursor-pointer text-muted-foreground hover:text-foreground">View task details</summary>
               <pre className="mt-2 whitespace-pre-wrap rounded-md bg-muted/80 p-2 text-xs dark:bg-muted/50">{task.original_body}</pre>
             </details>
           ) : null}

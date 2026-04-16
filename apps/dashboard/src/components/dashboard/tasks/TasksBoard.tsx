@@ -23,6 +23,7 @@ export function TasksBoard() {
   const queryClient = useQueryClient();
   const [activeBucket, setActiveBucket] = useState<Bucket>("today");
   const [error, setError] = useState<string | null>(null);
+  const [togglingTaskIds, setTogglingTaskIds] = useState<Set<string>>(() => new Set());
 
   const todayQuery = useQuery({ queryKey: ["tasks", "today"], queryFn: () => fetchBucket("today") });
   const thisWeekQuery = useQuery({ queryKey: ["tasks", "this_week"], queryFn: () => fetchBucket("this_week") });
@@ -117,7 +118,20 @@ export function TasksBoard() {
 
   async function onMarkDone(taskId: string, status: Task["status"]) {
     setError(null);
-    await markDoneMutation.mutateAsync({ taskId, status });
+    setTogglingTaskIds((prev) => {
+      const next = new Set(prev);
+      next.add(taskId);
+      return next;
+    });
+    try {
+      await markDoneMutation.mutateAsync({ taskId, status });
+    } finally {
+      setTogglingTaskIds((prev) => {
+        const next = new Set(prev);
+        next.delete(taskId);
+        return next;
+      });
+    }
   }
 
   async function onDelete(taskId: string) {
@@ -144,6 +158,7 @@ export function TasksBoard() {
                 bucket={bucket}
                 tasks={tasks}
                 loading={loadingByBucket[bucket]}
+                togglingTaskIds={togglingTaskIds}
                 onMove={onMove}
                 onMarkDone={onMarkDone}
                 onDelete={onDelete}
@@ -160,6 +175,7 @@ export function TasksBoard() {
             bucket={bucket}
             tasks={tasks}
             loading={loadingByBucket[bucket]}
+            togglingTaskIds={togglingTaskIds}
             onMove={onMove}
             onMarkDone={onMarkDone}
             onDelete={onDelete}

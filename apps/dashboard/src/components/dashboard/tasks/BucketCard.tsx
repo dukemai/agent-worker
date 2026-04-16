@@ -47,12 +47,22 @@ type BucketCardProps = {
   tasks: TasksByBucket;
   /** When true, this column’s list is still loading (shows message under the header). */
   loading?: boolean;
+  /** Task IDs currently being toggled between pending/done. */
+  togglingTaskIds?: Set<string>;
   onMove: (taskId: string, fromBucket: Bucket, toBucket: Bucket) => Promise<void> | void;
   onMarkDone: (taskId: string, status: Task["status"]) => Promise<void> | void;
   onDelete: (taskId: string) => Promise<void> | void;
 };
 
-export function BucketCard({ bucket, tasks, loading = false, onMove, onMarkDone, onDelete }: BucketCardProps) {
+export function BucketCard({
+  bucket,
+  tasks,
+  loading = false,
+  togglingTaskIds,
+  onMove,
+  onMarkDone,
+  onDelete,
+}: BucketCardProps) {
   const list = tasks[bucket];
   const [statusFilter, setStatusFilter] = useState<TaskStatusFilter>("all");
   const [sort, setSort] = useState<TaskColumnSort>("status_pending_first");
@@ -120,6 +130,7 @@ export function BucketCard({ bucket, tasks, loading = false, onMove, onMarkDone,
               key={task.id}
               task={task}
               bucket={bucket}
+              markDoneLoading={togglingTaskIds?.has(task.id) ?? false}
               onMove={onMove}
               onMarkDone={onMarkDone}
               onDelete={onDelete}
