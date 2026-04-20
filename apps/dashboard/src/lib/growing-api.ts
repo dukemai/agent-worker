@@ -247,6 +247,15 @@ export async function fetchSourceVideoInfo(sourceId: string): Promise<FetchSourc
   return result;
 }
 
+export async function fetchGrowingWindow(id: string): Promise<GrowingWindowItem> {
+  const response = await fetch(`/api/growing/windows/${id}`, { cache: "no-store" });
+  if (!response.ok) {
+    await readApiError(response, "Failed to load growing window");
+  }
+  const json = (await response.json()) as { window: GrowingWindowItem };
+  return json.window;
+}
+
 export async function fetchGrowingWindows(filters?: GrowingWindowFilters): Promise<{ windows: GrowingWindowItem[] }> {
   const params = new URLSearchParams();
   if (filters?.verification === "verified") {
@@ -321,6 +330,18 @@ export async function deleteGrowingKnowledge(id: string): Promise<{ success: boo
   const response = await fetch(`/api/growing/knowledge/${id}`, { method: "DELETE" });
   if (!response.ok) {
     await readApiError(response, "Failed to delete knowledge");
+  }
+  return response.json();
+}
+
+export async function mergeGrowingWindows(primaryId: string, secondaryIds: string[]): Promise<{ success: boolean }> {
+  const response = await fetch("/api/growing/windows/merge", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ primaryId, secondaryIds }),
+  });
+  if (!response.ok) {
+    await readApiError(response, "Failed to merge windows");
   }
   return response.json();
 }

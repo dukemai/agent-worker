@@ -11,11 +11,21 @@ import {
   deleteGrowingWindow,
   fetchGrowingWindows,
   type GrowingWindowItem,
+  mergeGrowingWindows,
   updateGrowingWindowMonths,
   updateGrowingWindowVerified,
 } from "@/lib/growing-api";
 import { extractYouTubeVideoId } from "@/lib/youtube";
 import { cn } from "@/lib/utils";
+import { CheckCircle2, Loader2, Merge, Search, Trash2 } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 const MONTH_NAMES = ["", "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 const MONTH_OPTIONS = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] as const;
@@ -65,6 +75,7 @@ export function GrowingWindowsTab() {
   const queryClient = useQueryClient();
   const [verification, setVerification] = useState<WindowVerificationFilter>("all");
   const [monthFilter, setMonthFilter] = useState<number | "all">("all");
+  const [searchQuery, setSearchQuery] = useState("");
   const windowsQuery = useQuery({
     queryKey: ["growing", "windows", verification],
     queryFn: () =>
@@ -77,6 +88,12 @@ export function GrowingWindowsTab() {
   const [editingMonthsId, setEditingMonthsId] = useState<string | null>(null);
   const [draftStart, setDraftStart] = useState<Record<string, number>>({});
   const [draftEnd, setDraftEnd] = useState<Record<string, number>>({});
+
+  // Selection/Merge states
+  const [selectionMode, setSelectionMode] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [isMergeDialogOpen, setIsMergeDialogOpen] = useState(false);
+  const [primaryId, setPrimaryId] = useState<string | null>(null);
 
   const updateWindowVerifiedMutation = useMutation({
     mutationFn: ({ id, verified }: { id: string; verified: boolean }) => updateGrowingWindowVerified(id, verified),
@@ -109,10 +126,26 @@ export function GrowingWindowsTab() {
     },
   });
 
+  const mergeWindowsMutation = useMutation({
+    mutationFn: ({ primaryId, secondaryIds }: { primaryId: string; secondaryIds: string[] }) =>
+      mergeGrowingWindows(primaryId, secondaryIds),
+    onSuccess: async () => {
+      setSelectionMode(false);
+      setSelectedIds(new Set());
+      setPrimaryId(null);
+      setIsMergeDialogOpen(false);
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["growing", "windows"] }),
+        queryClient.invalidateQueries({ queryKey: ["growing", "weekly"] }),
+      ]);
+    },
+  });
+
   const isBusy =
     updateWindowVerifiedMutation.isPending ||
     updateWindowMonthsMutation.isPending ||
-    deleteWindowMutation.isPending;
+    deleteWindowMutation.isPending ||
+    mergeWindowsMutation.isPending;
   const updatingId =
     updateWindowVerifiedMutation.isPending && updateWindowVerifiedMutation.variables
       ? updateWindowVerifiedMutation.variables.id
@@ -138,16 +171,33 @@ export function GrowingWindowsTab() {
   const total = windows.length;
   const verifiedCount = windows.filter((w) => w.verified).length;
   const visibleWindows = windows.filter((w) => {
-    if (monthFilter === "all") return true;
+    // 1) Filter by verification
+    // (Existing fetch logic already handles verification filter if we wanted, 
+    // but we can also filter here for extra reactive filtering if needed. 
+    // Actually the query already handles it.)
+    
+    // 2) Filter by month
     const m = monthFilter;
     const start = w.start_month;
     const end = w.end_month;
-    if (start < 1 || start > 12 || end < 1 || end > 12) return false;
-    if (start <= end) {
-      return m >= start && m <= end;
+    let monthMatch = true;
+    if (m !== "all") {
+      if (start < 1 || start > 12 || end < 1 || end > 12) monthMatch = false;
+      else if (start <= end) monthMatch = m >= start && m <= end;
+      else monthMatch = m >= start || m <= end;
     }
-    // Wrap-around range like Nov–Feb.
-    return m >= start || m <= end;
+    if (!monthMatch) return false;
+
+    // 3) Filter by search query
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase();
+      const nameMatch = w.item_name.toLowerCase().includes(q);
+      const noteMatch = w.stockholm_note.toLowerCase().includes(q);
+      const tagMatch = w.tags.some(tag => tag.toLowerCase().includes(q));
+      if (!nameMatch && !noteMatch && !tagMatch) return false;
+    }
+
+    return true;
   });
 
   function startEditMonths(window: GrowingWindowItem) {
@@ -184,8 +234,10 @@ export function GrowingWindowsTab() {
           <CardTitle>
             Actionable Windows
             {!isLoading && total > 0 ? (
-              <span className="ml-1.5 text-sm font-normal text-muted-foreground tabular-nums">
-                ({verifiedCount}/{total} verified)
+              <span className="ml-2 text-sm font-normal text-muted-foreground tabular-nums bg-muted/50 px-2 py-0.5 rounded-md">
+                {visibleWindows.length} showing / {total} total
+                <span className="mx-1.5 opacity-40">|</span>
+                {verifiedCount} verified
               </span>
             ) : null}
           </CardTitle>
@@ -193,9 +245,19 @@ export function GrowingWindowsTab() {
             Seasonal tips extracted from your sources (YouTube or blogs). Mark as verified when you&apos;ve confirmed
             they work for your location.
           </p>
-          <div className="mt-2 flex flex-wrap gap-2">
+          <div className="mt-2 flex flex-wrap items-center gap-2">
+            <div className="relative">
+              <Search className="absolute left-2.5 top-2.5 size-4 text-muted-foreground" />
+              <Input
+                placeholder="Search windows..."
+                className="w-[200px] pl-9"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
+
             <Select value={verification} onValueChange={(value) => setVerification(value as WindowVerificationFilter)}>
-              <SelectTrigger className="w-[200px]">
+              <SelectTrigger className="w-[180px]">
                 <SelectValue placeholder="Verification" />
               </SelectTrigger>
               <SelectContent>
@@ -204,14 +266,15 @@ export function GrowingWindowsTab() {
                 <SelectItem value="unverified">Unverified only</SelectItem>
               </SelectContent>
             </Select>
+
             <Select
               value={monthFilter === "all" ? "all" : String(monthFilter)}
               onValueChange={(value) =>
-                setMonthFilter(value === "all" ? "all" : Number(value) as number)
+                setMonthFilter(value === "all" ? "all" : (Number(value) as number))
               }
             >
-              <SelectTrigger className="w-[220px]">
-                <SelectValue placeholder="Filter by month window" />
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Month" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All months</SelectItem>
@@ -222,6 +285,32 @@ export function GrowingWindowsTab() {
                 ))}
               </SelectContent>
             </Select>
+
+            <div className="flex-1" />
+            <div className="flex gap-2">
+              {selectionMode ? (
+                <>
+                  <Button variant="outline" size="sm" onClick={() => { setSelectionMode(false); setSelectedIds(new Set()); }}>
+                    Cancel
+                  </Button>
+                  <Button 
+                    variant="default" 
+                    size="sm" 
+                    className="bg-indigo-600 hover:bg-indigo-700"
+                    disabled={selectedIds.size < 2}
+                    onClick={() => setIsMergeDialogOpen(true)}
+                  >
+                    <Merge className="mr-2 size-4" />
+                    Merge ({selectedIds.size})
+                  </Button>
+                </>
+              ) : (
+                <Button variant="outline" size="sm" onClick={() => setSelectionMode(true)}>
+                  <Merge className="mr-2 size-4" />
+                  Merge Mode
+                </Button>
+              )}
+            </div>
           </div>
         </CardHeader>
         <CardContent className="space-y-3">
@@ -238,6 +327,7 @@ export function GrowingWindowsTab() {
             </p>
           ) : (
             visibleWindows.map((window) => {
+              const isSelected = selectedIds.has(window.id);
               const isBlog = window.source?.source_type === "blog";
               const isYouTube = window.source?.url ? extractYouTubeVideoId(window.source.url) !== null : false;
               let sourceLabel: string | null = null;
@@ -260,7 +350,22 @@ export function GrowingWindowsTab() {
               }
 
               return (
-                <article key={window.id} className="rounded-md border bg-card/60 p-3">
+                <article 
+                  key={window.id} 
+                  className={cn(
+                    "rounded-md border bg-card/60 p-3 transition-all",
+                    selectionMode && "cursor-pointer hover:border-indigo-400",
+                    isSelected && "border-indigo-600 bg-indigo-50/50 dark:bg-indigo-950/20 shadow-md ring-1 ring-indigo-600"
+                  )}
+                  onClick={() => {
+                    if (selectionMode) {
+                      const next = new Set(selectedIds);
+                      if (next.has(window.id)) next.delete(window.id);
+                      else next.add(window.id);
+                      setSelectedIds(next);
+                    }
+                  }}
+                >
                   <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
                     <div className="flex flex-wrap items-center gap-2">
                       <h3 className="font-medium">{window.item_name}</h3>
@@ -393,6 +498,60 @@ export function GrowingWindowsTab() {
           )}
         </CardContent>
       </Card>
+
+      <Dialog open={isMergeDialogOpen} onOpenChange={setIsMergeDialogOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Merge Growing Windows</DialogTitle>
+            <DialogDescription>
+              This will merge {selectedIds.size} windows into one. All historical suggestions and tasks will be reassigned to the primary window. Secondary windows will be deleted.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4 py-4">
+            <p className="text-sm font-medium">Select the primary window to keep:</p>
+            <div className="grid gap-2">
+              {Array.from(selectedIds).map((id) => {
+                const win = windows.find((w) => w.id === id);
+                if (!win) return null;
+                return (
+                  <button
+                    key={id}
+                    onClick={() => setPrimaryId(id)}
+                    className={cn(
+                      "flex items-center justify-between rounded-md border p-3 text-left text-sm transition-colors",
+                      primaryId === id 
+                        ? "border-indigo-600 bg-indigo-50 dark:bg-indigo-950/30 ring-1 ring-indigo-600" 
+                        : "hover:bg-muted"
+                    )}
+                  >
+                    <span>{win.item_name}</span>
+                    {primaryId === id && <CheckCircle2 className="size-4 text-indigo-600" />}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsMergeDialogOpen(false)}>
+              Cancel
+            </Button>
+            <Button 
+              disabled={!primaryId || mergeWindowsMutation.isPending}
+              onClick={() => {
+                if (primaryId) {
+                  const secondaryIds = Array.from(selectedIds).filter(id => id !== primaryId);
+                  mergeWindowsMutation.mutate({ primaryId, secondaryIds });
+                }
+              }}
+            >
+              {mergeWindowsMutation.isPending && <Loader2 className="mr-2 size-4 animate-spin" />}
+              Confirm Merge
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

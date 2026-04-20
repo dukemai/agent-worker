@@ -41,7 +41,7 @@ type Props = {
   dashboardUrl: string;
 };
 
-function TaskList({ tasks }: { tasks: Task[] }) {
+function TaskList({ tasks, dashboardUrl }: { tasks: Task[]; dashboardUrl: string }) {
   if (tasks.length === 0) {
     return (
       <Text className="text-gray-400 text-[14px] italic m-0">
@@ -57,7 +57,9 @@ function TaskList({ tasks }: { tasks: Task[] }) {
           {index > 0 && <Hr className="border-gray-900/5 my-[12px]" />}
           <Section>
             <Text className="m-0 font-semibold text-[16px] text-gray-900">
-              {task.title}
+              <a href={`${dashboardUrl}/tasks/${task.id}`} className="text-gray-900 no-underline hover:underline">
+                {task.title}
+              </a>
             </Text>
             {task.due_date && (
               <Text className="m-0 text-[12px] text-gray-400 uppercase tracking-wider font-medium mt-[2px]">
@@ -246,7 +248,7 @@ export function DailyDigestEmail(props: Props) {
                    📅 High Priority
                  </Heading>
                  <Section className="bg-indigo-50/30 rounded-xl p-[20px] border border-solid border-indigo-100/50">
-                   <TaskList tasks={todayTasks} />
+                   <TaskList tasks={todayTasks} dashboardUrl={dashboardUrl} />
                  </Section>
               </Section>
 
@@ -256,7 +258,7 @@ export function DailyDigestEmail(props: Props) {
                      📆 Upcoming this Week
                    </Heading>
                    <Section className="bg-blue-50/30 rounded-xl p-[20px] border border-solid border-blue-100/50">
-                     <TaskList tasks={thisWeekTasks} />
+                     <TaskList tasks={thisWeekTasks} dashboardUrl={dashboardUrl} />
                    </Section>
                 </Section>
               )}
@@ -264,9 +266,18 @@ export function DailyDigestEmail(props: Props) {
 
             {/* Growing Insights */}
             <Section className="mb-[48px]">
-                <Heading className="m-0 text-[22px] font-bold text-gray-950 mb-[16px]">
-                  Growing Insights
-                </Heading>
+                <Row className="mb-[16px]">
+                  <Column>
+                    <Heading className="m-0 text-[22px] font-bold text-gray-950">
+                      Growing Insights
+                    </Heading>
+                  </Column>
+                  <Column align="right">
+                    <a href={`${dashboardUrl}/growing`} className="text-[14px] font-semibold text-emerald-600 no-underline">
+                      View all &rarr;
+                    </a>
+                  </Column>
+                </Row>
                 
                 {/* Actions First */}
                 {growingSuggestions.filter(s => s.suggestion_kind !== 'inspiration').length > 0 && (

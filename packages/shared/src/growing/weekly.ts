@@ -116,9 +116,34 @@ export async function generateWeeklySuggestions(
     return a.item_name.localeCompare(b.item_name);
   });
 
-  // 5) Keep action windows only and take top 10
-  const topActions = sortedWindows.filter((w) => w.suggestion_kind === "action").slice(0, 20);
-  const toInsert = [...topActions];
+  // 5) Select actions with top-up logic:
+  // Aim for up to 10 "active" (pending/converted) suggestions, but cap at 20 total items.
+  const allActions = sortedWindows.filter((w) => w.suggestion_kind === "action");
+  const selectedActions: GrowingWindow[] = [];
+  let activeCount = 0;
+
+  for (const window of allActions) {
+    if (selectedActions.length >= 20) break;
+
+    const dismissed = dismissedByWindowId.get(window.id);
+    const isDismissed = dismissed?.status === "dismissed";
+    const isConverted = windowToTaskId.has(window.id);
+
+    // Always preserve items the user has already interacted with (dismissed or converted).
+    if (isDismissed || isConverted) {
+      selectedActions.push(window);
+      if (isConverted) activeCount++;
+      continue;
+    }
+
+    // Fill remaining slots with "pending" items until we hit the active target.
+    if (activeCount < 10) {
+      selectedActions.push(window);
+      activeCount++;
+    }
+  }
+
+  const toInsert = selectedActions;
   // 6) Upsert for this week using composite key (week_number, window_id)
   if (toInsert.length > 0) {
     const payload = toInsert.map((window) => {

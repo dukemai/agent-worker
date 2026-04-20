@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { Bucket } from "@/types/database";
+import { getISOWeekNumber } from "@agent/shared";
 import {
   convertGrowingSuggestion,
   fetchWeeklyGrowing,
@@ -82,6 +83,7 @@ export function GrowingWeeklyTab() {
   }
   const supportingByWindowId = new Map(data.supporting_knowledge.map((item) => [item.window_id, item.knowledge]));
   const activeActions = data.actions.filter((item) => item.status !== "dismissed");
+  const plannedCount = activeActions.filter((item) => item.status === "converted").length;
 
   return (
     <section className="space-y-3">
@@ -101,8 +103,20 @@ export function GrowingWeeklyTab() {
       <div className="grid gap-4 md:grid-cols-2">
         <Card className="bg-emerald-50/20 border-emerald-100/50">
           <CardHeader>
-            <CardTitle>This Week in Stockholm</CardTitle>
-            <p className="text-sm text-emerald-600 font-medium">Recommended Actions</p>
+            <CardTitle className="flex items-center justify-between">
+              This Week in Stockholm
+              <span className="text-[10px] bg-emerald-100/80 text-emerald-700 px-2 py-0.5 rounded-full uppercase font-bold tracking-tighter border border-emerald-200">
+                Week {getISOWeekNumber()}
+              </span>
+            </CardTitle>
+            <div className="flex items-center justify-between mt-1">
+              <p className="text-sm text-emerald-600 font-medium">Recommended Actions</p>
+              {activeActions.length > 0 && (
+                <span className="text-[11px] font-medium text-emerald-600/70 tabular-nums">
+                  {plannedCount}/{activeActions.length} planned
+                </span>
+              )}
+            </div>
           </CardHeader>
           <CardContent className="space-y-4">
             {activeActions.length === 0 ? (

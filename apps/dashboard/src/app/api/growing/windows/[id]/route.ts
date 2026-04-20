@@ -3,6 +3,29 @@ import { errorResponse, getAuthedSupabase } from "@/lib/api";
 
 type Params = { params: Promise<{ id: string }> };
 
+export async function GET(_: Request, { params }: Params) {
+  const auth = await getAuthedSupabase();
+  if (auth.error || !auth.supabase) {
+    return auth.error;
+  }
+
+  const { id } = await params;
+  const { data, error } = await auth.supabase
+    .from("growing_windows")
+    .select("*, source:growing_sources(*)")
+    .eq("id", id)
+    .maybeSingle();
+
+  if (error) {
+    return errorResponse(error.message, 500);
+  }
+  if (!data) {
+    return errorResponse("Window not found", 404);
+  }
+
+  return NextResponse.json({ window: data });
+}
+
 export async function PATCH(request: Request, { params }: Params) {
   const auth = await getAuthedSupabase();
   if (auth.error || !auth.supabase) {

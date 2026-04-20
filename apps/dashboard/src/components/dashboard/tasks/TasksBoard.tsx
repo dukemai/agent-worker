@@ -139,6 +139,21 @@ export function TasksBoard() {
     await deleteTaskMutation.mutateAsync({ taskId });
   }
 
+  async function onCleanDone(bucket: Bucket) {
+    const doneTasks = tasks[bucket].filter((t) => t.status === "done");
+    if (doneTasks.length === 0) return;
+
+    setError(null);
+    try {
+      // For simplicity in this trivially simple task, we call the individual delete 
+      // multiple times. Success will invalidate once thanks to onSuccess/onSettled 
+      // behavior or we can manually invalidate once after.
+      await Promise.all(doneTasks.map((t) => deleteTaskMutation.mutateAsync({ taskId: t.id })));
+    } catch {
+      // Mutation handles its own error setting
+    }
+  }
+
   return (
     <>
       {displayError ? <p className="text-sm text-red-600">{displayError}</p> : null}
@@ -159,9 +174,11 @@ export function TasksBoard() {
                 tasks={tasks}
                 loading={loadingByBucket[bucket]}
                 togglingTaskIds={togglingTaskIds}
+                isCleaning={deleteTaskMutation.isPending}
                 onMove={onMove}
                 onMarkDone={onMarkDone}
                 onDelete={onDelete}
+                onCleanDone={onCleanDone}
               />
             </TabsContent>
           ))}
@@ -176,9 +193,11 @@ export function TasksBoard() {
             tasks={tasks}
             loading={loadingByBucket[bucket]}
             togglingTaskIds={togglingTaskIds}
+            isCleaning={deleteTaskMutation.isPending}
             onMove={onMove}
             onMarkDone={onMarkDone}
             onDelete={onDelete}
+            onCleanDone={onCleanDone}
           />
         ))}
       </section>

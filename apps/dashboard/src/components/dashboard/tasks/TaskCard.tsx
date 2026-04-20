@@ -1,10 +1,14 @@
 "use client";
 
+import { useQuery } from "@tanstack/react-query";
 import { CheckCircle2, Circle, ExternalLink, Loader2, Trash2 } from "lucide-react";
+import { useMemo, useState } from "react";
+import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import type { Task } from "@/types/database";
 import { cn } from "@/lib/utils";
+import { fetchGrowingWindowKnowledge } from "./api";
 import { BUCKETS, type Bucket } from "./types";
 
 /** Short labels for move actions to keep the row compact. */
@@ -26,6 +30,20 @@ type TaskCardProps = {
 export function TaskCard({ task, bucket, markDoneLoading = false, onMove, onMarkDone, onDelete }: TaskCardProps) {
   const isDone = task.status === "done";
   const link = typeof task.metadata?.link === "string" && task.metadata.link.length > 0 ? task.metadata.link : null;
+  const [detailsOpen, setDetailsOpen] = useState(false);
+  const isGrowingTask = task.source === "growing" || task.metadata?.item_type === "growing";
+  const growingWindowId = useMemo(() => {
+    if (typeof task.metadata?.window_id === "string" && task.metadata.window_id.length > 0) {
+      return task.metadata.window_id;
+    }
+    return task.window_id;
+  }, [task.metadata, task.window_id]);
+  const knowledgeQuery = useQuery({
+    queryKey: ["growing", "window-knowledge", growingWindowId],
+    queryFn: () => fetchGrowingWindowKnowledge(growingWindowId!),
+    enabled: detailsOpen && isGrowingTask && typeof growingWindowId === "string" && growingWindowId.length > 0,
+    staleTime: 60_000,
+  });
 
   return (
     <article
@@ -70,7 +88,9 @@ export function TaskCard({ task, bucket, markDoneLoading = false, onMove, onMark
                 isDone && "text-muted-foreground line-through decoration-muted-foreground/80"
               )}
             >
-              {task.title}
+              <Link href={`/tasks/${task.id}`} className="hover:underline">
+                {task.title}
+              </Link>
             </h3>
             <div className="flex shrink-0 items-center gap-0.5">
               {link ? (
@@ -122,10 +142,41 @@ export function TaskCard({ task, bucket, markDoneLoading = false, onMove, onMark
             ))}
           </div>
 
-          {task.original_body ? (
-            <details className="text-xs">
-              <summary className="cursor-pointer text-muted-foreground hover:text-foreground">View task details</summary>
-              <pre className="mt-2 whitespace-pre-wrap rounded-md bg-muted/80 p-2 text-xs dark:bg-muted/50">{task.original_body}</pre>
+          {task.original_body || isGrowingTask ? (
+            <details className="text-xs" onToggle={(event) => setDetailsOpen((event.currentTarget as HTMLDetailsElement).open)}>
+              <summary className="cursor-pointer text-muted-foreground hover:text-foreground">
+                View task details
+              </summary>
+              {task.original_body ? (
+                <pre className="mt-2 whitespace-pre-wrap rounded-md bg-muted/80 p-2 text-xs dark:bg-muted/50">
+                  {task.original_body}
+                </pre>
+              ) : (
+                <p className="mt-2 text-muted-foreground">No additional task note.</p>
+              )}
+              {isGrowingTask ? (
+                <div className="mt-2 rounded-md border border-emerald-100 bg-emerald-50/30 p-2 dark:border-emerald-900/35 dark:bg-emerald-950/20">
+                  <p className="mb-1 text-[11px] font-semibold uppercase tracking-wide text-emerald-700 dark:text-emerald-300">
+                    Related knowledge
+                  </p>
+                  {knowledgeQuery.isLoading ? (
+                    <p className="text-muted-foreground">Loading related knowledge…</p>
+                  ) : knowledgeQuery.error instanceof Error ? (
+                    <p className="text-red-600">{knowledgeQuery.error.message}</p>
+                  ) : !knowledgeQuery.data?.length ? (
+                    <p className="text-muted-foreground">No related knowledge found.</p>
+                  ) : (
+                    <div className="space-y-1.5">
+                      {knowledgeQuery.data.map((item) => (
+                        <div key={`${task.id}-${item.id}`}>
+                          <p className="font-medium text-foreground">{item.title}</p>
+                          <p className="line-clamp-2 text-muted-foreground">{item.content}</p>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ) : null}
             </details>
           ) : null}
         </div>

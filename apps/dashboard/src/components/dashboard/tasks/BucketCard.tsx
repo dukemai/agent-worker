@@ -1,6 +1,8 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { Trash2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import type { Task } from "@/types/database";
@@ -49,9 +51,11 @@ type BucketCardProps = {
   loading?: boolean;
   /** Task IDs currently being toggled between pending/done. */
   togglingTaskIds?: Set<string>;
+  isCleaning?: boolean;
   onMove: (taskId: string, fromBucket: Bucket, toBucket: Bucket) => Promise<void> | void;
   onMarkDone: (taskId: string, status: Task["status"]) => Promise<void> | void;
   onDelete: (taskId: string) => Promise<void> | void;
+  onCleanDone: (bucket: Bucket) => Promise<void> | void;
 };
 
 export function BucketCard({
@@ -59,11 +63,14 @@ export function BucketCard({
   tasks,
   loading = false,
   togglingTaskIds,
+  isCleaning,
   onMove,
   onMarkDone,
   onDelete,
+  onCleanDone,
 }: BucketCardProps) {
   const list = tasks[bucket];
+  const doneCount = useMemo(() => list.filter((t) => t.status === "done").length, [list]);
   const [statusFilter, setStatusFilter] = useState<TaskStatusFilter>("all");
   const [sort, setSort] = useState<TaskColumnSort>("status_pending_first");
 
@@ -115,6 +122,18 @@ export function BucketCard({
               <SelectItem value="status_done_first">Status (done first)</SelectItem>
             </SelectContent>
           </Select>
+          {doneCount > 0 && (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-8 text-xs text-muted-foreground hover:text-destructive shrink-0"
+              onClick={() => onCleanDone(bucket)}
+              disabled={isCleaning}
+            >
+              <Trash2 className="mr-1.5 size-3" />
+              Clean {doneCount} Done
+            </Button>
+          )}
         </div>
       </CardHeader>
       <CardContent className="space-y-3 px-0">

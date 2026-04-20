@@ -1,6 +1,7 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { Search } from "lucide-react";
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -32,6 +33,7 @@ export function GrowingKnowledgeTab() {
   const [tags, setTags] = useState("");
   const [locationFilter, setLocationFilter] = useState("");
   const [verification, setVerification] = useState<KnowledgeVerificationFilter>("all");
+  const [searchQuery, setSearchQuery] = useState("");
 
   const knowledgeQuery = useQuery({
     queryKey: [
@@ -79,9 +81,20 @@ export function GrowingKnowledgeTab() {
   });
 
   const isLoading = knowledgeQuery.isLoading;
-  const knowledge = knowledgeQuery.data?.knowledge ?? [];
-  const verifiedCount = knowledge.filter((item) => item.verified).length;
-  const unverifiedCount = knowledge.length - verifiedCount;
+  const rawKnowledge = knowledgeQuery.data?.knowledge ?? [];
+
+  const visibleKnowledge = rawKnowledge.filter((item) => {
+    if (!searchQuery.trim()) return true;
+    const q = searchQuery.toLowerCase();
+    return (
+      item.title.toLowerCase().includes(q) ||
+      item.content.toLowerCase().includes(q) ||
+      item.tags.some((tag) => tag.toLowerCase().includes(q))
+    );
+  });
+
+  const total = rawKnowledge.length;
+  const verifiedCount = rawKnowledge.filter((item) => item.verified).length;
   const isBusy =
     knowledgeToTaskMutation.isPending ||
     deleteKnowledgeMutation.isPending ||
@@ -124,6 +137,8 @@ export function GrowingKnowledgeTab() {
     }
   }
 
+  const knowledge = visibleKnowledge; // Use filtered list for rendering
+
   async function onToggleVerified(item: (typeof knowledge)[number]) {
     try {
       await updateKnowledgeVerifiedMutation.mutateAsync({
@@ -139,16 +154,29 @@ export function GrowingKnowledgeTab() {
     <div className="space-y-4">
       {error ? <p className="text-sm text-red-600">{error}</p> : null}
       <Card>
-        <CardHeader>
-          <CardTitle>
-            Knowledge Library
-            {knowledge.length > 0 ? (
-              <span className="ml-2 text-sm font-normal text-muted-foreground tabular-nums">
-                ({verifiedCount}/{knowledge.length} verified)
-              </span>
-            ) : null}
-          </CardTitle>
-          <div className="mt-2 grid gap-3 md:grid-cols-2 lg:grid-cols-5">
+          <CardHeader>
+            <CardTitle>
+              Knowledge Library
+              {!isLoading && total > 0 ? (
+                <span className="ml-2 text-sm font-normal text-muted-foreground tabular-nums bg-muted/50 px-2 py-0.5 rounded-md">
+                  {knowledge.length} showing / {total} total
+                  <span className="mx-1.5 opacity-40">|</span>
+                  {verifiedCount} verified
+                </span>
+              ) : null}
+            </CardTitle>
+            <div className="mt-2 flex flex-wrap gap-2">
+              <div className="relative">
+                <Search className="absolute left-2.5 top-2.5 size-4 text-muted-foreground" />
+                <Input
+                  placeholder="Search library..."
+                  className="w-[180px] pl-9"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
+              </div>
+              <div className="flex-1" />
+              <div className="grid grid-cols-2 gap-2 md:flex md:items-center">
             <Select value={category} onValueChange={(value) => setCategory(value as typeof category)}>
               <SelectTrigger className="w-full">
                 <SelectValue placeholder="Category" />
@@ -196,8 +224,9 @@ export function GrowingKnowledgeTab() {
                 <SelectItem value="all">All</SelectItem>
                 <SelectItem value="verified">Verified only</SelectItem>
                 <SelectItem value="unverified">Unverified only</SelectItem>
-              </SelectContent>
-            </Select>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
         </CardHeader>
         <CardContent className="space-y-3">
