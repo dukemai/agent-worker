@@ -61,6 +61,12 @@ export interface RecentGrowingWindowItem {
   sourceUrl: string | null;
 }
 
+export interface BirthdayDigestItem {
+  name: string;
+  daysLeft: number;
+  category: string;
+}
+
 /** Minimal lesson shape for digest email (profile_type, topic, content). */
 export interface DigestLessonItem {
   profile_type: string;

@@ -8,6 +8,7 @@ import type {
   RenewalDigestItem,
   RecentGrowingKnowledgeItem,
   RecentGrowingWindowItem,
+  BirthdayDigestItem,
   Task,
 } from "./types";
 import type { GrowingWindowKnowledgeLink } from "./types/growing";
@@ -209,6 +210,47 @@ export async function fetchRecentGrowingKnowledge(
 }
 
 /**
+ * Calculates days until a birthday (Month/Day) handling year-end wrap-around.
+ */
+function getDaysUntilBirthday(month: number, day: number, now: Date): number {
+  const currentYear = now.getUTCFullYear();
+  let target = new Date(Date.UTC(currentYear, month - 1, day));
+  
+  // If birthday already passed this year (by more than 1 day to handle timezones safely), check next year
+  if (target.getTime() < now.getTime() - 86400000) {
+    target = new Date(Date.UTC(currentYear + 1, month - 1, day));
+  }
+  
+  const diffTime = target.getTime() - now.getTime();
+  return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+}
+
+/**
+ * Loads upcoming birthdays from the birthdays table.
+ * Keeps items occurring in the next 20 days.
+ */
+export async function fetchUpcomingBirthdays(
+  supabase: SupabaseClient
+): Promise<BirthdayDigestItem[]> {
+  const { data, error } = await supabase
+    .from("birthdays")
+    .select("name, birthday_month, birthday_day, category")
+    .eq("status", "active");
+
+  if (error || !data) return [];
+
+  const now = new Date();
+  return data
+    .map((row) => ({
+      name: row.name,
+      category: row.category,
+      daysLeft: getDaysUntilBirthday(row.birthday_month, row.birthday_day, now),
+    }))
+    .filter((item) => item.daysLeft <= 20)
+    .sort((a, b) => a.daysLeft - b.daysLeft);
+}
+
+/**
  * Formats a list of tasks as plain text for the briefing context (e.g. "  • Title — due YYYY-MM-DD").
  * Uses Swedish locale for dates. Returns "  (none)" when the list is empty.
  */
@@ -308,6 +350,7 @@ export async function generateBriefingNarrative(
   todayTasks: Task[],
   thisWeekTasks: Task[],
   laterTasks: Task[],
+  birthdayItems: BirthdayDigestItem[],
   rainForecast: boolean
 ): Promise<string> {
   const now = new Date();
@@ -334,6 +377,18 @@ export async function generateBriefingNarrative(
       lines.push(`Idag är det ${nextHoliday.name}! Hoppas du får en fantastisk dag.`);
     } else {
       lines.push(`Det är ${days} ${days === 1 ? "dag" : "dagar"} kvar till ${nextHoliday.name}.`);
+    }
+  }
+
+  // 1b) Birthday countdowns (Focus on next 7 days in briefing)
+  const urgentBirthdays = birthdayItems.filter((b) => b.daysLeft <= 7);
+  for (const b of urgentBirthdays) {
+    if (b.daysLeft === 0) {
+      lines.push(`Idag fyller ${b.name} år! 🎂 Glöm inte att fira.`);
+    } else {
+      lines.push(
+        `Det är bara ${b.daysLeft} ${b.daysLeft === 1 ? "dag" : "dagar"} kvar till ${b.name} fyller år.`
+      );
     }
   }
 
@@ -401,6 +456,7 @@ export async function buildEmailHtml(
   growingSuggestions: GrowingSuggestionDigestItem[],
   recentGrowingKnowledge: RecentGrowingKnowledgeItem[],
   recentGrowingWindows: RecentGrowingWindowItem[],
+  birthdayItems: BirthdayDigestItem[],
   narrative: string,
   dashboardUrl: string
 ): Promise<string> {
@@ -422,6 +478,7 @@ export async function buildEmailHtml(
       lessons={lessons}
       promotionItems={promotionItems}
       renewalItems={renewalItems}
+      birthdayItems={birthdayItems}
       growingSuggestions={growingSuggestions}
       recentGrowingKnowledge={recentGrowingKnowledge}
       recentGrowingWindows={recentGrowingWindows}
@@ -461,6 +518,7 @@ export type DigestEmailContent = {
   lessons: DigestLessonItem[];
   promotionItems: PromotionDigestItem[];
   renewalItems: RenewalDigestItem[];
+  birthdayItems: BirthdayDigestItem[];
   growingSuggestions: GrowingSuggestionDigestItem[];
   recentGrowingKnowledge: RecentGrowingKnowledgeItem[];
   recentGrowingWindows: RecentGrowingWindowItem[];
@@ -478,10 +536,11 @@ export async function loadDigestEmailContent(
 ): Promise<DigestEmailContent> {
   const lessons = options.lessons ?? [];
 
-  const [todayTasks, thisWeekTasks, laterTasks] = await Promise.all([
+  const [todayTasks, thisWeekTasks, laterTasks, birthdayItems] = await Promise.all([
     fetchPendingTasksForBucket(supabase, "today_tasks"),
     fetchPendingTasksForBucket(supabase, "this_week_tasks"),
     fetchPendingTasksForBucket(supabase, "later_tasks"),
+    fetchUpcomingBirthdays(supabase),
   ]);
   const allTasks = [...todayTasks, ...thisWeekTasks, ...laterTasks];
   const promotionItems = extractPromotionItems(allTasks);
@@ -541,6 +600,7 @@ export async function loadDigestEmailContent(
         todayTasks,
         thisWeekTasks,
         laterTasks,
+        birthdayItems,
         options.rainForecast
       );
     } catch (err) {
@@ -558,6 +618,7 @@ export async function loadDigestEmailContent(
     lessons,
     promotionItems,
     renewalItems,
+    birthdayItems,
     growingSuggestions,
     recentGrowingKnowledge: relatedGrowingKnowledge,
     recentGrowingWindows,
@@ -581,6 +642,7 @@ export async function buildDigestEmailHtml(
     content.lessons,
     content.promotionItems,
     content.renewalItems,
+    content.birthdayItems,
     content.growingSuggestions,
     content.recentGrowingKnowledge,
     content.recentGrowingWindows,

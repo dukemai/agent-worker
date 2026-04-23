@@ -150,3 +150,21 @@ export interface GrowingKnowledge {
   verified: boolean;
   created_at: string;
 }
+
+export type BirthdayCategory = "family" | "close_friend" | "friend" | "kid_friend";
+export type BirthdayStatus = "active" | "archived";
+
+export interface Birthday {
+  id: string;
+  name: string;
+  birthday_month: number;
+  birthday_day: number;
+  birth_year: number | null;
+  category: BirthdayCategory;
+  is_recurring: boolean;
+  wishlist: string | null;
+  notes: string | null;
+  status: BirthdayStatus;
+  created_at: string;
+  updated_at: string;
+}

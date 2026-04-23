@@ -18,9 +18,9 @@ import type {
   GrowingSuggestionDigestItem,
   GrowingTaskDigestItem,
   PromotionDigestItem,
-  RecentGrowingKnowledgeItem,
   RecentGrowingWindowItem,
   RenewalDigestItem,
+  BirthdayDigestItem,
   Task,
 } from "../types";
 
@@ -37,6 +37,7 @@ type Props = {
   growingSuggestions: GrowingSuggestionDigestItem[];
   recentGrowingKnowledge: RecentGrowingKnowledgeItem[];
   recentGrowingWindows: RecentGrowingWindowItem[];
+  birthdayItems: BirthdayDigestItem[];
   narrative: string;
   dashboardUrl: string;
 };
@@ -92,6 +93,7 @@ export function DailyDigestEmail(props: Props) {
     growingSuggestions,
     recentGrowingKnowledge,
     recentGrowingWindows,
+    birthdayItems,
     narrative,
     dashboardUrl,
   } = props;
@@ -366,7 +368,7 @@ export function DailyDigestEmail(props: Props) {
                             <span className="text-teal-700 font-normal text-[12px] ml-[6px]">#{item.category}</span>
                           </Text>
                           <Text className="m-0 mt-[4px] text-[14px] text-gray-600 leading-[22px]">
-                            {item.content.length > 160 ? `${item.content.slice(0, 160)}...` : item.content}
+                            {(item.content?.length ?? 0) > 160 ? `${item.content?.slice(0, 160)}...` : item.content}
                             {item.sourceUrl && (
                               <a href={item.sourceUrl} className="ml-[6px] text-teal-600 underline">
                                 Read source
@@ -412,6 +414,40 @@ export function DailyDigestEmail(props: Props) {
                                   Go to renewal
                                 </a>
                               )}
+                            </Text>
+                         </Column>
+                      </Row>
+                    </Fragment>
+                  ))}
+                </Section>
+              </Section>
+            )}
+
+            {/* Birthdays & Events */}
+            {birthdayItems.length > 0 && (
+              <Section className="mb-[48px]">
+                <Heading className="m-0 text-[22px] font-bold text-gray-950 mb-[16px]">
+                  Birthdays & Events
+                </Heading>
+                <Section className="bg-pink-50/50 rounded-xl p-[20px] border border-solid border-pink-100">
+                  {birthdayItems.map((item, index) => (
+                    <Fragment key={item.name}>
+                      {index > 0 && <Hr className="border-pink-100/50 my-[12px]" />}
+                      <Row>
+                         <Column width="24" valign="top">
+                           <Text className="m-0 text-[14px]">🎂</Text>
+                         </Column>
+                         <Column>
+                            <Text className="m-0 font-semibold text-[15px] text-pink-900">
+                              {item.name}
+                            </Text>
+                            <Text className="m-0 text-[13px] text-pink-700 mt-[2px]">
+                              {item.daysLeft === 0 ? (
+                                <strong>Today! 🥳</strong>
+                              ) : (
+                                <>In <strong>{item.daysLeft} days</strong></>
+                              )}
+                              <span className="ml-[8px] opacity-60">({item.category.replace('_', ' ')})</span>
                             </Text>
                          </Column>
                       </Row>
