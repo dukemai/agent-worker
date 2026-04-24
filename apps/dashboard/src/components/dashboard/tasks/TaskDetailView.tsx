@@ -1,7 +1,7 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ArrowLeft, CheckCircle2, Circle, ExternalLink, Loader2 } from "lucide-react";
+import { ArrowLeft, CheckCircle2, Circle, ExternalLink, Loader2, Pencil } from "lucide-react";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -10,6 +10,7 @@ import { cn } from "@/lib/utils";
 import { fetchTask, fetchGrowingWindowKnowledge, updateTaskStatus } from "./api";
 import { fetchGrowingWindow } from "@/lib/growing-api";
 import type { Task } from "@/types/database";
+import { EditTaskDialog } from "./EditTaskDialog";
 
 type TaskDetailViewProps = {
   taskId: string;
@@ -77,28 +78,39 @@ export function TaskDetailView({ taskId }: TaskDetailViewProps) {
             Back to Dashboard
           </Link>
         </Button>
-        <Button
-          variant={task.status === "done" ? "default" : "outline"}
-          size="sm"
-          className={cn(
-            "capitalize transition-all",
-            task.status === "done" && "bg-emerald-600 hover:bg-emerald-700 text-white"
-          )}
-          onClick={() => {
-            const nextStatus = task.status === "done" ? "pending" : "done";
-            markDoneMutation.mutate(nextStatus);
-          }}
-          disabled={markDoneMutation.isPending}
-        >
-          {markDoneMutation.isPending ? (
-            <Loader2 className="mr-2 size-4 animate-spin" />
-          ) : task.status === "done" ? (
-            <CheckCircle2 className="mr-2 size-4" />
-          ) : (
-            <Circle className="mr-2 size-4" />
-          )}
-          {task.status === "done" ? "Completed" : "Mark as Done"}
-        </Button>
+        <div className="flex items-center gap-2">
+          <EditTaskDialog
+            task={task}
+            trigger={
+              <Button type="button" variant="outline" size="sm">
+                <Pencil className="mr-2 size-4" />
+                Edit
+              </Button>
+            }
+          />
+          <Button
+            variant={task.status === "done" ? "default" : "outline"}
+            size="sm"
+            className={cn(
+              "capitalize transition-all",
+              task.status === "done" && "bg-emerald-600 hover:bg-emerald-700 text-white"
+            )}
+            onClick={() => {
+              const nextStatus = task.status === "done" ? "pending" : "done";
+              markDoneMutation.mutate(nextStatus);
+            }}
+            disabled={markDoneMutation.isPending}
+          >
+            {markDoneMutation.isPending ? (
+              <Loader2 className="mr-2 size-4 animate-spin" />
+            ) : task.status === "done" ? (
+              <CheckCircle2 className="mr-2 size-4" />
+            ) : (
+              <Circle className="mr-2 size-4" />
+            )}
+            {task.status === "done" ? "Completed" : "Mark as Done"}
+          </Button>
+        </div>
       </div>
 
       <header className="space-y-2">

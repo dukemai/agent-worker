@@ -18,6 +18,7 @@ import type {
   GrowingSuggestionDigestItem,
   GrowingTaskDigestItem,
   PromotionDigestItem,
+  RecentGrowingKnowledgeItem,
   RecentGrowingWindowItem,
   RenewalDigestItem,
   BirthdayDigestItem,
@@ -137,6 +138,36 @@ export function DailyDigestEmail(props: Props) {
           </span>{" "}
           kvar till{" "}
           <span className="text-red-700 font-bold">{holidayName}</span>.
+        </Text>
+      );
+    }
+
+    const birthdayCountdown = p.match(/^Det är bara (\d+)\s+(dag|dagar)\s+kvar till (.+) fyller år\.$/);
+    if (birthdayCountdown) {
+      const [, days, unit, name] = birthdayCountdown;
+      return (
+        <Text
+          key={idx}
+          className={`m-0 text-[16px] text-gray-700 leading-[26px] ${idx === arr.length - 1 ? "" : "mb-[16px]"}`}
+        >
+          Det är bara{" "}
+          <span className="text-pink-700 font-bold">
+            {days} {unit}
+          </span>{" "}
+          kvar till <span className="text-pink-700 font-bold">{name}</span> fyller år.
+        </Text>
+      );
+    }
+
+    const birthdayToday = p.match(/^Idag fyller (.+) år! 🎂 Glöm inte att fira\.$/);
+    if (birthdayToday) {
+      const [, name] = birthdayToday;
+      return (
+        <Text
+          key={idx}
+          className={`m-0 text-[16px] text-gray-700 leading-[26px] ${idx === arr.length - 1 ? "" : "mb-[16px]"}`}
+        >
+          <span className="text-pink-700 font-bold">Idag fyller {name} år!</span> 🎂 Glöm inte att fira.
         </Text>
       );
     }
@@ -497,4 +528,3 @@ export function DailyDigestEmail(props: Props) {
     </Html>
   );
 }
-

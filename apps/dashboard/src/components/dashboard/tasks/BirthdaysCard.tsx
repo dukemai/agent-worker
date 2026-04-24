@@ -1,7 +1,7 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Cake, Calendar, Gift, MoreHorizontal, Trash2 } from "lucide-react";
+import { Cake, Calendar, CheckCircle2, ExternalLink, Gift, Link, MoreHorizontal, Pencil, Share2, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -13,6 +13,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { fetchBirthdays, deleteBirthday, updateBirthday } from "./birthdays-api";
+import { EditBirthdayDialog } from "./EditBirthdayDialog";
+import { fetchBucket } from "./api";
 import type { Birthday } from "@/types/database";
 
 function getDaysUntil(month: number, day: number): number {
@@ -32,9 +34,25 @@ export function BirthdaysCard() {
   const queryClient = useQueryClient();
   const [error, setError] = useState<string | null>(null);
   
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [editingBirthday, setEditingBirthday] = useState<Birthday | null>(null);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+
+  const copyWishlistLink = (id: string) => {
+    const url = `${window.location.origin}/wishlist/${id}`;
+    navigator.clipboard.writeText(url);
+    setCopiedId(id);
+    setTimeout(() => setCopiedId(null), 2000);
+  };
+  
   const birthdaysQuery = useQuery({
     queryKey: ["birthdays"],
     queryFn: () => fetchBirthdays({ status: "active" }),
+  });
+  
+  const tasksQuery = useQuery({
+    queryKey: ["tasks", "this_week"],
+    queryFn: () => fetchBucket("this_week"),
   });
   
   const deleteMutation = useMutation({
@@ -63,7 +81,6 @@ export function BirthdaysCard() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["tasks"] });
-      // If it's a one-time thing, we could archive here too if user wanted
     },
   });
 
@@ -96,7 +113,11 @@ export function BirthdaysCard() {
             return (
               <article
                 key={item.id}
-                className="relative flex flex-col gap-3 rounded-lg border bg-card p-4 shadow-sm transition-all hover:shadow-md"
+                className={`relative flex flex-col gap-3 rounded-lg border p-4 shadow-sm transition-all hover:shadow-md ${
+                  ["family", "close_friend"].includes(item.category)
+                    ? "border-emerald-200 bg-emerald-50/30 ring-1 ring-emerald-100/50"
+                    : "border-pink-100 bg-pink-50/20"
+                }`}
               >
                 <div className="flex items-start justify-between">
                   <div className="space-y-1">
@@ -109,25 +130,58 @@ export function BirthdaysCard() {
                       {item.birth_year ? ` · Born ${item.birth_year}` : ""}
                     </p>
                   </div>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="icon" className="size-8">
-                        <MoreHorizontal className="size-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem
-                        className="text-destructive"
-                        onClick={() => deleteMutation.mutate(item.id)}
-                      >
-                        <Trash2 className="mr-2 size-4" />
-                        Delete
-                      </DropdownMenuItem>
-                      <DropdownMenuItem onClick={() => archiveMutation.mutate(item.id)}>
-                        Archive
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+                  <div className="flex items-center gap-1">
+                    {["family", "close_friend"].includes(item.category) && (
+                      <>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="size-8 text-muted-foreground hover:text-emerald-600"
+                          onClick={() => window.open(`/wishlist/${item.id}`, "_blank")}
+                          title="View public wishlist page"
+                        >
+                          <ExternalLink className="size-4" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className={`size-8 transition-colors ${copiedId === item.id ? "text-green-600" : "text-muted-foreground hover:text-emerald-600"}`}
+                          onClick={() => copyWishlistLink(item.id)}
+                          title="Copy wishlist update link"
+                        >
+                          {copiedId === item.id ? <CheckCircle2 className="size-4" /> : <Share2 className="size-4" />}
+                        </Button>
+                      </>
+                    )}
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="icon" className="size-8">
+                          <MoreHorizontal className="size-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem
+                          onClick={() => {
+                            setEditingBirthday(item);
+                            setIsEditDialogOpen(true);
+                          }}
+                        >
+                          <Pencil className="mr-2 size-4" />
+                          Edit
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          className="text-destructive"
+                          onClick={() => deleteMutation.mutate(item.id)}
+                        >
+                          <Trash2 className="mr-2 size-4" />
+                          Delete
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => archiveMutation.mutate(item.id)}>
+                          Archive
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
                 </div>
 
                 <div className="flex flex-wrap gap-1.5">
@@ -151,22 +205,40 @@ export function BirthdaysCard() {
                 )}
 
                 <div className="mt-auto pt-2">
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="w-full text-xs"
-                    onClick={() => createPartyTaskMutation.mutate(item)}
-                    disabled={createPartyTaskMutation.isPending}
-                  >
-                    <Gift className="mr-2 size-3" />
-                    {["kid_friend", "friend"].includes(item.category) ? "Create Party Task" : "Plan Gift Task"}
-                  </Button>
+                  {(() => {
+                    const taskTitle = `Planning: ${item.name}'s Birthday Party`;
+                    const hasTask = (tasksQuery.data ?? []).some(t => t.title === taskTitle);
+                    
+                    return (
+                      <Button
+                        size="sm"
+                        variant={hasTask ? "secondary" : "outline"}
+                        className="w-full text-xs"
+                        onClick={() => createPartyTaskMutation.mutate(item)}
+                        disabled={createPartyTaskMutation.isPending || hasTask}
+                      >
+                        <Gift className="mr-2 size-3" />
+                        {hasTask 
+                          ? "Task Created" 
+                          : ["kid_friend", "friend"].includes(item.category) 
+                            ? "Create Party Task" 
+                            : "Plan Gift Task"
+                        }
+                      </Button>
+                    );
+                  })()}
                 </div>
               </article>
             );
           })}
         </div>
       </CardContent>
+
+      <EditBirthdayDialog
+        birthday={editingBirthday}
+        open={isEditDialogOpen}
+        onOpenChange={setIsEditDialogOpen}
+      />
     </Card>
   );
 }

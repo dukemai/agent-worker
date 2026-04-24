@@ -38,13 +38,24 @@ export async function fetchTask(id: string): Promise<Task> {
 }
 
 export async function updateTaskStatus(id: string, status: Task["status"]): Promise<Task> {
+  return updateTask(id, { status });
+}
+
+export type UpdateTaskPayload = {
+  title?: string;
+  original_body?: string | null;
+  due_date?: string | null;
+  status?: Task["status"];
+};
+
+export async function updateTask(id: string, payload: UpdateTaskPayload): Promise<Task> {
   const response = await fetch(`/api/tasks/${id}`, {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ status }),
+    body: JSON.stringify(payload),
   });
   if (!response.ok) {
-    await readApiError(response, "Failed to update task status");
+    await readApiError(response, "Failed to update task");
   }
   const json = (await response.json()) as { task: Task };
   return json.task;

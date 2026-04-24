@@ -32,6 +32,7 @@ export async function PATCH(request: Request, { params }: Params) {
   const { id } = await params;
   const payload = (await request.json()) as {
     title?: unknown;
+    original_body?: unknown;
     due_date?: unknown;
     status?: unknown;
   };
@@ -42,6 +43,14 @@ export async function PATCH(request: Request, { params }: Params) {
       return errorResponse("title must be a non-empty string");
     }
     updates.title = payload.title.trim().slice(0, 200);
+  }
+  if (payload.original_body !== undefined) {
+    if (payload.original_body !== null && typeof payload.original_body !== "string") {
+      return errorResponse("original_body must be a string or null");
+    }
+    updates.original_body = typeof payload.original_body === "string" && payload.original_body.trim().length > 0
+      ? payload.original_body.trim()
+      : null;
   }
   if (payload.status !== undefined) {
     if (payload.status !== "pending" && payload.status !== "done") {

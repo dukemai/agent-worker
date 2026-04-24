@@ -642,10 +642,10 @@ export async function buildDigestEmailHtml(
     content.lessons,
     content.promotionItems,
     content.renewalItems,
-    content.birthdayItems,
     content.growingSuggestions,
     content.recentGrowingKnowledge,
     content.recentGrowingWindows,
+    content.birthdayItems,
     content.narrative,
     dashboardUrl
   );

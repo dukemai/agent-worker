@@ -1,5 +1,5 @@
 export type TaskStatus = "pending" | "done";
-export type TaskSource = "email" | "manual";
+export type TaskSource = "email" | "manual" | "growing";
 export type Bucket = "today" | "this_week" | "later";
 export type LearningStatus = "active" | "paused";
 export type LearningProfileType = "topic" | "category";

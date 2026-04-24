@@ -10,6 +10,7 @@ import type { Task } from "@/types/database";
 import { cn } from "@/lib/utils";
 import { fetchGrowingWindowKnowledge } from "./api";
 import { BUCKETS, type Bucket } from "./types";
+import { EditTaskDialog } from "./EditTaskDialog";
 
 /** Short labels for move actions to keep the row compact. */
 const MOVE_SHORT: Record<Bucket, string> = {
@@ -93,6 +94,7 @@ export function TaskCard({ task, bucket, markDoneLoading = false, onMove, onMark
               </Link>
             </h3>
             <div className="flex shrink-0 items-center gap-0.5">
+              <EditTaskDialog task={task} />
               {link ? (
                 <Button
                   type="button"
