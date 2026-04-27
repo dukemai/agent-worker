@@ -1,0 +1,18 @@
+[
+  {
+    "id": "23b941f5-d64d-4923-ba37-3ce0d9cdabf7",
+    "name": "Gräddfil",
+    "productCount": 6,
+    "fullURLPath": "Mejeri-Ost/Gräddfil/Gräddfil",
+    "retailerCategoryId": "1304",
+    "children": []
+  },
+  {
+    "id": "f27d6989-3000-45c9-9cfc-9bb4616afde9",
+    "name": "Laktosfri gräddfil",
+    "productCount": 2,
+    "fullURLPath": "Mejeri-Ost/Gräddfil/Laktosfri-gräddfil",
+    "retailerCategoryId": "4681",
+    "children": []
+  }
+]

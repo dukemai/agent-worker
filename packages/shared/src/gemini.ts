@@ -604,6 +604,171 @@ export const RECIPE_GENERATOR_SOURCE_LABEL = "Gemini 2.5 Flash (AI recipe sugges
 /** Stored when the user pastes markdown from an external recipe to fulfill a suggestion. */
 export const RECIPE_SOURCE_MANUAL_MARKDOWN = "Manual (markdown from source)";
 
+export type FoodStyleFavoriteSuggestion = {
+  watchlist_text: string;
+  priority: number;
+  reason: string;
+};
+
+export type FoodStyleFavoriteSuggestionResult = {
+  suggestions: FoodStyleFavoriteSuggestion[];
+};
+
+const FOOD_STYLE_FAVORITE_SUGGESTION_SCHEMA: ObjectSchema = {
+  type: SchemaType.OBJECT,
+  properties: {
+    suggestions: {
+      type: SchemaType.ARRAY,
+      description: "Suggested ICA watchlist items for this food style",
+      items: {
+        type: SchemaType.OBJECT,
+        properties: {
+          watchlist_text: {
+            type: SchemaType.STRING,
+            description: "Exact watchlistText copied from the provided ICA item list",
+          } as Schema,
+          priority: {
+            type: SchemaType.INTEGER,
+            description: "Lower numbers are more important; use 10, 20, 30...",
+          } as Schema,
+          reason: {
+            type: SchemaType.STRING,
+            description: "Short Swedish reason why this item fits the food style",
+          } as Schema,
+        },
+        required: ["watchlist_text", "priority", "reason"],
+      } as Schema,
+    } as Schema,
+  },
+  required: ["suggestions"],
+};
+
+function sanitizeFoodStyleSuggestion(value: unknown): FoodStyleFavoriteSuggestion | null {
+  if (!value || typeof value !== "object") {
+    return null;
+  }
+  const row = value as Record<string, unknown>;
+  const watchlist_text =
+    typeof row.watchlist_text === "string"
+      ? row.watchlist_text.replace(/\s+/g, " ").trim().slice(0, 120)
+      : "";
+  const priority =
+    typeof row.priority === "number" && Number.isFinite(row.priority)
+      ? Math.max(1, Math.min(999, Math.round(row.priority)))
+      : 100;
+  const reason =
+    typeof row.reason === "string"
+      ? row.reason.replace(/\s+/g, " ").trim().slice(0, 220)
+      : "";
+  if (!watchlist_text || !reason) {
+    return null;
+  }
+  return { watchlist_text, priority, reason };
+}
+
+export async function suggestPromoFavoritesForFoodStyle(
+  apiKey: string,
+  input: {
+    styleLabel: string;
+    categories: Array<{ id: string; name: string; path: string }>;
+    items: Array<{ watchlistText: string; categoryName: string; departmentName: string }>;
+  },
+): Promise<FoodStyleFavoriteSuggestionResult> {
+  const styleLabel = input.styleLabel.replace(/\s+/g, " ").trim().slice(0, 120);
+  if (!styleLabel) {
+    throw new Error("Food style is required");
+  }
+
+  const categories = input.categories
+    .map((category) => ({
+      id: category.id,
+      name: category.name.replace(/\s+/g, " ").trim().slice(0, 80),
+      path: category.path.replace(/\s+/g, " ").trim().slice(0, 180),
+    }))
+    .filter((category) => category.id && category.name)
+    .slice(0, 300);
+
+  const items = input.items
+    .map((item) => ({
+      watchlistText: item.watchlistText.replace(/\s+/g, " ").trim().slice(0, 120),
+      categoryName: item.categoryName.replace(/\s+/g, " ").trim().slice(0, 80),
+      departmentName: item.departmentName.replace(/\s+/g, " ").trim().slice(0, 80),
+    }))
+    .filter((item) => item.watchlistText)
+    .slice(0, 900);
+
+  const allowedWatchlistTexts = new Set(items.map((item) => item.watchlistText));
+
+  const prompt = `Du hjälper till att bygga en promo-watchlist för matlagning i Sverige.
+
+## Uppgift
+Välj 8-18 ICA-katalogposter som är bra att bevaka på kampanj för matstilen: **${styleLabel}**.
+
+## Regler
+- Använd endast exakt **watchlistText** från listan med ICA-katalogposter.
+- Välj råvaror, proteiner, grönsaker, mejeri, basvaror eller färskvaror som faktiskt hjälper denna matstil.
+- Prioritera sådant som ofta är värt att köpa på kampanj och går att laga flera rätter med.
+- Undvik för generiska eller irrelevanta poster om det finns bättre specifika alternativ.
+- **reason** ska vara kort på svenska.
+- **priority**: 10, 20, 30... där lägre är viktigare.
+
+## ICA-kategorier
+${JSON.stringify(categories)}
+
+## ICA-katalogposter
+${JSON.stringify(items)}`;
+
+  const genAI = new GoogleGenerativeAI(apiKey);
+  const model = genAI.getGenerativeModel({
+    model: RECIPE_GENERATOR_MODEL_ID,
+    generationConfig: {
+      responseMimeType: "application/json",
+      responseSchema: FOOD_STYLE_FAVORITE_SUGGESTION_SCHEMA,
+    },
+  });
+
+  const result = await model.generateContent(prompt);
+  const text = result.response.text();
+  if (!text?.trim()) {
+    throw new Error("Gemini returned empty food-style suggestion response");
+  }
+
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(text) as unknown;
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e);
+    throw new Error(
+      `Gemini returned invalid food-style suggestion JSON: ${msg}. Snippet: ${text.slice(0, 160)}`,
+    );
+  }
+
+  const root = parsed && typeof parsed === "object" ? (parsed as Record<string, unknown>) : {};
+  const rawSuggestions = Array.isArray(root.suggestions) ? root.suggestions : [];
+  const seen = new Set<string>();
+  const suggestions: FoodStyleFavoriteSuggestion[] = [];
+  for (const raw of rawSuggestions) {
+    const suggestion = sanitizeFoodStyleSuggestion(raw);
+    if (!suggestion || seen.has(suggestion.watchlist_text)) {
+      continue;
+    }
+    if (!allowedWatchlistTexts.has(suggestion.watchlist_text)) {
+      continue;
+    }
+    seen.add(suggestion.watchlist_text);
+    suggestions.push(suggestion);
+    if (suggestions.length >= 24) {
+      break;
+    }
+  }
+
+  if (suggestions.length === 0) {
+    throw new Error("Gemini did not return any suggestions that matched the ICA catalog.");
+  }
+
+  return { suggestions };
+}
+
 const RECIPE_INGREDIENT_ITEM_SCHEMA: ObjectSchema = {
   type: SchemaType.OBJECT,
   properties: {

@@ -1,0 +1,34 @@
+[
+  {
+    "id": "7cda9983-6050-4fb8-8f27-a2e84bb08556",
+    "name": "Filmjölk naturell",
+    "productCount": 26,
+    "fullURLPath": "Mejeri-Ost/Filmjölk/Filmjölk-naturell",
+    "retailerCategoryId": "4511",
+    "children": []
+  },
+  {
+    "id": "d10ff20e-1558-40b6-9ef4-75f4df565d36",
+    "name": "Filmjölk smaksatt",
+    "productCount": 17,
+    "fullURLPath": "Mejeri-Ost/Filmjölk/Filmjölk-smaksatt",
+    "retailerCategoryId": "4512",
+    "children": []
+  },
+  {
+    "id": "818f0596-bed5-4f14-91e8-6526d65e95df",
+    "name": "Laktosfri filmjölk",
+    "productCount": 19,
+    "fullURLPath": "Mejeri-Ost/Filmjölk/Laktosfri-filmjölk",
+    "retailerCategoryId": "4509",
+    "children": []
+  },
+  {
+    "id": "60bd43fa-500c-4d3e-8c7b-3fefa90b4b8b",
+    "name": "Filbunke",
+    "productCount": 1,
+    "fullURLPath": "Mejeri-Ost/Filmjölk/Filbunke",
+    "retailerCategoryId": "4510",
+    "children": []
+  }
+]

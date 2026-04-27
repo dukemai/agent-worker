@@ -32,11 +32,7 @@ test.describe("ICA Maxi Barkarbystaden — extract promotions", () => {
   test("extracts promotion candidates via store strategy", async ({ page }) => {
     await icaMaxiBarkarbystadenStrategy.gotoOffersPage(page);
 
-    const interests = readWatchlistInterests();
-    const promotions = await icaMaxiBarkarbystadenStrategy.extractPromotions(
-      page,
-      interests.length > 0 ? { watchlistInterests: interests } : undefined,
-    );
+    const promotions = await icaMaxiBarkarbystadenStrategy.extractPromotions(page);
 
     expect(
       promotions.length,
@@ -60,6 +56,10 @@ test.describe("ICA Maxi Barkarbystaden — extract promotions", () => {
       body: Buffer.from(JSON.stringify(scrapedPayload, null, 2)),
       contentType: "application/json",
     });
+    const scrapedPath = writePromoRunJson("scraped-promotions.json", scrapedPayload);
+    if (scrapedPath) {
+      console.log(`[promo-run] wrote ${scrapedPath}`);
+    }
 
     const first = promotions[0];
     expect(first.title.length).toBeGreaterThan(2);
@@ -74,48 +74,52 @@ test.describe("ICA Maxi Barkarbystaden — extract promotions", () => {
       "expected at least one tile with a product image URL",
     ).toBeGreaterThan(0);
 
-    if (interests.length > 0) {
-      const matches = matchPromotionsToWatchlist(promotions, interests, {
-        minScore: 50,
-      });
-      const matchesPayload = {
-        storeKey: icaMaxiBarkarbystadenStrategy.storeKey,
-        watchlistItemCount: interests.length,
-        promotionCount: promotions.length,
-        matchCount: matches.length,
-        matches: matches.map((m) => ({
-          interest: m.interest,
-          score: m.score,
-          promotionIndex: m.promotion.index,
-          title: m.promotion.title,
-          priceHint: m.promotion.priceHint,
-          imageUrl: m.promotion.imageUrl,
-        })),
-      };
-      test.info().attach("watchlist-matches.json", {
-        body: Buffer.from(JSON.stringify(matchesPayload, null, 2)),
-        contentType: "application/json",
-      });
-      const matchesPath = writePromoRunJson("watchlist-matches.json", matchesPayload);
-      if (matchesPath) {
-        console.log(`[promo-run] wrote ${matchesPath}`);
-      }
-
-      const matchesOnlyPath = writePromoRunJson("watchlist-matches-only.json", {
-        interests,
-        matches,
-      });
-      if (matchesOnlyPath) {
-        console.log(`[promo-run] wrote ${matchesOnlyPath}`);
-      }
-
-      console.log(
-        `[${icaMaxiBarkarbystadenStrategy.storeKey}] watchlist matches: ${matches.length} (from ${interests.length} interests, ${promotions.length} promos)`,
-      );
-    }
+    // Favorite/watchlist matching is intentionally disabled for now. The import
+    // pipeline currently needs the complete promotion JSON, not a narrowed match set.
+    //
+    // const interests = readWatchlistInterests();
+    // if (interests.length > 0) {
+    //   const matches = matchPromotionsToWatchlist(promotions, interests, {
+    //     minScore: 50,
+    //   });
+    //   const matchesPayload = {
+    //     storeKey: icaMaxiBarkarbystadenStrategy.storeKey,
+    //     watchlistItemCount: interests.length,
+    //     promotionCount: promotions.length,
+    //     matchCount: matches.length,
+    //     matches: matches.map((m) => ({
+    //       interest: m.interest,
+    //       score: m.score,
+    //       promotionIndex: m.promotion.index,
+    //       title: m.promotion.title,
+    //       priceHint: m.promotion.priceHint,
+    //       imageUrl: m.promotion.imageUrl,
+    //     })),
+    //   };
+    //   test.info().attach("watchlist-matches.json", {
+    //     body: Buffer.from(JSON.stringify(matchesPayload, null, 2)),
+    //     contentType: "application/json",
+    //   });
+    //   const matchesPath = writePromoRunJson("watchlist-matches.json", matchesPayload);
+    //   if (matchesPath) {
+    //     console.log(`[promo-run] wrote ${matchesPath}`);
+    //   }
+    //
+    //   const matchesOnlyPath = writePromoRunJson("watchlist-matches-only.json", {
+    //     interests,
+    //     matches,
+    //   });
+    //   if (matchesOnlyPath) {
+    //     console.log(`[promo-run] wrote ${matchesOnlyPath}`);
+    //   }
+    //
+    //   console.log(
+    //     `[${icaMaxiBarkarbystadenStrategy.storeKey}] watchlist matches: ${matches.length} (from ${interests.length} interests, ${promotions.length} promos)`,
+    //   );
+    // }
   });
 
-  test("ranks scraped promos against data/promo-watchlist.json when file exists", async ({
+  test.skip("ranks scraped promos against data/promo-watchlist.json when file exists", async ({
     page,
   }) => {
     test.skip(

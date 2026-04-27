@@ -7,6 +7,7 @@
 - **Robust Countdown Logic**: Implemented UTC-safe proximity calculations that handle current year vs next year birthdays seamlessly.
 - **Workflow Automation**: The "Convert to Party Task" feature significantly streamlines the move from "remembering a date" to "planning the event".
 - **Email Presentation**: The Pink-themed section in the daily digest provides a distinct visual cue for social events compared to standard tasks (Blue/Indigo) or renewals (Amber).
+- **Briefing Highlight**: Birthday countdown lines in the daily briefing now highlight the days remaining and birthday name, making urgent social dates easier to spot.
 
 ## Challenges & Solutions
 - **Missing UI Component**: `dropdown-menu` was missing from the dashboard's shadcn library. Solved by manually implementing the component using Radix UI primitives and existing project styles to maintain consistency without external dependencies.

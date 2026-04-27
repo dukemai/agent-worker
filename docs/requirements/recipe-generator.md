@@ -22,6 +22,44 @@ This is **assistive cooking**, not medical or nutrition advice.
 8. **Library** table: title, type of food, **Vegetarian** (whether the request was vegetarian—see data model), **Tested**, actions.
 9. **Plan to cook → prepare → shopping list** (Phase A — [shared-shopping-list.md](shared-shopping-list.md)): from the library, user adds **several saved recipes** to a **plan to cook**; opens **prepare** to mark ingredients **at home** vs **need**; generates a **shared shopping list** with a link for someone else to shop. Implementation order may start with **one recipe** before multi-recipe plans.
 
+## Family collaboration
+
+Recipe sourcing can be shared through a focused family recipe workspace rather
+than the full personal dashboard. The owner creates a household invite link;
+the collaborator signs in or creates an account, accepts the invite, and joins
+as `collaborator`.
+
+Initial scope:
+
+- Route: `/family/recipes`.
+- Owner can create a collaborator invite link.
+- Household members can add recipe candidates with title, source URL, notes,
+  and optional pasted recipe text/markdown.
+- Household members can review candidates by status:
+  `new`, `want_to_try`, `looks_good`, `needs_changes`, `accepted`, `rejected`.
+- Canonical saved recipes remain separate from recipe candidates; accepting a
+  candidate is the handoff point for later conversion into `saved_recipes`.
+
+Data tables:
+
+- `households`, `household_members`, `household_invites`.
+- `recipe_candidates` for shared incoming ideas.
+- `recipe_reviews` for future review/comment history on candidates or saved
+  recipes.
+
+Follow-on: attach birthdays and saved recipes to `household_id` so shared
+domains use the same family membership model.
+
+Collaborator dashboard boundary:
+
+- Collaborators are account-backed users, but they should not see the full
+  owner dashboard.
+- Allowed starting surfaces: family recipes, recipe generator, plan to cook,
+  and birthdays.
+- Owner-only operational areas such as tasks, renewals, learning, growing,
+  context, digest preview, and promo watchlist remain hidden/blocked for
+  collaborators.
+
 ## Why ICA catalog for ingredients
 
 - Aligns with **real products and naming** in Swedish supermarkets (ICA Maxi Handla tree).

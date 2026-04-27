@@ -13,7 +13,8 @@ import { parsePromoPickerCatalogJson } from "@/lib/promo-picker-catalog-validate
 import type { PromoPickerCatalog } from "@/types/promo-picker-catalog";
 import { PromoWatchlistAddItems } from "@/components/dashboard/promo-watchlist-add-items";
 import { PromoWatchlistCurrentList } from "@/components/dashboard/promo-watchlist-current-list";
-import { PromoWeeklyMatchesSection } from "@/components/dashboard/promo-weekly-matches-section";
+import { PromoFoodStyleFavoritesSection } from "@/components/dashboard/promo-food-style-favorites-section";
+import { PromoWeeklyPromotionsSection } from "@/components/dashboard/promo-weekly-promotions-section";
 
 async function fetchPickerCatalog(): Promise<PromoPickerCatalog> {
   const response = await fetch("/data/ica-maxi-promo-picker-catalog.json", {
@@ -145,7 +146,7 @@ export function PromoWatchlistDashboard() {
             value="matches"
             className="!h-auto min-h-11 justify-center py-2.5 whitespace-normal shadow-none data-[state=active]:shadow-none"
           >
-            Matched offers
+            Weekly offers
           </TabsTrigger>
         </TabsList>
 
@@ -171,15 +172,43 @@ export function PromoWatchlistDashboard() {
             </CardHeader>
           </Card>
 
-          <PromoWatchlistAddItems
-            catalog={catalogQuery.data}
-            catalogLoading={catalogQuery.isLoading}
-            watchlistItems={items}
-            busy={busy}
-            onPersist={persist}
-            onError={setLocalError}
-            errorMessage={error}
-          />
+          <Tabs defaultValue="add-items" className="space-y-4">
+            <TabsList className="grid w-full grid-cols-2 items-stretch gap-1 group-data-[orientation=horizontal]/tabs:!h-auto group-data-[orientation=horizontal]/tabs:min-h-11">
+              <TabsTrigger
+                value="add-items"
+                className="!h-auto min-h-11 justify-center py-2.5 whitespace-normal shadow-none data-[state=active]:shadow-none"
+              >
+                Add items
+              </TabsTrigger>
+              <TabsTrigger
+                value="food-style"
+                className="!h-auto min-h-11 justify-center py-2.5 whitespace-normal shadow-none data-[state=active]:shadow-none"
+              >
+                Add by food style
+              </TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="add-items" className="space-y-4">
+              <PromoWatchlistAddItems
+                catalog={catalogQuery.data}
+                catalogLoading={catalogQuery.isLoading}
+                watchlistItems={items}
+                busy={busy}
+                onPersist={persist}
+                onError={setLocalError}
+                errorMessage={error}
+              />
+            </TabsContent>
+
+            <TabsContent value="food-style" className="space-y-4">
+              <PromoFoodStyleFavoritesSection
+                watchlistItems={items}
+                busy={busy}
+                onPersist={persist}
+                onError={setLocalError}
+              />
+            </TabsContent>
+          </Tabs>
 
           <PromoWatchlistCurrentList
             items={items}
@@ -193,7 +222,7 @@ export function PromoWatchlistDashboard() {
         </TabsContent>
 
         <TabsContent value="matches" className="space-y-6">
-          <PromoWeeklyMatchesSection />
+          <PromoWeeklyPromotionsSection />
         </TabsContent>
       </Tabs>
     </main>

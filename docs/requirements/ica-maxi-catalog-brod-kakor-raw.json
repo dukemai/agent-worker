@@ -1,0 +1,403 @@
+[
+  {
+    "id": "c26bff7e-481b-4d04-a3cf-fcadbe6116e7",
+    "name": "Matbröd",
+    "productCount": 122,
+    "fullURLPath": "Bröd-Kakor/Matbröd",
+    "retailerCategoryId": "4329",
+    "children": [
+      {
+        "id": "342e0fc3-2a05-4215-8e18-36e6f824522b",
+        "name": "Ljust bröd",
+        "productCount": 38,
+        "fullURLPath": "Bröd-Kakor/Matbröd/Ljust-bröd",
+        "retailerCategoryId": "4314",
+        "children": [
+          {
+            "id": "b3f2b06c-b0a7-4cfa-9622-5ab119c1f577",
+            "name": "Rostbröd",
+            "productCount": 14,
+            "fullURLPath": "Bröd-Kakor/Matbröd/Ljust-bröd/Rostbröd",
+            "retailerCategoryId": "4315",
+            "children": []
+          },
+          {
+            "id": "d8fec8c7-5b3f-4302-a38f-eae2a47d5088",
+            "name": "Lantbröd",
+            "productCount": 8,
+            "fullURLPath": "Bröd-Kakor/Matbröd/Ljust-bröd/Lantbröd",
+            "retailerCategoryId": "4316",
+            "children": []
+          },
+          {
+            "id": "f4c234db-c16e-4f0d-a8fe-245517578f2b",
+            "name": "Limpa",
+            "productCount": 10,
+            "fullURLPath": "Bröd-Kakor/Matbröd/Ljust-bröd/Limpa",
+            "retailerCategoryId": "4317",
+            "children": []
+          },
+          {
+            "id": "ca43829d-1dff-4224-bca0-318d010462bd",
+            "name": "Övrigt ljust bröd",
+            "productCount": 7,
+            "fullURLPath": "Bröd-Kakor/Matbröd/Ljust-bröd/Övrigt-ljust-bröd",
+            "retailerCategoryId": "4318",
+            "children": []
+          }
+        ]
+      },
+      {
+        "id": "82de26f7-5d75-4922-85c7-49a55602103a",
+        "name": "Mörkt & Grovt bröd",
+        "productCount": 38,
+        "fullURLPath": "Bröd-Kakor/Matbröd/Mörkt-Grovt-bröd",
+        "retailerCategoryId": "4319",
+        "children": [
+          {
+            "id": "1656fd9a-8feb-4352-9421-0d75548e4be3",
+            "name": "Mörkt skivat bröd",
+            "productCount": 13,
+            "fullURLPath": "Bröd-Kakor/Matbröd/Mörkt-Grovt-bröd/Mörkt-skivat-bröd",
+            "retailerCategoryId": "4320",
+            "children": []
+          },
+          {
+            "id": "0266bd64-b47f-41ea-86a0-7412c4594ad9",
+            "name": "Mörkt styckpackat bröd",
+            "productCount": 20,
+            "fullURLPath": "Bröd-Kakor/Matbröd/Mörkt-Grovt-bröd/Mörkt-styckpackat-bröd",
+            "retailerCategoryId": "4322",
+            "children": []
+          },
+          {
+            "id": "3c79b384-c34e-4df0-b2e1-2a486beb5eb5",
+            "name": "Rågbröd",
+            "productCount": 5,
+            "fullURLPath": "Bröd-Kakor/Matbröd/Mörkt-Grovt-bröd/Rågbröd",
+            "retailerCategoryId": "4321",
+            "children": []
+          }
+        ]
+      },
+      {
+        "id": "1404627b-9d73-48d3-a13b-5f841e81426e",
+        "name": "Mjukt tunnbröd & Vetekakor",
+        "productCount": 20,
+        "fullURLPath": "Bröd-Kakor/Matbröd/Mjukt-tunnbröd-Vetekakor",
+        "retailerCategoryId": "4324",
+        "children": [
+          {
+            "id": "2976abd1-7a97-471e-8e4b-c16f9a47d80b",
+            "name": "Mjukt tunnbröd",
+            "productCount": 5,
+            "fullURLPath": "Bröd-Kakor/Matbröd/Mjukt-tunnbröd-Vetekakor/Mjukt-tunnbröd",
+            "retailerCategoryId": "4326",
+            "children": []
+          },
+          {
+            "id": "47712266-1b28-4bde-a37f-23313108be2e",
+            "name": "Vetekakor",
+            "productCount": 12,
+            "fullURLPath": "Bröd-Kakor/Matbröd/Mjukt-tunnbröd-Vetekakor/Vetekakor",
+            "retailerCategoryId": "4327",
+            "children": []
+          },
+          {
+            "id": "d499c2dc-cfb0-4c07-bf1a-e0f71e265600",
+            "name": "Rågkakor",
+            "productCount": 3,
+            "fullURLPath": "Bröd-Kakor/Matbröd/Mjukt-tunnbröd-Vetekakor/Rågkakor",
+            "retailerCategoryId": "4328",
+            "children": []
+          }
+        ]
+      },
+      {
+        "id": "07f4351c-8f7a-46b5-b78e-921b032c7bda",
+        "name": "Surdegsbröd",
+        "productCount": 9,
+        "fullURLPath": "Bröd-Kakor/Matbröd/Surdegsbröd",
+        "retailerCategoryId": "4325",
+        "children": []
+      },
+      {
+        "id": "46cae46a-ceda-4bd7-be2a-6968031d7bb8",
+        "name": "Grädda hemma",
+        "productCount": 13,
+        "fullURLPath": "Bröd-Kakor/Matbröd/Grädda-hemma",
+        "retailerCategoryId": "1540",
+        "children": []
+      },
+      {
+        "id": "f0ee8ca0-d47a-4496-86b0-36491cfdbcc1",
+        "name": "Fryst bröd",
+        "productCount": 8,
+        "fullURLPath": "Bröd-Kakor/Matbröd/Fryst-bröd",
+        "retailerCategoryId": "4333",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "1db4d6d4-baa0-4499-a168-0ff9649c5316",
+    "name": "Korvbröd, Hamburgerbröd & Maträttsbröd",
+    "productCount": 39,
+    "fullURLPath": "Bröd-Kakor/Korvbröd-Hamburgerbröd-Maträttsbröd",
+    "retailerCategoryId": "704",
+    "children": [
+      {
+        "id": "b6c1d4db-0c15-420a-b691-06eb7e30a6e4",
+        "name": "Korvbröd",
+        "productCount": 10,
+        "fullURLPath": "Bröd-Kakor/Korvbröd-Hamburgerbröd-Maträttsbröd/Korvbröd",
+        "retailerCategoryId": "1965",
+        "children": []
+      },
+      {
+        "id": "1aa4ddef-7ef8-4a2e-ab22-2e42a3284df8",
+        "name": "Hamburgerbröd",
+        "productCount": 16,
+        "fullURLPath": "Bröd-Kakor/Korvbröd-Hamburgerbröd-Maträttsbröd/Hamburgerbröd",
+        "retailerCategoryId": "1966",
+        "children": []
+      },
+      {
+        "id": "cf16e943-9960-4776-86e9-55367de47ce5",
+        "name": "Pitabröd",
+        "productCount": 4,
+        "fullURLPath": "Bröd-Kakor/Korvbröd-Hamburgerbröd-Maträttsbröd/Pitabröd",
+        "retailerCategoryId": "4330",
+        "children": []
+      },
+      {
+        "id": "c6528368-4116-413c-9614-a8a97df1bd4e",
+        "name": "Pizzabotten",
+        "productCount": 4,
+        "fullURLPath": "Bröd-Kakor/Korvbröd-Hamburgerbröd-Maträttsbröd/Pizzabotten",
+        "retailerCategoryId": "4331",
+        "children": []
+      },
+      {
+        "id": "6b312727-f60b-46d6-84b6-47a555fe824d",
+        "name": "Övriga maträttsbröd",
+        "productCount": 9,
+        "fullURLPath": "Bröd-Kakor/Korvbröd-Hamburgerbröd-Maträttsbröd/Övriga-maträttsbröd",
+        "retailerCategoryId": "4332",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "9b395301-be7b-4c89-8a53-99ed5164dd7d",
+    "name": "Kaffebröd",
+    "productCount": 316,
+    "fullURLPath": "Bröd-Kakor/Kaffebröd",
+    "retailerCategoryId": "4355",
+    "children": [
+      {
+        "id": "020d34b8-f830-41e8-a7db-09a82eaff890",
+        "name": "Bullar & Vetelängder",
+        "productCount": 8,
+        "fullURLPath": "Bröd-Kakor/Kaffebröd/Bullar-Vetelängder",
+        "retailerCategoryId": "4356",
+        "children": []
+      },
+      {
+        "id": "d37d5aa0-2739-47df-b425-a002c2b9d701",
+        "name": "Mjuka kakor & Muffins",
+        "productCount": 37,
+        "fullURLPath": "Bröd-Kakor/Kaffebröd/Mjuka-kakor-Muffins",
+        "retailerCategoryId": "4359",
+        "children": []
+      },
+      {
+        "id": "4d3493a0-7ea1-4b0a-ab7e-fe4628d5ef6f",
+        "name": "Kondisbitar & Bakelser",
+        "productCount": 38,
+        "fullURLPath": "Bröd-Kakor/Kaffebröd/Kondisbitar-Bakelser",
+        "retailerCategoryId": "4364",
+        "children": []
+      },
+      {
+        "id": "a2d6e988-fb3b-4d89-81ac-657792da7dca",
+        "name": "Tårtor & Pajer",
+        "productCount": 26,
+        "fullURLPath": "Bröd-Kakor/Kaffebröd/Tårtor-Pajer",
+        "retailerCategoryId": "4365",
+        "children": []
+      },
+      {
+        "id": "99969a34-8b7c-43d4-9a4f-7c32a21b8ddf",
+        "name": "Tårtbottnar",
+        "productCount": 5,
+        "fullURLPath": "Bröd-Kakor/Kaffebröd/Tårtbottnar",
+        "retailerCategoryId": "4368",
+        "children": []
+      },
+      {
+        "id": "b6ce689d-0c42-4a64-bca3-adc705634304",
+        "name": "Fryst fikabröd",
+        "productCount": 10,
+        "fullURLPath": "Bröd-Kakor/Kaffebröd/Fryst-fikabröd",
+        "retailerCategoryId": "4369",
+        "children": []
+      },
+      {
+        "id": "90ac3f24-3a01-4e4a-b0a6-add1717b5e2a",
+        "name": "Kex & kakor",
+        "productCount": 194,
+        "fullURLPath": "Bröd-Kakor/Kaffebröd/Kex-kakor",
+        "retailerCategoryId": "703",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "90ac3f24-3a01-4e4a-b0a6-add1717b5e2a",
+    "name": "Kex & kakor",
+    "productCount": 194,
+    "fullURLPath": "Bröd-Kakor/Kex-kakor",
+    "retailerCategoryId": "703",
+    "children": [
+      {
+        "id": "df2f94a2-bf9a-40ef-af6c-24a6363da7f2",
+        "name": "Matkex",
+        "productCount": 39,
+        "fullURLPath": "Bröd-Kakor/Kaffebröd/Kex-kakor/Matkex",
+        "retailerCategoryId": "4377",
+        "children": []
+      },
+      {
+        "id": "38813079-bb1e-460f-88df-65ce963ffa44",
+        "name": "Söta kex & Kakor",
+        "productCount": 130,
+        "fullURLPath": "Bröd-Kakor/Kaffebröd/Kex-kakor/Söta-kex-Kakor",
+        "retailerCategoryId": "4382",
+        "children": []
+      },
+      {
+        "id": "ff4504ad-6dd4-4d62-9904-c58c8437424d",
+        "name": "Krustader & Krutonger",
+        "productCount": 8,
+        "fullURLPath": "Bröd-Kakor/Kaffebröd/Kex-kakor/Krustader-Krutonger",
+        "retailerCategoryId": "4390",
+        "children": []
+      },
+      {
+        "id": "7a598379-a71e-494d-aeff-adc51946ccb7",
+        "name": "Crostini, Grissini & Oststänger",
+        "productCount": 9,
+        "fullURLPath": "Bröd-Kakor/Kaffebröd/Kex-kakor/Crostini-Grissini-Oststänger",
+        "retailerCategoryId": "4391",
+        "children": []
+      },
+      {
+        "id": "bba40d74-48ad-447c-85da-fb9309e1e745",
+        "name": "Våffelstrutar & Maränger",
+        "productCount": 8,
+        "fullURLPath": "Bröd-Kakor/Kaffebröd/Kex-kakor/Våffelstrutar-Maränger",
+        "retailerCategoryId": "4392",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "855958e8-7bcc-45c3-a476-4be0392b7779",
+    "name": "Knäckebröd & Skorpor",
+    "productCount": 171,
+    "fullURLPath": "Bröd-Kakor/Knäckebröd-Skorpor",
+    "retailerCategoryId": "701",
+    "children": [
+      {
+        "id": "1044b65f-75a5-4604-89e0-37fea8356a4c",
+        "name": "Knäckebröd",
+        "productCount": 106,
+        "fullURLPath": "Bröd-Kakor/Knäckebröd-Skorpor/Knäckebröd",
+        "retailerCategoryId": "4345",
+        "children": []
+      },
+      {
+        "id": "a07831e6-19b9-4e62-8531-81be523f2ee0",
+        "name": "Hårt tunnbröd",
+        "productCount": 17,
+        "fullURLPath": "Bröd-Kakor/Knäckebröd-Skorpor/Hårt-tunnbröd",
+        "retailerCategoryId": "4351",
+        "children": []
+      },
+      {
+        "id": "a8adfefd-4e19-4d85-83a5-887782fadc54",
+        "name": "Riskakor",
+        "productCount": 36,
+        "fullURLPath": "Bröd-Kakor/Knäckebröd-Skorpor/Riskakor",
+        "retailerCategoryId": "4352",
+        "children": []
+      },
+      {
+        "id": "f79665b5-de54-4bbc-9be4-dd087aa9f58a",
+        "name": "Skorpor",
+        "productCount": 14,
+        "fullURLPath": "Bröd-Kakor/Knäckebröd-Skorpor/Skorpor",
+        "retailerCategoryId": "4353",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "3fc5f139-f90b-4a35-ab1a-4f429d009bb7",
+    "name": "Glutenfritt bröd & Kakor",
+    "productCount": 111,
+    "fullURLPath": "Bröd-Kakor/Glutenfritt-bröd-Kakor",
+    "retailerCategoryId": "4334",
+    "children": [
+      {
+        "id": "7d26dc57-ef86-4ce9-b8da-a4dcc4fb4ffc",
+        "name": "Glutenfritt bröd",
+        "productCount": 32,
+        "fullURLPath": "Bröd-Kakor/Glutenfritt-bröd-Kakor/Glutenfritt-bröd",
+        "retailerCategoryId": "4335",
+        "children": []
+      },
+      {
+        "id": "291cd8e9-0981-437c-9c5d-0b493bfa051a",
+        "name": "Glutenfritt knäckebröd",
+        "productCount": 19,
+        "fullURLPath": "Bröd-Kakor/Glutenfritt-bröd-Kakor/Glutenfritt-knäckebröd",
+        "retailerCategoryId": "4338",
+        "children": []
+      },
+      {
+        "id": "e30bfff4-a8b8-492f-b29e-16f54c82783e",
+        "name": "Glutenfria kex",
+        "productCount": 16,
+        "fullURLPath": "Bröd-Kakor/Glutenfritt-bröd-Kakor/Glutenfria-kex",
+        "retailerCategoryId": "4339",
+        "children": []
+      },
+      {
+        "id": "78d57d82-f60b-4404-a750-89cc8d93e50d",
+        "name": "Glutenfria kakor",
+        "productCount": 24,
+        "fullURLPath": "Bröd-Kakor/Glutenfritt-bröd-Kakor/Glutenfria-kakor",
+        "retailerCategoryId": "4340",
+        "children": []
+      },
+      {
+        "id": "30f03187-b753-49cf-985d-9fa261e7d272",
+        "name": "Glutenfritt fikabröd",
+        "productCount": 13,
+        "fullURLPath": "Bröd-Kakor/Glutenfritt-bröd-Kakor/Glutenfritt-fikabröd",
+        "retailerCategoryId": "4341",
+        "children": []
+      },
+      {
+        "id": "112a32f6-1df9-41e7-b25f-45a4f0221cab",
+        "name": "Glutenfria maträttsbröd",
+        "productCount": 13,
+        "fullURLPath": "Bröd-Kakor/Glutenfritt-bröd-Kakor/Glutenfria-maträttsbröd",
+        "retailerCategoryId": "4344",
+        "children": []
+      }
+    ]
+  }
+]

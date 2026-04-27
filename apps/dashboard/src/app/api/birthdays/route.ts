@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { errorResponse, getAuthedSupabase } from "@/lib/api";
+import { getUserHousehold } from "@/lib/household";
 
 export async function GET(request: NextRequest) {
   const auth = await getAuthedSupabase();
@@ -32,7 +33,7 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: Request) {
   const auth = await getAuthedSupabase();
-  if (auth.error || !auth.supabase) {
+  if (auth.error || !auth.supabase || !auth.user) {
     return auth.error;
   }
 
@@ -40,6 +41,11 @@ export async function POST(request: Request) {
 
   if (!payload.name || !payload.birthday_month || !payload.birthday_day || !payload.category) {
     return errorResponse("name, birthday_month, birthday_day, and category are required");
+  }
+
+  const household = await getUserHousehold(auth.supabase, auth.user.id);
+  if (household.error) {
+    return errorResponse(household.error.message, 500);
   }
 
   const { data: birthday, error } = await auth.supabase
@@ -53,7 +59,8 @@ export async function POST(request: Request) {
       is_recurring: payload.is_recurring !== undefined ? payload.is_recurring : true,
       wishlist: payload.wishlist || null,
       notes: payload.notes || null,
-      status: "active"
+      status: "active",
+      household_id: household.household?.id ?? null,
     })
     .select("*")
     .single();

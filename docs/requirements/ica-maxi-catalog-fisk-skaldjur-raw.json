@@ -1,0 +1,182 @@
+[
+  {
+    "id": "0cae5f1b-e8c8-4a27-b8c4-7fb95069e1da",
+    "name": "Fisk",
+    "productCount": 84,
+    "fullURLPath": "Fisk-Skaldjur/Fisk",
+    "retailerCategoryId": "1349",
+    "children": [
+      {
+        "id": "813fd4dd-cea9-4311-bb4c-212f8656b25c",
+        "name": "Lax",
+        "productCount": 56,
+        "fullURLPath": "Fisk-Skaldjur/Fisk/Lax",
+        "retailerCategoryId": "1462",
+        "children": []
+      },
+      {
+        "id": "87c387f3-8fa3-463d-896b-7e10398038c3",
+        "name": "Torsk & Vitfisk",
+        "productCount": 17,
+        "fullURLPath": "Fisk-Skaldjur/Fisk/Torsk-Vitfisk",
+        "retailerCategoryId": "1465",
+        "children": []
+      },
+      {
+        "id": "18bf1d23-b538-401d-b82c-6a3eaa47ba56",
+        "name": "Rödspätta & Plattfisk",
+        "productCount": 3,
+        "fullURLPath": "Fisk-Skaldjur/Fisk/Rödspätta-Plattfisk",
+        "retailerCategoryId": "1466",
+        "children": []
+      },
+      {
+        "id": "7b5aa5e8-31a6-4749-9eb3-309aafc2c409",
+        "name": "Övrig fisk",
+        "productCount": 8,
+        "fullURLPath": "Fisk-Skaldjur/Fisk/Övrig-fisk",
+        "retailerCategoryId": "1536",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "d48e1452-10cc-4b2d-af58-d60b7422a452",
+    "name": "Färdiga fiskrätter",
+    "productCount": 33,
+    "fullURLPath": "Fisk-Skaldjur/Färdiga-fiskrätter",
+    "retailerCategoryId": "4947",
+    "children": []
+  },
+  {
+    "id": "7520810c-c847-4a53-8a06-6f0eefc0ac0d",
+    "name": "Skaldjur",
+    "productCount": 55,
+    "fullURLPath": "Fisk-Skaldjur/Skaldjur",
+    "retailerCategoryId": "1362",
+    "children": [
+      {
+        "id": "99ebe998-8cc2-458c-a01f-fd1650d591bf",
+        "name": "Räkor",
+        "productCount": 31,
+        "fullURLPath": "Fisk-Skaldjur/Skaldjur/Räkor",
+        "retailerCategoryId": "1755",
+        "children": []
+      },
+      {
+        "id": "1f9ee73b-964c-490c-9223-b7d41a1ebb04",
+        "name": "Kräftor",
+        "productCount": 6,
+        "fullURLPath": "Fisk-Skaldjur/Skaldjur/Kräftor",
+        "retailerCategoryId": "1365",
+        "children": []
+      },
+      {
+        "id": "854b25b3-4683-402c-9fe5-8d0ffb1b8e15",
+        "name": "Hummer",
+        "productCount": 3,
+        "fullURLPath": "Fisk-Skaldjur/Skaldjur/Hummer",
+        "retailerCategoryId": "1367",
+        "children": []
+      },
+      {
+        "id": "5be7580f-63bb-45cb-9469-fcf2150c6e65",
+        "name": "Musslor",
+        "productCount": 8,
+        "fullURLPath": "Fisk-Skaldjur/Skaldjur/Musslor",
+        "retailerCategoryId": "1368",
+        "children": []
+      },
+      {
+        "id": "bd0a44e4-2cee-4a1b-ac5a-ba3948aa1c52",
+        "name": "Övriga skaldjur",
+        "productCount": 7,
+        "fullURLPath": "Fisk-Skaldjur/Skaldjur/Övriga-skaldjur",
+        "retailerCategoryId": "1363",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "1a0893ca-17a8-467b-b4cf-35662dc87340",
+    "name": "Sill & Ansjovis",
+    "productCount": 66,
+    "fullURLPath": "Fisk-Skaldjur/Sill-Ansjovis",
+    "retailerCategoryId": "1371",
+    "children": [
+      {
+        "id": "8b6c4021-6c8e-46a9-a655-38f7dde2218e",
+        "name": "Inlagd sill",
+        "productCount": 55,
+        "fullURLPath": "Fisk-Skaldjur/Sill-Ansjovis/Inlagd-sill",
+        "retailerCategoryId": "1549",
+        "children": []
+      },
+      {
+        "id": "1afb7a25-6bd4-493b-a34c-a36df6c92ec3",
+        "name": "Inläggningssill",
+        "productCount": 5,
+        "fullURLPath": "Fisk-Skaldjur/Sill-Ansjovis/Inläggningssill",
+        "retailerCategoryId": "4944",
+        "children": []
+      },
+      {
+        "id": "5f90e7bb-732a-403c-8153-b9b1fe19f97a",
+        "name": "Ansjovis",
+        "productCount": 4,
+        "fullURLPath": "Fisk-Skaldjur/Sill-Ansjovis/Ansjovis",
+        "retailerCategoryId": "1570",
+        "children": []
+      },
+      {
+        "id": "1c0510bf-32a1-48d9-9858-9c9a0e9cb086",
+        "name": "Stekt strömming",
+        "productCount": 1,
+        "fullURLPath": "Fisk-Skaldjur/Sill-Ansjovis/Stekt-strömming",
+        "retailerCategoryId": "1765",
+        "children": []
+      },
+      {
+        "id": "78024289-660b-4c64-a4e2-51803c257ae4",
+        "name": "Surströmming",
+        "productCount": 1,
+        "fullURLPath": "Fisk-Skaldjur/Sill-Ansjovis/Surströmming",
+        "retailerCategoryId": "1767",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "2759ecac-58f9-4c16-a1fa-d14f53cdf731",
+    "name": "Kaviar & Rom",
+    "productCount": 39,
+    "fullURLPath": "Fisk-Skaldjur/Kaviar-Rom",
+    "retailerCategoryId": "4943",
+    "children": [
+      {
+        "id": "5500be9f-9ec9-46b5-8d89-f84d1037d6d7",
+        "name": "Kaviar",
+        "productCount": 21,
+        "fullURLPath": "Fisk-Skaldjur/Kaviar-Rom/Kaviar",
+        "retailerCategoryId": "1460",
+        "children": []
+      },
+      {
+        "id": "4fc28941-8070-4959-b6ca-2f119c77cf98",
+        "name": "Färsk rom",
+        "productCount": 16,
+        "fullURLPath": "Fisk-Skaldjur/Kaviar-Rom/Färsk-rom",
+        "retailerCategoryId": "1461",
+        "children": []
+      },
+      {
+        "id": "6df1267b-38b0-4416-8735-2b892a8e1a2f",
+        "name": "Fryst rom",
+        "productCount": 2,
+        "fullURLPath": "Fisk-Skaldjur/Kaviar-Rom/Fryst-rom",
+        "retailerCategoryId": "4945",
+        "children": []
+      }
+    ]
+  }
+]

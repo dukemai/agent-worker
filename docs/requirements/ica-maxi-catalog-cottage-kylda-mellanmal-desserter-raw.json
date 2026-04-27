@@ -1,0 +1,50 @@
+[
+  {
+    "id": "205e35f4-1941-490a-9bce-b75628ca26af",
+    "name": "Kyld vaniljsås",
+    "productCount": 9,
+    "fullURLPath": "Mejeri-Ost/Kylda-mellanmål-desserter/Kyld-vaniljsås",
+    "retailerCategoryId": "1932",
+    "children": []
+  },
+  {
+    "id": "a9e578d9-df78-46e7-b9ad-5f61b8185deb",
+    "name": "Ostkaka",
+    "productCount": 5,
+    "fullURLPath": "Mejeri-Ost/Kylda-mellanmål-desserter/Ostkaka",
+    "retailerCategoryId": "640",
+    "children": []
+  },
+  {
+    "id": "39e3b99f-0647-4bfe-8816-214eea48268e",
+    "name": "Kylda mellanmål",
+    "productCount": 26,
+    "fullURLPath": "Mejeri-Ost/Kylda-mellanmål-desserter/Kylda-mellanmål",
+    "retailerCategoryId": "299",
+    "children": []
+  },
+  {
+    "id": "8b92af0c-e28a-436f-ade3-a20366d51bc0",
+    "name": "Kylda desserter",
+    "productCount": 15,
+    "fullURLPath": "Mejeri-Ost/Kylda-mellanmål-desserter/Kylda-desserter",
+    "retailerCategoryId": "1215",
+    "children": []
+  },
+  {
+    "id": "0cf1989b-eda1-44dc-94a0-8c113ec8ad18",
+    "name": "Proteinmål",
+    "productCount": 55,
+    "fullURLPath": "Mejeri-Ost/Kylda-mellanmål-desserter/Proteinmål",
+    "retailerCategoryId": "1933",
+    "children": []
+  },
+  {
+    "id": "f530dd3e-cded-47a3-b16a-d5e007bd21d7",
+    "name": "Färdig proteindryck",
+    "productCount": 34,
+    "fullURLPath": "Mejeri-Ost/Kylda-mellanmål-desserter/Färdig-proteindryck",
+    "retailerCategoryId": "3322",
+    "children": []
+  }
+]

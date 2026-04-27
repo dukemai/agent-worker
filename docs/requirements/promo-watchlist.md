@@ -47,7 +47,50 @@ Dashboard UI uses **cookie auth** via existing context routes; scrapers use the 
 | `DASHBOARD_BASE_URL` | Shell / `.env` when running `pnpm promo:download-watchlist` | Base URL of the running dashboard (e.g. `http://localhost:3000`, no trailing slash) |
 | `SCRAPE_SYNC_SECRET` | Same as above, in the shell that runs the script | Passed as `Authorization: Bearer …` by [`download-promo-watchlist.mjs`](../../apps/playwright-tools/scripts/download-promo-watchlist.mjs) |
 
-### Promo match import (weekly offers you matched offline)
+### Weekly promotion import (all offers, dashboard filtering)
+
+The current strategy is to import **all** weekly promotions first, then let the
+dashboard filter them for the signed-in user. This replaces the older
+matched-only upload as the primary flow.
+
+| Method | Path | Use |
+|--------|------|-----|
+| POST | `/api/promotions/import-weekly` | Cookie-auth. Body: `application/json` or multipart field `file` containing `scraped-promotions.json` (`{ storeKey, count, promotions }`) from Playwright. Creates `promotion_import_runs` + `weekly_promotions`. |
+| GET | `/api/promotions/current-week` | Cookie-auth. Returns `{ run }` for the latest weekly promotion import. |
+| GET | `/api/promotions/current-week/items` | Cookie-auth. Returns `{ run, items }` for all promotions in the latest import, ordered by scrape order. |
+| POST | `/api/promotions/filter` | Cookie-auth. Body `{ "runId": "<uuid>" }` optional. Matches `weekly_promotions` against `family_context.promo_watchlist` and rewrites `weekly_promotion_matches` for that run. |
+| GET | `/api/promotions/current-week/matches` | Cookie-auth. Returns matched offers for the latest run (or `?runId=`). |
+
+Dashboard flow:
+
+1. Upload all promotions for this week.
+2. Store canonical weekly promotions.
+3. Run filtering for this user and week.
+4. Show **matched offers** and allow viewing **all promotions**.
+
+### Food-style favorite suggestions
+
+The watchlist editor also supports adding favorites by food style. The mapping is
+stored in `food_style_favorite_suggestions`, seeded with initial Vietnamese,
+Korean, and Swedish/Nordic suggestions. The dashboard includes a separate
+**Manage mapping** modal so suggestions can be added or removed without editing
+raw JSON.
+
+The modal can ask AI for help: it sends the selected **food style** plus the
+ICA picker catalog categories/items from
+`ica-maxi-promo-picker-catalog.json` to Gemini, receives exact `watchlistText`
+suggestions, and lets the user review/save selected mappings.
+Food styles come from the same preset list as the recipe generator:
+`apps/dashboard/public/data/recipe-food-types.json`.
+
+| Method | Path | Use |
+|--------|------|-----|
+| GET | `/api/promo-food-style-suggestions` | List style → watchlist suggestion mappings. |
+| POST | `/api/promo-food-style-suggestions` | Add one mapping: `{ styleId, styleLabel, watchlistText, priority }`. |
+| POST | `/api/promo-food-style-suggestions/ai` | Generate draft mappings from `{ styleLabel }` using Gemini + ICA catalog categories/items. |
+| DELETE | `/api/promo-food-style-suggestions/:id` | Remove one mapping. |
+
+### Legacy promo match import (matched-only)
 
 | Method | Path | Use |
 |--------|------|-----|
@@ -56,7 +99,11 @@ Dashboard UI uses **cookie auth** via existing context routes; scrapers use the 
 | DELETE | `/api/promo-matches/run/[runId]` | **Cookie-auth.** Deletes that import run and its items (CASCADE). Use when clearing the current import. Response: `{ deleted: true, runId }`. |
 | POST | `/api/promo-matches/meal-plan` | **Cookie-auth.** JSON **`{ "runId": "<uuid>" }`** — builds a Swedish 7-day meal sketch from that import’s offers via Gemini; requires `GEMINI_API_KEY` on the server. See [promo-meal-plan.md](promo-meal-plan.md). |
 
-After running the ICA extract test with a non-empty local watchlist, upload **`apps/playwright-tools/data/promo-run/watchlist-matches-only.json`** from the Promo grocery watchlist page. Each upload appends a new run; the UI shows the **latest** run only (older runs remain in DB for future “history” if needed). **`promo_match_runs.week_number`** and each **`promo_match_items.week_number`** store the ISO week (UTC) at import time for filtering and meal planning later.
+The older matched-only path remains for compatibility with prior imports, but
+the main dashboard flow uses `scraped-promotions.json` and dashboard-side
+filtering. **`promo_match_runs.week_number`** and each
+**`promo_match_items.week_number`** store the ISO week (UTC) at import time for
+filtering and meal planning later.
 
 Server helper **`deletePromoMatchRun`** in `apps/dashboard/src/lib/promo-matches-run.ts` performs the DELETE used by the API route.
 
@@ -64,10 +111,11 @@ Server helper **`deletePromoMatchRun`** in `apps/dashboard/src/lib/promo-matches
 
 - **Route:** **`/promo-grocery-watchlist`** — kebab-case URL, parallel to `/context`, `/growing`.
 - **Nav / title:** **Promo grocery watchlist** — general-purpose wording (not retailer-specific).
-- **Weekly matched offers:** Second tab on the same page — upload `watchlist-matches-only.json`, list latest import from DB (see import APIs above); meal plan from chosen run.
+- **Weekly offers:** Second tab on the same page — upload `scraped-promotions.json`, list matched offers after filtering, and switch to all imported promotions for the week.
 - **Primary editor**: Dedicated page; generic Context page links here and does not list `promo_watchlist` rows.
 - **Item list layout:** **`table`** with **`#`**, **`Item`**, **`Actions`** (remove); horizontal scroll on small viewports; table caption for assistive tech.
 - **Add flow:** ICA-aligned picker catalog (`apps/dashboard/public/data/ica-maxi-promo-picker-catalog.json`, runtime-validated) plus **Add my own text**; clear-all with confirm (`DELETE` the context row).
+- **Add by food style:** Pick a style such as Vietnamese, Korean, or Swedish/Nordic; select mapped suggestions; **Manage mapping** opens a modal with manual edit and AI-assisted suggestion generation.
 - **Persistence**: Immediate save per add/remove (TanStack Query).
 - **Copy**: Example weekly offers link (ICA Maxi Barkarbystaden), `pnpm promo:download-watchlist`, note that per-store scrapers read the same list.
 
@@ -89,8 +137,8 @@ Server helper **`deletePromoMatchRun`** in `apps/dashboard/src/lib/promo-matches
 Local flow (see `apps/playwright-tools`):
 
 1. **Download watchlist** — with dashboard running and env set: `pnpm promo:download-watchlist` (writes `apps/playwright-tools/data/promo-watchlist.json`; gitignored).
-2. **Scrape ICA offers** — `pnpm playwright:test -- tests/ica-maxi-extract-promotions.spec.ts` (network; uses [`ica-maxi-barkarbystaden`](../../apps/playwright-tools/src/strategies/ica-maxi-barkarbystaden.ts): maps `data/promo-watchlist.json` items to departments via [`ica-maxi-promo-picker-catalog.json`](ica-maxi-promo-picker-catalog.json), then clicks weekly-offers filter chips per department before scraping tiles).
-3. **Rule-based match** — [`match-promotions.ts`](../../apps/playwright-tools/src/match-promotions.ts) scores each `ScrapedPromotion` against every watchlist string (full substring after Swedish case-fold, or all tokens ≥2 chars). The extract test attaches **`watchlist-matches.json`** when `data/promo-watchlist.json` exists. A second test runs scrape + match only if that file is present (skipped otherwise).
+2. **Scrape ICA offers** — `pnpm playwright:test -- tests/ica-maxi-extract-promotions.spec.ts` (network; writes **`scraped-promotions.json`** with all offers).
+3. **Dashboard import + match** — upload **`scraped-promotions.json`**; `POST /api/promotions/filter` scores each stored offer against every watchlist string (full substring after Swedish case-fold, or all tokens ≥2 chars).
 
 **On-disk outputs (no report download):** under **`apps/playwright-tools/data/promo-run/`** — **`watchlist-matches-only.json`** (`{ interests, matches }`, same as the report attachment) whenever the watchlist file has items; **`watchlist-matches.json`** (slim summary + `watchlist-matches.json`-style rows) from the main extract test; the rank-only test overwrites **`watchlist-matches-only.json`** if both run. Full **`scraped-promotions.json`** stays a Playwright attachment only unless you copy from the report. Set **`PROMO_NO_DISK_OUTPUT=1`** to skip disk writes.
 

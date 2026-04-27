@@ -1,0 +1,42 @@
+[
+  {
+    "id": "34a17826-f58b-4250-988d-dddf6afa518a",
+    "name": "Kvarg naturell",
+    "productCount": 6,
+    "fullURLPath": "Mejeri-Ost/Kvarg/Kvarg-naturell",
+    "retailerCategoryId": "652",
+    "children": []
+  },
+  {
+    "id": "f6663dc6-27ef-4aeb-8be6-f65565ddf664",
+    "name": "Kvarg smaksatt",
+    "productCount": 20,
+    "fullURLPath": "Mejeri-Ost/Kvarg/Kvarg-smaksatt",
+    "retailerCategoryId": "653",
+    "children": []
+  },
+  {
+    "id": "480bb93e-be97-45d9-b1c0-8b73f11ca738",
+    "name": "Kvarg portionsförpackning",
+    "productCount": 6,
+    "fullURLPath": "Mejeri-Ost/Kvarg/Kvarg-portionsförpackning",
+    "retailerCategoryId": "4684",
+    "children": []
+  },
+  {
+    "id": "db005863-0a24-44ba-8f72-0b9733949a7a",
+    "name": "Drickkvarg",
+    "productCount": 10,
+    "fullURLPath": "Mejeri-Ost/Kvarg/Drickkvarg",
+    "retailerCategoryId": "4685",
+    "children": []
+  },
+  {
+    "id": "bf9bfe02-47b3-449f-8b15-0fc9853b2b74",
+    "name": "Laktosfri kvarg",
+    "productCount": 25,
+    "fullURLPath": "Mejeri-Ost/Kvarg/Laktosfri-kvarg",
+    "retailerCategoryId": "4683",
+    "children": []
+  }
+]

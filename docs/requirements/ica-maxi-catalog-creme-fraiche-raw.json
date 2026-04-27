@@ -1,0 +1,34 @@
+[
+  {
+    "id": "e8dc2919-ca5e-46cc-9f77-997227af9cd9",
+    "name": "Crème fraiche naturell",
+    "productCount": 13,
+    "fullURLPath": "Mejeri-Ost/Crème-fraiche/Crème-fraiche-naturell",
+    "retailerCategoryId": "1302",
+    "children": []
+  },
+  {
+    "id": "6a8243d0-d51b-4991-8568-ed2888dc6a9b",
+    "name": "Crème fraiche smaksatt",
+    "productCount": 11,
+    "fullURLPath": "Mejeri-Ost/Crème-fraiche/Crème-fraiche-smaksatt",
+    "retailerCategoryId": "1303",
+    "children": []
+  },
+  {
+    "id": "583c92f4-ed94-4287-90a6-fc5601c715ad",
+    "name": "Mjölkfri fraiche",
+    "productCount": 3,
+    "fullURLPath": "Mejeri-Ost/Crème-fraiche/Mjölkfri-fraiche",
+    "retailerCategoryId": "1922",
+    "children": []
+  },
+  {
+    "id": "7e6afb2a-9a75-4787-8c5c-d723f2d80b6f",
+    "name": "Laktosfri crème fraiche",
+    "productCount": 8,
+    "fullURLPath": "Mejeri-Ost/Crème-fraiche/Laktosfri-crème-fraiche",
+    "retailerCategoryId": "4680",
+    "children": []
+  }
+]

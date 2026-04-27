@@ -1,0 +1,50 @@
+[
+  {
+    "id": "71a16b8c-026d-4e32-b456-7221e3b18851",
+    "name": "Vispgrädde",
+    "productCount": 14,
+    "fullURLPath": "Mejeri-Ost/Grädde/Vispgrädde",
+    "retailerCategoryId": "282",
+    "children": []
+  },
+  {
+    "id": "4eb1f76a-9958-4ad0-af26-ecaee942555b",
+    "name": "Matlagningsgrädde",
+    "productCount": 7,
+    "fullURLPath": "Mejeri-Ost/Grädde/Matlagningsgrädde",
+    "retailerCategoryId": "1307",
+    "children": []
+  },
+  {
+    "id": "714e0e96-f4d4-4e4b-90ab-c36bbf0016f0",
+    "name": "Mellangrädde",
+    "productCount": 3,
+    "fullURLPath": "Mejeri-Ost/Grädde/Mellangrädde",
+    "retailerCategoryId": "1587",
+    "children": []
+  },
+  {
+    "id": "7e733a6a-9570-4adc-9b62-6d728e554518",
+    "name": "Kaffegrädde",
+    "productCount": 1,
+    "fullURLPath": "Mejeri-Ost/Grädde/Kaffegrädde",
+    "retailerCategoryId": "1308",
+    "children": []
+  },
+  {
+    "id": "976d92d9-2cbc-46c5-b0c8-989925f12deb",
+    "name": "Mjölkfri grädde",
+    "productCount": 15,
+    "fullURLPath": "Mejeri-Ost/Grädde/Mjölkfri-grädde",
+    "retailerCategoryId": "1843",
+    "children": []
+  },
+  {
+    "id": "cb1b0199-28ad-42b1-9d9f-7a418a055de7",
+    "name": "Laktosfri grädde",
+    "productCount": 15,
+    "fullURLPath": "Mejeri-Ost/Grädde/Laktosfri-grädde",
+    "retailerCategoryId": "1845",
+    "children": []
+  }
+]

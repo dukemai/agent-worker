@@ -55,8 +55,8 @@
 - [x] Manual import of matched weekly offers → `promo_match_*` + dashboard (latest run)
 - [x] Meal plan API + UI (10 Swedish meal suggestions from a chosen import); follow-ons in `docs/phases/08-meal-shopping-from-promotions/TASKS.md`
 
-### Phase 9: Recipe generator & library (Sweden-oriented) — planned
-- [ ] Ingredients + food-type UI → Gemini structured recipes → add chosen rows to `saved_recipes` with **tested** toggle (`docs/phases/09-recipe-sources-sweden/SCOPE.md`, [`recipe-generator.md`](requirements/recipe-generator.md))
+### Phase 9: Recipe generator & library (Sweden-oriented) — in progress
+- [x] Ingredients + food-type UI → Gemini structured recipes → add chosen rows to `saved_recipes` with **tested** toggle (`docs/phases/09-recipe-sources-sweden/SCOPE.md`, [`recipe-generator.md`](requirements/recipe-generator.md))
 - [ ] Optional later: curated corpus / RAG grounding (same phase folder)
 
 ### Phase 10: YouTube Knowledge Extraction — planned

@@ -26,6 +26,7 @@
 - [x] Implement `fetchUpcomingBirthdays` in `packages/shared/src/digest.tsx`
 - [x] Integrate birthday countdowns into `generateBriefingNarrative` (Swedish text)
 - [x] Update `DailyDigestEmail.tsx` template with "Birthdays & Events" section (Pink theme)
+- [x] Highlight birthday countdown text in the daily briefing email
 - [x] Update `DigestPreviewResponse` to support email testing in the dashboard
 
 ## 6. Verification

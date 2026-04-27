@@ -1,0 +1,26 @@
+[
+  {
+    "id": "fe3b6b8a-3fcd-42d5-b655-69c81181bf51",
+    "name": "Cottage cheese naturell",
+    "productCount": 10,
+    "fullURLPath": "Mejeri-Ost/Cottage-cheese/Cottage-cheese-naturell",
+    "retailerCategoryId": "654",
+    "children": []
+  },
+  {
+    "id": "50b13142-d6ed-4f26-a7b2-789f89956ff1",
+    "name": "Cottage cheese smaksatt",
+    "productCount": 5,
+    "fullURLPath": "Mejeri-Ost/Cottage-cheese/Cottage-cheese-smaksatt",
+    "retailerCategoryId": "655",
+    "children": []
+  },
+  {
+    "id": "e208ee15-4c08-457d-b8d1-fcde67613345",
+    "name": "Laktosfri cottage cheese",
+    "productCount": 5,
+    "fullURLPath": "Mejeri-Ost/Cottage-cheese/Laktosfri-cottage-cheese",
+    "retailerCategoryId": "4682",
+    "children": []
+  }
+]

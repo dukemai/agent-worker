@@ -154,3 +154,43 @@ Normalized storage for **manual imports** of Playwright output `watchlist-matche
 - **`promo_match_runs`**: One row per upload — `store_key`, `interests` (JSONB), `raw_json` (full payload), `created_at`, **`week_number`** (ISO week 1–53 at import, UTC; mirrors items for quick filtering without scanning children).
 - **`promo_match_items`**: Child rows — `run_id`, `sort_order`, `week_number` (ISO week 1–53, UTC; same semantics as `growing_suggestions_log.week_number`), `interest`, `score`, `promotion_index`, `title`, `card_text`, `price_hint`, `image_url`, `source_url`, `store_key`. `ON DELETE CASCADE` from run.
 - **RLS**: Same pattern as other single-user tables — `authenticated` full access.
+
+#### `promotion_import_runs`, `weekly_promotions` & `weekly_promotion_matches`
+Canonical storage for the newer weekly promotion flow: import **all** scraped
+offers first, then run dashboard-side filtering for the current watchlist.
+- **`promotion_import_runs`**: One row per weekly upload — `store_key`,
+  `iso_year`, `week_number`, `source`, `imported_count`, `raw_json`.
+- **`weekly_promotions`**: Child rows for every scraped offer — `run_id`,
+  `sort_order`, `store_key`, `promotion_index`, `title`, `card_text`,
+  `price_hint`, `image_url`, `source_url`, optional category fields,
+  `dedupe_key`, and `raw_json`.
+- **`weekly_promotion_matches`**: Recomputed match rows — `run_id`,
+  `promotion_id`, `interest`, `score`, `match_kind`, `match_reason`.
+- **RLS**: Same single-user dashboard pattern — `authenticated` full access.
+
+#### `food_style_favorite_suggestions`
+Admin-editable mapping from cooking style to suggested watchlist favorites.
+- **Columns**: `style_id`, `style_label`, `watchlist_text`, `priority`,
+  optional `reason`, and `source`.
+- **Use**: The Promo grocery watchlist page groups mappings by style so the user
+  can add favorites for Vietnamese, Korean, Swedish/Nordic, and later styles.
+
+#### `households`, `household_members` & `household_invites`
+Account-backed family collaboration. A household has one owner and one or more
+collaborators. The owner creates invite tokens; collaborators sign in or create
+an account, then accept the invite.
+- **`households`**: `name`, `created_by`, timestamps.
+- **`household_members`**: `household_id`, `user_id`, `role`
+  (`owner` / `collaborator`), `display_name`.
+- **`household_invites`**: `token`, `role`, optional `email` / expiry,
+  `accepted_by`, `accepted_at`.
+
+#### `recipe_candidates` & `recipe_reviews`
+Shared recipe sourcing workflow for `/family/recipes`.
+- **`recipe_candidates`**: household-scoped incoming ideas with `title`,
+  optional `source_url`, `notes`, `raw_text`, and review `status`.
+- **`recipe_reviews`**: household-scoped comments/statuses for either a saved
+  recipe or a recipe candidate.
+- `saved_recipes.household_id` and `birthdays.household_id` are nullable bridge
+  columns for later sharing of canonical recipes and birthdays through the same
+  household model.

@@ -40,7 +40,6 @@ import {
   type SavedRecipeWithI18n,
 } from "@/lib/recipe-locale";
 import type { SavedRecipeRow } from "@/lib/saved-recipe-row";
-import { parsePromoPickerCatalogJson } from "@/lib/promo-picker-catalog-validate";
 import { foodDepartmentIdsFromCatalog } from "@/lib/recipe-picker-food-departments";
 import {
   MAX_INGREDIENT_PICKS,
@@ -62,7 +61,14 @@ import {
 import { parseMarkdownRecipeMarkdown } from "@/lib/markdown-recipe-parse";
 import { formatSavedRecipeSourceLabel } from "@/lib/recipe-source";
 import { cn } from "@/lib/utils";
-import type { PromoPickerCatalog, PromoPickerItem } from "@/types/promo-picker-catalog";
+import type { PromoPickerItem } from "@/types/promo-picker-catalog";
+import {
+  type GenerateResponse,
+  fetchFoodTypes,
+  fetchPickerCatalog,
+  fetchSavedRecipes,
+  throwApiError,
+} from "./recipe-generator-api";
 
 const ALL_DEPARTMENTS = "__all__";
 const ALL_LIBRARY_TYPES = "__all__";
@@ -89,57 +95,6 @@ function formatSavedAt(iso: string): string {
   } catch {
     return iso;
   }
-}
-
-type FoodTypesJson = {
-  options: { id: string; label: string }[];
-};
-
-type GenerateResponse = {
-  result: RecipeGenerateResult;
-  meta: {
-    food_type_id: string;
-    food_type_label_sv: string;
-    vegetarian: boolean;
-    ingredient_count: number;
-    exclude_count: number;
-    recipe_model: string;
-    recipe_source_label: string;
-  };
-};
-
-async function fetchPickerCatalog(): Promise<PromoPickerCatalog> {
-  const response = await fetch("/data/ica-maxi-promo-picker-catalog.json", {
-    cache: "no-store",
-  });
-  if (!response.ok) {
-    throw new Error("Failed to load picker catalog");
-  }
-  const raw: unknown = await response.json();
-  return parsePromoPickerCatalogJson(raw);
-}
-
-async function fetchFoodTypes(): Promise<FoodTypesJson> {
-  const response = await fetch("/data/recipe-food-types.json", { cache: "no-store" });
-  if (!response.ok) {
-    throw new Error("Failed to load food types");
-  }
-  return response.json() as Promise<FoodTypesJson>;
-}
-
-async function fetchSavedRecipes(): Promise<SavedRecipeRow[]> {
-  const response = await fetch("/api/recipes", { cache: "no-store" });
-  if (!response.ok) {
-    const json = (await response.json().catch(() => ({}))) as { error?: string };
-    throw new Error(json.error ?? "Failed to load recipes");
-  }
-  const json = (await response.json()) as { recipes: SavedRecipeRow[] };
-  return json.recipes ?? [];
-}
-
-async function throwApiError(response: Response, fallback: string): Promise<never> {
-  const json = (await response.json().catch(() => ({}))) as { error?: string };
-  throw new Error(json.error ?? fallback);
 }
 
 export function RecipeGeneratorDashboard() {
@@ -509,14 +464,8 @@ export function RecipeGeneratorDashboard() {
       .sort((a, b) => a.name.localeCompare(b.name, "sv"));
   }, [catalogQuery.data?.categories, foodDeptIds]);
 
-  useEffect(() => {
-    if (departmentId === ALL_DEPARTMENTS) {
-      return;
-    }
-    if (!foodDeptIds.has(departmentId)) {
-      setDepartmentId(ALL_DEPARTMENTS);
-    }
-  }, [departmentId, foodDeptIds]);
+  const effectiveDepartmentId =
+    departmentId === ALL_DEPARTMENTS || foodDeptIds.has(departmentId) ? departmentId : ALL_DEPARTMENTS;
 
   const promoWatchlistSet = useMemo(
     () => new Set(watchlistQuery.data ?? []),
@@ -530,7 +479,7 @@ export function RecipeGeneratorDashboard() {
       if (!foodDeptIds.has(it.departmentId)) {
         return false;
       }
-      if (departmentId !== ALL_DEPARTMENTS && it.departmentId !== departmentId) {
+      if (effectiveDepartmentId !== ALL_DEPARTMENTS && it.departmentId !== effectiveDepartmentId) {
         return false;
       }
       if (ingredientsFavoritesOnly) {
@@ -550,7 +499,7 @@ export function RecipeGeneratorDashboard() {
     });
   }, [
     catalogQuery.data?.items,
-    departmentId,
+    effectiveDepartmentId,
     search,
     foodDeptIds,
     ingredientsFavoritesOnly,
@@ -756,7 +705,7 @@ export function RecipeGeneratorDashboard() {
                       Food department
                     </span>
                     <Select
-                      value={departmentId}
+                      value={effectiveDepartmentId}
                       onValueChange={setDepartmentId}
                       disabled={!catalogQuery.data}
                     >

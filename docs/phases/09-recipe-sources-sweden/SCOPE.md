@@ -1,6 +1,6 @@
 # Phase 09: Recipe generator & library (Sweden-oriented) — Scope
 
-**Status**: planned (after [Phase 8](../08-meal-shopping-from-promotions/SCOPE.md))
+**Status**: in progress
 
 ## Goal
 

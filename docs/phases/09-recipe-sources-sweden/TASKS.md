@@ -4,8 +4,8 @@
 
 ## Prerequisites
 
-- [ ] Read [`SCOPE.md`](./SCOPE.md) and [`recipe-generator.md`](../../requirements/recipe-generator.md).
-- [ ] Confirm `GEMINI_API_KEY` available in dashboard env for local dev.
+- [x] Read [`SCOPE.md`](./SCOPE.md) and [`recipe-generator.md`](../../requirements/recipe-generator.md).
+- [x] Confirm `GEMINI_API_KEY` available in dashboard env for local dev.
 
 ## Tasks
 
@@ -15,8 +15,8 @@
 
 **Steps**:
 
-1. Confirm [`recipe-generator.md`](../../requirements/recipe-generator.md): ICA catalog for ingredients, [`recipe-food-types.json`](../../apps/dashboard/public/data/recipe-food-types.json) for food type, **Vegetarian** checkbox, optional **`excludeMealTitles`** for regeneration, max **8** meals.
-2. Reuse shared catalog validation for ICA JSON (same as promo picker).
+1. [x] Confirm [`recipe-generator.md`](../../requirements/recipe-generator.md): ICA catalog for ingredients, [`recipe-food-types.json`](../../apps/dashboard/public/data/recipe-food-types.json) for food type, **Vegetarian** checkbox, optional **`excludeMealTitles`** for regeneration, max **8** meals.
+2. [x] Reuse shared catalog validation for ICA JSON (same as promo picker).
 
 **Files**:
 
@@ -32,9 +32,9 @@
 
 **Steps**:
 
-1. Add migration: `saved_recipes` with `user_id` → `auth.users`, `title`, `food_type_id` (text), `vegetarian` (boolean), `ingredient_picks` JSONB (ICA strings used at generation), recipe body `ingredients` JSONB (`[{ text, ingredient_label, amount }]`) + `steps` JSONB, `tested` boolean NOT NULL DEFAULT false, `source` text default `'ai_generator'`, timestamps.
-2. Enable RLS; policy **authenticated** full CRUD on own rows (`auth.uid() = user_id`) — mirror style from `promo_match_*` or `family_context` as appropriate.
-3. Add indexes: `(user_id, created_at desc)`.
+1. [x] Add migration: `saved_recipes` with `user_id` → `auth.users`, `title`, `food_type_id` (text), `vegetarian` (boolean), `ingredient_picks` JSONB (ICA strings used at generation), recipe body `ingredients` JSONB (`[{ text, ingredient_label, amount }]`) + `steps` JSONB, `tested` boolean NOT NULL DEFAULT false, `source` text default `'ai_generator'`, timestamps.
+2. [x] Enable RLS; policy **authenticated** full CRUD on own rows (`auth.uid() = user_id`) — mirror style from `promo_match_*` or `family_context` as appropriate.
+3. [x] Add indexes: `(user_id, created_at desc)`.
 
 **Files**:
 
@@ -50,9 +50,9 @@
 
 **Steps**:
 
-1. Define types + response schema (aligned with [`recipe-generator.md`](../../requirements/recipe-generator.md)).
-2. Implement `generateRecipeIdeasFromIngredients(...)` in `packages/shared/src/gemini.ts` using structured JSON + Swedish/metric instructions (reuse tone from promo meal plan); when `vegetarian` is true, hard-exclude meat/fish/shellfish in the prompt; when `excludeMealTitles` is non-empty, add prompt block listing titles to avoid (no duplicates in output).
-3. Export from `@agent/shared` package index if needed.
+1. [x] Define types + response schema (aligned with [`recipe-generator.md`](../../requirements/recipe-generator.md)).
+2. [x] Implement `generateRecipeIdeasFromIngredients(...)` in `packages/shared/src/gemini.ts` using structured JSON + Swedish/metric instructions (reuse tone from promo meal plan); when `vegetarian` is true, hard-exclude meat/fish/shellfish in the prompt; when `excludeMealTitles` is non-empty, add prompt block listing titles to avoid (no duplicates in output).
+3. [x] Export from `@agent/shared` package index if needed.
 
 **Files**:
 
@@ -69,8 +69,8 @@
 
 **Steps**:
 
-1. Validate body: non-empty `ingredientTexts[]`, valid `foodTypeId` against `recipe-food-types.json`, boolean `vegetarian`, optional `excludeMealTitles` (trim, dedupe, enforce caps per [`recipe-generator.md`](../../requirements/recipe-generator.md)).
-2. Return **502/503** with clear messages if model fails or key missing.
+1. [x] Validate body: non-empty `ingredientTexts[]`, valid `foodTypeId` against `recipe-food-types.json`, boolean `vegetarian`, optional `excludeMealTitles` (trim, dedupe, enforce caps per [`recipe-generator.md`](../../requirements/recipe-generator.md)).
+2. [x] Return **502/503** with clear messages if model fails or key missing.
 
 **Files**:
 
@@ -87,10 +87,10 @@
 
 **Steps**:
 
-1. `GET /api/recipes` — return user’s rows, newest first.
-2. `POST /api/recipes` — body from “add” action (subset of AI meal + normalized shape).
-3. `PATCH /api/recipes/[id]` — partial update; **must** support `tested`.
-4. `DELETE /api/recipes/[id]` — owner only.
+1. [x] `GET /api/recipes` — return user’s rows, newest first.
+2. [x] `POST /api/recipes` — body from “add” action (subset of AI meal + normalized shape).
+3. [x] `PATCH /api/recipes/[id]` — partial update; **must** support `tested`.
+4. [x] `DELETE /api/recipes/[id]` — owner only.
 
 **Files**:
 
@@ -107,11 +107,11 @@
 
 **Steps**:
 
-1. New route `app/recipe-generator/page.tsx` (or `app/recipes/page.tsx` — match nav later).
-2. Load `ica-maxi-promo-picker-catalog.json` with existing validation helper; cap max picks (e.g. 15).
-3. TanStack Query mutation for generate; show loading/error.
-4. Card or row per suggested meal; **Add** calls `POST /api/recipes` and invalidates list query.
-5. **Exclude list UX**: e.g. multi-line input or chips for excluded titles; **“Use titles from last result”** to pre-fill `excludeMealTitles` for a second **Generate** (same ingredients/type/vegetarian).
+1. [x] New route `app/recipe-generator/page.tsx` (or `app/recipes/page.tsx` — match nav later).
+2. [x] Load `ica-maxi-promo-picker-catalog.json` with existing validation helper; cap max picks (e.g. 15).
+3. [x] TanStack Query mutation for generate; show loading/error.
+4. [x] Card or row per suggested meal; **Add** calls `POST /api/recipes` and invalidates list query.
+5. [x] **Exclude list UX**: e.g. multi-line input or chips for excluded titles; **“Use titles from last result”** to pre-fill `excludeMealTitles` for a second **Generate** (same ingredients/type/vegetarian).
 
 **Files**:
 
@@ -128,10 +128,10 @@
 
 **Steps**:
 
-1. `useQuery` for `GET /api/recipes`.
-2. Column **Tested**: checkbox or Switch bound to `PATCH` mutation (optimistic optional).
-3. Show **food type** label (resolve `food_type_id` via `recipe-food-types.json` or store snapshot label on save).
-4. Delete action; optional link to expand steps inline.
+1. [x] `useQuery` for `GET /api/recipes`.
+2. [x] Column **Tested**: checkbox or Switch bound to `PATCH` mutation (optimistic optional).
+3. [x] Show **food type** label (resolve `food_type_id` via `recipe-food-types.json` or store snapshot label on save).
+4. [x] Delete action; optional link to expand steps inline.
 
 **Files**:
 
@@ -147,9 +147,18 @@
 
 **Steps**:
 
-1. Add header + mobile nav link: **Recipe generator** (or agreed label).
-2. Update [`dashboard.md`](../../requirements/dashboard.md) sections list.
-3. [`INDEX.md`](../../requirements/INDEX.md) already links Phase 09; add row for [`recipe-generator.md`](../../requirements/recipe-generator.md) if not present.
+1. [x] Add header + mobile nav link: **Recipe generator** (or agreed label).
+2. [x] Update [`dashboard.md`](../../requirements/dashboard.md) sections list.
+3. [x] [`INDEX.md`](../../requirements/INDEX.md) already links Phase 09; add row for [`recipe-generator.md`](../../requirements/recipe-generator.md) if not present.
+
+### Task 9: Frontend quality pass — ongoing
+
+**Goal**: Bring Phase 9 frontend implementation closer to foundation quality rules.
+
+**Steps**:
+
+1. [x] Move feature server communication helpers from `recipe-generator-dashboard.tsx` into feature-local `recipe-generator-api.ts`.
+2. [ ] Continue splitting `recipe-generator-dashboard.tsx` by responsibility; it is currently over the 400-line threshold.
 
 **Files**:
 

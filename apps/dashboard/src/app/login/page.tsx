@@ -1,6 +1,6 @@
 "use client";
 
-import { FormEvent, Suspense, useEffect, useState } from "react";
+import { FormEvent, Suspense, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -12,14 +12,13 @@ function LoginInner() {
   const searchParams = useSearchParams();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(() => {
+    const err = searchParams.get("error");
+    return err ? decodeURIComponent(err) : null;
+  });
   const [success, setSuccess] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    const err = searchParams.get("error");
-    if (err) setError(decodeURIComponent(err));
-  }, [searchParams]);
+  const nextPath = searchParams.get("next") || "/";
 
   async function handleSignIn(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -39,7 +38,7 @@ function LoginInner() {
       return;
     }
 
-    router.replace("/");
+    router.replace(nextPath);
     router.refresh();
   }
 
@@ -59,7 +58,7 @@ function LoginInner() {
       email,
       password,
       options: {
-        emailRedirectTo: `${window.location.origin}/auth/confirm?next=/`,
+        emailRedirectTo: `${window.location.origin}/auth/confirm?next=${encodeURIComponent(nextPath)}`,
       },
     });
 
@@ -70,7 +69,7 @@ function LoginInner() {
     }
 
     if (data.session) {
-      router.replace("/");
+      router.replace(nextPath);
       router.refresh();
       return;
     }

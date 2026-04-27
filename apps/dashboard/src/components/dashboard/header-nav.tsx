@@ -7,6 +7,7 @@ import { SignOutButton } from "@/components/dashboard/sign-out-button";
 
 const cookingLinks = [
   { href: "/promo-grocery-watchlist", label: "Promo grocery watchlist" },
+  { href: "/family/recipes", label: "Family recipes" },
   { href: "/recipe-generator", label: "Recipe generator" },
   { href: "/cookbook", label: "Shared cookbook (preview)" },
   { href: "/plan-to-cook", label: "Plan to cook" },
@@ -18,7 +19,51 @@ const moreLinks = [
   { href: "/context", label: "Context" },
 ] as const;
 
-export function DashboardNav({ signedIn }: { signedIn: boolean }) {
+const collaboratorLinks = [
+  { href: "/family/recipes", label: "Family recipes" },
+  { href: "/recipe-generator", label: "Recipe generator" },
+  { href: "/plan-to-cook", label: "Plan to cook" },
+  { href: "/birthdays", label: "Birthdays" },
+] as const;
+
+export function DashboardNav({
+  signedIn,
+  role,
+}: {
+  signedIn: boolean;
+  role?: "owner" | "collaborator" | null;
+}) {
+  if (role === "collaborator") {
+    return (
+      <>
+        <nav className="hidden items-center gap-1 md:flex" aria-label="Main">
+          {collaboratorLinks.map((item) => (
+            <Button key={item.href} asChild variant="ghost" className="shrink-0">
+              <Link href={item.href}>{item.label}</Link>
+            </Button>
+          ))}
+          <SignOutButton />
+        </nav>
+
+        <details className="relative md:hidden">
+          <summary className="flex h-11 min-w-11 cursor-pointer list-none items-center justify-center rounded-md border px-3 text-sm">
+            Menu
+          </summary>
+          <div className="absolute right-0 top-12 z-50 w-64 rounded-md border bg-background p-2 shadow-md">
+            <div className="flex flex-col gap-1">
+              {collaboratorLinks.map((item) => (
+                <Button key={item.href} asChild variant="ghost" className="justify-start">
+                  <Link href={item.href}>{item.label}</Link>
+                </Button>
+              ))}
+              <SignOutButton />
+            </div>
+          </div>
+        </details>
+      </>
+    );
+  }
+
   return (
     <>
       <nav className="hidden items-center gap-1 md:flex" aria-label="Main">
