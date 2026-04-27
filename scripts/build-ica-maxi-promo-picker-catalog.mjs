@@ -73,16 +73,52 @@ const SNAPSHOTS = [
     file: "ica-maxi-catalog-mjolk-raw.json",
   },
   {
+    parentPath: "Mejeri-Ost/Filmjölk",
+    file: "ica-maxi-catalog-filmjolk-raw.json",
+  },
+  {
     parentPath: "Mejeri-Ost/Ost",
     file: "ica-maxi-catalog-ost-raw.json",
+  },
+  {
+    parentPath: "Mejeri-Ost/Grädde",
+    file: "ica-maxi-catalog-gradde-raw.json",
   },
   {
     parentPath: "Mejeri-Ost/Smör-Margarin",
     file: "ica-maxi-catalog-smor-magarin-raw.json",
   },
   {
+    parentPath: "Mejeri-Ost/Crème-fraiche",
+    file: "ica-maxi-catalog-creme-fraiche-raw.json",
+  },
+  {
+    parentPath: "Mejeri-Ost/Gräddfil",
+    file: "ica-maxi-catalog-graddfil-raw.json",
+  },
+  {
+    parentPath: "Mejeri-Ost/Kvarg",
+    file: "ica-maxi-catalog-kvarg-raw.json",
+  },
+  {
+    parentPath: "Mejeri-Ost/Cottage-cheese",
+    file: "ica-maxi-catalog-cottage-cheese-raw.json",
+  },
+  {
+    parentPath: "Mejeri-Ost/Kylda-mellanmål-desserter",
+    file: "ica-maxi-catalog-cottage-kylda-mellanmal-desserter-raw.json",
+  },
+  {
     parentPath: "Mejeri-Ost/Yoghurt",
     file: "ica-maxi-catalog-yoghurt-raw.json",
+  },
+  {
+    parentPath: "Fisk-Skaldjur",
+    file: "ica-maxi-catalog-fisk-skaldjur-raw.json",
+  },
+  {
+    parentPath: "Bröd-Kakor",
+    file: "ica-maxi-catalog-brod-kakor-raw.json",
   },
   {
     parentPath: "Kött-Chark-Fågel/Delikatesschark",

@@ -20,7 +20,7 @@ This doc covers **dashboard UI + persistence**. Scrape and match algorithms live
 
 **Constraints**
 
-- Normalize trim on save; reject empty strings; cap list length reasonably (e.g. 50) to avoid huge payloads.
+- Normalize trim on save; reject empty strings; cap list length reasonably (e.g. 100) to avoid huge payloads.
 - Upsert follows existing `family_context` uniqueness on `key`.
 
 ## API (existing)

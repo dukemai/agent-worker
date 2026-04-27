@@ -1,8 +1,10 @@
-import type { RecipeGeneratorMeal } from "@agent/shared";
+import type { RecipeDifficulty, RecipeGeneratorMeal } from "@agent/shared";
 import {
   RECIPE_GENERATOR_SOURCE_LABEL,
   RECIPE_SOURCE_MANUAL_MARKDOWN,
 } from "@agent/shared";
+import type { RecipeI18nColumn, RecipeTranslationBundle } from "@/lib/recipe-locale";
+import { normalizeRecipeDifficulty } from "@/lib/recipe-difficulty";
 import { parseSimilarRecipeUrl } from "@/lib/recipe-source";
 
 export const MAX_INGREDIENT_PICKS = 15;
@@ -69,11 +71,13 @@ export type SaveRecipeBody = {
   vegetarian: boolean;
   ingredient_picks: string[];
   estimated_cook_time: string;
+  difficulty: RecipeDifficulty;
   /** Set when the user pasted markdown from an external source. */
   source: string;
   source_markdown: string | null;
   /** http(s) link to the page the recipe was taken from (optional). */
   similar_recipe_url: string;
+  i18n?: RecipeI18nColumn | null;
 };
 
 function isRecipeIngredientRow(
@@ -124,13 +128,11 @@ export function parseSaveRecipeBody(body: unknown): SaveRecipeBody | { error: st
   }
   const steps = stepsParsed;
   const ingredient_picks = normalizeIngredientTexts(o.ingredient_picks);
-  if (ingredient_picks.length === 0) {
-    return { error: "ingredient_picks must include at least one item" };
-  }
   const estimated_cook_time =
     typeof o.estimated_cook_time === "string"
       ? o.estimated_cook_time.trim().slice(0, 120)
       : "";
+  const difficulty = normalizeRecipeDifficulty(o.difficulty);
   const title_en =
     typeof o.title_en === "string" ? o.title_en.trim().slice(0, 200) : "";
   const title_vi =
@@ -164,10 +166,65 @@ export function parseSaveRecipeBody(body: unknown): SaveRecipeBody | { error: st
     vegetarian,
     ingredient_picks,
     estimated_cook_time,
+    difficulty,
     source,
     source_markdown: source_markdown.length > 0 ? source_markdown : null,
     similar_recipe_url: similarParsed,
+    i18n: parseI18nColumn(o.i18n),
   };
+}
+
+function isRecipeTranslationBundle(value: unknown): value is RecipeTranslationBundle {
+  if (!value || typeof value !== "object") {
+    return false;
+  }
+  const o = value as Record<string, unknown>;
+  return (
+    typeof o.title === "string" &&
+    o.title.trim().length > 0 &&
+    typeof o.summary === "string" &&
+    o.summary.trim().length > 0 &&
+    Array.isArray(o.ingredients) &&
+    o.ingredients.length > 0 &&
+    o.ingredients.every(isRecipeIngredientRow) &&
+    Array.isArray(o.steps) &&
+    o.steps.some((s) => typeof s === "string" && s.trim().length > 0)
+  );
+}
+
+function cleanTranslationBundle(value: RecipeTranslationBundle): RecipeTranslationBundle {
+  return {
+    title: value.title.trim().slice(0, 200),
+    summary: value.summary.trim().slice(0, 2000),
+    ingredients: value.ingredients.map((row) => ({
+      text: row.text.trim(),
+      ingredient_label: row.ingredient_label.trim(),
+      amount: row.amount.trim(),
+    })),
+    steps: value.steps
+      .filter((s): s is string => typeof s === "string")
+      .map((s) => s.trim())
+      .filter(Boolean),
+    updated_at:
+      typeof value.updated_at === "string" && value.updated_at.trim()
+        ? value.updated_at.trim()
+        : new Date().toISOString(),
+  };
+}
+
+function parseI18nColumn(raw: unknown): RecipeI18nColumn | null {
+  if (!raw || typeof raw !== "object") {
+    return null;
+  }
+  const o = raw as Record<string, unknown>;
+  const out: RecipeI18nColumn = {};
+  if (isRecipeTranslationBundle(o.en)) {
+    out.en = cleanTranslationBundle(o.en);
+  }
+  if (isRecipeTranslationBundle(o.vi)) {
+    out.vi = cleanTranslationBundle(o.vi);
+  }
+  return out.en || out.vi ? out : null;
 }
 
 function parseIngredientsArray(
@@ -270,6 +327,12 @@ export function parseRecipePartialUpdate(
       return { error: "source must be a supported recipe source value" };
     }
     patch.source = s;
+  }
+  if (Object.prototype.hasOwnProperty.call(o, "i18n")) {
+    patch.i18n = parseI18nColumn(o.i18n) ?? {};
+  }
+  if (Object.prototype.hasOwnProperty.call(o, "difficulty")) {
+    patch.difficulty = normalizeRecipeDifficulty(o.difficulty);
   }
 
   return { patch };

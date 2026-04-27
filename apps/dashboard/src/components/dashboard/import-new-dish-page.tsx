@@ -18,6 +18,8 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { RecipeStepsDisplay } from "@/components/dashboard/recipe-steps-display";
+import type { RecipeI18nColumn } from "@/lib/recipe-locale";
+import { RECIPE_DIFFICULTIES, formatRecipeDifficulty } from "@/lib/recipe-difficulty";
 import type { SaveRecipeBody } from "@/lib/recipe-request";
 import { parseSaveRecipeBody } from "@/lib/recipe-request";
 const MEAL_KINDS: PromoMealPlanMealKind[] = ["lunch", "dinner", "either", "snack", "other"];
@@ -40,6 +42,31 @@ async function throwApiError(response: Response, fallback: string): Promise<neve
 }
 
 type EditableNewDish = ParsedNewDishFromMarkdown;
+
+function i18nFromParsedNewDish(draft: ParsedNewDishFromMarkdown): RecipeI18nColumn | null {
+  if (draft.source_language !== "en" && draft.source_language !== "vi") {
+    return null;
+  }
+  if (
+    !draft.source_language_summary.trim() ||
+    draft.source_language_ingredients.length === 0 ||
+    draft.source_language_steps.length === 0
+  ) {
+    return null;
+  }
+  const title =
+    draft.source_language === "en"
+      ? draft.title_en.trim() || draft.title
+      : draft.title_vi.trim() || draft.title;
+  const bundle = {
+    title,
+    summary: draft.source_language_summary,
+    ingredients: draft.source_language_ingredients,
+    steps: draft.source_language_steps,
+    updated_at: new Date().toISOString(),
+  };
+  return draft.source_language === "en" ? { en: bundle } : { vi: bundle };
+}
 
 export function ImportNewDishPage() {
   const router = useRouter();
@@ -104,8 +131,10 @@ export function ImportNewDishPage() {
         ingredients: draft.ingredients,
         steps: draft.steps,
         estimated_cook_time: draft.estimated_cook_time,
+        difficulty: draft.difficulty,
         source_markdown: markdown.trim(),
         similar_recipe_url: originalUrl.trim(),
+        i18n: i18nFromParsedNewDish(draft),
       };
       const parsed = parseSaveRecipeBody(body);
       if ("error" in parsed) {
@@ -416,6 +445,28 @@ export function ImportNewDishPage() {
                   className="max-w-md"
                   disabled={busy}
                 />
+              </div>
+
+              <div className="space-y-1.5">
+                <span className="text-xs font-medium text-muted-foreground">Difficulty</span>
+                <Select
+                  value={draft.difficulty}
+                  onValueChange={(value) =>
+                    setDraft((d) => (d ? { ...d, difficulty: value as typeof d.difficulty } : d))
+                  }
+                  disabled={busy}
+                >
+                  <SelectTrigger className="h-9 w-full max-w-xs">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {RECIPE_DIFFICULTIES.map((value) => (
+                      <SelectItem key={value} value={value}>
+                        {formatRecipeDifficulty(value)}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
 
               <div>

@@ -15,7 +15,6 @@ const PUBLIC_PATHS = [
 
 const COLLABORATOR_ALLOWED_PATHS = [
   "/family",
-  "/recipe-generator",
   "/plan-to-cook",
   "/cookbook",
   "/birthdays",

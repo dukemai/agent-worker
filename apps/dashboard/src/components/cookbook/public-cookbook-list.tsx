@@ -15,6 +15,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import type { SavedRecipeRow } from "@/lib/saved-recipe-row";
+import { formatRecipeDifficulty } from "@/lib/recipe-difficulty";
 
 const ALL_TYPES = "__all__";
 const ALL_MEAL = "__all__";
@@ -266,6 +267,7 @@ export function PublicCookbookList() {
                   <span className="capitalize">{r.meal_kind}</span>
                   <span>{labelByFoodTypeId.get(r.food_type_id) ?? r.food_type_id}</span>
                   {r.estimated_cook_time.trim() ? <span>{r.estimated_cook_time}</span> : null}
+                  <span>{formatRecipeDifficulty(r.difficulty)}</span>
                   {r.vegetarian ? <span className="text-emerald-700 dark:text-emerald-400">Vegetarian</span> : null}
                   {r.tested ? <span>Tested</span> : null}
                 </CardContent>

@@ -61,9 +61,11 @@ export async function POST(request: Request) {
       tested: false,
       want_to_try: false,
       estimated_cook_time: parsed.estimated_cook_time,
+      difficulty: parsed.difficulty,
       source: parsed.source,
       source_markdown: parsed.source_markdown,
       similar_recipe_url: parsed.similar_recipe_url,
+      i18n: parsed.i18n ?? {},
     })
     .select(SAVED_RECIPE_COLUMNS)
     .single();

@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "retailer": "ica-maxi",
   "meta": {
-    "generatedAt": "2026-04-05T19:24:35.730Z",
+    "generatedAt": "2026-04-26T19:40:45.078Z",
     "description": "ICA Maxi Handla category tree + merged leaf snapshots for promo watchlist picker suggestions.",
     "sources": [
       "docs/requirements/ica-maxi-initial-state-raw.json",
@@ -17,9 +17,18 @@
       "docs/requirements/ica-maxi-catalog-juice-fruktdryck-raw.json",
       "docs/requirements/ica-maxi-catalog-agg-jast-raw.json",
       "docs/requirements/ica-maxi-catalog-mjolk-raw.json",
+      "docs/requirements/ica-maxi-catalog-filmjolk-raw.json",
       "docs/requirements/ica-maxi-catalog-ost-raw.json",
+      "docs/requirements/ica-maxi-catalog-gradde-raw.json",
       "docs/requirements/ica-maxi-catalog-smor-magarin-raw.json",
+      "docs/requirements/ica-maxi-catalog-creme-fraiche-raw.json",
+      "docs/requirements/ica-maxi-catalog-graddfil-raw.json",
+      "docs/requirements/ica-maxi-catalog-kvarg-raw.json",
+      "docs/requirements/ica-maxi-catalog-cottage-cheese-raw.json",
+      "docs/requirements/ica-maxi-catalog-cottage-kylda-mellanmal-desserter-raw.json",
       "docs/requirements/ica-maxi-catalog-yoghurt-raw.json",
+      "docs/requirements/ica-maxi-catalog-fisk-skaldjur-raw.json",
+      "docs/requirements/ica-maxi-catalog-brod-kakor-raw.json",
       "docs/requirements/ica-maxi-catalog-fageldelikatesschark-raw.json",
       "docs/requirements/ica-maxi-catalog-inalvsmat-raw.json",
       "docs/requirements/ica-maxi-catalog-korv-raw.json",
@@ -60,6 +69,69 @@
       "departmentId": "a34eb6f1-7ef8-4bcb-b166-4373726c158f"
     },
     {
+      "id": "3fc5f139-f90b-4a35-ab1a-4f429d009bb7",
+      "name": "Glutenfritt bröd & Kakor",
+      "fullURLPath": "Bröd-Kakor/Glutenfritt-bröd-Kakor",
+      "parentId": "a34eb6f1-7ef8-4bcb-b166-4373726c158f",
+      "departmentId": "a34eb6f1-7ef8-4bcb-b166-4373726c158f"
+    },
+    {
+      "id": "9b395301-be7b-4c89-8a53-99ed5164dd7d",
+      "name": "Kaffebröd",
+      "fullURLPath": "Bröd-Kakor/Kaffebröd",
+      "parentId": "a34eb6f1-7ef8-4bcb-b166-4373726c158f",
+      "departmentId": "a34eb6f1-7ef8-4bcb-b166-4373726c158f"
+    },
+    {
+      "id": "90ac3f24-3a01-4e4a-b0a6-add1717b5e2a",
+      "name": "Kex & kakor",
+      "fullURLPath": "Bröd-Kakor/Kex-kakor",
+      "parentId": "a34eb6f1-7ef8-4bcb-b166-4373726c158f",
+      "departmentId": "a34eb6f1-7ef8-4bcb-b166-4373726c158f"
+    },
+    {
+      "id": "855958e8-7bcc-45c3-a476-4be0392b7779",
+      "name": "Knäckebröd & Skorpor",
+      "fullURLPath": "Bröd-Kakor/Knäckebröd-Skorpor",
+      "parentId": "a34eb6f1-7ef8-4bcb-b166-4373726c158f",
+      "departmentId": "a34eb6f1-7ef8-4bcb-b166-4373726c158f"
+    },
+    {
+      "id": "1db4d6d4-baa0-4499-a168-0ff9649c5316",
+      "name": "Korvbröd, Hamburgerbröd & Maträttsbröd",
+      "fullURLPath": "Bröd-Kakor/Korvbröd-Hamburgerbröd-Maträttsbröd",
+      "parentId": "a34eb6f1-7ef8-4bcb-b166-4373726c158f",
+      "departmentId": "a34eb6f1-7ef8-4bcb-b166-4373726c158f"
+    },
+    {
+      "id": "c26bff7e-481b-4d04-a3cf-fcadbe6116e7",
+      "name": "Matbröd",
+      "fullURLPath": "Bröd-Kakor/Matbröd",
+      "parentId": "a34eb6f1-7ef8-4bcb-b166-4373726c158f",
+      "departmentId": "a34eb6f1-7ef8-4bcb-b166-4373726c158f"
+    },
+    {
+      "id": "342e0fc3-2a05-4215-8e18-36e6f824522b",
+      "name": "Ljust bröd",
+      "fullURLPath": "Bröd-Kakor/Matbröd/Ljust-bröd",
+      "parentId": "c26bff7e-481b-4d04-a3cf-fcadbe6116e7",
+      "departmentId": "a34eb6f1-7ef8-4bcb-b166-4373726c158f"
+    },
+    {
+      "id": "1404627b-9d73-48d3-a13b-5f841e81426e",
+      "name": "Mjukt tunnbröd & Vetekakor",
+      "fullURLPath": "Bröd-Kakor/Matbröd/Mjukt-tunnbröd-Vetekakor",
+      "parentId": "c26bff7e-481b-4d04-a3cf-fcadbe6116e7",
+      "departmentId": "a34eb6f1-7ef8-4bcb-b166-4373726c158f"
+    },
+    {
+      "id": "82de26f7-5d75-4922-85c7-49a55602103a",
+      "name": "Mörkt & Grovt bröd",
+      "fullURLPath": "Bröd-Kakor/Matbröd/Mörkt-Grovt-bröd",
+      "parentId": "c26bff7e-481b-4d04-a3cf-fcadbe6116e7",
+      "departmentId": "a34eb6f1-7ef8-4bcb-b166-4373726c158f"
+    },
+    {
       "id": "555f311d-70ca-4bd8-bd50-921545531f89",
       "name": "Djur",
       "fullURLPath": "Djur",
@@ -92,6 +164,34 @@
       "name": "Fisk & Skaldjur",
       "fullURLPath": "Fisk-Skaldjur",
       "parentId": null,
+      "departmentId": "fc0292c5-c74d-4229-9577-ec302310430f"
+    },
+    {
+      "id": "0cae5f1b-e8c8-4a27-b8c4-7fb95069e1da",
+      "name": "Fisk",
+      "fullURLPath": "Fisk-Skaldjur/Fisk",
+      "parentId": "fc0292c5-c74d-4229-9577-ec302310430f",
+      "departmentId": "fc0292c5-c74d-4229-9577-ec302310430f"
+    },
+    {
+      "id": "2759ecac-58f9-4c16-a1fa-d14f53cdf731",
+      "name": "Kaviar & Rom",
+      "fullURLPath": "Fisk-Skaldjur/Kaviar-Rom",
+      "parentId": "fc0292c5-c74d-4229-9577-ec302310430f",
+      "departmentId": "fc0292c5-c74d-4229-9577-ec302310430f"
+    },
+    {
+      "id": "1a0893ca-17a8-467b-b4cf-35662dc87340",
+      "name": "Sill & Ansjovis",
+      "fullURLPath": "Fisk-Skaldjur/Sill-Ansjovis",
+      "parentId": "fc0292c5-c74d-4229-9577-ec302310430f",
+      "departmentId": "fc0292c5-c74d-4229-9577-ec302310430f"
+    },
+    {
+      "id": "7520810c-c847-4a53-8a06-6f0eefc0ac0d",
+      "name": "Skaldjur",
+      "fullURLPath": "Fisk-Skaldjur/Skaldjur",
+      "parentId": "fc0292c5-c74d-4229-9577-ec302310430f",
       "departmentId": "fc0292c5-c74d-4229-9577-ec302310430f"
     },
     {
@@ -312,6 +412,55 @@
       "departmentId": "7aac2fb3-4bf5-4763-9610-fd2ad3ef930a"
     },
     {
+      "id": "02f8b6c4-2d82-40ba-9110-1c6bfd651e4a",
+      "name": "Cottage cheese",
+      "fullURLPath": "Mejeri-Ost/Cottage-cheese",
+      "parentId": "7aac2fb3-4bf5-4763-9610-fd2ad3ef930a",
+      "departmentId": "7aac2fb3-4bf5-4763-9610-fd2ad3ef930a"
+    },
+    {
+      "id": "107df3c2-03fe-4c83-b721-2867539fa99e",
+      "name": "Crème fraiche",
+      "fullURLPath": "Mejeri-Ost/Crème-fraiche",
+      "parentId": "7aac2fb3-4bf5-4763-9610-fd2ad3ef930a",
+      "departmentId": "7aac2fb3-4bf5-4763-9610-fd2ad3ef930a"
+    },
+    {
+      "id": "d312e68f-2cda-44d4-b2f6-a414855ae6e8",
+      "name": "Filmjölk",
+      "fullURLPath": "Mejeri-Ost/Filmjölk",
+      "parentId": "7aac2fb3-4bf5-4763-9610-fd2ad3ef930a",
+      "departmentId": "7aac2fb3-4bf5-4763-9610-fd2ad3ef930a"
+    },
+    {
+      "id": "26a16380-e8a8-49ae-9cb3-db908dde8ff2",
+      "name": "Grädde",
+      "fullURLPath": "Mejeri-Ost/Grädde",
+      "parentId": "7aac2fb3-4bf5-4763-9610-fd2ad3ef930a",
+      "departmentId": "7aac2fb3-4bf5-4763-9610-fd2ad3ef930a"
+    },
+    {
+      "id": "e532fb01-d8cd-4936-b80c-6b1af259a242",
+      "name": "Gräddfil",
+      "fullURLPath": "Mejeri-Ost/Gräddfil",
+      "parentId": "7aac2fb3-4bf5-4763-9610-fd2ad3ef930a",
+      "departmentId": "7aac2fb3-4bf5-4763-9610-fd2ad3ef930a"
+    },
+    {
+      "id": "4ccb3617-bef5-422e-a0b6-bb4b6e827a7c",
+      "name": "Kvarg",
+      "fullURLPath": "Mejeri-Ost/Kvarg",
+      "parentId": "7aac2fb3-4bf5-4763-9610-fd2ad3ef930a",
+      "departmentId": "7aac2fb3-4bf5-4763-9610-fd2ad3ef930a"
+    },
+    {
+      "id": "4d8e47c8-3759-4490-ad44-25d72f6e6e6e",
+      "name": "Kylda mellanmål & desserter",
+      "fullURLPath": "Mejeri-Ost/Kylda-mellanmål-desserter",
+      "parentId": "7aac2fb3-4bf5-4763-9610-fd2ad3ef930a",
+      "departmentId": "7aac2fb3-4bf5-4763-9610-fd2ad3ef930a"
+    },
+    {
       "id": "77a83ff9-a0cf-4aa0-907f-c0d47e0ec53c",
       "name": "Mjölk",
       "fullURLPath": "Mejeri-Ost/Mjölk",
@@ -410,6 +559,16 @@
       "fullURLPath": "Apotek-Hälsa-Skönhet/Ansiktsvård",
       "parentCategoryId": "70e47511-1892-45c5-8b0a-c5340ef8e518",
       "departmentId": "70e47511-1892-45c5-8b0a-c5340ef8e518"
+    },
+    {
+      "id": "5f90e7bb-732a-403c-8153-b9b1fe19f97a",
+      "name": "Ansjovis",
+      "watchlistText": "Ansjovis",
+      "fullURLPath": "Fisk-Skaldjur/Sill-Ansjovis/Ansjovis",
+      "parentCategoryId": "1a0893ca-17a8-467b-b4cf-35662dc87340",
+      "departmentId": "fc0292c5-c74d-4229-9577-ec302310430f",
+      "retailerCategoryId": "1570",
+      "productCount": 4
     },
     {
       "id": "c42c9de6-52b7-4363-98f0-f63ce9f53af2",
@@ -676,6 +835,16 @@
       "productCount": 3
     },
     {
+      "id": "020d34b8-f830-41e8-a7db-09a82eaff890",
+      "name": "Bullar & Vetelängder",
+      "watchlistText": "Bullar & Vetelängder",
+      "fullURLPath": "Bröd-Kakor/Kaffebröd/Bullar-Vetelängder",
+      "parentCategoryId": "9b395301-be7b-4c89-8a53-99ed5164dd7d",
+      "departmentId": "a34eb6f1-7ef8-4bcb-b166-4373726c158f",
+      "retailerCategoryId": "4356",
+      "productCount": 8
+    },
+    {
       "id": "76939032-aec5-47e3-a2a6-77826d46b774",
       "name": "Böcker & Tidningar",
       "watchlistText": "Böcker & Tidningar",
@@ -756,20 +925,54 @@
       "productCount": 1
     },
     {
-      "id": "02f8b6c4-2d82-40ba-9110-1c6bfd651e4a",
-      "name": "Cottage cheese",
-      "watchlistText": "Cottage cheese",
-      "fullURLPath": "Mejeri-Ost/Cottage-cheese",
-      "parentCategoryId": "7aac2fb3-4bf5-4763-9610-fd2ad3ef930a",
-      "departmentId": "7aac2fb3-4bf5-4763-9610-fd2ad3ef930a"
+      "id": "fe3b6b8a-3fcd-42d5-b655-69c81181bf51",
+      "name": "Cottage cheese naturell",
+      "watchlistText": "Cottage cheese naturell",
+      "fullURLPath": "Mejeri-Ost/Cottage-cheese/Cottage-cheese-naturell",
+      "parentCategoryId": "02f8b6c4-2d82-40ba-9110-1c6bfd651e4a",
+      "departmentId": "7aac2fb3-4bf5-4763-9610-fd2ad3ef930a",
+      "retailerCategoryId": "654",
+      "productCount": 10
     },
     {
-      "id": "107df3c2-03fe-4c83-b721-2867539fa99e",
-      "name": "Crème fraiche",
-      "watchlistText": "Crème fraiche",
-      "fullURLPath": "Mejeri-Ost/Crème-fraiche",
-      "parentCategoryId": "7aac2fb3-4bf5-4763-9610-fd2ad3ef930a",
-      "departmentId": "7aac2fb3-4bf5-4763-9610-fd2ad3ef930a"
+      "id": "50b13142-d6ed-4f26-a7b2-789f89956ff1",
+      "name": "Cottage cheese smaksatt",
+      "watchlistText": "Cottage cheese smaksatt",
+      "fullURLPath": "Mejeri-Ost/Cottage-cheese/Cottage-cheese-smaksatt",
+      "parentCategoryId": "02f8b6c4-2d82-40ba-9110-1c6bfd651e4a",
+      "departmentId": "7aac2fb3-4bf5-4763-9610-fd2ad3ef930a",
+      "retailerCategoryId": "655",
+      "productCount": 5
+    },
+    {
+      "id": "e8dc2919-ca5e-46cc-9f77-997227af9cd9",
+      "name": "Crème fraiche naturell",
+      "watchlistText": "Crème fraiche naturell",
+      "fullURLPath": "Mejeri-Ost/Crème-fraiche/Crème-fraiche-naturell",
+      "parentCategoryId": "107df3c2-03fe-4c83-b721-2867539fa99e",
+      "departmentId": "7aac2fb3-4bf5-4763-9610-fd2ad3ef930a",
+      "retailerCategoryId": "1302",
+      "productCount": 13
+    },
+    {
+      "id": "6a8243d0-d51b-4991-8568-ed2888dc6a9b",
+      "name": "Crème fraiche smaksatt",
+      "watchlistText": "Crème fraiche smaksatt",
+      "fullURLPath": "Mejeri-Ost/Crème-fraiche/Crème-fraiche-smaksatt",
+      "parentCategoryId": "107df3c2-03fe-4c83-b721-2867539fa99e",
+      "departmentId": "7aac2fb3-4bf5-4763-9610-fd2ad3ef930a",
+      "retailerCategoryId": "1303",
+      "productCount": 11
+    },
+    {
+      "id": "7a598379-a71e-494d-aeff-adc51946ccb7",
+      "name": "Crostini, Grissini & Oststänger",
+      "watchlistText": "Crostini, Grissini & Oststänger",
+      "fullURLPath": "Bröd-Kakor/Kaffebröd/Kex-kakor/Crostini-Grissini-Oststänger",
+      "parentCategoryId": "90ac3f24-3a01-4e4a-b0a6-add1717b5e2a",
+      "departmentId": "a34eb6f1-7ef8-4bcb-b166-4373726c158f",
+      "retailerCategoryId": "4391",
+      "productCount": 9
     },
     {
       "id": "2d27612b-5109-4eef-b5bb-fcbbb4cbbc88",
@@ -872,6 +1075,16 @@
       "productCount": 1
     },
     {
+      "id": "db005863-0a24-44ba-8f72-0b9733949a7a",
+      "name": "Drickkvarg",
+      "watchlistText": "Drickkvarg",
+      "fullURLPath": "Mejeri-Ost/Kvarg/Drickkvarg",
+      "parentCategoryId": "4ccb3617-bef5-422e-a0b6-bb4b6e827a7c",
+      "departmentId": "7aac2fb3-4bf5-4763-9610-fd2ad3ef930a",
+      "retailerCategoryId": "4685",
+      "productCount": 10
+    },
+    {
       "id": "98b2145a-ca3d-47f6-8b87-ec9345e9ad93",
       "name": "Drickyoghurt",
       "watchlistText": "Drickyoghurt",
@@ -972,20 +1185,34 @@
       "productCount": 1
     },
     {
-      "id": "d312e68f-2cda-44d4-b2f6-a414855ae6e8",
-      "name": "Filmjölk",
-      "watchlistText": "Filmjölk",
-      "fullURLPath": "Mejeri-Ost/Filmjölk",
-      "parentCategoryId": "7aac2fb3-4bf5-4763-9610-fd2ad3ef930a",
-      "departmentId": "7aac2fb3-4bf5-4763-9610-fd2ad3ef930a"
+      "id": "60bd43fa-500c-4d3e-8c7b-3fefa90b4b8b",
+      "name": "Filbunke",
+      "watchlistText": "Filbunke",
+      "fullURLPath": "Mejeri-Ost/Filmjölk/Filbunke",
+      "parentCategoryId": "d312e68f-2cda-44d4-b2f6-a414855ae6e8",
+      "departmentId": "7aac2fb3-4bf5-4763-9610-fd2ad3ef930a",
+      "retailerCategoryId": "4510",
+      "productCount": 1
     },
     {
-      "id": "0cae5f1b-e8c8-4a27-b8c4-7fb95069e1da",
-      "name": "Fisk",
-      "watchlistText": "Fisk",
-      "fullURLPath": "Fisk-Skaldjur/Fisk",
-      "parentCategoryId": "fc0292c5-c74d-4229-9577-ec302310430f",
-      "departmentId": "fc0292c5-c74d-4229-9577-ec302310430f"
+      "id": "7cda9983-6050-4fb8-8f27-a2e84bb08556",
+      "name": "Filmjölk naturell",
+      "watchlistText": "Filmjölk naturell",
+      "fullURLPath": "Mejeri-Ost/Filmjölk/Filmjölk-naturell",
+      "parentCategoryId": "d312e68f-2cda-44d4-b2f6-a414855ae6e8",
+      "departmentId": "7aac2fb3-4bf5-4763-9610-fd2ad3ef930a",
+      "retailerCategoryId": "4511",
+      "productCount": 26
+    },
+    {
+      "id": "d10ff20e-1558-40b6-9ef4-75f4df565d36",
+      "name": "Filmjölk smaksatt",
+      "watchlistText": "Filmjölk smaksatt",
+      "fullURLPath": "Mejeri-Ost/Filmjölk/Filmjölk-smaksatt",
+      "parentCategoryId": "d312e68f-2cda-44d4-b2f6-a414855ae6e8",
+      "departmentId": "7aac2fb3-4bf5-4763-9610-fd2ad3ef930a",
+      "retailerCategoryId": "4512",
+      "productCount": 17
     },
     {
       "id": "f9aaf11f-e7f0-4f0b-a597-7a66339ebde9",
@@ -1152,12 +1379,32 @@
       "productCount": 10
     },
     {
+      "id": "f0ee8ca0-d47a-4496-86b0-36491cfdbcc1",
+      "name": "Fryst bröd",
+      "watchlistText": "Fryst bröd",
+      "fullURLPath": "Bröd-Kakor/Matbröd/Fryst-bröd",
+      "parentCategoryId": "c26bff7e-481b-4d04-a3cf-fcadbe6116e7",
+      "departmentId": "a34eb6f1-7ef8-4bcb-b166-4373726c158f",
+      "retailerCategoryId": "4333",
+      "productCount": 8
+    },
+    {
       "id": "8c016ec5-420a-4e4d-87c7-25949c90d939",
       "name": "Fryst bröd & dessert",
       "watchlistText": "Fryst bröd & dessert",
       "fullURLPath": "Fryst/Fryst-bröd-dessert",
       "parentCategoryId": "360db808-e41c-463d-8cb1-ec80eb426b37",
       "departmentId": "360db808-e41c-463d-8cb1-ec80eb426b37"
+    },
+    {
+      "id": "b6ce689d-0c42-4a64-bca3-adc705634304",
+      "name": "Fryst fikabröd",
+      "watchlistText": "Fryst fikabröd",
+      "fullURLPath": "Bröd-Kakor/Kaffebröd/Fryst-fikabröd",
+      "parentCategoryId": "9b395301-be7b-4c89-8a53-99ed5164dd7d",
+      "departmentId": "a34eb6f1-7ef8-4bcb-b166-4373726c158f",
+      "retailerCategoryId": "4369",
+      "productCount": 10
     },
     {
       "id": "bc4b7fea-8873-4a06-a684-4828fc1c5194",
@@ -1206,6 +1453,16 @@
       "fullURLPath": "Fryst/Fryst-potatis",
       "parentCategoryId": "360db808-e41c-463d-8cb1-ec80eb426b37",
       "departmentId": "360db808-e41c-463d-8cb1-ec80eb426b37"
+    },
+    {
+      "id": "6df1267b-38b0-4416-8735-2b892a8e1a2f",
+      "name": "Fryst rom",
+      "watchlistText": "Fryst rom",
+      "fullURLPath": "Fisk-Skaldjur/Kaviar-Rom/Fryst-rom",
+      "parentCategoryId": "2759ecac-58f9-4c16-a1fa-d14f53cdf731",
+      "departmentId": "fc0292c5-c74d-4229-9577-ec302310430f",
+      "retailerCategoryId": "4945",
+      "productCount": 2
     },
     {
       "id": "8069b325-ba1b-4d63-93e6-19aacfca9723",
@@ -1263,9 +1520,11 @@
       "id": "f530dd3e-cded-47a3-b16a-d5e007bd21d7",
       "name": "Färdig proteindryck",
       "watchlistText": "Färdig proteindryck",
-      "fullURLPath": "Träning-Återhämtning/Färdig-proteindryck",
-      "parentCategoryId": "e128adca-fd5e-4b7e-a34e-a0badfe367ac",
-      "departmentId": "e128adca-fd5e-4b7e-a34e-a0badfe367ac"
+      "fullURLPath": "Mejeri-Ost/Kylda-mellanmål-desserter/Färdig-proteindryck",
+      "parentCategoryId": "4d8e47c8-3759-4490-ad44-25d72f6e6e6e",
+      "departmentId": "7aac2fb3-4bf5-4763-9610-fd2ad3ef930a",
+      "retailerCategoryId": "3322",
+      "productCount": 34
     },
     {
       "id": "d48e1452-10cc-4b2d-af58-d60b7422a452",
@@ -1273,7 +1532,9 @@
       "watchlistText": "Färdiga fiskrätter",
       "fullURLPath": "Fisk-Skaldjur/Färdiga-fiskrätter",
       "parentCategoryId": "fc0292c5-c74d-4229-9577-ec302310430f",
-      "departmentId": "fc0292c5-c74d-4229-9577-ec302310430f"
+      "departmentId": "fc0292c5-c74d-4229-9577-ec302310430f",
+      "retailerCategoryId": "4947",
+      "productCount": 33
     },
     {
       "id": "4c8f1d41-2033-426c-81b6-a5dddd58b8e6",
@@ -1312,6 +1573,16 @@
       "fullURLPath": "Färdigmat/Färsk-pasta",
       "parentCategoryId": "5d7bd782-7db9-4fef-ab86-3b7c5e797ccb",
       "departmentId": "5d7bd782-7db9-4fef-ab86-3b7c5e797ccb"
+    },
+    {
+      "id": "4fc28941-8070-4959-b6ca-2f119c77cf98",
+      "name": "Färsk rom",
+      "watchlistText": "Färsk rom",
+      "fullURLPath": "Fisk-Skaldjur/Kaviar-Rom/Färsk-rom",
+      "parentCategoryId": "2759ecac-58f9-4c16-a1fa-d14f53cdf731",
+      "departmentId": "fc0292c5-c74d-4229-9577-ec302310430f",
+      "retailerCategoryId": "1461",
+      "productCount": 16
     },
     {
       "id": "771a189b-0e78-4a19-bfed-d3eb6154895b",
@@ -1386,12 +1657,64 @@
       "productCount": 23
     },
     {
-      "id": "3fc5f139-f90b-4a35-ab1a-4f429d009bb7",
-      "name": "Glutenfritt bröd & Kakor",
-      "watchlistText": "Glutenfritt bröd & Kakor",
-      "fullURLPath": "Bröd-Kakor/Glutenfritt-bröd-Kakor",
-      "parentCategoryId": "a34eb6f1-7ef8-4bcb-b166-4373726c158f",
-      "departmentId": "a34eb6f1-7ef8-4bcb-b166-4373726c158f"
+      "id": "78d57d82-f60b-4404-a750-89cc8d93e50d",
+      "name": "Glutenfria kakor",
+      "watchlistText": "Glutenfria kakor",
+      "fullURLPath": "Bröd-Kakor/Glutenfritt-bröd-Kakor/Glutenfria-kakor",
+      "parentCategoryId": "3fc5f139-f90b-4a35-ab1a-4f429d009bb7",
+      "departmentId": "a34eb6f1-7ef8-4bcb-b166-4373726c158f",
+      "retailerCategoryId": "4340",
+      "productCount": 24
+    },
+    {
+      "id": "e30bfff4-a8b8-492f-b29e-16f54c82783e",
+      "name": "Glutenfria kex",
+      "watchlistText": "Glutenfria kex",
+      "fullURLPath": "Bröd-Kakor/Glutenfritt-bröd-Kakor/Glutenfria-kex",
+      "parentCategoryId": "3fc5f139-f90b-4a35-ab1a-4f429d009bb7",
+      "departmentId": "a34eb6f1-7ef8-4bcb-b166-4373726c158f",
+      "retailerCategoryId": "4339",
+      "productCount": 16
+    },
+    {
+      "id": "112a32f6-1df9-41e7-b25f-45a4f0221cab",
+      "name": "Glutenfria maträttsbröd",
+      "watchlistText": "Glutenfria maträttsbröd",
+      "fullURLPath": "Bröd-Kakor/Glutenfritt-bröd-Kakor/Glutenfria-maträttsbröd",
+      "parentCategoryId": "3fc5f139-f90b-4a35-ab1a-4f429d009bb7",
+      "departmentId": "a34eb6f1-7ef8-4bcb-b166-4373726c158f",
+      "retailerCategoryId": "4344",
+      "productCount": 13
+    },
+    {
+      "id": "7d26dc57-ef86-4ce9-b8da-a4dcc4fb4ffc",
+      "name": "Glutenfritt bröd",
+      "watchlistText": "Glutenfritt bröd",
+      "fullURLPath": "Bröd-Kakor/Glutenfritt-bröd-Kakor/Glutenfritt-bröd",
+      "parentCategoryId": "3fc5f139-f90b-4a35-ab1a-4f429d009bb7",
+      "departmentId": "a34eb6f1-7ef8-4bcb-b166-4373726c158f",
+      "retailerCategoryId": "4335",
+      "productCount": 32
+    },
+    {
+      "id": "30f03187-b753-49cf-985d-9fa261e7d272",
+      "name": "Glutenfritt fikabröd",
+      "watchlistText": "Glutenfritt fikabröd",
+      "fullURLPath": "Bröd-Kakor/Glutenfritt-bröd-Kakor/Glutenfritt-fikabröd",
+      "parentCategoryId": "3fc5f139-f90b-4a35-ab1a-4f429d009bb7",
+      "departmentId": "a34eb6f1-7ef8-4bcb-b166-4373726c158f",
+      "retailerCategoryId": "4341",
+      "productCount": 13
+    },
+    {
+      "id": "291cd8e9-0981-437c-9c5d-0b493bfa051a",
+      "name": "Glutenfritt knäckebröd",
+      "watchlistText": "Glutenfritt knäckebröd",
+      "fullURLPath": "Bröd-Kakor/Glutenfritt-bröd-Kakor/Glutenfritt-knäckebröd",
+      "parentCategoryId": "3fc5f139-f90b-4a35-ab1a-4f429d009bb7",
+      "departmentId": "a34eb6f1-7ef8-4bcb-b166-4373726c158f",
+      "retailerCategoryId": "4338",
+      "productCount": 19
     },
     {
       "id": "985e6074-329f-4b29-9c6f-451a838c2cf3",
@@ -1522,20 +1845,24 @@
       "productCount": 1
     },
     {
-      "id": "26a16380-e8a8-49ae-9cb3-db908dde8ff2",
-      "name": "Grädde",
-      "watchlistText": "Grädde",
-      "fullURLPath": "Mejeri-Ost/Grädde",
-      "parentCategoryId": "7aac2fb3-4bf5-4763-9610-fd2ad3ef930a",
-      "departmentId": "7aac2fb3-4bf5-4763-9610-fd2ad3ef930a"
+      "id": "46cae46a-ceda-4bd7-be2a-6968031d7bb8",
+      "name": "Grädda hemma",
+      "watchlistText": "Grädda hemma",
+      "fullURLPath": "Bröd-Kakor/Matbröd/Grädda-hemma",
+      "parentCategoryId": "c26bff7e-481b-4d04-a3cf-fcadbe6116e7",
+      "departmentId": "a34eb6f1-7ef8-4bcb-b166-4373726c158f",
+      "retailerCategoryId": "1540",
+      "productCount": 13
     },
     {
-      "id": "e532fb01-d8cd-4936-b80c-6b1af259a242",
+      "id": "23b941f5-d64d-4923-ba37-3ce0d9cdabf7",
       "name": "Gräddfil",
       "watchlistText": "Gräddfil",
-      "fullURLPath": "Mejeri-Ost/Gräddfil",
-      "parentCategoryId": "7aac2fb3-4bf5-4763-9610-fd2ad3ef930a",
-      "departmentId": "7aac2fb3-4bf5-4763-9610-fd2ad3ef930a"
+      "fullURLPath": "Mejeri-Ost/Gräddfil/Gräddfil",
+      "parentCategoryId": "e532fb01-d8cd-4936-b80c-6b1af259a242",
+      "departmentId": "7aac2fb3-4bf5-4763-9610-fd2ad3ef930a",
+      "retailerCategoryId": "1304",
+      "productCount": 6
     },
     {
       "id": "a4bda5a2-68ab-41db-9008-1fd05c4e388a",
@@ -1632,6 +1959,16 @@
       "productCount": 19
     },
     {
+      "id": "1aa4ddef-7ef8-4a2e-ab22-2e42a3284df8",
+      "name": "Hamburgerbröd",
+      "watchlistText": "Hamburgerbröd",
+      "fullURLPath": "Bröd-Kakor/Korvbröd-Hamburgerbröd-Maträttsbröd/Hamburgerbröd",
+      "parentCategoryId": "1db4d6d4-baa0-4499-a168-0ff9649c5316",
+      "departmentId": "a34eb6f1-7ef8-4bcb-b166-4373726c158f",
+      "retailerCategoryId": "1966",
+      "productCount": 16
+    },
+    {
       "id": "7c0f88c1-7ca3-4306-b0e1-a4d72639024b",
       "name": "Hamburgerkött & vilt",
       "watchlistText": "Hamburgerkött & vilt",
@@ -1694,6 +2031,16 @@
       "departmentId": "70e47511-1892-45c5-8b0a-c5340ef8e518"
     },
     {
+      "id": "854b25b3-4683-402c-9fe5-8d0ffb1b8e15",
+      "name": "Hummer",
+      "watchlistText": "Hummer",
+      "fullURLPath": "Fisk-Skaldjur/Skaldjur/Hummer",
+      "parentCategoryId": "7520810c-c847-4a53-8a06-6f0eefc0ac0d",
+      "departmentId": "fc0292c5-c74d-4229-9577-ec302310430f",
+      "retailerCategoryId": "1367",
+      "productCount": 3
+    },
+    {
       "id": "4491cd95-241d-4037-8686-7aafb4f2f95e",
       "name": "Hund",
       "watchlistText": "Hund",
@@ -1708,6 +2055,16 @@
       "fullURLPath": "Kök/Husgeråd-Köksredskap",
       "parentCategoryId": "a0bceaa9-e61a-470f-9566-d46aae9b5b74",
       "departmentId": "a0bceaa9-e61a-470f-9566-d46aae9b5b74"
+    },
+    {
+      "id": "a07831e6-19b9-4e62-8531-81be523f2ee0",
+      "name": "Hårt tunnbröd",
+      "watchlistText": "Hårt tunnbröd",
+      "fullURLPath": "Bröd-Kakor/Knäckebröd-Skorpor/Hårt-tunnbröd",
+      "parentCategoryId": "855958e8-7bcc-45c3-a476-4be0392b7779",
+      "departmentId": "a34eb6f1-7ef8-4bcb-b166-4373726c158f",
+      "retailerCategoryId": "4351",
+      "productCount": 17
     },
     {
       "id": "b202ef46-1f87-460d-b4ab-ad3bc9985723",
@@ -1736,6 +2093,26 @@
       "departmentId": "f82845b1-7be6-4e08-8b5d-7f2c0f0a7d38",
       "retailerCategoryId": "4552",
       "productCount": 2
+    },
+    {
+      "id": "8b6c4021-6c8e-46a9-a655-38f7dde2218e",
+      "name": "Inlagd sill",
+      "watchlistText": "Inlagd sill",
+      "fullURLPath": "Fisk-Skaldjur/Sill-Ansjovis/Inlagd-sill",
+      "parentCategoryId": "1a0893ca-17a8-467b-b4cf-35662dc87340",
+      "departmentId": "fc0292c5-c74d-4229-9577-ec302310430f",
+      "retailerCategoryId": "1549",
+      "productCount": 55
+    },
+    {
+      "id": "1afb7a25-6bd4-493b-a34c-a36df6c92ec3",
+      "name": "Inläggningssill",
+      "watchlistText": "Inläggningssill",
+      "fullURLPath": "Fisk-Skaldjur/Sill-Ansjovis/Inläggningssill",
+      "parentCategoryId": "1a0893ca-17a8-467b-b4cf-35662dc87340",
+      "departmentId": "fc0292c5-c74d-4229-9577-ec302310430f",
+      "retailerCategoryId": "4944",
+      "productCount": 5
     },
     {
       "id": "64fbc96f-a17e-4e9f-b608-e80cf4051ca9",
@@ -1832,12 +2209,14 @@
       "departmentId": "34948432-df3c-4468-991b-f0db32126003"
     },
     {
-      "id": "9b395301-be7b-4c89-8a53-99ed5164dd7d",
-      "name": "Kaffebröd",
-      "watchlistText": "Kaffebröd",
-      "fullURLPath": "Bröd-Kakor/Kaffebröd",
-      "parentCategoryId": "a34eb6f1-7ef8-4bcb-b166-4373726c158f",
-      "departmentId": "a34eb6f1-7ef8-4bcb-b166-4373726c158f"
+      "id": "7e733a6a-9570-4adc-9b62-6d728e554518",
+      "name": "Kaffegrädde",
+      "watchlistText": "Kaffegrädde",
+      "fullURLPath": "Mejeri-Ost/Grädde/Kaffegrädde",
+      "parentCategoryId": "26a16380-e8a8-49ae-9cb3-db908dde8ff2",
+      "departmentId": "7aac2fb3-4bf5-4763-9610-fd2ad3ef930a",
+      "retailerCategoryId": "1308",
+      "productCount": 1
     },
     {
       "id": "898d5458-9dd4-45d1-a196-084a8d81c71b",
@@ -1896,20 +2275,24 @@
       "departmentId": "555f311d-70ca-4bd8-bd50-921545531f89"
     },
     {
-      "id": "2759ecac-58f9-4c16-a1fa-d14f53cdf731",
-      "name": "Kaviar & Rom",
-      "watchlistText": "Kaviar & Rom",
-      "fullURLPath": "Fisk-Skaldjur/Kaviar-Rom",
-      "parentCategoryId": "fc0292c5-c74d-4229-9577-ec302310430f",
-      "departmentId": "fc0292c5-c74d-4229-9577-ec302310430f"
+      "id": "5500be9f-9ec9-46b5-8d89-f84d1037d6d7",
+      "name": "Kaviar",
+      "watchlistText": "Kaviar",
+      "fullURLPath": "Fisk-Skaldjur/Kaviar-Rom/Kaviar",
+      "parentCategoryId": "2759ecac-58f9-4c16-a1fa-d14f53cdf731",
+      "departmentId": "fc0292c5-c74d-4229-9577-ec302310430f",
+      "retailerCategoryId": "1460",
+      "productCount": 21
     },
     {
       "id": "90ac3f24-3a01-4e4a-b0a6-add1717b5e2a",
       "name": "Kex & kakor",
       "watchlistText": "Kex & kakor",
-      "fullURLPath": "Bröd-Kakor/Kex-kakor",
-      "parentCategoryId": "a34eb6f1-7ef8-4bcb-b166-4373726c158f",
-      "departmentId": "a34eb6f1-7ef8-4bcb-b166-4373726c158f"
+      "fullURLPath": "Bröd-Kakor/Kaffebröd/Kex-kakor",
+      "parentCategoryId": "9b395301-be7b-4c89-8a53-99ed5164dd7d",
+      "departmentId": "a34eb6f1-7ef8-4bcb-b166-4373726c158f",
+      "retailerCategoryId": "703",
+      "productCount": 194
     },
     {
       "id": "2f5e5ac9-76bd-489f-a654-dc8b3c057116",
@@ -1922,12 +2305,24 @@
       "productCount": 5
     },
     {
-      "id": "855958e8-7bcc-45c3-a476-4be0392b7779",
-      "name": "Knäckebröd & Skorpor",
-      "watchlistText": "Knäckebröd & Skorpor",
-      "fullURLPath": "Bröd-Kakor/Knäckebröd-Skorpor",
-      "parentCategoryId": "a34eb6f1-7ef8-4bcb-b166-4373726c158f",
-      "departmentId": "a34eb6f1-7ef8-4bcb-b166-4373726c158f"
+      "id": "1044b65f-75a5-4604-89e0-37fea8356a4c",
+      "name": "Knäckebröd",
+      "watchlistText": "Knäckebröd",
+      "fullURLPath": "Bröd-Kakor/Knäckebröd-Skorpor/Knäckebröd",
+      "parentCategoryId": "855958e8-7bcc-45c3-a476-4be0392b7779",
+      "departmentId": "a34eb6f1-7ef8-4bcb-b166-4373726c158f",
+      "retailerCategoryId": "4345",
+      "productCount": 106
+    },
+    {
+      "id": "4d3493a0-7ea1-4b0a-ab7e-fe4628d5ef6f",
+      "name": "Kondisbitar & Bakelser",
+      "watchlistText": "Kondisbitar & Bakelser",
+      "fullURLPath": "Bröd-Kakor/Kaffebröd/Kondisbitar-Bakelser",
+      "parentCategoryId": "9b395301-be7b-4c89-8a53-99ed5164dd7d",
+      "departmentId": "a34eb6f1-7ef8-4bcb-b166-4373726c158f",
+      "retailerCategoryId": "4364",
+      "productCount": 38
     },
     {
       "id": "014fb976-769c-4ea0-8ec5-f7178aef5091",
@@ -1956,12 +2351,14 @@
       "productCount": 2
     },
     {
-      "id": "1db4d6d4-baa0-4499-a168-0ff9649c5316",
-      "name": "Korvbröd, Hamburgerbröd & Maträttsbröd",
-      "watchlistText": "Korvbröd, Hamburgerbröd & Maträttsbröd",
-      "fullURLPath": "Bröd-Kakor/Korvbröd-Hamburgerbröd-Maträttsbröd",
-      "parentCategoryId": "a34eb6f1-7ef8-4bcb-b166-4373726c158f",
-      "departmentId": "a34eb6f1-7ef8-4bcb-b166-4373726c158f"
+      "id": "b6c1d4db-0c15-420a-b691-06eb7e30a6e4",
+      "name": "Korvbröd",
+      "watchlistText": "Korvbröd",
+      "fullURLPath": "Bröd-Kakor/Korvbröd-Hamburgerbröd-Maträttsbröd/Korvbröd",
+      "parentCategoryId": "1db4d6d4-baa0-4499-a168-0ff9649c5316",
+      "departmentId": "a34eb6f1-7ef8-4bcb-b166-4373726c158f",
+      "retailerCategoryId": "1965",
+      "productCount": 10
     },
     {
       "id": "5bd19e61-4ff1-4ef3-a884-8024ddcd7805",
@@ -1988,6 +2385,16 @@
       "fullURLPath": "Blommor-Trädgård/Krukväxter-Blomsterarrangemang",
       "parentCategoryId": "71542409-5f2e-4ae3-9ad7-6751e10afb38",
       "departmentId": "71542409-5f2e-4ae3-9ad7-6751e10afb38"
+    },
+    {
+      "id": "ff4504ad-6dd4-4d62-9904-c58c8437424d",
+      "name": "Krustader & Krutonger",
+      "watchlistText": "Krustader & Krutonger",
+      "fullURLPath": "Bröd-Kakor/Kaffebröd/Kex-kakor/Krustader-Krutonger",
+      "parentCategoryId": "90ac3f24-3a01-4e4a-b0a6-add1717b5e2a",
+      "departmentId": "a34eb6f1-7ef8-4bcb-b166-4373726c158f",
+      "retailerCategoryId": "4390",
+      "productCount": 8
     },
     {
       "id": "1a48d8d3-4aea-404d-b147-27ace7dba3db",
@@ -2018,12 +2425,44 @@
       "productCount": 8
     },
     {
-      "id": "4ccb3617-bef5-422e-a0b6-bb4b6e827a7c",
-      "name": "Kvarg",
-      "watchlistText": "Kvarg",
-      "fullURLPath": "Mejeri-Ost/Kvarg",
-      "parentCategoryId": "7aac2fb3-4bf5-4763-9610-fd2ad3ef930a",
-      "departmentId": "7aac2fb3-4bf5-4763-9610-fd2ad3ef930a"
+      "id": "1f9ee73b-964c-490c-9223-b7d41a1ebb04",
+      "name": "Kräftor",
+      "watchlistText": "Kräftor",
+      "fullURLPath": "Fisk-Skaldjur/Skaldjur/Kräftor",
+      "parentCategoryId": "7520810c-c847-4a53-8a06-6f0eefc0ac0d",
+      "departmentId": "fc0292c5-c74d-4229-9577-ec302310430f",
+      "retailerCategoryId": "1365",
+      "productCount": 6
+    },
+    {
+      "id": "34a17826-f58b-4250-988d-dddf6afa518a",
+      "name": "Kvarg naturell",
+      "watchlistText": "Kvarg naturell",
+      "fullURLPath": "Mejeri-Ost/Kvarg/Kvarg-naturell",
+      "parentCategoryId": "4ccb3617-bef5-422e-a0b6-bb4b6e827a7c",
+      "departmentId": "7aac2fb3-4bf5-4763-9610-fd2ad3ef930a",
+      "retailerCategoryId": "652",
+      "productCount": 6
+    },
+    {
+      "id": "480bb93e-be97-45d9-b1c0-8b73f11ca738",
+      "name": "Kvarg portionsförpackning",
+      "watchlistText": "Kvarg portionsförpackning",
+      "fullURLPath": "Mejeri-Ost/Kvarg/Kvarg-portionsförpackning",
+      "parentCategoryId": "4ccb3617-bef5-422e-a0b6-bb4b6e827a7c",
+      "departmentId": "7aac2fb3-4bf5-4763-9610-fd2ad3ef930a",
+      "retailerCategoryId": "4684",
+      "productCount": 6
+    },
+    {
+      "id": "f6663dc6-27ef-4aeb-8be6-f65565ddf664",
+      "name": "Kvarg smaksatt",
+      "watchlistText": "Kvarg smaksatt",
+      "fullURLPath": "Mejeri-Ost/Kvarg/Kvarg-smaksatt",
+      "parentCategoryId": "4ccb3617-bef5-422e-a0b6-bb4b6e827a7c",
+      "departmentId": "7aac2fb3-4bf5-4763-9610-fd2ad3ef930a",
+      "retailerCategoryId": "653",
+      "productCount": 20
     },
     {
       "id": "11bc4dab-eda7-4ab5-aba5-f475de7ed402",
@@ -2066,12 +2505,34 @@
       "productCount": 13
     },
     {
-      "id": "4d8e47c8-3759-4490-ad44-25d72f6e6e6e",
-      "name": "Kylda mellanmål & desserter",
-      "watchlistText": "Kylda mellanmål & desserter",
-      "fullURLPath": "Mejeri-Ost/Kylda-mellanmål-desserter",
-      "parentCategoryId": "7aac2fb3-4bf5-4763-9610-fd2ad3ef930a",
-      "departmentId": "7aac2fb3-4bf5-4763-9610-fd2ad3ef930a"
+      "id": "205e35f4-1941-490a-9bce-b75628ca26af",
+      "name": "Kyld vaniljsås",
+      "watchlistText": "Kyld vaniljsås",
+      "fullURLPath": "Mejeri-Ost/Kylda-mellanmål-desserter/Kyld-vaniljsås",
+      "parentCategoryId": "4d8e47c8-3759-4490-ad44-25d72f6e6e6e",
+      "departmentId": "7aac2fb3-4bf5-4763-9610-fd2ad3ef930a",
+      "retailerCategoryId": "1932",
+      "productCount": 9
+    },
+    {
+      "id": "8b92af0c-e28a-436f-ade3-a20366d51bc0",
+      "name": "Kylda desserter",
+      "watchlistText": "Kylda desserter",
+      "fullURLPath": "Mejeri-Ost/Kylda-mellanmål-desserter/Kylda-desserter",
+      "parentCategoryId": "4d8e47c8-3759-4490-ad44-25d72f6e6e6e",
+      "departmentId": "7aac2fb3-4bf5-4763-9610-fd2ad3ef930a",
+      "retailerCategoryId": "1215",
+      "productCount": 15
+    },
+    {
+      "id": "39e3b99f-0647-4bfe-8816-214eea48268e",
+      "name": "Kylda mellanmål",
+      "watchlistText": "Kylda mellanmål",
+      "fullURLPath": "Mejeri-Ost/Kylda-mellanmål-desserter/Kylda-mellanmål",
+      "parentCategoryId": "4d8e47c8-3759-4490-ad44-25d72f6e6e6e",
+      "departmentId": "7aac2fb3-4bf5-4763-9610-fd2ad3ef930a",
+      "retailerCategoryId": "299",
+      "productCount": 26
     },
     {
       "id": "08d27ef1-eac5-4dbb-88d5-1be4f0882268",
@@ -2115,6 +2576,66 @@
       "parentCategoryId": "dd850748-c56e-4aa3-bd97-81281fea9bae",
       "departmentId": "c0a4a3ed-f97c-4b2f-81ca-dcc9a7e044f7",
       "retailerCategoryId": "1381",
+      "productCount": 25
+    },
+    {
+      "id": "e208ee15-4c08-457d-b8d1-fcde67613345",
+      "name": "Laktosfri cottage cheese",
+      "watchlistText": "Laktosfri cottage cheese",
+      "fullURLPath": "Mejeri-Ost/Cottage-cheese/Laktosfri-cottage-cheese",
+      "parentCategoryId": "02f8b6c4-2d82-40ba-9110-1c6bfd651e4a",
+      "departmentId": "7aac2fb3-4bf5-4763-9610-fd2ad3ef930a",
+      "retailerCategoryId": "4682",
+      "productCount": 5
+    },
+    {
+      "id": "7e6afb2a-9a75-4787-8c5c-d723f2d80b6f",
+      "name": "Laktosfri crème fraiche",
+      "watchlistText": "Laktosfri crème fraiche",
+      "fullURLPath": "Mejeri-Ost/Crème-fraiche/Laktosfri-crème-fraiche",
+      "parentCategoryId": "107df3c2-03fe-4c83-b721-2867539fa99e",
+      "departmentId": "7aac2fb3-4bf5-4763-9610-fd2ad3ef930a",
+      "retailerCategoryId": "4680",
+      "productCount": 8
+    },
+    {
+      "id": "818f0596-bed5-4f14-91e8-6526d65e95df",
+      "name": "Laktosfri filmjölk",
+      "watchlistText": "Laktosfri filmjölk",
+      "fullURLPath": "Mejeri-Ost/Filmjölk/Laktosfri-filmjölk",
+      "parentCategoryId": "d312e68f-2cda-44d4-b2f6-a414855ae6e8",
+      "departmentId": "7aac2fb3-4bf5-4763-9610-fd2ad3ef930a",
+      "retailerCategoryId": "4509",
+      "productCount": 19
+    },
+    {
+      "id": "cb1b0199-28ad-42b1-9d9f-7a418a055de7",
+      "name": "Laktosfri grädde",
+      "watchlistText": "Laktosfri grädde",
+      "fullURLPath": "Mejeri-Ost/Grädde/Laktosfri-grädde",
+      "parentCategoryId": "26a16380-e8a8-49ae-9cb3-db908dde8ff2",
+      "departmentId": "7aac2fb3-4bf5-4763-9610-fd2ad3ef930a",
+      "retailerCategoryId": "1845",
+      "productCount": 15
+    },
+    {
+      "id": "f27d6989-3000-45c9-9cfc-9bb4616afde9",
+      "name": "Laktosfri gräddfil",
+      "watchlistText": "Laktosfri gräddfil",
+      "fullURLPath": "Mejeri-Ost/Gräddfil/Laktosfri-gräddfil",
+      "parentCategoryId": "e532fb01-d8cd-4936-b80c-6b1af259a242",
+      "departmentId": "7aac2fb3-4bf5-4763-9610-fd2ad3ef930a",
+      "retailerCategoryId": "4681",
+      "productCount": 2
+    },
+    {
+      "id": "bf9bfe02-47b3-449f-8b15-0fc9853b2b74",
+      "name": "Laktosfri kvarg",
+      "watchlistText": "Laktosfri kvarg",
+      "fullURLPath": "Mejeri-Ost/Kvarg/Laktosfri-kvarg",
+      "parentCategoryId": "4ccb3617-bef5-422e-a0b6-bb4b6e827a7c",
+      "departmentId": "7aac2fb3-4bf5-4763-9610-fd2ad3ef930a",
+      "retailerCategoryId": "4683",
       "productCount": 25
     },
     {
@@ -2168,6 +2689,26 @@
       "productCount": 2
     },
     {
+      "id": "d8fec8c7-5b3f-4302-a38f-eae2a47d5088",
+      "name": "Lantbröd",
+      "watchlistText": "Lantbröd",
+      "fullURLPath": "Bröd-Kakor/Matbröd/Ljust-bröd/Lantbröd",
+      "parentCategoryId": "342e0fc3-2a05-4215-8e18-36e6f824522b",
+      "departmentId": "a34eb6f1-7ef8-4bcb-b166-4373726c158f",
+      "retailerCategoryId": "4316",
+      "productCount": 8
+    },
+    {
+      "id": "813fd4dd-cea9-4311-bb4c-212f8656b25c",
+      "name": "Lax",
+      "watchlistText": "Lax",
+      "fullURLPath": "Fisk-Skaldjur/Fisk/Lax",
+      "parentCategoryId": "0cae5f1b-e8c8-4a27-b8c4-7fb95069e1da",
+      "departmentId": "fc0292c5-c74d-4229-9577-ec302310430f",
+      "retailerCategoryId": "1462",
+      "productCount": 56
+    },
+    {
       "id": "94828ec1-5a2c-4208-b7cc-760e2cd4f755",
       "name": "Leksaker",
       "watchlistText": "Leksaker",
@@ -2184,6 +2725,16 @@
       "departmentId": "c0a4a3ed-f97c-4b2f-81ca-dcc9a7e044f7",
       "retailerCategoryId": "4761",
       "productCount": 2
+    },
+    {
+      "id": "f4c234db-c16e-4f0d-a8fe-245517578f2b",
+      "name": "Limpa",
+      "watchlistText": "Limpa",
+      "fullURLPath": "Bröd-Kakor/Matbröd/Ljust-bröd/Limpa",
+      "parentCategoryId": "342e0fc3-2a05-4215-8e18-36e6f824522b",
+      "departmentId": "a34eb6f1-7ef8-4bcb-b166-4373726c158f",
+      "retailerCategoryId": "4317",
+      "productCount": 10
     },
     {
       "id": "7196cfb1-44d5-40d0-b9f2-726eb287b412",
@@ -2274,14 +2825,6 @@
       "productCount": 1
     },
     {
-      "id": "c26bff7e-481b-4d04-a3cf-fcadbe6116e7",
-      "name": "Matbröd",
-      "watchlistText": "Matbröd",
-      "fullURLPath": "Bröd-Kakor/Matbröd",
-      "parentCategoryId": "a34eb6f1-7ef8-4bcb-b166-4373726c158f",
-      "departmentId": "a34eb6f1-7ef8-4bcb-b166-4373726c158f"
-    },
-    {
       "id": "96714c60-da25-417b-bbbb-8e76b1a37078",
       "name": "Matfett margarin",
       "watchlistText": "Matfett margarin",
@@ -2320,6 +2863,26 @@
       "departmentId": "a0bceaa9-e61a-470f-9566-d46aae9b5b74"
     },
     {
+      "id": "df2f94a2-bf9a-40ef-af6c-24a6363da7f2",
+      "name": "Matkex",
+      "watchlistText": "Matkex",
+      "fullURLPath": "Bröd-Kakor/Kaffebröd/Kex-kakor/Matkex",
+      "parentCategoryId": "90ac3f24-3a01-4e4a-b0a6-add1717b5e2a",
+      "departmentId": "a34eb6f1-7ef8-4bcb-b166-4373726c158f",
+      "retailerCategoryId": "4377",
+      "productCount": 39
+    },
+    {
+      "id": "4eb1f76a-9958-4ad0-af26-ecaee942555b",
+      "name": "Matlagningsgrädde",
+      "watchlistText": "Matlagningsgrädde",
+      "fullURLPath": "Mejeri-Ost/Grädde/Matlagningsgrädde",
+      "parentCategoryId": "26a16380-e8a8-49ae-9cb3-db908dde8ff2",
+      "departmentId": "7aac2fb3-4bf5-4763-9610-fd2ad3ef930a",
+      "retailerCategoryId": "1307",
+      "productCount": 7
+    },
+    {
       "id": "51d9cb25-c568-434b-a515-984d0c9181ae",
       "name": "Matlagningsost",
       "watchlistText": "Matlagningsost",
@@ -2356,6 +2919,16 @@
       "departmentId": "c0a4a3ed-f97c-4b2f-81ca-dcc9a7e044f7",
       "retailerCategoryId": "2628",
       "productCount": 2
+    },
+    {
+      "id": "714e0e96-f4d4-4e4b-90ab-c36bbf0016f0",
+      "name": "Mellangrädde",
+      "watchlistText": "Mellangrädde",
+      "fullURLPath": "Mejeri-Ost/Grädde/Mellangrädde",
+      "parentCategoryId": "26a16380-e8a8-49ae-9cb3-db908dde8ff2",
+      "departmentId": "7aac2fb3-4bf5-4763-9610-fd2ad3ef930a",
+      "retailerCategoryId": "1587",
+      "productCount": 3
     },
     {
       "id": "b7d2e654-3124-4cd3-a6a7-583cb567bddd",
@@ -2406,6 +2979,16 @@
       "productCount": 1
     },
     {
+      "id": "d37d5aa0-2739-47df-b425-a002c2b9d701",
+      "name": "Mjuka kakor & Muffins",
+      "watchlistText": "Mjuka kakor & Muffins",
+      "fullURLPath": "Bröd-Kakor/Kaffebröd/Mjuka-kakor-Muffins",
+      "parentCategoryId": "9b395301-be7b-4c89-8a53-99ed5164dd7d",
+      "departmentId": "a34eb6f1-7ef8-4bcb-b166-4373726c158f",
+      "retailerCategoryId": "4359",
+      "productCount": 37
+    },
+    {
       "id": "b2822b7d-ace5-4d6a-b2ca-3d0ef0e509ae",
       "name": "Mjukost",
       "watchlistText": "Mjukost",
@@ -2414,6 +2997,16 @@
       "departmentId": "7aac2fb3-4bf5-4763-9610-fd2ad3ef930a",
       "retailerCategoryId": "269",
       "productCount": 33
+    },
+    {
+      "id": "2976abd1-7a97-471e-8e4b-c16f9a47d80b",
+      "name": "Mjukt tunnbröd",
+      "watchlistText": "Mjukt tunnbröd",
+      "fullURLPath": "Bröd-Kakor/Matbröd/Mjukt-tunnbröd-Vetekakor/Mjukt-tunnbröd",
+      "parentCategoryId": "1404627b-9d73-48d3-a13b-5f841e81426e",
+      "departmentId": "a34eb6f1-7ef8-4bcb-b166-4373726c158f",
+      "retailerCategoryId": "4326",
+      "productCount": 5
     },
     {
       "id": "92dc546e-6541-462e-8082-520f78ce30f8",
@@ -2452,6 +3045,26 @@
       "productCount": 77
     },
     {
+      "id": "583c92f4-ed94-4287-90a6-fc5601c715ad",
+      "name": "Mjölkfri fraiche",
+      "watchlistText": "Mjölkfri fraiche",
+      "fullURLPath": "Mejeri-Ost/Crème-fraiche/Mjölkfri-fraiche",
+      "parentCategoryId": "107df3c2-03fe-4c83-b721-2867539fa99e",
+      "departmentId": "7aac2fb3-4bf5-4763-9610-fd2ad3ef930a",
+      "retailerCategoryId": "1922",
+      "productCount": 3
+    },
+    {
+      "id": "976d92d9-2cbc-46c5-b0c8-989925f12deb",
+      "name": "Mjölkfri grädde",
+      "watchlistText": "Mjölkfri grädde",
+      "fullURLPath": "Mejeri-Ost/Grädde/Mjölkfri-grädde",
+      "parentCategoryId": "26a16380-e8a8-49ae-9cb3-db908dde8ff2",
+      "departmentId": "7aac2fb3-4bf5-4763-9610-fd2ad3ef930a",
+      "retailerCategoryId": "1843",
+      "productCount": 15
+    },
+    {
       "id": "dbbdbc86-629c-490f-87be-727085463534",
       "name": "Mjölkfri yoghurt",
       "watchlistText": "Mjölkfri yoghurt",
@@ -2488,6 +3101,16 @@
       "departmentId": "70e47511-1892-45c5-8b0a-c5340ef8e518"
     },
     {
+      "id": "5be7580f-63bb-45cb-9469-fcf2150c6e65",
+      "name": "Musslor",
+      "watchlistText": "Musslor",
+      "fullURLPath": "Fisk-Skaldjur/Skaldjur/Musslor",
+      "parentCategoryId": "7520810c-c847-4a53-8a06-6f0eefc0ac0d",
+      "departmentId": "fc0292c5-c74d-4229-9577-ec302310430f",
+      "retailerCategoryId": "1368",
+      "productCount": 8
+    },
+    {
       "id": "096a82ae-71c4-498d-9976-b9e836a7ad3c",
       "name": "Mynta",
       "watchlistText": "Mynta",
@@ -2506,6 +3129,26 @@
       "departmentId": "7aac2fb3-4bf5-4763-9610-fd2ad3ef930a",
       "retailerCategoryId": "2594",
       "productCount": 64
+    },
+    {
+      "id": "1656fd9a-8feb-4352-9421-0d75548e4be3",
+      "name": "Mörkt skivat bröd",
+      "watchlistText": "Mörkt skivat bröd",
+      "fullURLPath": "Bröd-Kakor/Matbröd/Mörkt-Grovt-bröd/Mörkt-skivat-bröd",
+      "parentCategoryId": "82de26f7-5d75-4922-85c7-49a55602103a",
+      "departmentId": "a34eb6f1-7ef8-4bcb-b166-4373726c158f",
+      "retailerCategoryId": "4320",
+      "productCount": 13
+    },
+    {
+      "id": "0266bd64-b47f-41ea-86a0-7412c4594ad9",
+      "name": "Mörkt styckpackat bröd",
+      "watchlistText": "Mörkt styckpackat bröd",
+      "fullURLPath": "Bröd-Kakor/Matbröd/Mörkt-Grovt-bröd/Mörkt-styckpackat-bröd",
+      "parentCategoryId": "82de26f7-5d75-4922-85c7-49a55602103a",
+      "departmentId": "a34eb6f1-7ef8-4bcb-b166-4373726c158f",
+      "retailerCategoryId": "4322",
+      "productCount": 20
     },
     {
       "id": "c1db2ab6-f049-44f3-81b7-fecfe2b05bfd",
@@ -2562,6 +3205,16 @@
       "departmentId": "f82845b1-7be6-4e08-8b5d-7f2c0f0a7d38",
       "retailerCategoryId": "4561",
       "productCount": 2
+    },
+    {
+      "id": "a9e578d9-df78-46e7-b9ad-5f61b8185deb",
+      "name": "Ostkaka",
+      "watchlistText": "Ostkaka",
+      "fullURLPath": "Mejeri-Ost/Kylda-mellanmål-desserter/Ostkaka",
+      "parentCategoryId": "4d8e47c8-3759-4490-ad44-25d72f6e6e6e",
+      "departmentId": "7aac2fb3-4bf5-4763-9610-fd2ad3ef930a",
+      "retailerCategoryId": "640",
+      "productCount": 5
     },
     {
       "id": "bb37b6e6-8b46-4b6b-bcb2-a4a009e255d3",
@@ -2680,6 +3333,26 @@
       "productCount": 2
     },
     {
+      "id": "cf16e943-9960-4776-86e9-55367de47ce5",
+      "name": "Pitabröd",
+      "watchlistText": "Pitabröd",
+      "fullURLPath": "Bröd-Kakor/Korvbröd-Hamburgerbröd-Maträttsbröd/Pitabröd",
+      "parentCategoryId": "1db4d6d4-baa0-4499-a168-0ff9649c5316",
+      "departmentId": "a34eb6f1-7ef8-4bcb-b166-4373726c158f",
+      "retailerCategoryId": "4330",
+      "productCount": 4
+    },
+    {
+      "id": "c6528368-4116-413c-9614-a8a97df1bd4e",
+      "name": "Pizzabotten",
+      "watchlistText": "Pizzabotten",
+      "fullURLPath": "Bröd-Kakor/Korvbröd-Hamburgerbröd-Maträttsbröd/Pizzabotten",
+      "parentCategoryId": "1db4d6d4-baa0-4499-a168-0ff9649c5316",
+      "departmentId": "a34eb6f1-7ef8-4bcb-b166-4373726c158f",
+      "retailerCategoryId": "4331",
+      "productCount": 4
+    },
+    {
       "id": "9ddf2a0c-8049-4bd5-8e60-cc0090dd2379",
       "name": "Pizzakit & kylda degar",
       "watchlistText": "Pizzakit & kylda degar",
@@ -2725,9 +3398,11 @@
       "id": "0cf1989b-eda1-44dc-94a0-8c113ec8ad18",
       "name": "Proteinmål",
       "watchlistText": "Proteinmål",
-      "fullURLPath": "Träning-Återhämtning/Proteinmål",
-      "parentCategoryId": "e128adca-fd5e-4b7e-a34e-a0badfe367ac",
-      "departmentId": "e128adca-fd5e-4b7e-a34e-a0badfe367ac"
+      "fullURLPath": "Mejeri-Ost/Kylda-mellanmål-desserter/Proteinmål",
+      "parentCategoryId": "4d8e47c8-3759-4490-ad44-25d72f6e6e6e",
+      "departmentId": "7aac2fb3-4bf5-4763-9610-fd2ad3ef930a",
+      "retailerCategoryId": "1933",
+      "productCount": 55
     },
     {
       "id": "960baeed-c38a-4c62-836e-c2429075f6b5",
@@ -2824,6 +3499,16 @@
       "productCount": 8
     },
     {
+      "id": "a8adfefd-4e19-4d85-83a5-887782fadc54",
+      "name": "Riskakor",
+      "watchlistText": "Riskakor",
+      "fullURLPath": "Bröd-Kakor/Knäckebröd-Skorpor/Riskakor",
+      "parentCategoryId": "855958e8-7bcc-45c3-a476-4be0392b7779",
+      "departmentId": "a34eb6f1-7ef8-4bcb-b166-4373726c158f",
+      "retailerCategoryId": "4352",
+      "productCount": 36
+    },
+    {
       "id": "cbceb008-06bd-4050-89a4-90c576ba4832",
       "name": "Romansallad",
       "watchlistText": "Romansallad",
@@ -2874,6 +3559,16 @@
       "productCount": 4
     },
     {
+      "id": "b3f2b06c-b0a7-4cfa-9622-5ab119c1f577",
+      "name": "Rostbröd",
+      "watchlistText": "Rostbröd",
+      "fullURLPath": "Bröd-Kakor/Matbröd/Ljust-bröd/Rostbröd",
+      "parentCategoryId": "342e0fc3-2a05-4215-8e18-36e6f824522b",
+      "departmentId": "a34eb6f1-7ef8-4bcb-b166-4373726c158f",
+      "retailerCategoryId": "4315",
+      "productCount": 14
+    },
+    {
       "id": "ef503f56-bc49-4150-a659-833e7fafd351",
       "name": "Rotselleri",
       "watchlistText": "Rotselleri",
@@ -2912,6 +3607,26 @@
       "productCount": 10
     },
     {
+      "id": "3c79b384-c34e-4df0-b2e1-2a486beb5eb5",
+      "name": "Rågbröd",
+      "watchlistText": "Rågbröd",
+      "fullURLPath": "Bröd-Kakor/Matbröd/Mörkt-Grovt-bröd/Rågbröd",
+      "parentCategoryId": "82de26f7-5d75-4922-85c7-49a55602103a",
+      "departmentId": "a34eb6f1-7ef8-4bcb-b166-4373726c158f",
+      "retailerCategoryId": "4321",
+      "productCount": 5
+    },
+    {
+      "id": "d499c2dc-cfb0-4c07-bf1a-e0f71e265600",
+      "name": "Rågkakor",
+      "watchlistText": "Rågkakor",
+      "fullURLPath": "Bröd-Kakor/Matbröd/Mjukt-tunnbröd-Vetekakor/Rågkakor",
+      "parentCategoryId": "1404627b-9d73-48d3-a13b-5f841e81426e",
+      "departmentId": "a34eb6f1-7ef8-4bcb-b166-4373726c158f",
+      "retailerCategoryId": "4328",
+      "productCount": 3
+    },
+    {
       "id": "1ae52516-747f-4570-ba2b-386cfef57867",
       "name": "Rädisor",
       "watchlistText": "Rädisor",
@@ -2920,6 +3635,16 @@
       "departmentId": "f82845b1-7be6-4e08-8b5d-7f2c0f0a7d38",
       "retailerCategoryId": "4584",
       "productCount": 3
+    },
+    {
+      "id": "99ebe998-8cc2-458c-a01f-fd1650d591bf",
+      "name": "Räkor",
+      "watchlistText": "Räkor",
+      "fullURLPath": "Fisk-Skaldjur/Skaldjur/Räkor",
+      "parentCategoryId": "7520810c-c847-4a53-8a06-6f0eefc0ac0d",
+      "departmentId": "fc0292c5-c74d-4229-9577-ec302310430f",
+      "retailerCategoryId": "1755",
+      "productCount": 31
     },
     {
       "id": "f1346b41-d843-4d2f-98ba-84f113361e3c",
@@ -2950,6 +3675,16 @@
       "departmentId": "f82845b1-7be6-4e08-8b5d-7f2c0f0a7d38",
       "retailerCategoryId": "1263",
       "productCount": 4
+    },
+    {
+      "id": "18bf1d23-b538-401d-b82c-6a3eaa47ba56",
+      "name": "Rödspätta & Plattfisk",
+      "watchlistText": "Rödspätta & Plattfisk",
+      "fullURLPath": "Fisk-Skaldjur/Fisk/Rödspätta-Plattfisk",
+      "parentCategoryId": "0cae5f1b-e8c8-4a27-b8c4-7fb95069e1da",
+      "departmentId": "fc0292c5-c74d-4229-9577-ec302310430f",
+      "retailerCategoryId": "1466",
+      "productCount": 3
     },
     {
       "id": "071547c8-85dc-4bac-8d3e-4f1f4d02c562",
@@ -3030,22 +3765,6 @@
       "productCount": 2
     },
     {
-      "id": "1a0893ca-17a8-467b-b4cf-35662dc87340",
-      "name": "Sill & Ansjovis",
-      "watchlistText": "Sill & Ansjovis",
-      "fullURLPath": "Fisk-Skaldjur/Sill-Ansjovis",
-      "parentCategoryId": "fc0292c5-c74d-4229-9577-ec302310430f",
-      "departmentId": "fc0292c5-c74d-4229-9577-ec302310430f"
-    },
-    {
-      "id": "7520810c-c847-4a53-8a06-6f0eefc0ac0d",
-      "name": "Skaldjur",
-      "watchlistText": "Skaldjur",
-      "fullURLPath": "Fisk-Skaldjur/Skaldjur",
-      "parentCategoryId": "fc0292c5-c74d-4229-9577-ec302310430f",
-      "departmentId": "fc0292c5-c74d-4229-9577-ec302310430f"
-    },
-    {
       "id": "f857880f-3617-4c15-b2c0-453c80c55508",
       "name": "Skinka",
       "watchlistText": "Skinka",
@@ -3072,6 +3791,16 @@
       "fullURLPath": "Kläder-Accessoarer/Skor-Skovård",
       "parentCategoryId": "a6c5191e-77ac-4dae-a6e8-da5b0aba93e0",
       "departmentId": "a6c5191e-77ac-4dae-a6e8-da5b0aba93e0"
+    },
+    {
+      "id": "f79665b5-de54-4bbc-9be4-dd087aa9f58a",
+      "name": "Skorpor",
+      "watchlistText": "Skorpor",
+      "fullURLPath": "Bröd-Kakor/Knäckebröd-Skorpor/Skorpor",
+      "parentCategoryId": "855958e8-7bcc-45c3-a476-4be0392b7779",
+      "departmentId": "a34eb6f1-7ef8-4bcb-b166-4373726c158f",
+      "retailerCategoryId": "4353",
+      "productCount": 14
     },
     {
       "id": "adff6d6c-1499-41f7-94b1-e950567992fd",
@@ -3224,6 +3953,16 @@
       "productCount": 21
     },
     {
+      "id": "1c0510bf-32a1-48d9-9858-9c9a0e9cb086",
+      "name": "Stekt strömming",
+      "watchlistText": "Stekt strömming",
+      "fullURLPath": "Fisk-Skaldjur/Sill-Ansjovis/Stekt-strömming",
+      "parentCategoryId": "1a0893ca-17a8-467b-b4cf-35662dc87340",
+      "departmentId": "fc0292c5-c74d-4229-9577-ec302310430f",
+      "retailerCategoryId": "1765",
+      "productCount": 1
+    },
+    {
       "id": "2c330185-7ae0-4044-b23c-13ff1f342d16",
       "name": "Stenfrukt",
       "watchlistText": "Stenfrukt",
@@ -3270,6 +4009,16 @@
       "departmentId": "563524de-aa3c-49b6-a9d0-27924320f035"
     },
     {
+      "id": "07f4351c-8f7a-46b5-b78e-921b032c7bda",
+      "name": "Surdegsbröd",
+      "watchlistText": "Surdegsbröd",
+      "fullURLPath": "Bröd-Kakor/Matbröd/Surdegsbröd",
+      "parentCategoryId": "c26bff7e-481b-4d04-a3cf-fcadbe6116e7",
+      "departmentId": "a34eb6f1-7ef8-4bcb-b166-4373726c158f",
+      "retailerCategoryId": "4325",
+      "productCount": 9
+    },
+    {
       "id": "4ec92291-5b9b-4393-a86d-89939050eff5",
       "name": "Surkål",
       "watchlistText": "Surkål",
@@ -3278,6 +4027,16 @@
       "departmentId": "f82845b1-7be6-4e08-8b5d-7f2c0f0a7d38",
       "retailerCategoryId": "4543",
       "productCount": 7
+    },
+    {
+      "id": "78024289-660b-4c64-a4e2-51803c257ae4",
+      "name": "Surströmming",
+      "watchlistText": "Surströmming",
+      "fullURLPath": "Fisk-Skaldjur/Sill-Ansjovis/Surströmming",
+      "parentCategoryId": "1a0893ca-17a8-467b-b4cf-35662dc87340",
+      "departmentId": "fc0292c5-c74d-4229-9577-ec302310430f",
+      "retailerCategoryId": "1767",
+      "productCount": 1
     },
     {
       "id": "8349c5e8-d2d0-4bb6-9f15-5b7d9e58e16e",
@@ -3304,6 +4063,16 @@
       "departmentId": "c0a4a3ed-f97c-4b2f-81ca-dcc9a7e044f7",
       "retailerCategoryId": "4966",
       "productCount": 3
+    },
+    {
+      "id": "38813079-bb1e-460f-88df-65ce963ffa44",
+      "name": "Söta kex & Kakor",
+      "watchlistText": "Söta kex & Kakor",
+      "fullURLPath": "Bröd-Kakor/Kaffebröd/Kex-kakor/Söta-kex-Kakor",
+      "parentCategoryId": "90ac3f24-3a01-4e4a-b0a6-add1717b5e2a",
+      "departmentId": "a34eb6f1-7ef8-4bcb-b166-4373726c158f",
+      "retailerCategoryId": "4382",
+      "productCount": 130
     },
     {
       "id": "0a6a9bdd-f4ef-4f1e-b382-0562e204e43c",
@@ -3354,6 +4123,16 @@
       "productCount": 12
     },
     {
+      "id": "87c387f3-8fa3-463d-896b-7e10398038c3",
+      "name": "Torsk & Vitfisk",
+      "watchlistText": "Torsk & Vitfisk",
+      "fullURLPath": "Fisk-Skaldjur/Fisk/Torsk-Vitfisk",
+      "parentCategoryId": "0cae5f1b-e8c8-4a27-b8c4-7fb95069e1da",
+      "departmentId": "fc0292c5-c74d-4229-9577-ec302310430f",
+      "retailerCategoryId": "1465",
+      "productCount": 17
+    },
+    {
       "id": "2a46eb66-e9ce-40b7-9faf-bdeac574191c",
       "name": "Tropisk juice",
       "watchlistText": "Tropisk juice",
@@ -3402,6 +4181,26 @@
       "fullURLPath": "Städ-Tvätt-Papper/Tvätt",
       "parentCategoryId": "563524de-aa3c-49b6-a9d0-27924320f035",
       "departmentId": "563524de-aa3c-49b6-a9d0-27924320f035"
+    },
+    {
+      "id": "99969a34-8b7c-43d4-9a4f-7c32a21b8ddf",
+      "name": "Tårtbottnar",
+      "watchlistText": "Tårtbottnar",
+      "fullURLPath": "Bröd-Kakor/Kaffebröd/Tårtbottnar",
+      "parentCategoryId": "9b395301-be7b-4c89-8a53-99ed5164dd7d",
+      "departmentId": "a34eb6f1-7ef8-4bcb-b166-4373726c158f",
+      "retailerCategoryId": "4368",
+      "productCount": 5
+    },
+    {
+      "id": "a2d6e988-fb3b-4d89-81ac-657792da7dca",
+      "name": "Tårtor & Pajer",
+      "watchlistText": "Tårtor & Pajer",
+      "fullURLPath": "Bröd-Kakor/Kaffebröd/Tårtor-Pajer",
+      "parentCategoryId": "9b395301-be7b-4c89-8a53-99ed5164dd7d",
+      "departmentId": "a34eb6f1-7ef8-4bcb-b166-4373726c158f",
+      "retailerCategoryId": "4365",
+      "productCount": 26
     },
     {
       "id": "bbe1a0e2-b997-4c0a-9379-5c2f0791aafa",
@@ -3504,6 +4303,16 @@
       "departmentId": "442f3f18-3b3a-484a-ae0d-700be34148ed"
     },
     {
+      "id": "47712266-1b28-4bde-a37f-23313108be2e",
+      "name": "Vetekakor",
+      "watchlistText": "Vetekakor",
+      "fullURLPath": "Bröd-Kakor/Matbröd/Mjukt-tunnbröd-Vetekakor/Vetekakor",
+      "parentCategoryId": "1404627b-9d73-48d3-a13b-5f841e81426e",
+      "departmentId": "a34eb6f1-7ef8-4bcb-b166-4373726c158f",
+      "retailerCategoryId": "4327",
+      "productCount": 12
+    },
+    {
       "id": "55f2bab3-8593-47cb-a059-b44acb7721fd",
       "name": "Vilt",
       "watchlistText": "Vilt",
@@ -3532,6 +4341,16 @@
       "departmentId": "34948432-df3c-4468-991b-f0db32126003"
     },
     {
+      "id": "71a16b8c-026d-4e32-b456-7221e3b18851",
+      "name": "Vispgrädde",
+      "watchlistText": "Vispgrädde",
+      "fullURLPath": "Mejeri-Ost/Grädde/Vispgrädde",
+      "parentCategoryId": "26a16380-e8a8-49ae-9cb3-db908dde8ff2",
+      "departmentId": "7aac2fb3-4bf5-4763-9610-fd2ad3ef930a",
+      "retailerCategoryId": "282",
+      "productCount": 14
+    },
+    {
       "id": "befdb240-339f-4c02-a327-ef5c611495df",
       "name": "Vitaminer & Hälsokost",
       "watchlistText": "Vitaminer & Hälsokost",
@@ -3558,6 +4377,16 @@
       "departmentId": "f82845b1-7be6-4e08-8b5d-7f2c0f0a7d38",
       "retailerCategoryId": "1264",
       "productCount": 6
+    },
+    {
+      "id": "bba40d74-48ad-447c-85da-fb9309e1e745",
+      "name": "Våffelstrutar & Maränger",
+      "watchlistText": "Våffelstrutar & Maränger",
+      "fullURLPath": "Bröd-Kakor/Kaffebröd/Kex-kakor/Våffelstrutar-Maränger",
+      "parentCategoryId": "90ac3f24-3a01-4e4a-b0a6-add1717b5e2a",
+      "departmentId": "a34eb6f1-7ef8-4bcb-b166-4373726c158f",
+      "retailerCategoryId": "4392",
+      "productCount": 8
     },
     {
       "id": "5e6b1e51-71ba-4753-9b38-afc467d54084",
@@ -3698,6 +4527,16 @@
       "productCount": 5
     },
     {
+      "id": "7b5aa5e8-31a6-4749-9eb3-309aafc2c409",
+      "name": "Övrig fisk",
+      "watchlistText": "Övrig fisk",
+      "fullURLPath": "Fisk-Skaldjur/Fisk/Övrig-fisk",
+      "parentCategoryId": "0cae5f1b-e8c8-4a27-b8c4-7fb95069e1da",
+      "departmentId": "fc0292c5-c74d-4229-9577-ec302310430f",
+      "retailerCategoryId": "1536",
+      "productCount": 8
+    },
+    {
       "id": "a959bf67-63f2-4d0f-acca-817ac732cd18",
       "name": "Övrig heminredning",
       "watchlistText": "Övrig heminredning",
@@ -3756,6 +4595,16 @@
       "productCount": 3
     },
     {
+      "id": "6b312727-f60b-46d6-84b6-47a555fe824d",
+      "name": "Övriga maträttsbröd",
+      "watchlistText": "Övriga maträttsbröd",
+      "fullURLPath": "Bröd-Kakor/Korvbröd-Hamburgerbröd-Maträttsbröd/Övriga-maträttsbröd",
+      "parentCategoryId": "1db4d6d4-baa0-4499-a168-0ff9649c5316",
+      "departmentId": "a34eb6f1-7ef8-4bcb-b166-4373726c158f",
+      "retailerCategoryId": "4332",
+      "productCount": 9
+    },
+    {
       "id": "54ea6b0a-beae-4a06-89d9-8401f5bce2ca",
       "name": "Övriga rotfrukter",
       "watchlistText": "Övriga rotfrukter",
@@ -3766,6 +4615,16 @@
       "productCount": 2
     },
     {
+      "id": "bd0a44e4-2cee-4a1b-ac5a-ba3948aa1c52",
+      "name": "Övriga skaldjur",
+      "watchlistText": "Övriga skaldjur",
+      "fullURLPath": "Fisk-Skaldjur/Skaldjur/Övriga-skaldjur",
+      "parentCategoryId": "7520810c-c847-4a53-8a06-6f0eefc0ac0d",
+      "departmentId": "fc0292c5-c74d-4229-9577-ec302310430f",
+      "retailerCategoryId": "1363",
+      "productCount": 7
+    },
+    {
       "id": "64e44810-2b76-4c57-adae-070a311be68c",
       "name": "Övrigt fläskkött",
       "watchlistText": "Övrigt fläskkött",
@@ -3774,6 +4633,16 @@
       "departmentId": "c0a4a3ed-f97c-4b2f-81ca-dcc9a7e044f7",
       "retailerCategoryId": "4965",
       "productCount": 2
+    },
+    {
+      "id": "ca43829d-1dff-4224-bca0-318d010462bd",
+      "name": "Övrigt ljust bröd",
+      "watchlistText": "Övrigt ljust bröd",
+      "fullURLPath": "Bröd-Kakor/Matbröd/Ljust-bröd/Övrigt-ljust-bröd",
+      "parentCategoryId": "342e0fc3-2a05-4215-8e18-36e6f824522b",
+      "departmentId": "a34eb6f1-7ef8-4bcb-b166-4373726c158f",
+      "retailerCategoryId": "4318",
+      "productCount": 7
     },
     {
       "id": "4a0bc0b8-3610-4b41-be46-65a26348778a",

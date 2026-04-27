@@ -1,4 +1,4 @@
-import type { RecipeGeneratorMeal } from "@agent/shared";
+import type { RecipeDifficulty, RecipeGeneratorMeal } from "@agent/shared";
 import type { RecipeI18nColumn } from "@/lib/recipe-locale";
 
 /** Row shape returned by `/api/recipes` and `/api/recipes/[id]`. */
@@ -17,6 +17,7 @@ export type SavedRecipeRow = {
   tested: boolean;
   want_to_try: boolean;
   estimated_cook_time: string;
+  difficulty: RecipeDifficulty;
   source: string;
   /** Raw markdown pasted from an external recipe when fulfilling a suggestion. */
   source_markdown?: string | null;
@@ -34,6 +35,7 @@ export type RecipeEditDraft = {
   title_vi: string;
   summary: string;
   meal_kind: string;
+  difficulty: RecipeDifficulty;
   ingredients: RecipeGeneratorMeal["ingredients"];
 };
 
@@ -44,6 +46,7 @@ export function savedRowToEditDraft(r: SavedRecipeRow): RecipeEditDraft {
     title_vi: r.title_vi ?? "",
     summary: r.summary,
     meal_kind: r.meal_kind,
+    difficulty: r.difficulty ?? "medium",
     ingredients: r.ingredients.map((x) => ({ ...x })),
   };
 }

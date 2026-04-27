@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { formatSavedRecipeSourceLabel } from "@/lib/recipe-source";
+import { RECIPE_DIFFICULTIES, formatRecipeDifficulty } from "@/lib/recipe-difficulty";
 import {
   type RecipeEditDraft,
   type SavedRecipeRow,
@@ -54,6 +55,7 @@ export function EditRecipePage({ recipeId }: EditRecipePageProps) {
   const [draft, setDraft] = useState<RecipeEditDraft | null>(null);
   const [stepsText, setStepsText] = useState("");
   const [cookTime, setCookTime] = useState("");
+  const [difficulty, setDifficulty] = useState("medium");
   const [similarUrl, setSimilarUrl] = useState("");
   const [localError, setLocalError] = useState<string | null>(null);
 
@@ -65,6 +67,7 @@ export function EditRecipePage({ recipeId }: EditRecipePageProps) {
     enabled: validId,
   });
 
+  /* eslint-disable react-hooks/set-state-in-effect -- hydrate editable form state after the recipe query resolves. */
   useEffect(() => {
     const r = recipeQuery.data;
     if (!r) {
@@ -73,9 +76,11 @@ export function EditRecipePage({ recipeId }: EditRecipePageProps) {
     setDraft(savedRowToEditDraft(r));
     setStepsText(recipeStepsToMarkdown(r.steps));
     setCookTime(r.estimated_cook_time);
+    setDifficulty(r.difficulty ?? "medium");
     setSimilarUrl(r.similar_recipe_url);
     setLocalError(null);
   }, [recipeQuery.data]);
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   const saveMutation = useMutation({
     mutationFn: async (payload: {
@@ -88,6 +93,7 @@ export function EditRecipePage({ recipeId }: EditRecipePageProps) {
       ingredients: RecipeGeneratorMeal["ingredients"];
       steps: string[];
       estimated_cook_time: string;
+      difficulty: string;
       similar_recipe_url: string;
     }) => {
       const { id, ...rest } = payload;
@@ -142,6 +148,7 @@ export function EditRecipePage({ recipeId }: EditRecipePageProps) {
       ingredients,
       steps,
       estimated_cook_time: cookTime,
+      difficulty,
       similar_recipe_url: similarUrl,
     });
   };
@@ -323,8 +330,10 @@ export function EditRecipePage({ recipeId }: EditRecipePageProps) {
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg">Timing & reference</CardTitle>
-          <CardDescription>How long it takes and a link to a similar published recipe, if any.</CardDescription>
+          <CardTitle className="text-lg">Timing, difficulty & reference</CardTitle>
+          <CardDescription>
+            How hard it feels, how long it takes, and a link to a similar published recipe, if any.
+          </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-1.5">
@@ -337,6 +346,21 @@ export function EditRecipePage({ recipeId }: EditRecipePageProps) {
               disabled={saving}
               className="max-w-md"
             />
+          </div>
+          <div className="space-y-1.5">
+            <span className="text-xs font-medium text-muted-foreground">Difficulty</span>
+            <Select value={difficulty} onValueChange={setDifficulty} disabled={saving}>
+              <SelectTrigger className="h-9 w-full max-w-xs">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {RECIPE_DIFFICULTIES.map((value) => (
+                  <SelectItem key={value} value={value}>
+                    {formatRecipeDifficulty(value)}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
           <div className="space-y-1.5">
             <span className="text-xs font-medium text-muted-foreground">Original recipe URL (optional)</span>

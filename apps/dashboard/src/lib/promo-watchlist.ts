@@ -1,5 +1,5 @@
 export const PROMO_WATCHLIST_KEY = "promo_watchlist";
-export const MAX_PROMO_WATCHLIST_ITEMS = 50;
+export const MAX_PROMO_WATCHLIST_ITEMS = 100;
 
 /** Loads watchlist strings from `family_context` (same source as Promo grocery watchlist). */
 export async function fetchPromoWatchlist(): Promise<string[]> {

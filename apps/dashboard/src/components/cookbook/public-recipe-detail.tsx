@@ -12,6 +12,7 @@ import {
   getRecipeDisplayTitle,
   type SavedRecipeWithI18n,
 } from "@/lib/recipe-locale";
+import { formatRecipeDifficulty } from "@/lib/recipe-difficulty";
 import type { SavedRecipeRow } from "@/lib/saved-recipe-row";
 
 async function fetchPublicRecipe(id: string): Promise<SavedRecipeRow> {
@@ -137,6 +138,7 @@ export function PublicRecipeDetail({ recipeId }: PublicRecipeDetailProps) {
           {recipe.estimated_cook_time.trim() ? (
             <span>Est. {recipe.estimated_cook_time}</span>
           ) : null}
+          <span>{formatRecipeDifficulty(recipe.difficulty)}</span>
           {recipe.vegetarian ? (
             <span className="text-emerald-700 dark:text-emerald-400">Vegetarian</span>
           ) : null}

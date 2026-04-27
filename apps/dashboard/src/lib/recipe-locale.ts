@@ -1,4 +1,4 @@
-import type { RecipeIngredient } from "@agent/shared";
+import type { RecipeDifficulty, RecipeIngredient } from "@agent/shared";
 
 export type AppLocale = "sv" | "en" | "vi";
 
@@ -27,6 +27,7 @@ export type SavedRecipeWithI18n = {
   summary: string;
   meal_kind: string;
   estimated_cook_time: string;
+  difficulty?: RecipeDifficulty;
   vegetarian: boolean;
   ingredients: RecipeIngredient[];
   steps: string[];

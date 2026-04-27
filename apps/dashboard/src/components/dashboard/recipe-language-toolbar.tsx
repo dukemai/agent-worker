@@ -14,11 +14,12 @@ import {
 async function translateRecipeRequest(
   recipeId: string,
   target: "en" | "vi",
+  endpointForRecipe: (recipeId: string) => string,
 ): Promise<{ recipe: SavedRecipeWithI18n }> {
-  const res = await fetch(`/api/recipes/${encodeURIComponent(recipeId)}/translate`, {
+  const res = await fetch(endpointForRecipe(recipeId), {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ locale: target }),
+    body: JSON.stringify({ locale: target, recipeId }),
   });
   if (!res.ok) {
     const j = (await res.json().catch(() => ({}))) as { error?: string };
@@ -38,11 +39,13 @@ export function RecipeLanguageToolbar({
   recipe,
   onTranslated,
   className,
+  translateEndpointForRecipe = (id) => `/api/recipes/${encodeURIComponent(id)}/translate`,
 }: {
   recipeId: string;
   recipe: SavedRecipeWithI18n;
   onTranslated: (recipe: SavedRecipeWithI18n) => void;
   className?: string;
+  translateEndpointForRecipe?: (recipeId: string) => string;
 }) {
   const { locale } = useRecipeLocale();
   const queryClient = useQueryClient();
@@ -52,7 +55,7 @@ export function RecipeLanguageToolbar({
       if (locale !== "en" && locale !== "vi") {
         throw new Error("Pick English or Vietnamese to translate.");
       }
-      return translateRecipeRequest(recipeId, locale);
+      return translateRecipeRequest(recipeId, locale, translateEndpointForRecipe);
     },
     onSuccess: (data) => {
       onTranslated(data.recipe);

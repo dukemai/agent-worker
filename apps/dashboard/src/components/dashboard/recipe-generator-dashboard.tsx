@@ -6,10 +6,11 @@ import {
   type RecipeGeneratorMeal,
 } from "@agent/shared";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Eye, FileInput, Pencil, Star, Trash2 } from "lucide-react";
+import { Eye, FileInput, Pencil, Search, Sparkles, Star, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
+import type { FoodStyleFavoriteSuggestionRow } from "@/app/api/promo-food-style-suggestions/route";
 import { useRecipeLocale } from "@/components/dashboard/recipe-locale-provider";
 import { ImportRecipeFromSourcePage } from "@/components/dashboard/import-recipe-from-source-page";
 import { RecipeLanguageToolbar } from "@/components/dashboard/recipe-language-toolbar";
@@ -41,6 +42,7 @@ import {
 } from "@/lib/recipe-locale";
 import type { SavedRecipeRow } from "@/lib/saved-recipe-row";
 import { foodDepartmentIdsFromCatalog } from "@/lib/recipe-picker-food-departments";
+import { formatRecipeDifficulty } from "@/lib/recipe-difficulty";
 import {
   MAX_INGREDIENT_PICKS,
   normalizeExcludeMealTitles,
@@ -84,6 +86,10 @@ const IMPORT_SOURCE_WITH_MARKDOWN_ONLY = "with_source";
 const IMPORT_RECIPE_UUID_RE =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
+type FoodStyleSuggestionsResponse = {
+  suggestions: FoodStyleFavoriteSuggestionRow[];
+};
+
 /** Placeholder until the user pastes steps from a trusted source in the editor. */
 const SUGGESTION_ONLY_STEPS = [
   "Tillagning saknas än — öppna Redigera recept och klistra in text från en källa du litar på.",
@@ -95,6 +101,15 @@ function formatSavedAt(iso: string): string {
   } catch {
     return iso;
   }
+}
+
+async function fetchFoodStyleSuggestions(): Promise<FoodStyleSuggestionsResponse> {
+  const response = await fetch("/api/promo-food-style-suggestions", { cache: "no-store" });
+  if (!response.ok) {
+    await throwApiError(response, "Failed to load food style mappings");
+  }
+  const data = (await response.json()) as FoodStyleSuggestionsResponse;
+  return { suggestions: Array.isArray(data.suggestions) ? data.suggestions : [] };
 }
 
 export function RecipeGeneratorDashboard() {
@@ -110,10 +125,12 @@ export function RecipeGeneratorDashboard() {
   const [localError, setLocalError] = useState<string | null>(null);
   const [libraryTypeFilter, setLibraryTypeFilter] = useState<string>(ALL_LIBRARY_TYPES);
   const [libraryTestedFilter, setLibraryTestedFilter] = useState<string>(ALL_LIBRARY_TESTED);
+  const [librarySearch, setLibrarySearch] = useState("");
   const [importSourceMarkdownFilter, setImportSourceMarkdownFilter] = useState<string>(
     IMPORT_SOURCE_WITHOUT_MARKDOWN,
   );
-  const [ingredientsFavoritesOnly, setIngredientsFavoritesOnly] = useState(false);
+  const [ingredientPickMode, setIngredientPickMode] = useState<"mapping" | "catalog">("mapping");
+  const [excludeExistingForStyle, setExcludeExistingForStyle] = useState(true);
   const [detailRecipe, setDetailRecipe] = useState<SavedRecipeRow | null>(null);
   const [fulfillMeal, setFulfillMeal] = useState<RecipeGeneratorMeal | null>(null);
   const [fulfillMarkdown, setFulfillMarkdown] = useState("");
@@ -138,7 +155,7 @@ export function RecipeGeneratorDashboard() {
     if (t === "library" || t === "plan" || t === "generate" || t === "import") {
       return t;
     }
-    return "generate";
+    return "library";
   }, [searchParams]);
 
   const importRecipeParamRaw = searchParams.get("importRecipe")?.trim() ?? "";
@@ -202,6 +219,11 @@ export function RecipeGeneratorDashboard() {
     queryFn: fetchSavedRecipes,
   });
 
+  const foodStyleSuggestionsQuery = useQuery({
+    queryKey: ["promo-food-style-suggestions"],
+    queryFn: fetchFoodStyleSuggestions,
+  });
+
   const watchlistQuery = useQuery({
     queryKey: ["context", PROMO_WATCHLIST_KEY],
     queryFn: fetchPromoWatchlist,
@@ -232,10 +254,17 @@ export function RecipeGeneratorDashboard() {
   const generateMutation = useMutation({
     mutationFn: async () => {
       const excludeMealTitles = normalizeExcludeMealTitles(
-        excludeText
-          .split("\n")
-          .map((s) => s.trim())
-          .filter(Boolean),
+        [
+          ...excludeText
+            .split("\n")
+            .map((s) => s.trim())
+            .filter(Boolean),
+          ...(excludeExistingForStyle
+            ? (savedQuery.data ?? [])
+                .filter((r) => r.food_type_id === foodTypeId)
+                .map((r) => r.title)
+            : []),
+        ],
       );
       const response = await fetch("/api/recipes/generate", {
         method: "POST",
@@ -307,6 +336,7 @@ export function RecipeGeneratorDashboard() {
           vegetarian: lastMeta.vegetarian,
           ingredient_picks: picks,
           estimated_cook_time: meal.estimated_cook_time,
+          difficulty: meal.difficulty,
           source_markdown,
           similar_recipe_url: (originalRecipeUrl ?? "").trim(),
         }),
@@ -330,6 +360,7 @@ export function RecipeGeneratorDashboard() {
       tested?: boolean;
       want_to_try?: boolean;
       estimated_cook_time?: string;
+      difficulty?: string;
       similar_recipe_url?: string;
       title?: string;
       title_en?: string;
@@ -351,6 +382,9 @@ export function RecipeGeneratorDashboard() {
       }
       if (typeof rest.estimated_cook_time === "string") {
         body.estimated_cook_time = rest.estimated_cook_time.trim().slice(0, 120);
+      }
+      if (typeof rest.difficulty === "string") {
+        body.difficulty = rest.difficulty;
       }
       if (typeof rest.similar_recipe_url === "string") {
         body.similar_recipe_url = rest.similar_recipe_url.trim();
@@ -472,6 +506,41 @@ export function RecipeGeneratorDashboard() {
     [watchlistQuery.data],
   );
 
+  const mappedSuggestionsForSelectedStyle = useMemo(() => {
+    const suggestions = foodStyleSuggestionsQuery.data?.suggestions ?? [];
+    if (!foodTypeId) {
+      return [];
+    }
+    return suggestions
+      .filter((suggestion) => suggestion.style_id === foodTypeId)
+      .slice()
+      .sort(
+        (a, b) =>
+          a.priority - b.priority ||
+          a.watchlist_text.localeCompare(b.watchlist_text, "sv", { sensitivity: "base" }),
+      );
+  }, [foodStyleSuggestionsQuery.data?.suggestions, foodTypeId]);
+
+  const mappedIngredientTexts = useMemo(
+    () =>
+      new Set(
+        mappedSuggestionsForSelectedStyle.map((suggestion) => suggestion.watchlist_text.trim()),
+      ),
+    [mappedSuggestionsForSelectedStyle],
+  );
+
+  const filteredMappedSuggestions = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    if (!q) {
+      return mappedSuggestionsForSelectedStyle;
+    }
+    return mappedSuggestionsForSelectedStyle.filter(
+      (suggestion) =>
+        suggestion.watchlist_text.toLowerCase().includes(q) ||
+        (suggestion.reason?.toLowerCase().includes(q) ?? false),
+    );
+  }, [mappedSuggestionsForSelectedStyle, search]);
+
   const filteredPickerItems = useMemo(() => {
     const items = catalogQuery.data?.items ?? [];
     const q = search.trim().toLowerCase();
@@ -482,11 +551,11 @@ export function RecipeGeneratorDashboard() {
       if (effectiveDepartmentId !== ALL_DEPARTMENTS && it.departmentId !== effectiveDepartmentId) {
         return false;
       }
-      if (ingredientsFavoritesOnly) {
-        if (watchlistQuery.isLoading) {
+      if (ingredientPickMode === "mapping") {
+        if (foodStyleSuggestionsQuery.isLoading) {
           return false;
         }
-        if (!promoWatchlistSet.has(it.watchlistText.trim())) {
+        if (!mappedIngredientTexts.has(it.watchlistText.trim())) {
           return false;
         }
       }
@@ -502,9 +571,9 @@ export function RecipeGeneratorDashboard() {
     effectiveDepartmentId,
     search,
     foodDeptIds,
-    ingredientsFavoritesOnly,
-    watchlistQuery.isLoading,
-    promoWatchlistSet,
+    ingredientPickMode,
+    foodStyleSuggestionsQuery.isLoading,
+    mappedIngredientTexts,
   ]);
 
   async function togglePromoWatchlistItem(entry: PromoPickerItem) {
@@ -537,7 +606,7 @@ export function RecipeGeneratorDashboard() {
     return m;
   }, [foodTypesQuery.data?.options]);
 
-  const filteredSavedRecipes = useMemo(() => {
+  const typeAndTestedFilteredSavedRecipes = useMemo(() => {
     let list = savedQuery.data ?? [];
     if (libraryTypeFilter !== ALL_LIBRARY_TYPES) {
       list = list.filter((r) => r.food_type_id === libraryTypeFilter);
@@ -548,15 +617,27 @@ export function RecipeGeneratorDashboard() {
     return list;
   }, [savedQuery.data, libraryTypeFilter, libraryTestedFilter]);
 
+  const filteredSavedRecipes = useMemo(() => {
+    const q = librarySearch.trim().toLocaleLowerCase("sv-SE");
+    if (!q) {
+      return typeAndTestedFilteredSavedRecipes;
+    }
+    return typeAndTestedFilteredSavedRecipes.filter((r) =>
+      [r.title, r.title_en, r.title_vi, r.summary]
+        .filter(Boolean)
+        .some((value) => value.toLocaleLowerCase("sv-SE").includes(q)),
+    );
+  }, [typeAndTestedFilteredSavedRecipes, librarySearch]);
+
   const recipesForImportTab = useMemo(() => {
-    let list = filteredSavedRecipes;
+    let list = typeAndTestedFilteredSavedRecipes;
     if (importSourceMarkdownFilter === IMPORT_SOURCE_WITHOUT_MARKDOWN) {
       list = list.filter((r) => !r.source_markdown?.trim());
     } else if (importSourceMarkdownFilter === IMPORT_SOURCE_WITH_MARKDOWN_ONLY) {
       list = list.filter((r) => Boolean(r.source_markdown?.trim()));
     }
     return list;
-  }, [filteredSavedRecipes, importSourceMarkdownFilter]);
+  }, [typeAndTestedFilteredSavedRecipes, importSourceMarkdownFilter]);
 
   const savedCountByFoodTypeId = useMemo(
     () => countRecipesByFoodTypeId(savedQuery.data ?? []),
@@ -575,8 +656,8 @@ export function RecipeGeneratorDashboard() {
     generateMutation.isPending ||
     saveMutation.isPending;
 
-  function addPick(entry: PromoPickerItem) {
-    const text = entry.watchlistText.trim();
+  function addPickText(rawText: string) {
+    const text = rawText.trim();
     if (!text || picks.includes(text)) {
       return;
     }
@@ -586,6 +667,10 @@ export function RecipeGeneratorDashboard() {
     }
     setLocalError(null);
     setPicks((prev) => [...prev, text]);
+  }
+
+  function addPick(entry: PromoPickerItem) {
+    addPickText(entry.watchlistText);
   }
 
   function removePick(index: number) {
@@ -603,12 +688,8 @@ export function RecipeGeneratorDashboard() {
   async function onGenerate(event: FormEvent) {
     event.preventDefault();
     setLocalError(null);
-    if (picks.length === 0) {
-      setLocalError("Add at least one ingredient from the catalog.");
-      return;
-    }
     if (!foodTypeId) {
-      setLocalError("Choose a type of food.");
+      setLocalError("Choose a food style.");
       return;
     }
     await generateMutation.mutateAsync();
@@ -619,6 +700,9 @@ export function RecipeGeneratorDashboard() {
     (catalogQuery.error instanceof Error ? catalogQuery.error.message : null) ??
     (foodTypesQuery.error instanceof Error ? foodTypesQuery.error.message : null) ??
     (savedQuery.error instanceof Error ? savedQuery.error.message : null) ??
+    (foodStyleSuggestionsQuery.error instanceof Error
+      ? foodStyleSuggestionsQuery.error.message
+      : null) ??
     (watchlistQuery.error instanceof Error ? watchlistQuery.error.message : null) ??
     (watchlistMutation.error instanceof Error ? watchlistMutation.error.message : null) ??
     (generateMutation.error instanceof Error ? generateMutation.error.message : null) ??
@@ -641,6 +725,12 @@ export function RecipeGeneratorDashboard() {
       >
         <TabsList className="grid w-full grid-cols-2 items-stretch gap-1 rounded-lg bg-muted p-1 group-data-[orientation=horizontal]/tabs:!h-auto group-data-[orientation=horizontal]/tabs:min-h-11 sm:grid-cols-4 sm:w-full">
           <TabsTrigger
+            value="library"
+            className="!h-auto min-h-11 justify-center py-2.5 whitespace-normal shadow-none data-[state=active]:shadow-none"
+          >
+            Library
+          </TabsTrigger>
+          <TabsTrigger
             value="generate"
             className="!h-auto min-h-11 justify-center py-2.5 whitespace-normal shadow-none data-[state=active]:shadow-none"
           >
@@ -653,12 +743,6 @@ export function RecipeGeneratorDashboard() {
             Import
           </TabsTrigger>
           <TabsTrigger
-            value="library"
-            className="!h-auto min-h-11 justify-center py-2.5 whitespace-normal shadow-none data-[state=active]:shadow-none"
-          >
-            Library
-          </TabsTrigger>
-          <TabsTrigger
             value="plan"
             className="!h-auto min-h-11 justify-center py-2.5 whitespace-normal shadow-none data-[state=active]:shadow-none"
           >
@@ -669,12 +753,12 @@ export function RecipeGeneratorDashboard() {
         <TabsContent value="generate" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Recipe generator</CardTitle>
+              <CardTitle>Generate recipe ideas</CardTitle>
               <CardDescription>
-                Pick ICA Maxi ingredients and a food style. AI suggests <strong>dish names</strong>{" "}
-                and a structured <strong>ingredient list</strong> only — not full cooking
-                instructions. When you pick a dish, paste markdown from a recipe you trust (blog,
-                cookbook, …) to fill in steps, or save the suggestion and edit later.
+                Choose a food style first, optionally add ICA focus ingredients, then let AI suggest{" "}
+                <strong>dish names</strong> and structured <strong>ingredient lists</strong>. When
+                you pick a dish, paste markdown from a recipe you trust to fill in steps, or save the
+                suggestion and edit later.
               </CardDescription>
             </CardHeader>
           </Card>
@@ -682,10 +766,104 @@ export function RecipeGeneratorDashboard() {
           <form className="space-y-6" onSubmit={onGenerate}>
             <Card>
               <CardHeader>
-                <CardTitle>Ingredients (ICA catalog)</CardTitle>
+                <CardTitle>Style & filters</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-1.5">
+                  <span className="text-xs font-medium text-muted-foreground" id="ft-r">
+                    Food style
+                  </span>
+                  <Select
+                    value={foodTypeId || undefined}
+                    onValueChange={setFoodTypeId}
+                    disabled={!foodTypesQuery.data}
+                  >
+                    <SelectTrigger className="w-full sm:max-w-md" aria-labelledby="ft-r">
+                      <SelectValue placeholder="Choose…" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {(foodTypesQuery.data?.options ?? []).map((o) => (
+                        <SelectItem key={o.id} value={o.id}>
+                          {o.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {foodTypeId ? (
+                    <p className="text-sm text-muted-foreground">
+                      {savedQuery.isLoading ? (
+                        "Loading saved counts…"
+                      ) : (
+                        <>
+                          You have{" "}
+                          <span className="font-medium tabular-nums text-foreground">
+                            {selectedStyleSavedCount ?? 0}
+                          </span>{" "}
+                          saved in this style (target {recipeStyleTargetRangeLabel()}).
+                        </>
+                      )}
+                    </p>
+                  ) : null}
+                </div>
+                <label className="flex cursor-pointer items-start gap-3 text-sm">
+                  <input
+                    type="checkbox"
+                    className="mt-1 size-4 shrink-0"
+                    checked={vegetarian}
+                    onChange={(e) => setVegetarian(e.target.checked)}
+                    disabled={busy}
+                  />
+                  <span>Vegetarian (no meat, fish, or shellfish)</span>
+                </label>
+                <label className="flex cursor-pointer items-start gap-3 text-sm">
+                  <input
+                    type="checkbox"
+                    className="mt-1 size-4 shrink-0"
+                    checked={excludeExistingForStyle}
+                    onChange={(e) => setExcludeExistingForStyle(e.target.checked)}
+                    disabled={busy || !foodTypeId}
+                  />
+                  <span>Exclude recipes already saved in this food style</span>
+                </label>
+                <div className="space-y-1.5">
+                  <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                    <span className="text-xs font-medium text-muted-foreground" id="ex-r">
+                      Extra meal titles to exclude (optional, one per line)
+                    </span>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      disabled={busy || lastMeals.length === 0}
+                      onClick={() => fillExcludeFromLast()}
+                    >
+                      Use titles from last result
+                    </Button>
+                  </div>
+                  <Textarea
+                    id="ex-r"
+                    value={excludeText}
+                    onChange={(e) => setExcludeText(e.target.value)}
+                    placeholder="e.g. Kyckling parmigiana"
+                    rows={4}
+                    disabled={busy}
+                  />
+                </div>
+                <Button type="submit" disabled={busy} className="min-h-11">
+                  {generateMutation.isPending ? "Generating…" : "Generate suggestions"}
+                </Button>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Focus ingredients (optional)</CardTitle>
                 <CardDescription>
-                  Food departments only (same ICA catalog as the promo watchlist, filtered).
-                  Stars add or remove items on your{" "}
+                  Add ingredients only when you want the ideas to lean toward specific things.
+                  Start from the ingredients mapped to the selected food style, or browse the ICA
+                  catalog freely. If you leave this empty, generation uses the food style alone.
+                  {" "}
+                  Stars in catalog mode add or remove items on your{" "}
                   <Link
                     href="/promo-grocery-watchlist"
                     className="font-semibold text-foreground underline-offset-4 hover:underline"
@@ -696,68 +874,127 @@ export function RecipeGeneratorDashboard() {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
-                {catalogQuery.isLoading ? (
+                {ingredientPickMode === "catalog" && catalogQuery.isLoading ? (
                   <p className="text-sm text-muted-foreground">Loading catalog…</p>
                 ) : null}
-                <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-start">
-                  <div className="space-y-1.5">
-                    <span className="text-xs font-medium text-muted-foreground" id="dept-r">
-                      Food department
+                <div className="grid gap-2 rounded-md border bg-muted/30 p-1 sm:grid-cols-2">
+                  <button
+                    type="button"
+                    className={`rounded-md px-3 py-2 text-left text-sm transition ${
+                      ingredientPickMode === "mapping"
+                        ? "bg-background font-medium text-foreground shadow-sm"
+                        : "text-muted-foreground hover:bg-background/70 hover:text-foreground"
+                    }`}
+                    onClick={() => setIngredientPickMode("mapping")}
+                    disabled={foodStyleSuggestionsQuery.isLoading}
+                    aria-pressed={ingredientPickMode === "mapping"}
+                  >
+                    Food-style mapping
+                    <span className="mt-0.5 block text-xs font-normal text-muted-foreground">
+                      Ingredients managed for the selected style
                     </span>
-                    <Select
-                      value={effectiveDepartmentId}
-                      onValueChange={setDepartmentId}
-                      disabled={!catalogQuery.data}
-                    >
-                      <SelectTrigger
-                        className="h-9 w-full min-w-[12rem] sm:w-64"
-                        aria-labelledby="dept-r"
+                  </button>
+                  <button
+                    type="button"
+                    className={`rounded-md px-3 py-2 text-left text-sm transition ${
+                      ingredientPickMode === "catalog"
+                        ? "bg-background font-medium text-foreground shadow-sm"
+                        : "text-muted-foreground hover:bg-background/70 hover:text-foreground"
+                    }`}
+                    onClick={() => setIngredientPickMode("catalog")}
+                    disabled={!catalogQuery.data}
+                    aria-pressed={ingredientPickMode === "catalog"}
+                  >
+                    Browse ICA catalog
+                    <span className="mt-0.5 block text-xs font-normal text-muted-foreground">
+                      Choose freely from all food departments
+                    </span>
+                  </button>
+                </div>
+                <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-start">
+                  {ingredientPickMode === "catalog" ? (
+                    <div className="space-y-1.5">
+                      <span className="text-xs font-medium text-muted-foreground" id="dept-r">
+                        Food department
+                      </span>
+                      <Select
+                        value={effectiveDepartmentId}
+                        onValueChange={setDepartmentId}
+                        disabled={!catalogQuery.data}
                       >
-                        <SelectValue placeholder="All food departments" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value={ALL_DEPARTMENTS}>All food departments</SelectItem>
-                        {departments.map((d) => (
-                          <SelectItem key={d.id} value={d.id}>
-                            {d.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
+                        <SelectTrigger
+                          className="h-9 w-full min-w-[12rem] sm:w-64"
+                          aria-labelledby="dept-r"
+                        >
+                          <SelectValue placeholder="All food departments" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value={ALL_DEPARTMENTS}>All food departments</SelectItem>
+                          {departments.map((d) => (
+                            <SelectItem key={d.id} value={d.id}>
+                              {d.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  ) : null}
                   <div className="min-w-0 flex-1 space-y-1.5">
                     <span className="text-xs font-medium text-muted-foreground" id="search-r">
-                      Search catalog
+                      {ingredientPickMode === "mapping"
+                        ? "Search mapped ingredients"
+                        : "Search catalog"}
                     </span>
                     <Input
                       aria-labelledby="search-r"
                       placeholder="Filter…"
                       value={search}
                       onChange={(e) => setSearch(e.target.value)}
-                      disabled={!catalogQuery.data}
+                      disabled={
+                        ingredientPickMode === "catalog"
+                          ? !catalogQuery.data
+                          : foodStyleSuggestionsQuery.isLoading
+                      }
                     />
                   </div>
                 </div>
-                <label className="flex cursor-pointer items-center gap-2 text-sm">
-                  <input
-                    type="checkbox"
-                    className="size-4 shrink-0"
-                    checked={ingredientsFavoritesOnly}
-                    onChange={(e) => setIngredientsFavoritesOnly(e.target.checked)}
-                    disabled={!catalogQuery.data || watchlistQuery.isLoading}
-                  />
-                  <span>Watchlist only (promo grocery watchlist)</span>
-                </label>
                 <div className="max-h-56 overflow-y-auto rounded-md border p-2">
-                  {filteredPickerItems.length === 0 ? (
+                  {ingredientPickMode === "mapping" ? (
+                    filteredMappedSuggestions.length === 0 ? (
+                      <p className="px-2 py-4 text-center text-sm italic text-muted-foreground">
+                        {foodStyleSuggestionsQuery.isLoading
+                          ? "Loading food-style mappings…"
+                          : !foodTypeId
+                            ? "Choose a food style to see its mapped ingredients."
+                            : mappedSuggestionsForSelectedStyle.length === 0
+                              ? "No ingredients are mapped to this food style yet."
+                              : "No mapped ingredients match this search."}
+                      </p>
+                    ) : (
+                      <ul className="flex flex-wrap gap-2" role="list">
+                        {filteredMappedSuggestions.map((suggestion) => {
+                          const text = suggestion.watchlist_text.trim();
+                          return (
+                            <li key={suggestion.id} className="max-w-full">
+                              <Button
+                                type="button"
+                                variant="secondary"
+                                size="sm"
+                                className="h-auto max-w-full whitespace-normal text-left"
+                                disabled={busy || picks.includes(text)}
+                                onClick={() => addPickText(text)}
+                                title={suggestion.reason ?? undefined}
+                              >
+                                {text}
+                              </Button>
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    )
+                  ) : filteredPickerItems.length === 0 ? (
                     <p className="px-2 py-4 text-center text-sm italic text-muted-foreground">
-                      {watchlistQuery.isLoading
-                        ? "Loading watchlist…"
-                        : ingredientsFavoritesOnly && (watchlistQuery.data?.length ?? 0) === 0
-                          ? "Your promo watchlist is empty. Star catalog items to add them (or manage them on Promo grocery watchlist)."
-                          : ingredientsFavoritesOnly && (watchlistQuery.data?.length ?? 0) > 0
-                            ? "No watchlist items match this department or search."
-                            : "No matches."}
+                      No catalog items match this department or search.
                     </p>
                   ) : (
                     <ul className="flex flex-wrap gap-2" role="list">
@@ -825,89 +1062,10 @@ export function RecipeGeneratorDashboard() {
                     </ul>
                   </div>
                 ) : (
-                  <p className="text-sm italic text-muted-foreground">No ingredients selected yet.</p>
+                  <p className="text-sm italic text-muted-foreground">
+                    No focus ingredients selected. Suggestions will use the food style only.
+                  </p>
                 )}
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Style & filters</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-1.5">
-                  <span className="text-xs font-medium text-muted-foreground" id="ft-r">
-                    Type of food
-                  </span>
-                  <Select
-                    value={foodTypeId || undefined}
-                    onValueChange={setFoodTypeId}
-                    disabled={!foodTypesQuery.data}
-                  >
-                    <SelectTrigger className="w-full sm:max-w-md" aria-labelledby="ft-r">
-                      <SelectValue placeholder="Choose…" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {(foodTypesQuery.data?.options ?? []).map((o) => (
-                        <SelectItem key={o.id} value={o.id}>
-                          {o.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  {foodTypeId ? (
-                    <p className="text-sm text-muted-foreground">
-                      {savedQuery.isLoading ? (
-                        "Loading saved counts…"
-                      ) : (
-                        <>
-                          You have{" "}
-                          <span className="font-medium tabular-nums text-foreground">
-                            {selectedStyleSavedCount ?? 0}
-                          </span>{" "}
-                          saved in this style (target {recipeStyleTargetRangeLabel()}).
-                        </>
-                      )}
-                    </p>
-                  ) : null}
-                </div>
-                <label className="flex cursor-pointer items-start gap-3 text-sm">
-                  <input
-                    type="checkbox"
-                    className="mt-1 size-4 shrink-0"
-                    checked={vegetarian}
-                    onChange={(e) => setVegetarian(e.target.checked)}
-                    disabled={busy}
-                  />
-                  <span>Vegetarian (no meat, fish, or shellfish)</span>
-                </label>
-                <div className="space-y-1.5">
-                  <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                    <span className="text-xs font-medium text-muted-foreground" id="ex-r">
-                      Exclude meal titles (one per line)
-                    </span>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      disabled={busy || lastMeals.length === 0}
-                      onClick={() => fillExcludeFromLast()}
-                    >
-                      Use titles from last result
-                    </Button>
-                  </div>
-                  <Textarea
-                    id="ex-r"
-                    value={excludeText}
-                    onChange={(e) => setExcludeText(e.target.value)}
-                    placeholder="e.g. Kyckling parmigiana"
-                    rows={4}
-                    disabled={busy}
-                  />
-                </div>
-                <Button type="submit" disabled={busy} className="min-h-11">
-                  {generateMutation.isPending ? "Generating…" : "Generate suggestions"}
-                </Button>
               </CardContent>
             </Card>
           </form>
@@ -953,6 +1111,9 @@ export function RecipeGeneratorDashboard() {
                         Est. cook time: {meal.estimated_cook_time}
                       </p>
                     ) : null}
+                    <p className="text-sm text-muted-foreground">
+                      Difficulty: {formatRecipeDifficulty(meal.difficulty)}
+                    </p>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="overflow-x-auto rounded-md border">
@@ -1237,7 +1398,7 @@ export function RecipeGeneratorDashboard() {
                         </div>
                       </div>
                     </div>
-                    {filteredSavedRecipes.length === 0 ? (
+                    {typeAndTestedFilteredSavedRecipes.length === 0 ? (
                       <p className="text-sm text-muted-foreground">
                         No recipes match the current filters. Try <strong>All types</strong> or{" "}
                         <strong>All recipes</strong>.
@@ -1268,6 +1429,7 @@ export function RecipeGeneratorDashboard() {
                                 <th className="px-3 py-2 text-left font-medium">Title</th>
                                 <th className="px-3 py-2 text-left font-medium">Type</th>
                                 <th className="px-3 py-2 text-left font-medium">Est. cook time</th>
+                                <th className="px-3 py-2 text-left font-medium">Difficulty</th>
                                 <th className="px-3 py-2 text-center font-medium" title="Pasted source markdown saved on this recipe">
                                   Source
                                 </th>
@@ -1298,6 +1460,9 @@ export function RecipeGeneratorDashboard() {
                                   </td>
                                   <td className="px-3 py-2 text-muted-foreground">
                                     {r.estimated_cook_time.trim() ? r.estimated_cook_time : "—"}
+                                  </td>
+                                  <td className="px-3 py-2 text-muted-foreground">
+                                    {formatRecipeDifficulty(r.difficulty)}
                                   </td>
                                   <td className="px-3 py-2 text-center align-middle">
                                     {r.source_markdown?.trim() ? (
@@ -1370,17 +1535,32 @@ export function RecipeGeneratorDashboard() {
 
         <TabsContent value="library" className="min-w-0 space-y-4">
           <Card className="min-w-0 overflow-hidden">
-            <CardHeader>
-              <CardTitle>Saved recipes</CardTitle>
-              <CardDescription>
-                Filter by type, open <strong>View</strong> for full recipe details. Mark{" "}
-                <strong>Want to try</strong> for your backlog and <strong>Tested</strong> when you
-                have cooked it at home. Aim for about{" "}
-                <strong>
-                  {RECIPE_STYLE_TARGET_MIN}–{RECIPE_STYLE_TARGET_MAX}
-                </strong>{" "}
-                saved recipes per style for a solid rotation.
-              </CardDescription>
+            <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+              <div>
+                <CardTitle>Recipe library</CardTitle>
+                <CardDescription className="mt-1.5">
+                  Search and manage saved recipes. Mark <strong>Want to try</strong> for your
+                  backlog and <strong>Tested</strong> when you have cooked it at home. Aim for about{" "}
+                  <strong>
+                    {RECIPE_STYLE_TARGET_MIN}–{RECIPE_STYLE_TARGET_MAX}
+                  </strong>{" "}
+                  saved recipes per style for a solid rotation.
+                </CardDescription>
+              </div>
+              <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
+                <Button asChild className="w-full shrink-0 gap-2 sm:w-auto">
+                  <Link href="/recipe-generator?tab=generate">
+                    <Sparkles className="size-4" aria-hidden />
+                    Generate recipe ideas
+                  </Link>
+                </Button>
+                <Button asChild variant="secondary" className="w-full shrink-0 gap-2 sm:w-auto">
+                  <Link href="/recipe-generator?tab=import">
+                    <FileInput className="size-4" aria-hidden />
+                    Import from source
+                  </Link>
+                </Button>
+              </div>
             </CardHeader>
             <CardContent className="min-w-0 space-y-4">
               {savedQuery.isLoading ? (
@@ -1392,65 +1572,79 @@ export function RecipeGeneratorDashboard() {
                     Progress per style (target {recipeStyleTargetRangeLabel()} each)
                   </p>
                   <p className="mb-2 text-[11px] leading-snug text-muted-foreground/90">
-                    Row tint: 0 · &lt;10 · &lt;20 · &lt;30 · 30–39 · 40+
+                    Select a card to filter the library by that style.
                   </p>
-                  <div className="max-h-52 overflow-y-auto rounded-sm border border-border/60 bg-background">
-                    <table className="w-full min-w-[16rem] border-collapse text-sm">
-                      <caption className="sr-only">Saved recipe counts by food style</caption>
-                      <thead>
-                        <tr className="border-b bg-muted/50">
-                          <th className="px-3 py-1.5 text-left font-medium">Style</th>
-                          <th className="px-3 py-1.5 text-right font-medium">Saved</th>
-                          <th className="px-3 py-1.5 text-right font-medium text-muted-foreground">
-                            Target
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {(foodTypesQuery.data.options ?? []).map((o) => {
-                          const c = savedCountByFoodTypeId.get(o.id) ?? 0;
-                          const band = recipeStyleProgressBand(c);
-                          const activeRow =
-                            libraryTypeFilter !== ALL_LIBRARY_TYPES && libraryTypeFilter === o.id;
-                          const bandRow =
-                            band === "zero"
-                              ? "border-b border-slate-200/80 bg-slate-100/90 dark:border-slate-800 dark:bg-slate-900/55"
-                              : band === "lt10"
-                                ? "border-b border-rose-200/80 bg-rose-50/95 dark:border-rose-900/50 dark:bg-rose-950/40"
-                                : band === "lt20"
-                                  ? "border-b border-orange-200/80 bg-orange-50/95 dark:border-orange-900/45 dark:bg-orange-950/35"
-                                  : band === "lt30"
-                                    ? "border-b border-amber-200/80 bg-amber-50/95 dark:border-amber-900/45 dark:bg-amber-950/35"
-                                    : band === "lt40"
-                                      ? "border-b border-lime-200/80 bg-lime-50/90 dark:border-lime-900/45 dark:bg-lime-950/35"
-                                      : "border-b border-emerald-200/80 bg-emerald-100/90 dark:border-emerald-900/50 dark:bg-emerald-950/40";
-                          return (
-                            <tr
-                              key={o.id}
-                              className={
-                                activeRow
-                                  ? `${bandRow} ring-2 ring-inset ring-emerald-600/45 dark:ring-emerald-400/40`
-                                  : `${bandRow} last:border-0`
-                              }
-                            >
-                              <td className="px-3 py-1.5">{o.label}</td>
-                              <td
-                                className={
-                                  band === "ge40" || band === "lt40"
-                                    ? "px-3 py-1.5 text-right tabular-nums font-medium text-emerald-900 dark:text-emerald-200"
-                                    : "px-3 py-1.5 text-right tabular-nums text-foreground"
-                                }
-                              >
-                                {c}
-                              </td>
-                              <td className="px-3 py-1.5 text-right tabular-nums text-muted-foreground">
-                                {RECIPE_STYLE_TARGET_MIN}–{RECIPE_STYLE_TARGET_MAX}
-                              </td>
-                            </tr>
-                          );
-                        })}
-                      </tbody>
-                    </table>
+                  <div className="grid max-h-80 gap-2 overflow-y-auto pr-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                    {(foodTypesQuery.data.options ?? []).map((o) => {
+                      const c = savedCountByFoodTypeId.get(o.id) ?? 0;
+                      const band = recipeStyleProgressBand(c);
+                      const active =
+                        libraryTypeFilter !== ALL_LIBRARY_TYPES && libraryTypeFilter === o.id;
+                      const progress = Math.min(
+                        100,
+                        Math.round((c / RECIPE_STYLE_TARGET_MAX) * 100),
+                      );
+                      const cardTone =
+                        band === "zero"
+                          ? "border-slate-200 bg-slate-50 dark:border-slate-800 dark:bg-slate-950/45"
+                          : band === "lt10"
+                            ? "border-rose-200 bg-rose-50 dark:border-rose-900/55 dark:bg-rose-950/35"
+                            : band === "lt20"
+                              ? "border-orange-200 bg-orange-50 dark:border-orange-900/50 dark:bg-orange-950/30"
+                              : band === "lt30"
+                                ? "border-amber-200 bg-amber-50 dark:border-amber-900/50 dark:bg-amber-950/30"
+                                : band === "lt40"
+                                  ? "border-lime-200 bg-lime-50 dark:border-lime-900/50 dark:bg-lime-950/30"
+                                  : "border-emerald-200 bg-emerald-50 dark:border-emerald-900/55 dark:bg-emerald-950/35";
+                      const barTone =
+                        band === "zero"
+                          ? "bg-slate-300 dark:bg-slate-700"
+                          : band === "lt10"
+                            ? "bg-rose-400"
+                            : band === "lt20"
+                              ? "bg-orange-400"
+                              : band === "lt30"
+                                ? "bg-amber-400"
+                                : band === "lt40"
+                                  ? "bg-lime-500"
+                                  : "bg-emerald-500";
+
+                      return (
+                        <button
+                          key={o.id}
+                          type="button"
+                          className={cn(
+                            "min-h-28 rounded-md border p-3 text-left transition hover:-translate-y-0.5 hover:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                            cardTone,
+                            active
+                              ? "ring-2 ring-inset ring-emerald-600/55 dark:ring-emerald-400/50"
+                              : "",
+                          )}
+                          aria-pressed={active}
+                          onClick={() =>
+                            setLibraryTypeFilter((current) =>
+                              current === o.id ? ALL_LIBRARY_TYPES : o.id,
+                            )
+                          }
+                        >
+                          <span className="block min-h-10 text-sm font-medium leading-snug">
+                            {o.label}
+                          </span>
+                          <span className="mt-3 flex items-baseline justify-between gap-2">
+                            <span className="text-2xl font-semibold tabular-nums">{c}</span>
+                            <span className="text-xs text-muted-foreground">
+                              target {RECIPE_STYLE_TARGET_MIN}–{RECIPE_STYLE_TARGET_MAX}
+                            </span>
+                          </span>
+                          <span className="mt-2 block h-1.5 overflow-hidden rounded-full bg-background/80">
+                            <span
+                              className={cn("block h-full rounded-full", barTone)}
+                              style={{ width: `${progress}%` }}
+                            />
+                          </span>
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
               ) : null}
@@ -1484,6 +1678,24 @@ export function RecipeGeneratorDashboard() {
                       ) : null}
                     </p>
                     <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end">
+                      <div className="min-w-0 flex-1 space-y-1.5 sm:w-72 sm:flex-none">
+                        <span className="text-xs font-medium text-muted-foreground" id="lib-search">
+                          Search recipes
+                        </span>
+                        <div className="relative">
+                          <Search
+                            className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
+                            aria-hidden
+                          />
+                          <Input
+                            aria-labelledby="lib-search"
+                            value={librarySearch}
+                            onChange={(e) => setLibrarySearch(e.target.value)}
+                            placeholder="Name or summary…"
+                            className="pl-9"
+                          />
+                        </div>
+                      </div>
                       <div className="space-y-1.5">
                         <span className="text-xs font-medium text-muted-foreground" id="lib-ft">
                           Type filter
@@ -1536,8 +1748,8 @@ export function RecipeGeneratorDashboard() {
                   filteredSavedRecipes.length === 0 ? (
                     <p className="text-sm text-muted-foreground">
                       No recipes match the current filters. Try{" "}
-                      <strong>All types</strong>, <strong>All recipes</strong> under Tested filter,
-                      or adjust your choices.
+                      clearing search, <strong>All types</strong>, <strong>All recipes</strong>{" "}
+                      under Tested filter, or adjust your choices.
                     </p>
                   ) : null}
                   {filteredSavedRecipes.length > 0 ? (
@@ -1550,7 +1762,7 @@ export function RecipeGeneratorDashboard() {
                         role="region"
                         aria-label="Saved recipes table — scroll horizontally when needed"
                       >
-                        <table className="w-full min-w-[52rem] border-collapse text-sm">
+                        <table className="w-full min-w-[56rem] border-collapse text-sm">
                           <caption className="sr-only">Saved recipes</caption>
                           <thead>
                             <tr className="border-b border-emerald-200/60 bg-emerald-100/50 dark:border-emerald-900/50 dark:bg-emerald-950/40">
@@ -1560,6 +1772,7 @@ export function RecipeGeneratorDashboard() {
                               <th className="px-3 py-2 text-left font-medium">Title</th>
                             <th className="px-3 py-2 text-left font-medium">Type</th>
                             <th className="px-3 py-2 text-left font-medium">Est. cook time</th>
+                            <th className="px-3 py-2 text-left font-medium">Difficulty</th>
                             <th className="px-3 py-2 text-center font-medium">Want to try</th>
                             <th className="px-3 py-2 text-center font-medium">Tested</th>
                             <th className="px-3 py-2 text-right font-medium">Actions</th>
@@ -1593,6 +1806,9 @@ export function RecipeGeneratorDashboard() {
                               </td>
                               <td className="px-3 py-2 text-muted-foreground">
                                 {r.estimated_cook_time.trim() ? r.estimated_cook_time : "—"}
+                              </td>
+                              <td className="px-3 py-2 text-muted-foreground">
+                                {formatRecipeDifficulty(r.difficulty)}
                               </td>
                               <td className="px-3 py-2 text-center">
                                 <input
@@ -1922,7 +2138,15 @@ export function RecipeGeneratorDashboard() {
                       <p className="text-sm text-foreground">
                         {detailRecipe.estimated_cook_time.trim()
                           ? detailRecipe.estimated_cook_time
-                          : "—"}
+                        : "—"}
+                      </p>
+                    </div>
+                    <div className="space-y-1.5">
+                      <span className="text-xs font-medium text-muted-foreground">
+                        Difficulty
+                      </span>
+                      <p className="text-sm text-foreground">
+                        {formatRecipeDifficulty(detailRecipe.difficulty)}
                       </p>
                     </div>
                     <div className="space-y-1.5">

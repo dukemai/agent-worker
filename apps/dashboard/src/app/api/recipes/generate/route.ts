@@ -25,9 +25,6 @@ export async function POST(request: Request) {
   }
   const o = body as Record<string, unknown>;
   const ingredientTexts = normalizeIngredientTexts(o.ingredientTexts);
-  if (ingredientTexts.length === 0) {
-    return errorResponse("ingredientTexts must include at least one item", 400);
-  }
   const foodTypeId = typeof o.foodTypeId === "string" ? o.foodTypeId.trim() : "";
   if (!foodTypeId || !isValidFoodTypeId(foodTypeId)) {
     return errorResponse("foodTypeId is invalid", 400);

@@ -8,7 +8,7 @@ import { SignOutButton } from "@/components/dashboard/sign-out-button";
 const cookingLinks = [
   { href: "/promo-grocery-watchlist", label: "Promo grocery watchlist" },
   { href: "/family/recipes", label: "Family recipes" },
-  { href: "/recipe-generator", label: "Recipe generator" },
+  { href: "/recipe-generator", label: "Recipe library" },
   { href: "/cookbook", label: "Shared cookbook (preview)" },
   { href: "/plan-to-cook", label: "Plan to cook" },
   { href: "/plan-to-cook/cook", label: "Cooking" },
@@ -21,7 +21,6 @@ const moreLinks = [
 
 const collaboratorLinks = [
   { href: "/family/recipes", label: "Family recipes" },
-  { href: "/recipe-generator", label: "Recipe generator" },
   { href: "/plan-to-cook", label: "Plan to cook" },
   { href: "/birthdays", label: "Birthdays" },
 ] as const;

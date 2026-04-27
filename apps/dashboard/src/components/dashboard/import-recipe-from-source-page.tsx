@@ -12,6 +12,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { RecipeStepsDisplay } from "@/components/dashboard/recipe-steps-display";
+import type { RecipeI18nColumn } from "@/lib/recipe-locale";
+import { formatRecipeDifficulty } from "@/lib/recipe-difficulty";
 import { formatSavedRecipeSourceLabel } from "@/lib/recipe-source";
 import type { SavedRecipeRow } from "@/lib/saved-recipe-row";
 
@@ -65,6 +67,34 @@ function StepsBlock({ steps }: { steps: string[] }) {
   return <RecipeStepsDisplay className="list-decimal space-y-1.5 pl-5 text-sm" steps={steps} />;
 }
 
+function i18nFromParsedImport(
+  parsed: ParsedRecipeFromMarkdownImport,
+  recipe: SavedRecipeRow,
+): RecipeI18nColumn | null {
+  if (parsed.source_language !== "en" && parsed.source_language !== "vi") {
+    return null;
+  }
+  if (
+    !parsed.source_language_summary.trim() ||
+    parsed.source_language_ingredients.length === 0 ||
+    parsed.source_language_steps.length === 0
+  ) {
+    return null;
+  }
+  const title =
+    parsed.source_language_title.trim() ||
+    (parsed.source_language === "en" ? recipe.title_en.trim() : recipe.title_vi.trim()) ||
+    recipe.title;
+  const bundle = {
+    title,
+    summary: parsed.source_language_summary,
+    ingredients: parsed.source_language_ingredients,
+    steps: parsed.source_language_steps,
+    updated_at: new Date().toISOString(),
+  };
+  return parsed.source_language === "en" ? { en: bundle } : { vi: bundle };
+}
+
 async function fetchRecipe(id: string): Promise<SavedRecipeRow> {
   const response = await fetch(`/api/recipes/${encodeURIComponent(id)}`, { cache: "no-store" });
   if (!response.ok) {
@@ -112,8 +142,10 @@ export function ImportRecipeFromSourcePage({
       return;
     }
     seededFromRecipe.current = true;
-    setMarkdown(recipe.source_markdown?.trim() ?? "");
-    setOriginalUrl(recipe.similar_recipe_url?.trim() ?? "");
+    queueMicrotask(() => {
+      setMarkdown(recipe.source_markdown?.trim() ?? "");
+      setOriginalUrl(recipe.similar_recipe_url?.trim() ?? "");
+    });
   }, [recipe]);
 
   const parseMutation = useMutation({
@@ -155,9 +187,11 @@ export function ImportRecipeFromSourcePage({
           ingredients: parsed.ingredients,
           steps: parsed.steps,
           estimated_cook_time: parsed.estimated_cook_time.trim() || recipe.estimated_cook_time,
+          difficulty: parsed.difficulty || recipe.difficulty,
           source_markdown: markdown.trim(),
           similar_recipe_url: originalUrl.trim(),
           source: RECIPE_SOURCE_MANUAL_MARKDOWN,
+          i18n: i18nFromParsedImport(parsed, recipe),
         }),
       });
       if (!response.ok) {
@@ -369,6 +403,14 @@ export function ImportRecipeFromSourcePage({
               <p className="md:col-span-1">
                 <span className="text-muted-foreground">Import cook time: </span>
                 <span>{parsed.estimated_cook_time.trim() || "—"}</span>
+              </p>
+              <p className="md:col-span-1">
+                <span className="text-muted-foreground">Current difficulty: </span>
+                <span>{formatRecipeDifficulty(recipe.difficulty)}</span>
+              </p>
+              <p className="md:col-span-1">
+                <span className="text-muted-foreground">Import difficulty: </span>
+                <span>{formatRecipeDifficulty(parsed.difficulty)}</span>
               </p>
             </div>
 

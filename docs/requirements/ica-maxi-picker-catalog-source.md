@@ -399,9 +399,18 @@ Nested levels: repeat the same object inside `children` (see **Exotisk frukt** i
 | [`ica-maxi-catalog-juice-fruktdryck-raw.json`](./ica-maxi-catalog-juice-fruktdryck-raw.json) | `Dryck/Juice-Fruktdryck` (linked under Mejeri in nav; path matches initial state) |
 | [`ica-maxi-catalog-agg-jast-raw.json`](./ica-maxi-catalog-agg-jast-raw.json) | `Mejeri-Ost/Ägg-Jäst` |
 | [`ica-maxi-catalog-mjolk-raw.json`](./ica-maxi-catalog-mjolk-raw.json) | `Mejeri-Ost/Mjölk` |
+| [`ica-maxi-catalog-filmjolk-raw.json`](./ica-maxi-catalog-filmjolk-raw.json) | `Mejeri-Ost/Filmjölk` |
 | [`ica-maxi-catalog-ost-raw.json`](./ica-maxi-catalog-ost-raw.json) | `Mejeri-Ost/Ost` |
+| [`ica-maxi-catalog-gradde-raw.json`](./ica-maxi-catalog-gradde-raw.json) | `Mejeri-Ost/Grädde` |
 | [`ica-maxi-catalog-smor-magarin-raw.json`](./ica-maxi-catalog-smor-magarin-raw.json) | `Mejeri-Ost/Smör-Margarin` |
+| [`ica-maxi-catalog-creme-fraiche-raw.json`](./ica-maxi-catalog-creme-fraiche-raw.json) | `Mejeri-Ost/Crème-fraiche` |
+| [`ica-maxi-catalog-graddfil-raw.json`](./ica-maxi-catalog-graddfil-raw.json) | `Mejeri-Ost/Gräddfil` |
+| [`ica-maxi-catalog-kvarg-raw.json`](./ica-maxi-catalog-kvarg-raw.json) | `Mejeri-Ost/Kvarg` |
+| [`ica-maxi-catalog-cottage-cheese-raw.json`](./ica-maxi-catalog-cottage-cheese-raw.json) | `Mejeri-Ost/Cottage-cheese` |
+| [`ica-maxi-catalog-cottage-kylda-mellanmal-desserter-raw.json`](./ica-maxi-catalog-cottage-kylda-mellanmal-desserter-raw.json) | `Mejeri-Ost/Kylda-mellanmål-desserter` |
 | [`ica-maxi-catalog-yoghurt-raw.json`](./ica-maxi-catalog-yoghurt-raw.json) | `Mejeri-Ost/Yoghurt` |
+| [`ica-maxi-catalog-fisk-skaldjur-raw.json`](./ica-maxi-catalog-fisk-skaldjur-raw.json) | `Fisk-Skaldjur` |
+| [`ica-maxi-catalog-brod-kakor-raw.json`](./ica-maxi-catalog-brod-kakor-raw.json) | `Bröd-Kakor` |
 | [`ica-maxi-catalog-fageldelikatesschark-raw.json`](./ica-maxi-catalog-fageldelikatesschark-raw.json) | `Kött-Chark-Fågel/Delikatesschark` |
 | [`ica-maxi-catalog-inalvsmat-raw.json`](./ica-maxi-catalog-inalvsmat-raw.json) | `Kött-Chark-Fågel/Inälvsmat` |
 | [`ica-maxi-catalog-korv-raw.json`](./ica-maxi-catalog-korv-raw.json) | `Kött-Chark-Fågel/Korv` |
@@ -442,9 +451,18 @@ Top level is whatever your consumer needs; this pattern stays close to ICA:
       "ica-maxi-catalog-juice-fruktdryck-raw.json",
       "ica-maxi-catalog-agg-jast-raw.json",
       "ica-maxi-catalog-mjolk-raw.json",
+      "ica-maxi-catalog-filmjolk-raw.json",
       "ica-maxi-catalog-ost-raw.json",
+      "ica-maxi-catalog-gradde-raw.json",
       "ica-maxi-catalog-smor-magarin-raw.json",
+      "ica-maxi-catalog-creme-fraiche-raw.json",
+      "ica-maxi-catalog-graddfil-raw.json",
+      "ica-maxi-catalog-kvarg-raw.json",
+      "ica-maxi-catalog-cottage-cheese-raw.json",
+      "ica-maxi-catalog-cottage-kylda-mellanmal-desserter-raw.json",
       "ica-maxi-catalog-yoghurt-raw.json",
+      "ica-maxi-catalog-fisk-skaldjur-raw.json",
+      "ica-maxi-catalog-brod-kakor-raw.json",
       "ica-maxi-catalog-fageldelikatesschark-raw.json",
       "ica-maxi-catalog-inalvsmat-raw.json",
       "ica-maxi-catalog-korv-raw.json",

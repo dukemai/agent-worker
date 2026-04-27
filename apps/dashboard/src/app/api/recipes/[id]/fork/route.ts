@@ -67,6 +67,7 @@ export async function POST(request: Request, { params }: Params) {
       tested: false,
       want_to_try: false,
       estimated_cook_time: source.estimated_cook_time ?? "",
+      difficulty: source.difficulty ?? "medium",
       source: source.source ?? "ai_generator",
       similar_recipe_url: source.similar_recipe_url ?? "",
       i18n: source.i18n ?? {},

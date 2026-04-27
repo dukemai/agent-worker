@@ -12,6 +12,7 @@ import {
   getRecipeDisplayTitle,
   type SavedRecipeWithI18n,
 } from "@/lib/recipe-locale";
+import { formatRecipeDifficulty } from "@/lib/recipe-difficulty";
 import type { SavedRecipeRow } from "@/lib/saved-recipe-row";
 
 async function fetchPublicRecipe(id: string): Promise<SavedRecipeRow> {
@@ -77,11 +78,11 @@ export function PublicCookbookCook({ recipeId }: PublicCookbookCookProps) {
               Cooking
             </p>
             <h1 className="text-2xl font-semibold tracking-tight">{title}</h1>
-            {recipe.estimated_cook_time.trim() ? (
-              <p className="mt-1 text-sm text-muted-foreground">
-                Est. {recipe.estimated_cook_time}
-              </p>
-            ) : null}
+            <p className="mt-1 text-sm text-muted-foreground">
+              {recipe.estimated_cook_time.trim()
+                ? `Est. ${recipe.estimated_cook_time} · ${formatRecipeDifficulty(recipe.difficulty)}`
+                : formatRecipeDifficulty(recipe.difficulty)}
+            </p>
           </div>
         </div>
         <div className="flex flex-wrap gap-2">

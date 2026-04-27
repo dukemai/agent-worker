@@ -564,6 +564,12 @@ export interface RecipeIngredient {
   amount: string;
 }
 
+export type RecipeDifficulty = "easy" | "medium" | "hard";
+
+function sanitizeRecipeDifficulty(value: unknown): RecipeDifficulty {
+  return value === "easy" || value === "hard" || value === "medium" ? value : "medium";
+}
+
 /**
  * One AI-generated **suggestion** (recipe generator): dish names + shopping-style ingredients.
  * Cooking steps are **not** from the model — the user pastes markdown from a trusted source.
@@ -580,6 +586,8 @@ export interface RecipeGeneratorMeal {
   meal_kind: PromoMealPlanMealKind;
   /** Approx. active + light waiting time until serving, e.g. "ca 35 min" (Swedish). */
   estimated_cook_time: string;
+  /** Rough cooking difficulty for planning and filtering. */
+  difficulty: RecipeDifficulty;
   ingredients: RecipeIngredient[];
   /** Always empty from AI; filled when the user pastes source markdown in the dashboard. */
   steps: string[];
@@ -829,6 +837,13 @@ const RECIPE_GENERATOR_MEAL_ITEM_SCHEMA: ObjectSchema = {
       description:
         "Ungefärlig tid till servering (aktiv + lite väntetid), t.ex. ca 35 min eller 25–40 min",
     } as Schema,
+    difficulty: {
+      type: SchemaType.STRING,
+      format: "enum",
+      enum: ["easy", "medium", "hard"],
+      description:
+        "Cooking difficulty: easy = straightforward weekday cooking, medium = some timing/technique, hard = many steps or advanced technique",
+    } as Schema,
   },
   required: [
     "title",
@@ -839,6 +854,7 @@ const RECIPE_GENERATOR_MEAL_ITEM_SCHEMA: ObjectSchema = {
     "steps",
     "uses_ingredient_picks",
     "estimated_cook_time",
+    "difficulty",
   ],
 };
 
@@ -900,6 +916,7 @@ function sanitizeRecipeGeneratorMeal(raw: unknown): RecipeGeneratorMeal | null {
     typeof m.estimated_cook_time === "string"
       ? m.estimated_cook_time.replace(/\s+/g, " ").trim().slice(0, 80)
       : "";
+  const difficulty = sanitizeRecipeDifficulty(m.difficulty);
 
   const uses = Array.isArray(m.uses_ingredient_picks)
     ? m.uses_ingredient_picks
@@ -916,6 +933,7 @@ function sanitizeRecipeGeneratorMeal(raw: unknown): RecipeGeneratorMeal | null {
     summary,
     meal_kind: sanitizeMealKind(m.meal_kind),
     estimated_cook_time,
+    difficulty,
     ingredients,
     steps,
     uses_ingredient_picks: uses,
@@ -923,7 +941,7 @@ function sanitizeRecipeGeneratorMeal(raw: unknown): RecipeGeneratorMeal | null {
 }
 
 /**
- * Generate up to **8** meal ideas from ICA ingredient picks + food type + optional vegetarian/excludes.
+ * Generate up to **8** meal ideas from food type + optional ICA ingredient picks, vegetarian, and excludes.
  */
 export async function generateRecipeIdeasFromIngredients(
   apiKey: string,
@@ -953,10 +971,15 @@ export async function generateRecipeIdeasFromIngredients(
     ? `\n## Vegetariskt\n- Föreslå **endast vegetariska** rätter: **ingen** kött, fisk, skaldjur, gelatin eller djur löpe.\n- Ägg och mejeri är tillåtet om det passar.\n`
     : "";
 
-  const systemPreamble = `Du hjälper ett hushåll i **Sverige** att välja **rätter** utifrån valda råvaror.
+  const ingredientModeBlock =
+    picks.length > 0
+      ? `- Användarens valda ingredienser är **fokus**, inte ett tvång att använda alla i varje rätt.\n- **uses_ingredient_picks**: vilka av användarens ingredienser som är centrala (exakta strängar från listan när möjligt).`
+      : `- Användaren har inte valt fokusingredienser. Föreslå rätter utifrån **matstilen** och vanliga råvaror som är lätta att handla i Sverige.\n- **uses_ingredient_picks** ska vara en tom lista [].`;
+
+  const systemPreamble = `Du hjälper ett hushåll i **Sverige** att välja **rätter** utifrån matstil och eventuella fokusråvaror.
 
 ## Uppgift
-Föreslå **högst ${RECIPE_GENERATOR_MAX_MEALS}** **rättnamn + inköpslista** (ingrediensrader) utifrån användarens **valda ingredienser** och **matstil**.
+Föreslå **högst ${RECIPE_GENERATOR_MAX_MEALS}** **rättnamn + inköpslista** (ingrediensrader) utifrån användarens **matstil** och eventuella **valda ingredienser**.
 
 ## Viktigt: ingen tillagning från modellen
 - **Skriv inte** tillagningssteg, metod eller detaljerade recept. Användaren hämtar det pålitlig text från bloggar, böcker eller sidor och klistrar in den själv.
@@ -969,7 +992,8 @@ Föreslå **högst ${RECIPE_GENERATOR_MAX_MEALS}** **rättnamn + inköpslista** 
 - **ingredients**: varje rad har **text** (full rad), **ingredient_label** (kort, gärna nära användarens val), **amount**.
 - **meal_kind**: lunch | dinner | either | snack | other.
 - **estimated_cook_time**: grov uppskattning (t.ex. "ca 30 min") — bara vägledning.
-- **uses_ingredient_picks**: vilka av användarens ingredienser som är centrala (exakta strängar från listan när möjligt).
+- **difficulty**: easy | medium | hard. Välj **easy** för enkel vardagsmat, **medium** för viss tajming/teknik, **hard** för många moment eller avancerad teknik.
+${ingredientModeBlock}
 ${vegBlock}${excludeBlock}
 `;
 
@@ -1186,6 +1210,17 @@ export type ParsedRecipeFromMarkdownImport = {
   steps: string[];
   /** Swedish phrase, e.g. "ca 35 min", or empty. */
   estimated_cook_time: string;
+  difficulty: RecipeDifficulty;
+  /** Detected original/source language of the pasted markdown. */
+  source_language: "sv" | "en" | "vi" | "other";
+  /** Original-language dish name when source language is EN/VI; empty otherwise. */
+  source_language_title: string;
+  /** Original-language summary when source language is EN/VI; empty otherwise. */
+  source_language_summary: string;
+  /** Original-language ingredient rows when source language is EN/VI; empty otherwise. */
+  source_language_ingredients: RecipeIngredient[];
+  /** Original-language steps when source language is EN/VI; empty otherwise. */
+  source_language_steps: string[];
 };
 
 const RECIPE_MARKDOWN_IMPORT_RESULT_SCHEMA: ObjectSchema = {
@@ -1212,8 +1247,54 @@ const RECIPE_MARKDOWN_IMPORT_RESULT_SCHEMA: ObjectSchema = {
       description:
         "Approximate total time in Swedish, e.g. ca 40 min or 25–35 min; empty string if unknown",
     } as Schema,
+    difficulty: {
+      type: SchemaType.STRING,
+      format: "enum",
+      enum: ["easy", "medium", "hard"],
+      description:
+        "Cooking difficulty: easy = straightforward, medium = some timing/technique, hard = many steps or advanced technique",
+    } as Schema,
+    source_language: {
+      type: SchemaType.STRING,
+      format: "enum",
+      enum: ["sv", "en", "vi", "other"],
+      description: "Detected main language of the pasted source markdown.",
+    } as Schema,
+    source_language_title: {
+      type: SchemaType.STRING,
+      description:
+        "Original-language title if source_language is en or vi; empty string for sv/other.",
+    } as Schema,
+    source_language_summary: {
+      type: SchemaType.STRING,
+      description:
+        "Original-language 1–2 sentence summary if source_language is en or vi; empty string for sv/other.",
+    } as Schema,
+    source_language_ingredients: {
+      type: SchemaType.ARRAY,
+      description:
+        "Original-language ingredient rows if source_language is en or vi; empty array for sv/other.",
+      items: RECIPE_INGREDIENT_ITEM_SCHEMA,
+    } as Schema,
+    source_language_steps: {
+      type: SchemaType.ARRAY,
+      description:
+        "Original-language cooking steps if source_language is en or vi; empty array for sv/other.",
+      items: { type: SchemaType.STRING } as Schema,
+    } as Schema,
   },
-  required: ["summary", "ingredients", "steps"],
+  required: [
+    "summary",
+    "ingredients",
+    "steps",
+    "estimated_cook_time",
+    "difficulty",
+    "source_language",
+    "source_language_title",
+    "source_language_summary",
+    "source_language_ingredients",
+    "source_language_steps",
+  ],
 };
 
 function sanitizeParsedRecipeMarkdownImport(raw: unknown): ParsedRecipeFromMarkdownImport | null {
@@ -1254,12 +1335,63 @@ function sanitizeParsedRecipeMarkdownImport(raw: unknown): ParsedRecipeFromMarkd
     typeof m.estimated_cook_time === "string"
       ? m.estimated_cook_time.replace(/\s+/g, " ").trim().slice(0, 120)
       : "";
+  const difficulty = sanitizeRecipeDifficulty(m.difficulty);
+  const rawSourceLanguage =
+    typeof m.source_language === "string"
+      ? m.source_language.replace(/\s+/g, " ").trim().toLowerCase()
+      : "";
+  const source_language =
+    rawSourceLanguage === "en" ||
+    rawSourceLanguage === "vi" ||
+    rawSourceLanguage === "sv" ||
+    rawSourceLanguage === "other"
+      ? rawSourceLanguage
+      : "other";
+  const keepSourceBody = source_language === "en" || source_language === "vi";
+  const source_language_title =
+    keepSourceBody && typeof m.source_language_title === "string"
+      ? m.source_language_title.replace(/\s+/g, " ").trim().slice(0, 200)
+      : "";
+  const source_language_summary =
+    keepSourceBody && typeof m.source_language_summary === "string"
+      ? m.source_language_summary.replace(/\s+/g, " ").trim().slice(0, 800)
+      : "";
+  const sourceIngredientsRaw = Array.isArray(m.source_language_ingredients)
+    ? m.source_language_ingredients
+    : [];
+  const source_language_ingredients: RecipeIngredient[] = [];
+  if (keepSourceBody) {
+    for (const row of sourceIngredientsRaw) {
+      const s = sanitizeRecipeIngredientRow(row);
+      if (s) {
+        source_language_ingredients.push(s);
+      }
+      if (source_language_ingredients.length >= RECIPE_INGREDIENT_ROW_CAP) {
+        break;
+      }
+    }
+  }
+  const sourceStepsRaw = Array.isArray(m.source_language_steps) ? m.source_language_steps : [];
+  const source_language_steps = keepSourceBody
+    ? sourceStepsRaw
+        .filter((s): s is string => typeof s === "string")
+        .map((s) => s.replace(/\s+/g, " ").trim())
+        .filter(Boolean)
+        .map((s) => (s.length > 800 ? `${s.slice(0, 800)}…` : s))
+        .slice(0, RECIPE_STEP_CAP)
+    : [];
 
   return {
     summary,
     ingredients,
     steps,
     estimated_cook_time,
+    difficulty,
+    source_language,
+    source_language_title,
+    source_language_summary,
+    source_language_ingredients,
+    source_language_steps,
   };
 }
 
@@ -1288,10 +1420,14 @@ ${sumHint ? `Nuvarande kort beskrivning (får uppdateras om källan är tydligar
 
 ## Uppgift
 - Tolka markdown och extrahera **ingredienser** och **tillagningssteg** på **svenska** (köksnära, realistiska mängder: g, kg, dl, ml, st, krm).
+- Identifiera källans huvudspråk som **source_language**: "sv", "en", "vi" eller "other".
+- Om källspråket är **engelska** eller **vietnamesiska**, fyll även i **source_language_title**, **source_language_summary**, **source_language_ingredients** och **source_language_steps** på originalspråket. Bevara naturligt receptspråk från källan, men strukturera rader/steg som i svenska fälten.
+- Om källspråket är svenska eller annat språk än engelska/vietnamesiska: sätt originalspråksfälten till tom sträng/tom array.
 - Ignorera annonser, navigering, kommentarsfält och irrelevant text.
 - **summary**: 1–2 meningar om vad rätten är.
 - **steps**: varje steg som en kort, numrerbar mening (ingen sifferpräfix i själva strängen).
 - **estimated_cook_time**: om tid nämns, kort svensk fras (t.ex. "ca 35 min"); annars tom sträng.
+- **difficulty**: easy | medium | hard utifrån antal moment, tajming och teknik.
 
 Om vissa uppgifter saknas i texten: gör så mycket du kan; låt inte fälten bli tomma om det finns innehåll att hämta.
 `;
@@ -1342,6 +1478,15 @@ export type ParsedNewDishFromMarkdown = {
   ingredients: RecipeIngredient[];
   steps: string[];
   estimated_cook_time: string;
+  difficulty: RecipeDifficulty;
+  /** Detected original/source language of the pasted markdown. */
+  source_language: "sv" | "en" | "vi" | "other";
+  /** Original-language summary when source language is EN/VI; empty otherwise. */
+  source_language_summary: string;
+  /** Original-language ingredient rows when source language is EN/VI; empty otherwise. */
+  source_language_ingredients: RecipeIngredient[];
+  /** Original-language steps when source language is EN/VI; empty otherwise. */
+  source_language_steps: string[];
 };
 
 const NEW_DISH_MARKDOWN_IMPORT_SCHEMA: ObjectSchema = {
@@ -1400,6 +1545,36 @@ const NEW_DISH_MARKDOWN_IMPORT_SCHEMA: ObjectSchema = {
       description:
         "Approximate total time in Swedish, e.g. ca 40 min; empty string if unknown",
     } as Schema,
+    difficulty: {
+      type: SchemaType.STRING,
+      format: "enum",
+      enum: ["easy", "medium", "hard"],
+      description:
+        "Cooking difficulty: easy = straightforward, medium = some timing/technique, hard = many steps or advanced technique",
+    } as Schema,
+    source_language: {
+      type: SchemaType.STRING,
+      format: "enum",
+      enum: ["sv", "en", "vi", "other"],
+      description: "Detected main language of the pasted source markdown.",
+    } as Schema,
+    source_language_summary: {
+      type: SchemaType.STRING,
+      description:
+        "Original-language 1–2 sentence summary if source_language is en or vi; empty string for sv/other.",
+    } as Schema,
+    source_language_ingredients: {
+      type: SchemaType.ARRAY,
+      description:
+        "Original-language ingredient rows if source_language is en or vi; empty array for sv/other.",
+      items: RECIPE_INGREDIENT_ITEM_SCHEMA,
+    } as Schema,
+    source_language_steps: {
+      type: SchemaType.ARRAY,
+      description:
+        "Original-language cooking steps if source_language is en or vi; empty array for sv/other.",
+      items: { type: SchemaType.STRING } as Schema,
+    } as Schema,
   },
   required: [
     "title",
@@ -1413,6 +1588,11 @@ const NEW_DISH_MARKDOWN_IMPORT_SCHEMA: ObjectSchema = {
     "ingredients",
     "steps",
     "estimated_cook_time",
+    "difficulty",
+    "source_language",
+    "source_language_summary",
+    "source_language_ingredients",
+    "source_language_steps",
   ],
 };
 
@@ -1509,6 +1689,47 @@ function sanitizeParsedNewDishFromMarkdown(
     typeof m.estimated_cook_time === "string"
       ? m.estimated_cook_time.replace(/\s+/g, " ").trim().slice(0, 120)
       : "";
+  const difficulty = sanitizeRecipeDifficulty(m.difficulty);
+  const rawSourceLanguage =
+    typeof m.source_language === "string"
+      ? m.source_language.replace(/\s+/g, " ").trim().toLowerCase()
+      : "";
+  const source_language =
+    rawSourceLanguage === "en" ||
+    rawSourceLanguage === "vi" ||
+    rawSourceLanguage === "sv" ||
+    rawSourceLanguage === "other"
+      ? rawSourceLanguage
+      : "other";
+  const keepSourceBody = source_language === "en" || source_language === "vi";
+  const source_language_summary =
+    keepSourceBody && typeof m.source_language_summary === "string"
+      ? m.source_language_summary.replace(/\s+/g, " ").trim().slice(0, 800)
+      : "";
+  const sourceIngredientsRaw = Array.isArray(m.source_language_ingredients)
+    ? m.source_language_ingredients
+    : [];
+  const source_language_ingredients: RecipeIngredient[] = [];
+  if (keepSourceBody) {
+    for (const row of sourceIngredientsRaw) {
+      const s = sanitizeRecipeIngredientRow(row);
+      if (s) {
+        source_language_ingredients.push(s);
+      }
+      if (source_language_ingredients.length >= RECIPE_INGREDIENT_ROW_CAP) {
+        break;
+      }
+    }
+  }
+  const sourceStepsRaw = Array.isArray(m.source_language_steps) ? m.source_language_steps : [];
+  const source_language_steps = keepSourceBody
+    ? sourceStepsRaw
+        .filter((s): s is string => typeof s === "string")
+        .map((s) => s.replace(/\s+/g, " ").trim())
+        .filter(Boolean)
+        .map((s) => (s.length > 800 ? `${s.slice(0, 800)}…` : s))
+        .slice(0, RECIPE_STEP_CAP)
+    : [];
 
   return {
     title,
@@ -1522,6 +1743,11 @@ function sanitizeParsedNewDishFromMarkdown(
     ingredients,
     steps,
     estimated_cook_time,
+    difficulty,
+    source_language,
+    source_language_summary,
+    source_language_ingredients,
+    source_language_steps,
   };
 }
 
@@ -1557,6 +1783,10 @@ ${styleBlock}
 
 ## Uppgift
 - Identifiera rättens namn: **title** på svenska; **title_en** och **title_vi** om det går, annars tom sträng.
+- Identifiera källans huvudspråk som **source_language**: "sv", "en", "vi" eller "other".
+- Om källspråket är engelska: sätt **title_en** till original-/naturligt engelskt namn och fyll **source_language_summary**, **source_language_ingredients**, **source_language_steps** på engelska.
+- Om källspråket är vietnamesiska: sätt **title_vi** till original-/naturligt vietnamesiskt namn och fyll **source_language_summary**, **source_language_ingredients**, **source_language_steps** på vietnamesiska.
+- Om källspråket är svenska eller annat språk än engelska/vietnamesiska: sätt originalspråksfälten till tom sträng/tom array.
 - **summary**: kort på svenska vad rätten är.
 - **meal_kind**: lunch | dinner | either | snack | other — vad som passar bäst.
 - **food_type_id**: exakt ett id från listan ovan som bäst matchar rättens stil (köket/stämningen).
@@ -1565,6 +1795,7 @@ ${styleBlock}
 - **ingredients**: strukturerade rader: text, ingredient_label, amount på svenska.
 - **steps**: tillagningssteg i ordning, ett tydligt steg per sträng (ingen siffra i början av strängen).
 - **estimated_cook_time**: t.ex. "ca 35 min" om det går att avgöra; annars tom sträng.
+- **difficulty**: easy | medium | hard utifrån antal moment, tajming och teknik.
 
 Ignorera annonser, navigering och irrelevant text. Om något saknas, gör ett rimligt bästa val utifrån texten.`;
 

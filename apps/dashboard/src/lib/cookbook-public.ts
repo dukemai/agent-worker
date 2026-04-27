@@ -2,7 +2,7 @@ import { isServiceRoleKeySameAsAnonKey } from "@/lib/supabase/service-role";
 
 /** Columns returned by the public cookbook API (no raw source markdown). */
 export const PUBLIC_COOKBOOK_RECIPE_COLUMNS =
-  "id, title, title_en, title_vi, summary, meal_kind, ingredients, steps, food_type_id, vegetarian, ingredient_picks, tested, want_to_try, estimated_cook_time, source, similar_recipe_url, created_at, i18n, forked_from_id";
+  "id, title, title_en, title_vi, summary, meal_kind, ingredients, steps, food_type_id, vegetarian, ingredient_picks, tested, want_to_try, estimated_cook_time, difficulty, source, similar_recipe_url, created_at, i18n, forked_from_id";
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
