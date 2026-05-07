@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { errorResponse, getAuthedSupabase } from "@/lib/api";
 import { ensureCookPlan } from "@/lib/cook-plan-server";
+import { canUserAccessRecipe } from "@/lib/recipe-collaboration-search";
 
 export async function POST(request: Request) {
   const auth = await getAuthedSupabase();
@@ -31,17 +32,11 @@ export async function POST(request: Request) {
     return errorResponse(e instanceof Error ? e.message : "Cook plan error", 500);
   }
 
-  const { data: recipe, error: recipeError } = await auth.supabase
-    .from("saved_recipes")
-    .select("id")
-    .eq("id", recipeId)
-    .eq("user_id", auth.user.id)
-    .maybeSingle();
-
-  if (recipeError) {
-    return errorResponse(recipeError.message, 500);
+  const access = await canUserAccessRecipe(auth.supabase, auth.user, recipeId);
+  if (access.error) {
+    return errorResponse(access.error.message, 500);
   }
-  if (!recipe) {
+  if (!access.canAccess) {
     return errorResponse("Recipe not found", 404);
   }
 

@@ -296,6 +296,13 @@ export function parseRecipePartialUpdate(
     }
     patch.meal_kind = meal_kind;
   }
+  if (Object.prototype.hasOwnProperty.call(o, "food_type_id")) {
+    const food_type_id = typeof o.food_type_id === "string" ? o.food_type_id.trim() : "";
+    if (!food_type_id) {
+      return { error: "food_type_id is required" };
+    }
+    patch.food_type_id = food_type_id;
+  }
   if (Object.prototype.hasOwnProperty.call(o, "ingredients")) {
     const ing = parseIngredientsArray(o.ingredients);
     if ("error" in ing) {

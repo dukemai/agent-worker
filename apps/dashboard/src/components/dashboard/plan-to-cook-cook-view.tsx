@@ -1,8 +1,7 @@
 "use client";
 
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import type { RecipeGeneratorMeal } from "@agent/shared";
-import { ChefHat } from "lucide-react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { CheckCircle2, ChefHat } from "lucide-react";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -70,6 +69,16 @@ async function fetchRecipe(id: string): Promise<{ recipe: RecipeDetail }> {
   return res.json() as Promise<{ recipe: RecipeDetail }>;
 }
 
+async function removeCookPlanRecipe(recipeId: string): Promise<void> {
+  const res = await fetch(`/api/cook-plan/items?recipeId=${encodeURIComponent(recipeId)}`, {
+    method: "DELETE",
+  });
+  if (!res.ok) {
+    const j = (await res.json().catch(() => ({}))) as { error?: string };
+    throw new Error(j.error ?? "Could not mark recipe done");
+  }
+}
+
 export function PlanToCookCookView() {
   const queryClient = useQueryClient();
   const { locale } = useRecipeLocale();
@@ -80,6 +89,19 @@ export function PlanToCookCookView() {
     queryKey: ["recipe", openRecipeId],
     queryFn: () => fetchRecipe(openRecipeId!),
     enabled: openRecipeId !== null,
+  });
+
+  const doneMutation = useMutation({
+    mutationFn: removeCookPlanRecipe,
+    onSuccess: async (_, recipeId) => {
+      if (openRecipeId === recipeId) {
+        setOpenRecipeId(null);
+      }
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["cook-plan"] }),
+        queryClient.invalidateQueries({ queryKey: ["cook-plan-prepare"] }),
+      ]);
+    },
   });
 
   const items = planQuery.data?.items ?? [];
@@ -181,13 +203,28 @@ export function PlanToCookCookView() {
                         {r?.vegetarian ? <span>Vegetarian</span> : null}
                       </div>
                     </div>
-                    <div className="shrink-0">
+                    <div className="flex shrink-0 flex-wrap gap-2">
+                      {r ? (
+                        <Button asChild>
+                          <Link href={`/recipes/${encodeURIComponent(r.id)}/cook`}>
+                            Start cooking
+                          </Link>
+                        </Button>
+                      ) : (
+                        <Button type="button" disabled>
+                          Start cooking
+                        </Button>
+                      )}
                       <Button
                         type="button"
-                        disabled={!r}
-                        onClick={() => r && setOpenRecipeId(r.id)}
+                        variant="outline"
+                        disabled={doneMutation.isPending}
+                        onClick={() => doneMutation.mutate(row.recipe_id)}
                       >
-                        Start cooking
+                        <CheckCircle2 className="mr-2 size-4" aria-hidden />
+                        {doneMutation.isPending && doneMutation.variables === row.recipe_id
+                          ? "Marking…"
+                          : "Done"}
                       </Button>
                     </div>
                   </li>
@@ -195,6 +232,11 @@ export function PlanToCookCookView() {
               })}
             </ul>
           )}
+          {doneMutation.error ? (
+            <p className="mt-3 text-sm text-destructive">
+              {doneMutation.error instanceof Error ? doneMutation.error.message : "Could not mark done"}
+            </p>
+          ) : null}
         </CardContent>
       </Card>
 
@@ -297,6 +339,19 @@ export function PlanToCookCookView() {
                 <div>
                   <p className="mb-2 text-xs font-medium text-muted-foreground">Steps</p>
                   <RecipeStepsDisplay className="list-decimal space-y-2 pl-5" steps={display.steps} />
+                </div>
+                <div className="border-t pt-4">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    disabled={doneMutation.isPending}
+                    onClick={() => doneMutation.mutate(dialogRecipe.id)}
+                  >
+                    <CheckCircle2 className="mr-2 size-4" aria-hidden />
+                    {doneMutation.isPending && doneMutation.variables === dialogRecipe.id
+                      ? "Marking done…"
+                      : "Mark recipe done"}
+                  </Button>
                 </div>
               </div>
             </>

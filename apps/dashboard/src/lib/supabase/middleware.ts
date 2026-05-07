@@ -9,6 +9,7 @@ const PUBLIC_PATHS = [
   "/api/auth/callback",
   "/api/public",
   "/cookbook",
+  "/recipes/shared",
   "/invite",
   "/wishlist",
 ];
@@ -17,6 +18,7 @@ const COLLABORATOR_ALLOWED_PATHS = [
   "/family",
   "/plan-to-cook",
   "/cookbook",
+  "/recipes",
   "/birthdays",
   "/shop",
   "/wishlist",

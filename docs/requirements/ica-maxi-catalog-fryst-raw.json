@@ -1,0 +1,90 @@
+[
+  {
+    "id": "d59fe447-36e6-49be-a5a4-c2946f447ed2",
+    "name": "Fryst färdigmat",
+    "productCount": 299,
+    "fullURLPath": "Fryst/Fryst-färdigmat",
+    "retailerCategoryId": "746",
+    "children": []
+  },
+  {
+    "id": "1070cc2c-7727-4d4f-8f65-58da3b126b12",
+    "name": "Fryst kött & burgare",
+    "productCount": 66,
+    "fullURLPath": "Fryst/Fryst-kött-burgare",
+    "retailerCategoryId": "745",
+    "children": []
+  },
+  {
+    "id": "c1223071-8a2e-4dc9-a5a5-6288b18ea95f",
+    "name": "Fryst fågel",
+    "productCount": 77,
+    "fullURLPath": "Fryst/Fryst-fågel",
+    "retailerCategoryId": "744",
+    "children": []
+  },
+  {
+    "id": "bc4b7fea-8873-4a06-a684-4828fc1c5194",
+    "name": "Fryst fisk & Skaldjur",
+    "productCount": 94,
+    "fullURLPath": "Fryst/Fryst-fisk-Skaldjur",
+    "retailerCategoryId": "742",
+    "children": []
+  },
+  {
+    "id": "8069b325-ba1b-4d63-93e6-19aacfca9723",
+    "name": "Fryst vegetarisk färdigmat",
+    "productCount": 81,
+    "fullURLPath": "Fryst/Fryst-vegetarisk-färdigmat",
+    "retailerCategoryId": "1483",
+    "children": []
+  },
+  {
+    "id": "947311e0-0931-4699-835b-7fd694e17221",
+    "name": "Frysta grönsaker",
+    "productCount": 85,
+    "fullURLPath": "Fryst/Frysta-grönsaker",
+    "retailerCategoryId": "645",
+    "children": []
+  },
+  {
+    "id": "19f48756-6028-4361-9473-366e53bd8df7",
+    "name": "Fryst potatis",
+    "productCount": 36,
+    "fullURLPath": "Fryst/Fryst-potatis",
+    "retailerCategoryId": "646",
+    "children": []
+  },
+  {
+    "id": "5edb3eb9-65a2-4136-be59-1b1c3d71e476",
+    "name": "Fryst frukt & bär",
+    "productCount": 39,
+    "fullURLPath": "Fryst/Fryst-frukt-bär",
+    "retailerCategoryId": "749",
+    "children": []
+  },
+  {
+    "id": "8c016ec5-420a-4e4d-87c7-25949c90d939",
+    "name": "Fryst bröd & dessert",
+    "productCount": 93,
+    "fullURLPath": "Fryst/Fryst-bröd-dessert",
+    "retailerCategoryId": "1336",
+    "children": []
+  },
+  {
+    "id": "af256e1f-043d-4fbf-89f4-015038f15051",
+    "name": "Färdig is",
+    "productCount": 4,
+    "fullURLPath": "Fryst/Färdig-is",
+    "retailerCategoryId": "2520",
+    "children": []
+  },
+  {
+    "id": "2147a428-d74c-4b44-ac4a-f72702d55f7a",
+    "name": "Glass",
+    "productCount": 257,
+    "fullURLPath": "Fryst/Glass",
+    "retailerCategoryId": "2267",
+    "children": []
+  }
+]

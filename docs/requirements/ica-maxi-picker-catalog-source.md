@@ -358,7 +358,11 @@ Regenerate the **tree** block after updating `ica-maxi-initial-state-raw.json`:
 | Key | Use |
 |-----|-----|
 | `categories` | Filter groups (nodes that have children): `id`, `name`, `fullURLPath`, `parentId`, `departmentId` (top-level department UUID). |
-| `items` | Leaf pickables: `watchlistText` is the string to append to `promo_watchlist`; `parentCategoryId` / `departmentId` for filtering; `retailerCategoryId` / `productCount` when sourced from a snapshot. |
+| `items` | Leaf pickables: `watchlistText` is the Swedish string to append to `promo_watchlist`; `labels.sv` / `labels.en` / `labels.vi` provide multilingual display/search labels for recipe ingredient sources; `parentCategoryId` / `departmentId` for filtering; `retailerCategoryId` / `productCount` when sourced from a snapshot. |
+
+The build script preserves existing `items[].labels` by item id when
+regenerating the catalog, so curated English/Vietnamese labels are not lost
+when ICA source snapshots are rebuilt.
 
 In `items`, each **`fullURLPath`** and each ICA category **`id`** appear **once**. ICA sometimes lists the same category id under two aisles (e.g. **Avokado** under both Frukt and Grönsaker); the merge keeps the first tree-walk occurrence so the watchlist picker does not show duplicate labels.
 

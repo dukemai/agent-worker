@@ -7,11 +7,11 @@ import { SignOutButton } from "@/components/dashboard/sign-out-button";
 
 const cookingLinks = [
   { href: "/promo-grocery-watchlist", label: "Promo grocery watchlist" },
-  { href: "/family/recipes", label: "Family recipes" },
-  { href: "/recipe-generator", label: "Recipe library" },
+  { href: "/recipes", label: "Recipes" },
+  { href: "/recipes?tab=manage", label: "Manage recipes" },
+  { href: "/recipes?tab=collect", label: "Collect ideas" },
+  { href: "/recipes?tab=share", label: "Share recipes" },
   { href: "/cookbook", label: "Shared cookbook (preview)" },
-  { href: "/plan-to-cook", label: "Plan to cook" },
-  { href: "/plan-to-cook/cook", label: "Cooking" },
 ] as const;
 
 const moreLinks = [
@@ -20,8 +20,9 @@ const moreLinks = [
 ] as const;
 
 const collaboratorLinks = [
-  { href: "/family/recipes", label: "Family recipes" },
-  { href: "/plan-to-cook", label: "Plan to cook" },
+  { href: "/recipes", label: "Recipes" },
+  { href: "/recipes?tab=collect", label: "Collect ideas" },
+  { href: "/recipes?tab=cook", label: "Cook" },
   { href: "/birthdays", label: "Birthdays" },
 ] as const;
 

@@ -7,5 +7,6 @@ export * from "./gemini";
 export * from "./growing";
 export * from "./prompts";
 export * from "./promotions";
+export * from "./recipe-food-types";
 export * from "./types";
 export * from "./utils";

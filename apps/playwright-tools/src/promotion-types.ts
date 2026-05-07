@@ -33,6 +33,7 @@ export type ExtractPromotionsOptions = {
  */
 export type StorePromotionStrategy = {
   readonly storeKey: string;
+  readonly storeName?: string;
   readonly defaultOffersUrl: string;
   /** Navigate and wait until offers are ready to scrape */
   gotoOffersPage: (page: Page) => Promise<void>;

@@ -42,7 +42,7 @@ const SNAPSHOTS = [
   },
   {
     parentPath: "Frukt-Grönt/Grönsaker",
-    file: "ica-maxi-catalog-vegetables-raw.json",
+    file: "ica-maxi-catalog-gronsaker-raw.json",
   },
   {
     parentPath: "Frukt-Grönt/Kål",
@@ -63,6 +63,10 @@ const SNAPSHOTS = [
   {
     parentPath: "Dryck/Juice-Fruktdryck",
     file: "ica-maxi-catalog-juice-fruktdryck-raw.json",
+  },
+  {
+    parentPath: "Dryck",
+    file: "ica-maxi-catalog-dryck-raw.json",
   },
   {
     parentPath: "Mejeri-Ost/Ägg-Jäst",
@@ -121,6 +125,26 @@ const SNAPSHOTS = [
     file: "ica-maxi-catalog-brod-kakor-raw.json",
   },
   {
+    parentPath: "Barn",
+    file: "ica-maxi-catalog-barn-raw.json",
+  },
+  {
+    parentPath: "Fryst",
+    file: "ica-maxi-catalog-fryst-raw.json",
+  },
+  {
+    parentPath: "Glass-Godis-Snacks",
+    file: "ica-maxi-catalog-glass-godis-snacks-raw.json",
+  },
+  {
+    parentPath: "Grill",
+    file: "ica-maxi-catalog-grill-raw.json",
+  },
+  {
+    parentPath: "Skafferi",
+    file: "ica-maxi-catalog-skafferi-raw.json",
+  },
+  {
     parentPath: "Kött-Chark-Fågel/Delikatesschark",
     file: "ica-maxi-catalog-fageldelikatesschark-raw.json",
   },
@@ -162,6 +186,28 @@ if (!cat?.categories || !cat.root) {
 }
 
 const byId = cat.categories;
+
+/** Preserve manually curated item labels across catalog rebuilds. */
+const existingLabelsById = new Map();
+for (const p of [OUT_DASHBOARD, OUT]) {
+  if (!fs.existsSync(p)) continue;
+  try {
+    const existing = JSON.parse(fs.readFileSync(p, "utf8"));
+    for (const item of existing.items ?? []) {
+      if (
+        typeof item.id === "string" &&
+        item.labels &&
+        typeof item.labels.sv === "string" &&
+        typeof item.labels.en === "string" &&
+        typeof item.labels.vi === "string"
+      ) {
+        existingLabelsById.set(item.id, item.labels);
+      }
+    }
+  } catch {
+    // Existing generated file is best-effort input only.
+  }
+}
 
 /** @type {Map<string, object[]>} */
 const snapshotByParent = new Map();
@@ -261,6 +307,11 @@ function walk(node, parentId, departmentId) {
       id: node.id,
       name: node.name,
       watchlistText: node.name,
+      labels: existingLabelsById.get(node.id) ?? {
+        sv: node.name,
+        en: "",
+        vi: "",
+      },
       fullURLPath: node.fullURLPath,
       parentCategoryId: parentId,
       departmentId,

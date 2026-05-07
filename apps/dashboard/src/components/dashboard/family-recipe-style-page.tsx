@@ -1,7 +1,7 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ArrowLeft, ChevronLeft, ChevronRight } from "lucide-react";
+import { ArrowLeft, ChevronLeft, ChevronRight, ShoppingCart } from "lucide-react";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { RecipeLanguageToolbar } from "@/components/dashboard/recipe-language-toolbar";
@@ -12,6 +12,7 @@ import {
   fetchFoodTypes,
   throwApiError,
 } from "@/components/dashboard/recipe-generator-api";
+import { addRecipeToPlan } from "@/components/dashboard/family-recipes-api";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -84,6 +85,7 @@ export function FamilyRecipeStylePage({ styleId }: { styleId: string }) {
   const [testedFilter, setTestedFilter] = useState<FilterValue>("all");
   const [wantToTryFilter, setWantToTryFilter] = useState<FilterValue>("all");
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [addedRecipeId, setAddedRecipeId] = useState<string | null>(null);
 
   const foodTypesQuery = useQuery<FoodTypesJson>({
     queryKey: ["recipe-food-types"],
@@ -101,6 +103,14 @@ export function FamilyRecipeStylePage({ styleId }: { styleId: string }) {
         queryKey: ["recipe-collaboration-style-recipes", styleId],
       });
       await queryClient.invalidateQueries({ queryKey: ["recipe-collaboration-style-counts"] });
+    },
+  });
+
+  const addToPlanMutation = useMutation({
+    mutationFn: addRecipeToPlan,
+    onSuccess: async (_data, recipeId) => {
+      setAddedRecipeId(recipeId);
+      await queryClient.invalidateQueries({ queryKey: ["cook-plan"] });
     },
   });
 
@@ -124,7 +134,9 @@ export function FamilyRecipeStylePage({ styleId }: { styleId: string }) {
         ? recipesQuery.error.message
         : feedbackMutation.error instanceof Error
           ? feedbackMutation.error.message
-          : null;
+          : addToPlanMutation.error instanceof Error
+            ? addToPlanMutation.error.message
+            : null;
 
   function updateTestedFilter(value: FilterValue) {
     setTestedFilter(value);
@@ -271,7 +283,9 @@ export function FamilyRecipeStylePage({ styleId }: { styleId: string }) {
               className="rounded-md border bg-muted/25 p-3"
               recipeId={recipe.id}
               recipe={recipe as SavedRecipeWithI18n}
-              translateEndpointForRecipe={() => "/api/recipe-collaboration/recipes/translate"}
+              translateEndpointForRecipe={(id) =>
+                `/api/recipe-collaboration/recipes/${encodeURIComponent(id)}/translate`
+              }
               onTranslated={replaceRecipeInCache}
             />
             {display?.showingSourceFallback && locale !== "sv" ? (
@@ -366,6 +380,20 @@ export function FamilyRecipeStylePage({ styleId }: { styleId: string }) {
                   onClick={() => saveFeedback({ easy_to_follow: true })}
                 >
                   Looks good
+                </Button>
+                <Button
+                  type="button"
+                  size="sm"
+                  className="shrink-0 gap-1"
+                  disabled={addToPlanMutation.isPending}
+                  onClick={() => addToPlanMutation.mutate(recipe.id)}
+                >
+                  <ShoppingCart className="size-4" aria-hidden />
+                  {addToPlanMutation.isPending
+                    ? "Adding..."
+                    : addedRecipeId === recipe.id
+                      ? "Added"
+                      : "Add to plan"}
                 </Button>
                 <Button
                   type="button"

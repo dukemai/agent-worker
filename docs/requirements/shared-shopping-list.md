@@ -35,7 +35,7 @@ flowchart LR
 
 1. **Recipe page** ([recipe-generator.md](recipe-generator.md) — saved library + generator): user selects **one or more recipes** and **adds them to plan to cook** (queue / basket for meals).
 2. **Plan to cook list:** ordered list of recipes the user intends to cook (week plan, ad-hoc backlog — product copy TBD). User can remove or reorder later.
-3. **Prepare:** user opens **Prepare** from the plan (whole plan or **per recipe** in v1 — see open questions). UI shows **ingredient lines** (merged or per recipe).
+3. **Prepare:** user opens **Prepare** from the plan. UI shows one merged ingredient list, and each ingredient line shows which meal(s) use it.
 4. On each line, user indicates **at home** vs **need to buy** (see **line semantics** below). The app derives **items to buy**.
 5. **Shopping list:** consolidated lines (deduped where possible) with clear “buy” emphasis.
 6. **Share:** same as before — **unguessable URL**, anonymous read for recipient.
@@ -53,7 +53,7 @@ flowchart LR
 
 The public shared list only exposes lines marked **`need`**. (A previous three-state model with `want` was dropped to reduce confusion.)
 
-**Aggregation:** If two recipes both need “smör”, **merge** to one line with quantity text if the recipe data allows; otherwise show two lines with recipe tags (clearer, slightly longer list).
+**Aggregation:** If two recipes both need “smör”, **merge** to one line. Show combined quantity text when available, and show recipe tags/names under the ingredient so the user knows which meals depend on it.
 
 ---
 
@@ -83,9 +83,10 @@ If **plan + prepare** tables are heavy for a first slice: **MVP0** = Prepare fro
 ### Owner
 
 1. Open **Recipe generator → Library** (or saved recipe detail) → **Add to plan to cook** on several recipes.
-2. Open **Plan to cook** (new dashboard area or tab) → review queue → **Prepare**.
-3. In **Prepare**, mark each ingredient **at home** or **need**.
-4. **Generate shopping list** → review consolidated list → **Copy link**.
+2. Open **Plan to cook** (new dashboard area or tab) → review queue. Extra library selection opens in a modal so the page stays focused on the chosen recipes, including recipes added from promo recommendations.
+3. Choose **Prepare**.
+4. In **Prepare**, mark each ingredient **at home** or **need**.
+5. **Generate shopping list** → review consolidated list → **Copy link**.
 
 ### Recipient
 

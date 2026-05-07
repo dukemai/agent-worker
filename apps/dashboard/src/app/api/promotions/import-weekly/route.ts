@@ -121,6 +121,7 @@ export async function POST(request: Request) {
   return NextResponse.json({
     runId: run.id,
     storeKey: parsed.data.storeKey,
+    storeName: parsed.data.storeName,
     weekNumber,
     isoYear,
     itemCount: rows.length,

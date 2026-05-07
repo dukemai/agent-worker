@@ -10,10 +10,21 @@ import {
   resolveIcaMaxiDepartmentsForInterests,
 } from "../ica-maxi/promo-picker-catalog";
 
-const OFFERS_URL =
+const BARKARBYSTADEN_OFFERS_URL =
   "https://www.ica.se/erbjudanden/maxi-ica-stormarknad-barkarbystaden-1003408/";
+const KALLHALL_OFFERS_URL =
+  "https://www.ica.se/erbjudanden/ica-nara-kallhall-1004315/";
 
-const STORE_KEY = "ica-maxi-barkarbystaden";
+const BARKARBYSTADEN_STORE_KEY = "ica-maxi-barkarbystaden";
+const KALLHALL_STORE_KEY = "ica-nara-kallhall";
+const BARKARBYSTADEN_STORE_NAME = "ICA Maxi Barkarbystaden";
+const KALLHALL_STORE_NAME = "ICA Nära Kallhäll";
+
+const pageStoreKey = new WeakMap<Page, string>();
+
+function storeKeyForPage(page: Page): string {
+  return pageStoreKey.get(page) ?? BARKARBYSTADEN_STORE_KEY;
+}
 
 /** Weekly-offers department chips live here on the current ICA Maxi template. */
 const OFFERS_CATEGORIES_CONTAINER = ".categoriesContainer";
@@ -268,7 +279,7 @@ async function clickOffersCategoryChipByResolvedLabel(
 
   const base = normalizeOfferChipBase(chipLabelFromList);
   console.warn(
-    `[${STORE_KEY}] Could not click chip for label: ${chipLabelFromList} (normalized base: ${base})`,
+    `[${storeKeyForPage(page)}] Could not click chip for label: ${chipLabelFromList} (normalized base: ${base})`,
   );
   return false;
 }
@@ -279,6 +290,7 @@ async function clickOffersCategoryChipByResolvedLabel(
  */
 async function scrapePromotionTilesOnPage(page: Page): Promise<ScrapedPromotion[]> {
   const sourceUrl = page.url();
+  const storeKey = storeKeyForPage(page);
   await expandLazyLoadedOfferTiles(page);
 
   const rows = await page.evaluate(() => {
@@ -374,7 +386,7 @@ async function scrapePromotionTilesOnPage(page: Page): Promise<ScrapedPromotion[
   });
 
   return rows.map((row, index) => ({
-    storeKey: STORE_KEY,
+    storeKey,
     sourceUrl,
     index,
     title: stripListCta(row.title),
@@ -389,7 +401,8 @@ async function extractPromotionsScopedByDepartments(
   departmentNames: string[],
 ): Promise<ScrapedPromotion[]> {
   const chips = await listIcaMaxiOfferCategoryChips(page);
-  console.log(`[${STORE_KEY}] Offer categories (${chips.length}):`, chips.join(" | "));
+  const storeKey = storeKeyForPage(page);
+  console.log(`[${storeKey}] Offer categories (${chips.length}):`, chips.join(" | "));
 
   const skippedNoChip: string[] = [];
   const visits: { catalogDepartment: string; chipLabel: string }[] = [];
@@ -405,19 +418,19 @@ async function extractPromotionsScopedByDepartments(
 
   if (skippedNoChip.length > 0) {
     console.log(
-      `[${STORE_KEY}] Skipping ${skippedNoChip.length} department(s) with no chip on this week’s offers page: ${skippedNoChip.join("; ")}`,
+      `[${storeKey}] Skipping ${skippedNoChip.length} department(s) with no chip on this week’s offers page: ${skippedNoChip.join("; ")}`,
     );
   }
 
   if (visits.length === 0) {
     console.warn(
-      `[${STORE_KEY}] No departments matched available offer chips; scraping full offers view.`,
+      `[${storeKey}] No departments matched available offer chips; scraping full offers view.`,
     );
     return scrapePromotionTilesOnPage(page);
   }
 
   console.log(
-    `[${STORE_KEY}] Scraping offer chips for: ${visits.map((v) => `${v.catalogDepartment} → ${v.chipLabel}`).join(" | ")}`,
+    `[${storeKey}] Scraping offer chips for: ${visits.map((v) => `${v.catalogDepartment} → ${v.chipLabel}`).join(" | ")}`,
   );
 
   const seen = new Set<string>();
@@ -466,18 +479,23 @@ async function extractPromotions(
 
   if (fromCatalog.length === 0) {
     console.warn(
-      `[${STORE_KEY}] No Handla catalog departments matched watchlist; trying weekly-offers chips only (${departments.join("; ")}).`,
+      `[${storeKeyForPage(page)}] No Handla catalog departments matched watchlist; trying weekly-offers chips only (${departments.join("; ")}).`,
     );
   } else {
     console.log(
-      `[${STORE_KEY}] Scraping weekly offers per departments: ${departments.join("; ")}`,
+      `[${storeKeyForPage(page)}] Scraping weekly offers per departments: ${departments.join("; ")}`,
     );
   }
   return extractPromotionsScopedByDepartments(page, departments);
 }
 
-async function gotoOffersPage(page: Page): Promise<void> {
-  const response = await page.goto(OFFERS_URL, { waitUntil: "domcontentloaded" });
+async function gotoIcaOffersPage(
+  page: Page,
+  storeKey: string,
+  offersUrl: string,
+): Promise<void> {
+  pageStoreKey.set(page, storeKey);
+  const response = await page.goto(offersUrl, { waitUntil: "domcontentloaded" });
   if (!response?.ok()) {
     throw new Error(`Failed to load offers: HTTP ${response?.status()}`);
   }
@@ -490,8 +508,18 @@ async function gotoOffersPage(page: Page): Promise<void> {
 }
 
 export const icaMaxiBarkarbystadenStrategy: StorePromotionStrategy = {
-  storeKey: STORE_KEY,
-  defaultOffersUrl: OFFERS_URL,
-  gotoOffersPage,
+  storeKey: BARKARBYSTADEN_STORE_KEY,
+  storeName: BARKARBYSTADEN_STORE_NAME,
+  defaultOffersUrl: BARKARBYSTADEN_OFFERS_URL,
+  gotoOffersPage: (page) =>
+    gotoIcaOffersPage(page, BARKARBYSTADEN_STORE_KEY, BARKARBYSTADEN_OFFERS_URL),
+  extractPromotions,
+};
+
+export const icaNaraKallhallStrategy: StorePromotionStrategy = {
+  storeKey: KALLHALL_STORE_KEY,
+  storeName: KALLHALL_STORE_NAME,
+  defaultOffersUrl: KALLHALL_OFFERS_URL,
+  gotoOffersPage: (page) => gotoIcaOffersPage(page, KALLHALL_STORE_KEY, KALLHALL_OFFERS_URL),
   extractPromotions,
 };

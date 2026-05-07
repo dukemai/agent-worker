@@ -158,8 +158,13 @@ Normalized storage for **manual imports** of Playwright output `watchlist-matche
 #### `promotion_import_runs`, `weekly_promotions` & `weekly_promotion_matches`
 Canonical storage for the newer weekly promotion flow: import **all** scraped
 offers first, then run dashboard-side filtering for the current watchlist.
-- **`promotion_import_runs`**: One row per weekly upload — `store_key`,
-  `iso_year`, `week_number`, `source`, `imported_count`, `raw_json`.
+- **`promotion_import_runs`**: One row per weekly upload per store —
+  `store_key`, `iso_year`, `week_number`, `source`, `imported_count`,
+  `raw_json`. Multiple stores can have imports for the same ISO week, and one
+  store can have multiple imports in a week when promotions are split into
+  separate batches; current dashboard reads aggregate all runs for the selected
+  `store_key` + ISO week. Aggregate reads merge duplicate visible offers by
+  `store_key` plus a slugified title; raw import rows remain unchanged.
 - **`weekly_promotions`**: Child rows for every scraped offer — `run_id`,
   `sort_order`, `store_key`, `promotion_index`, `title`, `card_text`,
   `price_hint`, `image_url`, `source_url`, optional category fields,
@@ -188,9 +193,43 @@ an account, then accept the invite.
 #### `recipe_candidates` & `recipe_reviews`
 Shared recipe sourcing workflow for `/family/recipes`.
 - **`recipe_candidates`**: household-scoped incoming ideas with `title`,
-  optional `source_url`, `notes`, `raw_text`, and review `status`.
+  optional `source_url`, appended `notes`, `raw_text`, `image_urls`, and review
+  `status`; `done` status hides an item from the default review queue.
 - **`recipe_reviews`**: household-scoped comments/statuses for either a saved
   recipe or a recipe candidate.
 - `saved_recipes.household_id` and `birthdays.household_id` are nullable bridge
   columns for later sharing of canonical recipes and birthdays through the same
   household model.
+
+#### `recipe_import_queue`
+Async source-import staging for `/recipe-generator?tab=import`.
+- **Purpose**: Store pasted source URL/label and raw markdown until the Worker
+  can extract a full recipe with AI.
+- **Status**: `pending`, `processing`, `completed`, or `failed`.
+- **Retry fields**: `attempts`, `last_error`, `run_after`,
+  `processing_started_at`, and `processed_at`.
+- **Output link**: `created_recipe_id` references the `saved_recipes` row made
+  by the Worker.
+- **RLS**: users manage rows where `user_id = auth.uid()`; the Worker uses the
+  service role client for scheduled processing.
+
+#### `recipe_share_links`
+Read-only public sharing for the `/recipes` hub.
+- **Purpose**: Opaque public links for either one saved recipe or all recipes in
+  a food style, served at `/recipes/shared/[slug]`.
+- **Columns**: `public_slug`, `scope_type` (`recipe` / `food_style`),
+  nullable `recipe_id`, nullable `food_type_id`, `title`, `disabled_at`, and
+  timestamps.
+- **Access**: authenticated users manage their own links through RLS; anonymous
+  readers use the `get_recipe_share_by_slug` SECURITY DEFINER RPC, which returns
+  only public-safe recipe fields and never `source_markdown`.
+
+#### `vietnamese_meals` & `vietnamese_meal_recipe_links`
+Recipe-first Vietnamese food catalog for `/vietnamese-meals`.
+- **`vietnamese_meals`**: owner-scoped canonical meal rows with `name_vi`,
+  optional `name_en`, `slug`, review `status`, tag arrays, structured
+  `typical_ingredients`, lightweight `tourist_notes`, and AI confidence.
+- **`vietnamese_meal_recipe_links`**: connects catalog meals to
+  `saved_recipes` as `canonical`, `variant`, or `inspired_by`.
+- **RLS**: authenticated users manage rows they created; collaborator access is
+  blocked by dashboard middleware for this owner-only admin surface.

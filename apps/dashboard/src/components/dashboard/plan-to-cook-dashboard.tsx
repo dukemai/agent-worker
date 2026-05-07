@@ -1,11 +1,18 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Search, ShoppingCart } from "lucide-react";
+import { ChefHat, Search, ShoppingCart, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -67,6 +74,16 @@ async function fetchSharedLists(): Promise<{ lists: SharedListBrief[] }> {
     throw new Error(j.error ?? "Failed to load shopping lists");
   }
   return res.json() as Promise<{ lists: SharedListBrief[] }>;
+}
+
+async function deleteSharedList(id: string): Promise<void> {
+  const res = await fetch(`/api/shared-shopping-lists/${encodeURIComponent(id)}`, {
+    method: "DELETE",
+  });
+  if (!res.ok) {
+    const j = (await res.json().catch(() => ({}))) as { error?: string };
+    throw new Error(j.error ?? "Could not delete shopping list");
+  }
 }
 
 type SavedRecipeForLibrary = {
@@ -154,6 +171,7 @@ export function PlanToCookDashboard({ embedded = false }: { embedded?: boolean }
   const [mealFilter, setMealFilter] = useState<string>(ALL_MEALS);
   const [styleFilter, setStyleFilter] = useState<string>(ALL_STYLES);
   const [addingRecipeId, setAddingRecipeId] = useState<string | null>(null);
+  const [libraryDialogOpen, setLibraryDialogOpen] = useState(false);
 
   const labelByFoodTypeId = useMemo(() => {
     const m = new Map<string, string>();
@@ -176,6 +194,13 @@ export function PlanToCookDashboard({ embedded = false }: { embedded?: boolean }
     },
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ["cook-plan"] });
+    },
+  });
+
+  const deleteListMutation = useMutation({
+    mutationFn: deleteSharedList,
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ["shared-shopping-lists"] });
     },
   });
 
@@ -284,11 +309,21 @@ export function PlanToCookDashboard({ embedded = false }: { embedded?: boolean }
       )}
 
       <Card>
-        <CardHeader>
-          <CardTitle className="text-lg">Your queue</CardTitle>
-          <CardDescription>
-            Pick saved recipes to add, then open Prepare when you are ready.
-          </CardDescription>
+        <CardHeader className="gap-3 sm:flex-row sm:items-start sm:justify-between">
+          <div>
+            <CardTitle className="text-lg">Your queue</CardTitle>
+            <CardDescription>
+              Recipes selected for cooking. Add from promo recommendations or choose from the library.
+            </CardDescription>
+          </div>
+          <Button
+            type="button"
+            variant="outline"
+            className="w-full sm:w-auto"
+            onClick={() => setLibraryDialogOpen(true)}
+          >
+            Add recipes
+          </Button>
         </CardHeader>
         <CardContent className="space-y-4">
           {planQuery.isLoading ? (
@@ -320,207 +355,9 @@ export function PlanToCookDashboard({ embedded = false }: { embedded?: boolean }
                 </div>
               </div>
 
-              <div className="space-y-3">
-                <div>
-                  <span className="text-xs font-medium text-muted-foreground">Add from library</span>
-                  <p className="mt-0.5 text-xs text-muted-foreground">
-                    Filter by meal type and food style, then search titles and text (SV/EN/VI), summary, and
-                    meal kind. Results exclude recipes already on your plan.
-                  </p>
-                </div>
-                <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end">
-                  <div className="space-y-1.5 sm:min-w-[10rem]">
-                    <span className="text-xs font-medium text-muted-foreground" id="plan-lib-meal">
-                      Meal type
-                    </span>
-                    <Select
-                      value={mealFilter}
-                      onValueChange={setMealFilter}
-                      disabled={savedQuery.isLoading || recipesAvailableToAdd.length === 0}
-                    >
-                      <SelectTrigger id="plan-lib-meal-trigger" aria-labelledby="plan-lib-meal">
-                        <SelectValue placeholder="All meals" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value={ALL_MEALS}>All meal types</SelectItem>
-                        {MEAL_KIND_OPTIONS.map((k) => (
-                          <SelectItem key={k} value={k}>
-                            {k}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="min-w-0 flex-1 space-y-1.5 sm:min-w-[14rem]">
-                    <span className="text-xs font-medium text-muted-foreground" id="plan-lib-style">
-                      Style
-                    </span>
-                    <Select
-                      value={styleFilter}
-                      onValueChange={setStyleFilter}
-                      disabled={
-                        savedQuery.isLoading ||
-                        recipesAvailableToAdd.length === 0 ||
-                        foodTypesQuery.isLoading
-                      }
-                    >
-                      <SelectTrigger
-                        id="plan-lib-style-trigger"
-                        className="w-full"
-                        aria-labelledby="plan-lib-style"
-                      >
-                        <SelectValue placeholder={foodTypesQuery.isLoading ? "Loading…" : "All styles"} />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value={ALL_STYLES}>All styles</SelectItem>
-                        {(foodTypesQuery.data?.options ?? []).map((o) => (
-                          <SelectItem key={o.id} value={o.id}>
-                            {o.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    {foodTypesQuery.error ? (
-                      <p className="text-xs text-destructive">
-                        Could not load style list. Meal filter still works.
-                      </p>
-                    ) : null}
-                  </div>
-                  {filtersActive ? (
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      className="shrink-0 self-end sm:mb-0.5"
-                      onClick={() => {
-                        setMealFilter(ALL_MEALS);
-                        setStyleFilter(ALL_STYLES);
-                      }}
-                    >
-                      Clear filters
-                    </Button>
-                  ) : null}
-                </div>
-                <div className="relative">
-                  <Search
-                    className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
-                    aria-hidden
-                  />
-                  <Input
-                    className="pl-9"
-                    value={librarySearch}
-                    onChange={(e) => setLibrarySearch(e.target.value)}
-                    placeholder="Search saved recipes…"
-                    disabled={savedQuery.isLoading || recipesAvailableToAdd.length === 0}
-                    aria-label="Search saved recipes to add to the plan"
-                  />
-                </div>
-                {savedQuery.error ? (
-                  <p className="text-xs text-destructive">
-                    {savedQuery.error instanceof Error ? savedQuery.error.message : "Could not load recipes"}
-                  </p>
-                ) : null}
-                {!savedQuery.isLoading &&
-                (savedQuery.data?.length ?? 0) === 0 &&
-                !savedQuery.error ? (
-                  <p className="text-xs text-muted-foreground">
-                    No saved recipes yet. Use the <strong>Library</strong> tab to save one first.
-                  </p>
-                ) : null}
-                {!savedQuery.isLoading &&
-                (savedQuery.data?.length ?? 0) > 0 &&
-                recipesAvailableToAdd.length === 0 &&
-                items.length > 0 ? (
-                  <p className="text-xs text-muted-foreground">All saved recipes are already on this plan.</p>
-                ) : null}
-                {!savedQuery.isLoading && recipesAvailableToAdd.length > 0 ? (
-                  <div className="overflow-x-auto rounded-lg border border-emerald-200/80 bg-emerald-50/50 dark:border-emerald-900/45 dark:bg-emerald-950/25">
-                    <div className="max-h-[min(22rem,50vh)] overflow-y-auto">
-                      <table className="w-full min-w-[28rem] border-collapse text-sm">
-                        <caption className="sr-only">
-                          Saved recipes matching filters and search; add to plan
-                        </caption>
-                        <thead className="sticky top-0 z-10 border-b border-emerald-200/60 bg-emerald-100/90 backdrop-blur-sm dark:border-emerald-900/50 dark:bg-emerald-950/90">
-                          <tr>
-                            <th className="px-3 py-2 text-left font-medium">Title</th>
-                            <th className="px-3 py-2 text-left font-medium">Est. time</th>
-                            <th className="px-3 py-2 text-right font-medium">Action</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {librarySearchResults.length === 0 ? (
-                            <tr>
-                              <td
-                                colSpan={3}
-                                className="px-3 py-6 text-center text-muted-foreground"
-                              >
-                                {recipesAfterMealAndStyle.length === 0 && recipesAvailableToAdd.length > 0
-                                  ? "No recipes match meal type and style filters."
-                                  : normalizeSearch(librarySearch) && recipesAfterMealAndStyle.length > 0
-                                    ? "No recipes match your search."
-                                    : "No recipes to show."}
-                              </td>
-                            </tr>
-                          ) : (
-                            librarySearchResults.map((r) => (
-                              <tr
-                                key={r.id}
-                                className="border-b border-emerald-200/40 last:border-0 dark:border-emerald-900/35"
-                              >
-                                <td className="px-3 py-2 align-top">
-                                  <div className="font-medium leading-snug">{r.title}</div>
-                                  {r.title_en || r.title_vi ? (
-                                    <div className="mt-1 text-xs text-muted-foreground">
-                                      {r.title_en ? <span>EN: {r.title_en}</span> : null}
-                                      {r.title_en && r.title_vi ? " · " : null}
-                                      {r.title_vi ? <span>VI: {r.title_vi}</span> : null}
-                                    </div>
-                                  ) : null}
-                                </td>
-                                <td className="px-3 py-2 align-top text-muted-foreground">
-                                  {r.estimated_cook_time?.trim() ? r.estimated_cook_time : "—"}
-                                </td>
-                                <td className="px-3 py-2 text-right align-top">
-                                  <Button
-                                    type="button"
-                                    size="sm"
-                                    variant="secondary"
-                                    disabled={
-                                      addToPlanMutation.isPending && addingRecipeId === r.id
-                                    }
-                                    onClick={() => void addToPlanMutation.mutateAsync(r.id)}
-                                  >
-                                    {addToPlanMutation.isPending && addingRecipeId === r.id
-                                      ? "Adding…"
-                                      : "Add"}
-                                  </Button>
-                                </td>
-                              </tr>
-                            ))
-                          )}
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-                ) : null}
-                {!savedQuery.isLoading && recipesAvailableToAdd.length > 0 ? (
-                  <p className="text-xs text-muted-foreground">
-                    <span className="font-medium tabular-nums text-foreground">
-                      {librarySearchResults.length}
-                    </span>{" "}
-                    {librarySearchResults.length === 1 ? "recipe" : "recipes"}
-                    {normalizeSearch(librarySearch)
-                      ? " match search"
-                      : filtersActive
-                        ? " after filters"
-                        : " not on plan"}
-                  </p>
-                ) : null}
-              </div>
-
               {items.length === 0 ? (
                 <p className="text-sm text-muted-foreground">
-                  No recipes in the queue yet. Add one from the search results above.
+                  No recipes in the queue yet. Add from promo recommendations or choose from the library.
                 </p>
               ) : (
                 <ul className="divide-y rounded-lg border">
@@ -540,6 +377,14 @@ export function PlanToCookDashboard({ embedded = false }: { embedded?: boolean }
                         ) : null}
                       </div>
                       <div className="flex shrink-0 flex-wrap items-center gap-1">
+                        {row.recipe ? (
+                          <Button asChild variant="outline" size="sm">
+                            <Link href={`/recipes/${encodeURIComponent(row.recipe.id)}/cook`}>
+                              <ChefHat className="size-4" aria-hidden />
+                              Cook
+                            </Link>
+                          </Button>
+                        ) : null}
                         <Button
                           type="button"
                           variant="ghost"
@@ -564,6 +409,201 @@ export function PlanToCookDashboard({ embedded = false }: { embedded?: boolean }
           )}
         </CardContent>
       </Card>
+
+      <Dialog open={libraryDialogOpen} onOpenChange={setLibraryDialogOpen}>
+        <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-3xl">
+          <DialogHeader>
+            <DialogTitle>Add recipes from library</DialogTitle>
+            <DialogDescription>
+              Search saved recipes that are not already on your plan.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-3">
+            <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end">
+              <div className="space-y-1.5 sm:min-w-[10rem]">
+                <span className="text-xs font-medium text-muted-foreground" id="plan-lib-meal">
+                  Meal type
+                </span>
+                <Select
+                  value={mealFilter}
+                  onValueChange={setMealFilter}
+                  disabled={savedQuery.isLoading || recipesAvailableToAdd.length === 0}
+                >
+                  <SelectTrigger id="plan-lib-meal-trigger" aria-labelledby="plan-lib-meal">
+                    <SelectValue placeholder="All meals" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value={ALL_MEALS}>All meal types</SelectItem>
+                    {MEAL_KIND_OPTIONS.map((k) => (
+                      <SelectItem key={k} value={k}>
+                        {k}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="min-w-0 flex-1 space-y-1.5 sm:min-w-[14rem]">
+                <span className="text-xs font-medium text-muted-foreground" id="plan-lib-style">
+                  Style
+                </span>
+                <Select
+                  value={styleFilter}
+                  onValueChange={setStyleFilter}
+                  disabled={
+                    savedQuery.isLoading ||
+                    recipesAvailableToAdd.length === 0 ||
+                    foodTypesQuery.isLoading
+                  }
+                >
+                  <SelectTrigger
+                    id="plan-lib-style-trigger"
+                    className="w-full"
+                    aria-labelledby="plan-lib-style"
+                  >
+                    <SelectValue placeholder={foodTypesQuery.isLoading ? "Loading…" : "All styles"} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value={ALL_STYLES}>All styles</SelectItem>
+                    {(foodTypesQuery.data?.options ?? []).map((o) => (
+                      <SelectItem key={o.id} value={o.id}>
+                        {o.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {foodTypesQuery.error ? (
+                  <p className="text-xs text-destructive">
+                    Could not load style list. Meal filter still works.
+                  </p>
+                ) : null}
+              </div>
+              {filtersActive ? (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="shrink-0 self-end sm:mb-0.5"
+                  onClick={() => {
+                    setMealFilter(ALL_MEALS);
+                    setStyleFilter(ALL_STYLES);
+                  }}
+                >
+                  Clear filters
+                </Button>
+              ) : null}
+            </div>
+            <div className="relative">
+              <Search
+                className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
+                aria-hidden
+              />
+              <Input
+                className="pl-9"
+                value={librarySearch}
+                onChange={(e) => setLibrarySearch(e.target.value)}
+                placeholder="Search saved recipes…"
+                disabled={savedQuery.isLoading || recipesAvailableToAdd.length === 0}
+                aria-label="Search saved recipes to add to the plan"
+              />
+            </div>
+            {savedQuery.error ? (
+              <p className="text-xs text-destructive">
+                {savedQuery.error instanceof Error ? savedQuery.error.message : "Could not load recipes"}
+              </p>
+            ) : null}
+            {!savedQuery.isLoading && (savedQuery.data?.length ?? 0) === 0 && !savedQuery.error ? (
+              <p className="text-xs text-muted-foreground">
+                No saved recipes yet. Use the <strong>Library</strong> tab to save one first.
+              </p>
+            ) : null}
+            {!savedQuery.isLoading &&
+            (savedQuery.data?.length ?? 0) > 0 &&
+            recipesAvailableToAdd.length === 0 &&
+            items.length > 0 ? (
+              <p className="text-xs text-muted-foreground">All saved recipes are already on this plan.</p>
+            ) : null}
+            {!savedQuery.isLoading && recipesAvailableToAdd.length > 0 ? (
+              <div className="overflow-x-auto rounded-lg border border-emerald-200/80 bg-emerald-50/50 dark:border-emerald-900/45 dark:bg-emerald-950/25">
+                <div className="max-h-[min(22rem,50vh)] overflow-y-auto">
+                  <table className="w-full min-w-[28rem] border-collapse text-sm">
+                    <caption className="sr-only">
+                      Saved recipes matching filters and search; add to plan
+                    </caption>
+                    <thead className="sticky top-0 z-10 border-b border-emerald-200/60 bg-emerald-100/90 backdrop-blur-sm dark:border-emerald-900/50 dark:bg-emerald-950/90">
+                      <tr>
+                        <th className="px-3 py-2 text-left font-medium">Title</th>
+                        <th className="px-3 py-2 text-left font-medium">Est. time</th>
+                        <th className="px-3 py-2 text-right font-medium">Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {librarySearchResults.length === 0 ? (
+                        <tr>
+                          <td colSpan={3} className="px-3 py-6 text-center text-muted-foreground">
+                            {recipesAfterMealAndStyle.length === 0 && recipesAvailableToAdd.length > 0
+                              ? "No recipes match meal type and style filters."
+                              : normalizeSearch(librarySearch) && recipesAfterMealAndStyle.length > 0
+                                ? "No recipes match your search."
+                                : "No recipes to show."}
+                          </td>
+                        </tr>
+                      ) : (
+                        librarySearchResults.map((r) => (
+                          <tr
+                            key={r.id}
+                            className="border-b border-emerald-200/40 last:border-0 dark:border-emerald-900/35"
+                          >
+                            <td className="px-3 py-2 align-top">
+                              <div className="font-medium leading-snug">{r.title}</div>
+                              {r.title_en || r.title_vi ? (
+                                <div className="mt-1 text-xs text-muted-foreground">
+                                  {r.title_en ? <span>EN: {r.title_en}</span> : null}
+                                  {r.title_en && r.title_vi ? " · " : null}
+                                  {r.title_vi ? <span>VI: {r.title_vi}</span> : null}
+                                </div>
+                              ) : null}
+                            </td>
+                            <td className="px-3 py-2 align-top text-muted-foreground">
+                              {r.estimated_cook_time?.trim() ? r.estimated_cook_time : "—"}
+                            </td>
+                            <td className="px-3 py-2 text-right align-top">
+                              <Button
+                                type="button"
+                                size="sm"
+                                variant="secondary"
+                                disabled={addToPlanMutation.isPending && addingRecipeId === r.id}
+                                onClick={() => void addToPlanMutation.mutateAsync(r.id)}
+                              >
+                                {addToPlanMutation.isPending && addingRecipeId === r.id
+                                  ? "Adding…"
+                                  : "Add"}
+                              </Button>
+                            </td>
+                          </tr>
+                        ))
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            ) : null}
+            {!savedQuery.isLoading && recipesAvailableToAdd.length > 0 ? (
+              <p className="text-xs text-muted-foreground">
+                <span className="font-medium tabular-nums text-foreground">
+                  {librarySearchResults.length}
+                </span>{" "}
+                {librarySearchResults.length === 1 ? "recipe" : "recipes"}
+                {normalizeSearch(librarySearch)
+                  ? " match search"
+                  : filtersActive
+                    ? " after filters"
+                    : " not on plan"}
+              </p>
+            ) : null}
+          </div>
+        </DialogContent>
+      </Dialog>
 
       <Card>
         <CardHeader>
@@ -602,11 +642,36 @@ export function PlanToCookDashboard({ embedded = false }: { embedded?: boolean }
                       <Link href={`/plan-to-cook/lists/${list.id}`}>Edit</Link>
                     </Button>
                     <CopyPublicLinkButton slug={list.public_slug} />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      disabled={deleteListMutation.isPending}
+                      onClick={() => {
+                        const ok = window.confirm(
+                          `Delete "${list.title || "Shopping list"}"? The public link will stop working.`,
+                        );
+                        if (ok) {
+                          void deleteListMutation.mutateAsync(list.id);
+                        }
+                      }}
+                      aria-label={`Delete ${list.title || "shopping list"}`}
+                      title={`Delete ${list.title || "shopping list"}`}
+                    >
+                      <Trash2 className="size-4" aria-hidden />
+                    </Button>
                   </div>
                 </li>
               ))}
             </ul>
           )}
+          {deleteListMutation.error ? (
+            <p className="mt-3 text-sm text-destructive">
+              {deleteListMutation.error instanceof Error
+                ? deleteListMutation.error.message
+                : "Could not delete shopping list"}
+            </p>
+          ) : null}
         </CardContent>
       </Card>
     </div>

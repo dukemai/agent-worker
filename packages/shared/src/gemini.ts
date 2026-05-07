@@ -599,9 +599,73 @@ export interface RecipeGenerateResult {
   meals: RecipeGeneratorMeal[];
 }
 
+export type VietnameseMealStatus = "draft" | "published" | "archived";
+export type VietnameseMealIngredientRole =
+  | "main"
+  | "broth"
+  | "sauce"
+  | "garnish"
+  | "optional";
+
+export interface VietnameseMealTypicalIngredient {
+  name: string;
+  name_vi: string;
+  role: VietnameseMealIngredientRole;
+  notes: string;
+}
+
+export interface VietnameseMealTouristNotes {
+  taste_description: string;
+  ordering_context: string;
+  allergen_hints: string[];
+  adventurousness: "familiar" | "medium" | "adventurous";
+}
+
+export interface VietnameseMealDraft {
+  name_vi: string;
+  name_en: string;
+  summary: string;
+  status: VietnameseMealStatus;
+  region_tags: string[];
+  base_tags: string[];
+  protein_tags: string[];
+  method_tags: string[];
+  flavor_tags: string[];
+  meal_context_tags: string[];
+  typical_ingredients: VietnameseMealTypicalIngredient[];
+  tourist_notes: VietnameseMealTouristNotes;
+  ai_confidence: number;
+  warnings: string[];
+}
+
+export interface VietnameseMealEnrichmentResult {
+  meals: VietnameseMealDraft[];
+}
+
 const RECIPE_GENERATOR_MAX_MEALS = 8;
 const RECIPE_INGREDIENT_ROW_CAP = 24;
 const RECIPE_STEP_CAP = 24;
+const VIETNAMESE_MEAL_ENRICHMENT_MAX_MEALS = 30;
+const VIETNAMESE_MEAL_TAG_CAP = 12;
+const VIETNAMESE_MEAL_INGREDIENT_CAP = 24;
+
+const VIETNAMESE_RECIPE_TRANSLATION_GLOSSARY = [
+  {
+    vi: "hạt nêm",
+    sv: "vietnamesiskt buljongpulver",
+    en: "Vietnamese seasoning granules",
+  },
+  { vi: "nước mắm", sv: "fisksås", en: "fish sauce" },
+  { vi: "bột ngọt", sv: "natriumglutamat (MSG)", en: "MSG" },
+  { vi: "bánh phở", sv: "risnudlar för pho", en: "pho rice noodles" },
+  { vi: "gạo nếp", sv: "klibbigt ris", en: "glutinous rice" },
+  { vi: "đường phèn", sv: "kandisocker", en: "rock sugar" },
+] as const;
+
+const VIETNAMESE_RECIPE_TRANSLATION_GLOSSARY_TEXT =
+  VIETNAMESE_RECIPE_TRANSLATION_GLOSSARY.map(
+    (row) => `- ${row.vi}: svenska = ${row.sv}; English = ${row.en}; tiếng Việt = ${row.vi}`,
+  ).join("\n");
 
 /** Model id for dashboard recipe generator (`generateRecipeIdeasFromIngredients`). */
 export const RECIPE_GENERATOR_MODEL_ID = "gemini-2.5-flash";
@@ -874,6 +938,199 @@ const RECIPE_GENERATOR_RESULT_SCHEMA: ObjectSchema = {
   required: ["intro", "meals"],
 };
 
+const VIETNAMESE_MEAL_INGREDIENT_SCHEMA: ObjectSchema = {
+  type: SchemaType.OBJECT,
+  properties: {
+    name: { type: SchemaType.STRING, description: "Ingredient name in English" } as Schema,
+    name_vi: { type: SchemaType.STRING, description: "Ingredient name in Vietnamese if known" } as Schema,
+    role: {
+      type: SchemaType.STRING,
+      format: "enum",
+      enum: ["main", "broth", "sauce", "garnish", "optional"],
+    } as Schema,
+    notes: {
+      type: SchemaType.STRING,
+      description: "Short English note about the ingredient role, or empty string",
+    } as Schema,
+  },
+  required: ["name", "name_vi", "role", "notes"],
+};
+
+const VIETNAMESE_MEAL_TOURIST_NOTES_SCHEMA: ObjectSchema = {
+  type: SchemaType.OBJECT,
+  properties: {
+    taste_description: {
+      type: SchemaType.STRING,
+      description: "Short English description of what the dish tastes like",
+    } as Schema,
+    ordering_context: {
+      type: SchemaType.STRING,
+      description: "Short English note about where/when tourists commonly order it",
+    } as Schema,
+    allergen_hints: {
+      type: SchemaType.ARRAY,
+      items: { type: SchemaType.STRING } as Schema,
+    } as Schema,
+    adventurousness: {
+      type: SchemaType.STRING,
+      format: "enum",
+      enum: ["familiar", "medium", "adventurous"],
+    } as Schema,
+  },
+  required: ["taste_description", "ordering_context", "allergen_hints", "adventurousness"],
+};
+
+const VIETNAMESE_MEAL_DRAFT_SCHEMA: ObjectSchema = {
+  type: SchemaType.OBJECT,
+  properties: {
+    name_vi: { type: SchemaType.STRING, description: "Canonical Vietnamese dish name" } as Schema,
+    name_en: { type: SchemaType.STRING, description: "Natural English dish name" } as Schema,
+    summary: {
+      type: SchemaType.STRING,
+      description: "Short English summary of the dish for the dashboard",
+    } as Schema,
+    status: {
+      type: SchemaType.STRING,
+      format: "enum",
+      enum: ["draft", "published", "archived"],
+    } as Schema,
+    region_tags: { type: SchemaType.ARRAY, items: { type: SchemaType.STRING } as Schema } as Schema,
+    base_tags: { type: SchemaType.ARRAY, items: { type: SchemaType.STRING } as Schema } as Schema,
+    protein_tags: { type: SchemaType.ARRAY, items: { type: SchemaType.STRING } as Schema } as Schema,
+    method_tags: { type: SchemaType.ARRAY, items: { type: SchemaType.STRING } as Schema } as Schema,
+    flavor_tags: { type: SchemaType.ARRAY, items: { type: SchemaType.STRING } as Schema } as Schema,
+    meal_context_tags: { type: SchemaType.ARRAY, items: { type: SchemaType.STRING } as Schema } as Schema,
+    typical_ingredients: {
+      type: SchemaType.ARRAY,
+      items: VIETNAMESE_MEAL_INGREDIENT_SCHEMA,
+    } as Schema,
+    tourist_notes: VIETNAMESE_MEAL_TOURIST_NOTES_SCHEMA,
+    ai_confidence: {
+      type: SchemaType.NUMBER,
+      description: "Confidence from 0 to 1",
+    } as Schema,
+    warnings: { type: SchemaType.ARRAY, items: { type: SchemaType.STRING } as Schema } as Schema,
+  },
+  required: [
+    "name_vi",
+    "name_en",
+    "summary",
+    "status",
+    "region_tags",
+    "base_tags",
+    "protein_tags",
+    "method_tags",
+    "flavor_tags",
+    "meal_context_tags",
+    "typical_ingredients",
+    "tourist_notes",
+    "ai_confidence",
+    "warnings",
+  ],
+};
+
+const VIETNAMESE_MEAL_ENRICHMENT_SCHEMA: ObjectSchema = {
+  type: SchemaType.OBJECT,
+  properties: {
+    meals: {
+      type: SchemaType.ARRAY,
+      items: VIETNAMESE_MEAL_DRAFT_SCHEMA,
+    } as Schema,
+  },
+  required: ["meals"],
+};
+
+const VIETNAMESE_RECIPE_INGREDIENT_ITEM_SCHEMA: ObjectSchema = {
+  type: SchemaType.OBJECT,
+  properties: {
+    text: {
+      type: SchemaType.STRING,
+      description: "Full display line in English, e.g. rice noodles 300 g, soaked",
+    } as Schema,
+    ingredient_label: {
+      type: SchemaType.STRING,
+      description: "Short shopping-friendly ingredient label in English.",
+    } as Schema,
+    amount: {
+      type: SchemaType.STRING,
+      description: "Amount in English/metric-friendly text, e.g. 300 g, 2 tbsp, to taste",
+    } as Schema,
+  },
+  required: ["text", "ingredient_label", "amount"],
+};
+
+const VIETNAMESE_RECIPE_GENERATOR_MEAL_ITEM_SCHEMA: ObjectSchema = {
+  type: SchemaType.OBJECT,
+  properties: {
+    title: { type: SchemaType.STRING, description: "Dish name in English" } as Schema,
+    title_en: { type: SchemaType.STRING, description: "Same dish name in English" } as Schema,
+    title_vi: {
+      type: SchemaType.STRING,
+      description: "Same dish name in Vietnamese with diacritics when known",
+    } as Schema,
+    summary: {
+      type: SchemaType.STRING,
+      description: "One short English line describing the dish. No Swedish.",
+    } as Schema,
+    meal_kind: {
+      type: SchemaType.STRING,
+      description: "One of: lunch, dinner, either, snack, other",
+    } as Schema,
+    ingredients: {
+      type: SchemaType.ARRAY,
+      description: "Structured ingredient rows in English, with Vietnamese terms preserved where useful",
+      items: VIETNAMESE_RECIPE_INGREDIENT_ITEM_SCHEMA,
+    } as Schema,
+    steps: {
+      type: SchemaType.ARRAY,
+      description: "Must be an empty array - do not output cooking steps",
+      items: { type: SchemaType.STRING } as Schema,
+    } as Schema,
+    uses_ingredient_picks: {
+      type: SchemaType.ARRAY,
+      description: "Subset of source ingredient names this meal uses",
+      items: { type: SchemaType.STRING } as Schema,
+    } as Schema,
+    estimated_cook_time: {
+      type: SchemaType.STRING,
+      description: "Approximate time in English, e.g. about 35 min or 25-40 min",
+    } as Schema,
+    difficulty: {
+      type: SchemaType.STRING,
+      format: "enum",
+      enum: ["easy", "medium", "hard"],
+      description: "Cooking difficulty: easy, medium, or hard",
+    } as Schema,
+  },
+  required: [
+    "title",
+    "title_en",
+    "title_vi",
+    "meal_kind",
+    "ingredients",
+    "steps",
+    "uses_ingredient_picks",
+    "estimated_cook_time",
+    "difficulty",
+  ],
+};
+
+const VIETNAMESE_RECIPE_GENERATOR_RESULT_SCHEMA: ObjectSchema = {
+  type: SchemaType.OBJECT,
+  properties: {
+    intro: {
+      type: SchemaType.STRING,
+      description: "Short English intro or empty string. No Swedish.",
+    } as Schema,
+    meals: {
+      type: SchemaType.ARRAY,
+      description: `At most ${RECIPE_GENERATOR_MAX_MEALS} meal ideas`,
+      items: VIETNAMESE_RECIPE_GENERATOR_MEAL_ITEM_SCHEMA,
+    } as Schema,
+  },
+  required: ["intro", "meals"],
+};
+
 function sanitizeRecipeIngredientRow(value: unknown): RecipeIngredient | null {
   if (!value || typeof value !== "object") return null;
   const o = value as Record<string, unknown>;
@@ -937,6 +1194,106 @@ function sanitizeRecipeGeneratorMeal(raw: unknown): RecipeGeneratorMeal | null {
     ingredients,
     steps,
     uses_ingredient_picks: uses,
+  };
+}
+
+function cleanShortText(value: unknown, max: number): string {
+  return typeof value === "string" ? value.replace(/\s+/g, " ").trim().slice(0, max) : "";
+}
+
+function sanitizeVietnameseTagList(value: unknown): string[] {
+  if (!Array.isArray(value)) return [];
+  const out: string[] = [];
+  const seen = new Set<string>();
+  for (const item of value) {
+    const tag = cleanShortText(item, 48).toLocaleLowerCase("sv-SE");
+    if (!tag || seen.has(tag)) continue;
+    seen.add(tag);
+    out.push(tag);
+    if (out.length >= VIETNAMESE_MEAL_TAG_CAP) break;
+  }
+  return out;
+}
+
+function sanitizeVietnameseMealIngredientRole(
+  value: unknown,
+): VietnameseMealIngredientRole {
+  return value === "main" ||
+    value === "broth" ||
+    value === "sauce" ||
+    value === "garnish" ||
+    value === "optional"
+    ? value
+    : "main";
+}
+
+function sanitizeVietnameseMealIngredient(
+  value: unknown,
+): VietnameseMealTypicalIngredient | null {
+  if (!value || typeof value !== "object") return null;
+  const o = value as Record<string, unknown>;
+  const name = cleanShortText(o.name, 100);
+  const name_vi = cleanShortText(o.name_vi, 100);
+  if (!name && !name_vi) return null;
+  return {
+    name: name || name_vi,
+    name_vi,
+    role: sanitizeVietnameseMealIngredientRole(o.role),
+    notes: cleanShortText(o.notes, 180),
+  };
+}
+
+function sanitizeVietnameseMealTouristNotes(value: unknown): VietnameseMealTouristNotes {
+  const o = value && typeof value === "object" ? (value as Record<string, unknown>) : {};
+  const adventurousnessRaw = o.adventurousness;
+  const adventurousness =
+    adventurousnessRaw === "familiar" ||
+    adventurousnessRaw === "adventurous" ||
+    adventurousnessRaw === "medium"
+      ? adventurousnessRaw
+      : "medium";
+  return {
+    taste_description: cleanShortText(o.taste_description, 300),
+    ordering_context: cleanShortText(o.ordering_context, 300),
+    allergen_hints: sanitizeVietnameseTagList(o.allergen_hints).slice(0, 10),
+    adventurousness,
+  };
+}
+
+function sanitizeVietnameseMealDraft(raw: unknown): VietnameseMealDraft | null {
+  if (!raw || typeof raw !== "object") return null;
+  const o = raw as Record<string, unknown>;
+  const name_vi = cleanShortText(o.name_vi, 120);
+  if (!name_vi) return null;
+
+  const rawIngredients = Array.isArray(o.typical_ingredients) ? o.typical_ingredients : [];
+  const typical_ingredients: VietnameseMealTypicalIngredient[] = [];
+  for (const item of rawIngredients) {
+    const ingredient = sanitizeVietnameseMealIngredient(item);
+    if (ingredient) typical_ingredients.push(ingredient);
+    if (typical_ingredients.length >= VIETNAMESE_MEAL_INGREDIENT_CAP) break;
+  }
+
+  const aiConfidence =
+    typeof o.ai_confidence === "number" && Number.isFinite(o.ai_confidence)
+      ? Math.max(0, Math.min(1, o.ai_confidence))
+      : 0.5;
+
+  return {
+    name_vi,
+    name_en: cleanShortText(o.name_en, 160),
+    summary: cleanShortText(o.summary, 900),
+    status: "draft",
+    region_tags: sanitizeVietnameseTagList(o.region_tags),
+    base_tags: sanitizeVietnameseTagList(o.base_tags),
+    protein_tags: sanitizeVietnameseTagList(o.protein_tags),
+    method_tags: sanitizeVietnameseTagList(o.method_tags),
+    flavor_tags: sanitizeVietnameseTagList(o.flavor_tags),
+    meal_context_tags: sanitizeVietnameseTagList(o.meal_context_tags),
+    typical_ingredients,
+    tourist_notes: sanitizeVietnameseMealTouristNotes(o.tourist_notes),
+    ai_confidence: Math.round(aiConfidence * 100) / 100,
+    warnings: sanitizeVietnameseTagList(o.warnings).slice(0, 8),
   };
 }
 
@@ -1049,6 +1406,188 @@ ${vegBlock}${excludeBlock}
       intro ||
       "Här är rättförslag och inköpsrader. Klistra in tillagning från en källa du litar på när du sparar.",
     meals,
+  };
+}
+
+export async function enrichVietnameseMealNames(
+  apiKey: string,
+  input: { names: string[] },
+): Promise<VietnameseMealEnrichmentResult> {
+  const names = input.names
+    .map((s) => s.replace(/\s+/g, " ").trim())
+    .filter(Boolean)
+    .slice(0, VIETNAMESE_MEAL_ENRICHMENT_MAX_MEALS);
+  if (names.length === 0) {
+    throw new Error("At least one meal name is required.");
+  }
+
+  const prompt = `You are building a curated Vietnamese food knowledge base for a household recipe dashboard.
+
+## Task
+Enrich each Vietnamese meal name into a reviewed draft catalog row.
+
+## Rules
+- Keep **name_vi** as the canonical Vietnamese dish name with diacritics when known.
+- **summary** must be English, short, and practical for a recipe library and future tourist food discovery.
+- Tags must be short lowercase facets, not long sentences.
+- Use these tag styles:
+  - region_tags: north, central, south, hue, saigon, hanoi, mekong, diaspora, unknown
+  - base_tags: noodles, rice, soup, bread, rolls, pancake, salad, hotpot
+  - protein_tags: pork, beef, chicken, seafood, fish, shrimp, egg, tofu, vegetarian
+  - method_tags: grilled, braised, fried, steamed, simmered, fresh, fermented
+  - flavor_tags: spicy, sour, sweet-savory, herb-heavy, fermented, rich, light
+  - meal_context_tags: breakfast, lunch, dinner, street-food, family-meal, festive, snack
+- typical_ingredients should list ingredients tourists/cooks would recognize. Use role main/broth/sauce/garnish/optional.
+- tourist_notes are future-facing, in English.
+- ai_confidence is 0-1. Add warnings when regional variation or uncertainty matters.
+- Set status to draft for every row.
+
+Input names:
+${JSON.stringify(names)}`;
+
+  const genAI = new GoogleGenerativeAI(apiKey);
+  const model = genAI.getGenerativeModel({
+    model: RECIPE_GENERATOR_MODEL_ID,
+    generationConfig: {
+      responseMimeType: "application/json",
+      responseSchema: VIETNAMESE_MEAL_ENRICHMENT_SCHEMA,
+    },
+  });
+
+  const result = await model.generateContent(prompt);
+  const text = result.response.text();
+  if (!text?.trim()) {
+    throw new Error("Gemini returned empty Vietnamese meal enrichment response");
+  }
+
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(text) as unknown;
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e);
+    throw new Error(
+      `Gemini returned invalid Vietnamese meal JSON: ${msg}. Snippet: ${text.slice(0, 160)}`,
+    );
+  }
+
+  const root = parsed && typeof parsed === "object" ? (parsed as Record<string, unknown>) : {};
+  const rawMeals = Array.isArray(root.meals) ? root.meals : [];
+  const meals = rawMeals
+    .map((meal) => sanitizeVietnameseMealDraft(meal))
+    .filter((meal): meal is VietnameseMealDraft => meal !== null)
+    .slice(0, names.length);
+
+  if (meals.length === 0) {
+    throw new Error("Vietnamese meal enrichment returned no usable meals after validation.");
+  }
+  return { meals };
+}
+
+export async function generateRecipesFromVietnameseMeals(
+  apiKey: string,
+  input: {
+    meals: Array<{
+      name_vi: string;
+      name_en: string;
+      summary: string;
+      region_tags: string[];
+      base_tags: string[];
+      protein_tags: string[];
+      typical_ingredients: VietnameseMealTypicalIngredient[];
+    }>;
+    excludeMealTitles: string[];
+  },
+): Promise<RecipeGenerateResult> {
+  const meals = input.meals
+    .map((meal) => ({
+      name_vi: cleanShortText(meal.name_vi, 120),
+      name_en: cleanShortText(meal.name_en, 160),
+      summary: cleanShortText(meal.summary, 700),
+      region_tags: meal.region_tags.slice(0, 10),
+      base_tags: meal.base_tags.slice(0, 10),
+      protein_tags: meal.protein_tags.slice(0, 10),
+      typical_ingredients: meal.typical_ingredients.slice(0, 18),
+    }))
+    .filter((meal) => meal.name_vi)
+    .slice(0, 8);
+  if (meals.length === 0) {
+    throw new Error("At least one Vietnamese meal is required.");
+  }
+
+  const exclude = input.excludeMealTitles
+    .map((s) => s.replace(/\s+/g, " ").trim())
+    .filter(Boolean)
+    .slice(0, 40);
+  const excludeBlock =
+    exclude.length > 0
+      ? `\nAvoid these existing saved recipe titles or near-identical variants:\n${exclude.map((title) => `- ${title}`).join("\n")}`
+      : "";
+
+  const prompt = `You help build recipe ideas from a curated Vietnamese meal database.
+
+## Task
+Create at most ${RECIPE_GENERATOR_MAX_MEALS} recipe suggestions inspired by the selected Vietnamese meals.
+
+## Language rules
+- Use **English** for title, title_en, summary, intro, ingredient text, ingredient_label, amount, estimated_cook_time, and any notes.
+- Use **Vietnamese** only in title_vi and when preserving specific Vietnamese ingredient names inside English ingredient text.
+- Do **not** write Swedish anywhere. Avoid Swedish words such as "ca", "st", "efter smak", "färsk", "risnudlar", "fisksås", or "vietnamesiskt".
+
+## Content rules
+- The result must match the recipe generator schema.
+- title and title_en should be natural English names for the dish.
+- title_vi should be the natural Vietnamese dish name with diacritics when known.
+- steps must always be [] because the user will add cooking instructions from a trusted source later.
+- Keep the recipes practical for a household shopping in Sweden, but describe ingredients in English.
+- ingredient_label must be short and shopping-friendly in English.
+- Amounts should use metric-friendly English, e.g. "400 g", "2 tbsp", "to taste".
+- estimated_cook_time should be English, e.g. "about 35 min" or "25-40 min".
+- difficulty must be realistic.
+${excludeBlock}
+
+Selected Vietnamese meals:
+${JSON.stringify(meals)}`;
+
+  const genAI = new GoogleGenerativeAI(apiKey);
+  const model = genAI.getGenerativeModel({
+    model: RECIPE_GENERATOR_MODEL_ID,
+    generationConfig: {
+      responseMimeType: "application/json",
+      responseSchema: VIETNAMESE_RECIPE_GENERATOR_RESULT_SCHEMA,
+    },
+  });
+
+  const result = await model.generateContent(prompt);
+  const text = result.response.text();
+  if (!text?.trim()) {
+    throw new Error("Gemini returned empty Vietnamese recipe suggestion response");
+  }
+
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(text) as unknown;
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e);
+    throw new Error(
+      `Gemini returned invalid Vietnamese recipe JSON: ${msg}. Snippet: ${text.slice(0, 160)}`,
+    );
+  }
+
+  const root = parsed && typeof parsed === "object" ? (parsed as Record<string, unknown>) : {};
+  const intro =
+    typeof root.intro === "string" ? root.intro.replace(/\s+/g, " ").trim().slice(0, 800) : "";
+  const rawMeals = Array.isArray(root.meals) ? root.meals : [];
+  const suggestions = rawMeals
+    .map((meal) => sanitizeRecipeGeneratorMeal(meal))
+    .filter((meal): meal is RecipeGeneratorMeal => meal !== null)
+    .slice(0, RECIPE_GENERATOR_MAX_MEALS);
+
+  if (suggestions.length === 0) {
+    throw new Error("Vietnamese recipe suggestions returned no usable meals after validation.");
+  }
+  return {
+    intro: intro || "Here are recipe ideas inspired by the selected Vietnamese meals.",
+    meals: suggestions,
   };
 }
 
@@ -1171,6 +1710,10 @@ Translate the recipe into **${langName}** for kitchen use. Keep units realistic 
 - **summary**: 1–2 sentences in ${langName}.
 - **ingredients**: Same number of rows as source; each row has **text**, **ingredient_label**, **amount** — all in ${langName} where it makes sense (labels can stay short).
 - **steps**: Same step count and order as source; clear, short sentences in ${langName}.
+- Preserve culturally specific Vietnamese ingredients. If a glossary term appears in the source, use the exact target-language term below instead of a generic substitute.
+
+## Vietnamese ingredient glossary
+${VIETNAMESE_RECIPE_TRANSLATION_GLOSSARY_TEXT}
 ${hint ? `\n## Title hint\n${hint}\n` : ""}
 `;
 
@@ -1203,6 +1746,142 @@ ${hint ? `\n## Title hint\n${hint}\n` : ""}
   return out;
 }
 
+async function translateImportedSourceBodyToSwedish(
+  apiKey: string,
+  input: {
+    sourceLanguage: "en" | "vi";
+    sourceTitle: string;
+    sourceSummary: string;
+    ingredients: RecipeIngredient[];
+    steps: string[];
+  },
+): Promise<SavedRecipeTranslationPayload> {
+  const sourceLanguageName = input.sourceLanguage === "en" ? "English" : "Vietnamese";
+  const sourceJson = JSON.stringify(
+    {
+      source_language: input.sourceLanguage,
+      title: input.sourceTitle,
+      summary: input.sourceSummary,
+      ingredients: input.ingredients,
+      steps: input.steps,
+    },
+    null,
+    0,
+  );
+
+  const systemPreamble = `You translate imported home cooking recipes for a family in Sweden.
+
+## Task
+Translate the ${sourceLanguageName} recipe body into **Swedish** for the primary saved recipe fields.
+
+## Rules
+- Return only Swedish in **title**, **summary**, **ingredients**, and **steps**.
+- **title**: natural Swedish dish name; preserve the dish identity.
+- **summary**: 1–2 Swedish sentences.
+- **ingredients**: same number of rows as source; each row has **text**, **ingredient_label**, **amount**. Translate text and labels into Swedish shopping/cooking language.
+- **steps**: same step count and order as source; clear Swedish kitchen instructions.
+- Keep units realistic for Sweden (g, kg, dl, ml, st, krm).
+- Preserve culturally specific Vietnamese ingredients. If a glossary term appears in the source, use the exact Swedish term below instead of a generic substitute.
+
+## Vietnamese ingredient glossary
+${VIETNAMESE_RECIPE_TRANSLATION_GLOSSARY_TEXT}
+`;
+
+  const genAI = new GoogleGenerativeAI(apiKey);
+  const model = genAI.getGenerativeModel({
+    model: RECIPE_GENERATOR_MODEL_ID,
+    generationConfig: {
+      responseMimeType: "application/json",
+      responseSchema: RECIPE_TRANSLATE_RESULT_SCHEMA,
+    },
+  });
+
+  const fullPrompt = `${systemPreamble}\n## Source (JSON)\n${sourceJson}\n`;
+  const result = await model.generateContent(fullPrompt);
+  const text = result.response.text();
+  if (!text?.trim()) {
+    throw new Error("Gemini returned empty Swedish import translation");
+  }
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(text) as unknown;
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e);
+    throw new Error(`Gemini returned invalid Swedish import translation JSON: ${msg}`);
+  }
+  const out = sanitizeSavedRecipeTranslationPayload(parsed);
+  if (!out) {
+    throw new Error("Gemini Swedish import translation failed validation");
+  }
+  return out;
+}
+
+async function ensureImportedRecipePrimaryBodyIsSwedish(
+  apiKey: string,
+  parsed: ParsedRecipeFromMarkdownImport,
+): Promise<ParsedRecipeFromMarkdownImport> {
+  if (parsed.source_language !== "en" && parsed.source_language !== "vi") {
+    return parsed;
+  }
+  if (
+    !parsed.source_language_summary.trim() ||
+    parsed.source_language_ingredients.length === 0 ||
+    parsed.source_language_steps.length === 0
+  ) {
+    return parsed;
+  }
+
+  const translated = await translateImportedSourceBodyToSwedish(apiKey, {
+    sourceLanguage: parsed.source_language,
+    sourceTitle: parsed.source_language_title,
+    sourceSummary: parsed.source_language_summary,
+    ingredients: parsed.source_language_ingredients,
+    steps: parsed.source_language_steps,
+  });
+
+  return {
+    ...parsed,
+    summary: translated.summary,
+    ingredients: translated.ingredients,
+    steps: translated.steps,
+  };
+}
+
+async function ensureNewDishPrimaryBodyIsSwedish(
+  apiKey: string,
+  parsed: ParsedNewDishFromMarkdown,
+): Promise<ParsedNewDishFromMarkdown> {
+  if (parsed.source_language !== "en" && parsed.source_language !== "vi") {
+    return parsed;
+  }
+  if (
+    !parsed.source_language_summary.trim() ||
+    parsed.source_language_ingredients.length === 0 ||
+    parsed.source_language_steps.length === 0
+  ) {
+    return parsed;
+  }
+
+  const translated = await translateImportedSourceBodyToSwedish(apiKey, {
+    sourceLanguage: parsed.source_language,
+    sourceTitle:
+      parsed.source_language === "en"
+        ? parsed.title_en.trim() || parsed.title
+        : parsed.title_vi.trim() || parsed.title,
+    sourceSummary: parsed.source_language_summary,
+    ingredients: parsed.source_language_ingredients,
+    steps: parsed.source_language_steps,
+  });
+
+  return {
+    ...parsed,
+    title: translated.title,
+    summary: translated.summary,
+    ingredients: translated.ingredients,
+    steps: translated.steps,
+  };
+}
+
 /** Structured recipe extracted from pasted markdown (import flow). */
 export type ParsedRecipeFromMarkdownImport = {
   summary: string;
@@ -1229,17 +1908,18 @@ const RECIPE_MARKDOWN_IMPORT_RESULT_SCHEMA: ObjectSchema = {
     summary: {
       type: SchemaType.STRING,
       description:
-        "1–2 sentences in Swedish describing the dish (what it is, not full instructions)",
+        "1–2 sentences in Swedish describing the dish (what it is, not full instructions). Never copy English/Vietnamese source text here.",
     } as Schema,
     ingredients: {
       type: SchemaType.ARRAY,
-      description: "Structured ingredient lines in Swedish for shopping",
+      description:
+        "Structured ingredient lines in Swedish for shopping. Never copy English/Vietnamese source rows here.",
       items: RECIPE_INGREDIENT_ITEM_SCHEMA,
     } as Schema,
     steps: {
       type: SchemaType.ARRAY,
       description:
-        "Ordered cooking steps in Swedish, one clear sentence per step (no numbering in the string)",
+        "Ordered cooking steps in Swedish, one clear sentence per step (no numbering in the string). Never copy English/Vietnamese source steps here.",
       items: { type: SchemaType.STRING } as Schema,
     } as Schema,
     estimated_cook_time: {
@@ -1419,7 +2099,9 @@ Användaren fyller receptet med titeln: **"${titleHint}"**
 ${sumHint ? `Nuvarande kort beskrivning (får uppdateras om källan är tydligare):\n${sumHint}\n` : ""}
 
 ## Uppgift
-- Tolka markdown och extrahera **ingredienser** och **tillagningssteg** på **svenska** (köksnära, realistiska mängder: g, kg, dl, ml, st, krm).
+- Tolka markdown och extrahera de primära receptfälten på **svenska**, även om källan är på engelska eller vietnamesiska.
+- **summary**, **ingredients**, **steps** och **estimated_cook_time** är alltid svenska fält. Kopiera aldrig engelska/vietnamesiska meningar till dessa fält.
+- Extrahera **ingredienser** och **tillagningssteg** på **svenska** (köksnära, realistiska mängder: g, kg, dl, ml, st, krm).
 - Identifiera källans huvudspråk som **source_language**: "sv", "en", "vi" eller "other".
 - Om källspråket är **engelska** eller **vietnamesiska**, fyll även i **source_language_title**, **source_language_summary**, **source_language_ingredients** och **source_language_steps** på originalspråket. Bevara naturligt receptspråk från källan, men strukturera rader/steg som i svenska fälten.
 - Om källspråket är svenska eller annat språk än engelska/vietnamesiska: sätt originalspråksfälten till tom sträng/tom array.
@@ -1428,6 +2110,10 @@ ${sumHint ? `Nuvarande kort beskrivning (får uppdateras om källan är tydligar
 - **steps**: varje steg som en kort, numrerbar mening (ingen sifferpräfix i själva strängen).
 - **estimated_cook_time**: om tid nämns, kort svensk fras (t.ex. "ca 35 min"); annars tom sträng.
 - **difficulty**: easy | medium | hard utifrån antal moment, tajming och teknik.
+- Bevara kulturspecifika vietnamesiska råvaror. Om en term i ordlistan förekommer i källan, använd exakt svensk term i svenska fält och exakt originalterm i vietnamesiska originalspråksfält.
+
+## Vietnamesisk råvaruordlista
+${VIETNAMESE_RECIPE_TRANSLATION_GLOSSARY_TEXT}
 
 Om vissa uppgifter saknas i texten: gör så mycket du kan; låt inte fälten bli tomma om det finns innehåll att hämta.
 `;
@@ -1460,7 +2146,7 @@ Om vissa uppgifter saknas i texten: gör så mycket du kan; låt inte fälten bl
   if (!out) {
     throw new Error("Recipe import response failed validation (need summary, ingredients, and steps).");
   }
-  return out;
+  return ensureImportedRecipePrimaryBodyIsSwedish(apiKey, out);
 }
 
 /** Full structured recipe for “new dish” import from markdown (no existing row). */
@@ -1494,7 +2180,8 @@ const NEW_DISH_MARKDOWN_IMPORT_SCHEMA: ObjectSchema = {
   properties: {
     title: {
       type: SchemaType.STRING,
-      description: "Dish name in Swedish (primary title for the recipe row).",
+      description:
+        "Dish name in Swedish (primary title for the recipe row). Never copy the English/Vietnamese source title here.",
     } as Schema,
     title_en: {
       type: SchemaType.STRING,
@@ -1506,7 +2193,8 @@ const NEW_DISH_MARKDOWN_IMPORT_SCHEMA: ObjectSchema = {
     } as Schema,
     summary: {
       type: SchemaType.STRING,
-      description: "1–3 sentences in Swedish: what the dish is (not full step copy).",
+      description:
+        "1–3 sentences in Swedish: what the dish is (not full step copy). Never copy English/Vietnamese source text here.",
     } as Schema,
     meal_kind: {
       type: SchemaType.STRING,
@@ -1531,13 +2219,14 @@ const NEW_DISH_MARKDOWN_IMPORT_SCHEMA: ObjectSchema = {
     } as Schema,
     ingredients: {
       type: SchemaType.ARRAY,
-      description: "Structured ingredient rows in Swedish for shopping/cooking",
+      description:
+        "Structured ingredient rows in Swedish for shopping/cooking. Never copy English/Vietnamese source rows here.",
       items: RECIPE_INGREDIENT_ITEM_SCHEMA,
     } as Schema,
     steps: {
       type: SchemaType.ARRAY,
       description:
-        "Ordered cooking steps in Swedish, one clear sentence per step (no numbering in the string).",
+        "Ordered cooking steps in Swedish, one clear sentence per step (no numbering in the string). Never copy English/Vietnamese source steps here.",
       items: { type: SchemaType.STRING } as Schema,
     } as Schema,
     estimated_cook_time: {
@@ -1776,17 +2465,20 @@ export async function parseNewDishFromMarkdown(
   const allowed = new Set(opts.map((o) => o.id.trim()));
   const styleBlock = opts.map((o) => `- \`${o.id}\` — ${o.label}`).join("\n");
 
-  const systemPreamble = `Du är en köksassistent för ett **svenskt hem**. Användaren klistrar in **markdown** (blogg, tidning, receptsajt) om ett nytt recept som ska sparas som egen rätt.
+  const systemPreamble = `Du är en köksassistent för ett **svenskt hem**. Användaren klistrar in **markdown eller manuella anteckningar** (blogg, tidning, receptsajt, YouTube/TikTok-noteringar, ingredienslista eller familjens egna matlagningsanteckningar) om ett nytt recept som ska sparas som egen rätt.
 
 ## Matstilar (välj exakt ett \`food_type_id\` från listan)
 ${styleBlock}
 
 ## Uppgift
 - Identifiera rättens namn: **title** på svenska; **title_en** och **title_vi** om det går, annars tom sträng.
+- Alla primära receptfält (**title**, **summary**, **ingredient_picks**, **ingredients**, **steps**, **estimated_cook_time**) ska vara på **svenska**, även när källan är på engelska eller vietnamesiska.
+- Kopiera aldrig engelska/vietnamesiska källmeningar till de primära svenska fälten; använd originalspråksfälten för originaltexten.
 - Identifiera källans huvudspråk som **source_language**: "sv", "en", "vi" eller "other".
 - Om källspråket är engelska: sätt **title_en** till original-/naturligt engelskt namn och fyll **source_language_summary**, **source_language_ingredients**, **source_language_steps** på engelska.
 - Om källspråket är vietnamesiska: sätt **title_vi** till original-/naturligt vietnamesiskt namn och fyll **source_language_summary**, **source_language_ingredients**, **source_language_steps** på vietnamesiska.
 - Om källspråket är svenska eller annat språk än engelska/vietnamesiska: sätt originalspråksfälten till tom sträng/tom array.
+- Om underlaget är manuella anteckningar utan komplett recept: fullfölj receptet praktiskt utifrån anteckningarna, men hitta inte på dyra eller ovanliga råvaror om enklare svenska butiksvaror räcker.
 - **summary**: kort på svenska vad rätten är.
 - **meal_kind**: lunch | dinner | either | snack | other — vad som passar bäst.
 - **food_type_id**: exakt ett id från listan ovan som bäst matchar rättens stil (köket/stämningen).
@@ -1796,8 +2488,12 @@ ${styleBlock}
 - **steps**: tillagningssteg i ordning, ett tydligt steg per sträng (ingen siffra i början av strängen).
 - **estimated_cook_time**: t.ex. "ca 35 min" om det går att avgöra; annars tom sträng.
 - **difficulty**: easy | medium | hard utifrån antal moment, tajming och teknik.
+- Bevara kulturspecifika vietnamesiska råvaror. Om en term i ordlistan förekommer i källan, använd exakt svensk term i svenska fält och exakt originalterm i vietnamesiska originalspråksfält.
 
-Ignorera annonser, navigering och irrelevant text. Om något saknas, gör ett rimligt bästa val utifrån texten.`;
+## Vietnamesisk råvaruordlista
+${VIETNAMESE_RECIPE_TRANSLATION_GLOSSARY_TEXT}
+
+Ignorera annonser, navigering och irrelevant text. Om något saknas, gör ett rimligt bästa val utifrån texten och markera praktiska antaganden i summary eller steps på ett naturligt sätt.`;
 
   const userBlock = `## Inklistrad markdown\n\n${md}`;
 
@@ -1827,5 +2523,5 @@ Ignorera annonser, navigering och irrelevant text. Om något saknas, gör ett ri
   if (!out) {
     throw new Error("New-dish import response failed validation.");
   }
-  return out;
+  return ensureNewDishPrimaryBodyIsSwedish(apiKey, out);
 }

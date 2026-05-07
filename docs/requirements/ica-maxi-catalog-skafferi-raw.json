@@ -1,0 +1,392 @@
+[
+  {
+    "id": "adff6d6c-1499-41f7-94b1-e950567992fd",
+    "name": "Smaker från världen",
+    "productCount": 719,
+    "fullURLPath": "Skafferi/Smaker-från-världen",
+    "retailerCategoryId": "944",
+    "children": [
+      {
+        "id": "f388c1ea-b57b-4251-bede-8268dd091cbb",
+        "name": "Asien",
+        "productCount": 205,
+        "fullURLPath": "Skafferi/Smaker-från-världen/Asien",
+        "retailerCategoryId": "975",
+        "children": [
+          {
+            "id": "a567645d-07eb-4a4e-a9f0-a722161e225f",
+            "name": "Nudlar",
+            "productCount": 66,
+            "fullURLPath": "Skafferi/Smaker-från-världen/Asien/Nudlar",
+            "retailerCategoryId": "4518",
+            "children": []
+          },
+          {
+            "id": "90ea3086-d080-4789-86ff-1f042e1134da",
+            "name": "Kokosmjölk",
+            "productCount": 11,
+            "fullURLPath": "Skafferi/Smaker-från-världen/Asien/Kokosmjölk",
+            "retailerCategoryId": "1391",
+            "children": []
+          },
+          {
+            "id": "23ecd5cd-f1a2-4e93-bb2e-f52b10e6494f",
+            "name": "Grönsakskonserver",
+            "productCount": 3,
+            "fullURLPath": "Skafferi/Smaker-från-världen/Asien/Grönsakskonserver",
+            "retailerCategoryId": "1053",
+            "children": []
+          },
+          {
+            "id": "89fd648d-5531-4f62-b204-b864ae6f02b9",
+            "name": "Middagspaket & tillbehör",
+            "productCount": 13,
+            "fullURLPath": "Skafferi/Smaker-från-världen/Asien/Middagspaket-tillbehör",
+            "retailerCategoryId": "1077",
+            "children": []
+          },
+          {
+            "id": "c6068b06-a1a8-4050-81a3-bfa6f84d91d3",
+            "name": "Sushi & Japansk smaksättning",
+            "productCount": 39,
+            "fullURLPath": "Skafferi/Smaker-från-världen/Asien/Sushi-Japansk-smaksättning",
+            "retailerCategoryId": "2908",
+            "children": []
+          },
+          {
+            "id": "6518a26a-8851-4a20-bb69-426236e8defa",
+            "name": "Thailändsk smaksättning",
+            "productCount": 31,
+            "fullURLPath": "Skafferi/Smaker-från-världen/Asien/Thailändsk-smaksättning",
+            "retailerCategoryId": "2921",
+            "children": []
+          },
+          {
+            "id": "78e5bf88-72e9-4e6a-8e70-5e1024961d9c",
+            "name": "Kinesisk smaksättning",
+            "productCount": 10,
+            "fullURLPath": "Skafferi/Smaker-från-världen/Asien/Kinesisk-smaksättning",
+            "retailerCategoryId": "2923",
+            "children": []
+          },
+          {
+            "id": "0f560940-2e36-4521-91e0-d4f447a1457a",
+            "name": "Koreansk smaksättning",
+            "productCount": 6,
+            "fullURLPath": "Skafferi/Smaker-från-världen/Asien/Koreansk-smaksättning",
+            "retailerCategoryId": "2925",
+            "children": []
+          },
+          {
+            "id": "78fb4772-a1b4-45e3-bc58-c24084f7457d",
+            "name": "Sambal oelek",
+            "productCount": 5,
+            "fullURLPath": "Skafferi/Smaker-från-världen/Asien/Sambal-oelek",
+            "retailerCategoryId": "4517",
+            "children": []
+          },
+          {
+            "id": "9e80ad7b-03d9-42b9-b09b-bc0f74b385e0",
+            "name": "Övrig asiatisk smaksättning",
+            "productCount": 32,
+            "fullURLPath": "Skafferi/Smaker-från-världen/Asien/Övrig-asiatisk-smaksättning",
+            "retailerCategoryId": "2950",
+            "children": []
+          }
+        ]
+      },
+      {
+        "id": "5db1d88c-b2a2-4194-82ec-d1a1f159fa8c",
+        "name": "Taco",
+        "productCount": 136,
+        "fullURLPath": "Skafferi/Smaker-från-världen/Taco",
+        "retailerCategoryId": "976",
+        "children": [
+          {
+            "id": "45737bbd-ee3d-40b0-8c85-4c108b929adf",
+            "name": "Tortilla & Tacobröd",
+            "productCount": 27,
+            "fullURLPath": "Skafferi/Smaker-från-världen/Taco/Tortilla-Tacobröd",
+            "retailerCategoryId": "1044",
+            "children": []
+          },
+          {
+            "id": "84245680-29d1-4190-9a58-e00a0c413c04",
+            "name": "Tacoskal",
+            "productCount": 8,
+            "fullURLPath": "Skafferi/Smaker-från-världen/Taco/Tacoskal",
+            "retailerCategoryId": "1045",
+            "children": []
+          },
+          {
+            "id": "5cb872b3-bd15-4b12-98e2-6d6e654af4de",
+            "name": "Tortillachips",
+            "productCount": 27,
+            "fullURLPath": "Skafferi/Smaker-från-världen/Taco/Tortillachips",
+            "retailerCategoryId": "1046",
+            "children": []
+          },
+          {
+            "id": "03ff96c8-d1a9-4aa5-b38c-02efe37a6ef3",
+            "name": "Tacosås & Salsa",
+            "productCount": 48,
+            "fullURLPath": "Skafferi/Smaker-från-världen/Taco/Tacosås-Salsa",
+            "retailerCategoryId": "1047",
+            "children": []
+          },
+          {
+            "id": "74cb9f74-050d-4c25-9241-a1addc09dfde",
+            "name": "Tacokrydda",
+            "productCount": 28,
+            "fullURLPath": "Skafferi/Smaker-från-världen/Taco/Tacokrydda",
+            "retailerCategoryId": "1048",
+            "children": []
+          }
+        ]
+      },
+      {
+        "id": "4e9f6c0a-4339-4ed4-8331-48c2ab9d8ee4",
+        "name": "Mellanöstern & Nordafrika",
+        "productCount": 165,
+        "fullURLPath": "Skafferi/Smaker-från-världen/Mellanöstern-Nordafrika",
+        "retailerCategoryId": "5170",
+        "children": [
+          {
+            "id": "808f17b7-70d3-4090-a44a-041d04934008",
+            "name": "Dryck från Mellanöstern",
+            "productCount": 15,
+            "fullURLPath": "Skafferi/Smaker-från-världen/Mellanöstern-Nordafrika/Dryck-från-Mellanöstern",
+            "retailerCategoryId": "5174",
+            "children": []
+          },
+          {
+            "id": "ac12abcd-b65a-4e96-ab4c-54a0586556b2",
+            "name": "Snacks & Dessert från Mellanöstern",
+            "productCount": 30,
+            "fullURLPath": "Skafferi/Smaker-från-världen/Mellanöstern-Nordafrika/Snacks-Dessert-från-Mellanöstern",
+            "retailerCategoryId": "5175",
+            "children": []
+          },
+          {
+            "id": "373097f6-ea08-4c57-9d4a-5cbf23142a27",
+            "name": "Konserver från Mellanöstern",
+            "productCount": 28,
+            "fullURLPath": "Skafferi/Smaker-från-världen/Mellanöstern-Nordafrika/Konserver-från-Mellanöstern",
+            "retailerCategoryId": "5171",
+            "children": []
+          },
+          {
+            "id": "ee29af40-cad9-45b6-af87-896683145c37",
+            "name": "Skafferivaror från Mellanöstern",
+            "productCount": 62,
+            "fullURLPath": "Skafferi/Smaker-från-världen/Mellanöstern-Nordafrika/Skafferivaror-från-Mellanöstern",
+            "retailerCategoryId": "5176",
+            "children": []
+          },
+          {
+            "id": "10ac652f-9842-43dc-b884-2493f80ceda9",
+            "name": "Kryddor från Mellanöstern",
+            "productCount": 34,
+            "fullURLPath": "Skafferi/Smaker-från-världen/Mellanöstern-Nordafrika/Kryddor-från-Mellanöstern",
+            "retailerCategoryId": "5177",
+            "children": []
+          },
+          {
+            "id": "c12ceb2f-5e61-4cb9-b508-6d64553b2a89",
+            "name": "Halal",
+            "productCount": 4,
+            "fullURLPath": "Skafferi/Smaker-från-världen/Mellanöstern-Nordafrika/Halal",
+            "retailerCategoryId": "3659",
+            "children": []
+          }
+        ]
+      },
+      {
+        "id": "c7bb6858-a1ff-4032-a2a0-1c5827ec1aaa",
+        "name": "Balkan",
+        "productCount": 115,
+        "fullURLPath": "Skafferi/Smaker-från-världen/Balkan",
+        "retailerCategoryId": "5166",
+        "children": [
+          {
+            "id": "57032fad-4f87-4a67-8534-e176362aa2e6",
+            "name": "Dryck från Balkan",
+            "productCount": 12,
+            "fullURLPath": "Skafferi/Smaker-från-världen/Balkan/Dryck-från-Balkan",
+            "retailerCategoryId": "5167",
+            "children": []
+          },
+          {
+            "id": "09ce3f49-bf32-4b68-b64c-ef71eee0f468",
+            "name": "Snacks  & Dessert från Balkan",
+            "productCount": 37,
+            "fullURLPath": "Skafferi/Smaker-från-världen/Balkan/Snacks-Dessert-från-Balkan",
+            "retailerCategoryId": "5168",
+            "children": []
+          },
+          {
+            "id": "3dbd2792-5b3f-4172-90fd-7f5356924614",
+            "name": "Konserver från Balkan",
+            "productCount": 25,
+            "fullURLPath": "Skafferi/Smaker-från-världen/Balkan/Konserver-från-Balkan",
+            "retailerCategoryId": "5169",
+            "children": []
+          },
+          {
+            "id": "44455aea-8def-481f-84ae-b4b16c3b4dbf",
+            "name": "Skafferivaror från Balkan",
+            "productCount": 27,
+            "fullURLPath": "Skafferi/Smaker-från-världen/Balkan/Skafferivaror-från-Balkan",
+            "retailerCategoryId": "5172",
+            "children": []
+          },
+          {
+            "id": "05dc0f38-da22-43dd-a1d3-345ccb2e185d",
+            "name": "Kryddor från Balkan",
+            "productCount": 19,
+            "fullURLPath": "Skafferi/Smaker-från-världen/Balkan/Kryddor-från-Balkan",
+            "retailerCategoryId": "5173",
+            "children": []
+          }
+        ]
+      },
+      {
+        "id": "d9f6baf4-3dd8-48f2-a382-a615769b35f9",
+        "name": "Polen",
+        "productCount": 90,
+        "fullURLPath": "Skafferi/Smaker-från-världen/Polen",
+        "retailerCategoryId": "5178",
+        "children": [
+          {
+            "id": "5ba48a84-215f-46f4-af30-463383336439",
+            "name": "Dryck från Polen",
+            "productCount": 17,
+            "fullURLPath": "Skafferi/Smaker-från-världen/Polen/Dryck-från-Polen",
+            "retailerCategoryId": "5179",
+            "children": []
+          },
+          {
+            "id": "45ea48ee-38c2-46f9-ad3b-86dc9ad1b585",
+            "name": "Snacks  & Dessert från Polen",
+            "productCount": 26,
+            "fullURLPath": "Skafferi/Smaker-från-världen/Polen/Snacks-Dessert-från-Polen",
+            "retailerCategoryId": "5180",
+            "children": []
+          },
+          {
+            "id": "8246ded5-8fc8-40c0-b542-3a037a5b2469",
+            "name": "Konserver från Polen",
+            "productCount": 23,
+            "fullURLPath": "Skafferi/Smaker-från-världen/Polen/Konserver-från-Polen",
+            "retailerCategoryId": "5181",
+            "children": []
+          },
+          {
+            "id": "166fb2f9-a713-473c-9224-dc55e1f25f5c",
+            "name": "Skafferivaror från Polen",
+            "productCount": 15,
+            "fullURLPath": "Skafferi/Smaker-från-världen/Polen/Skafferivaror-från-Polen",
+            "retailerCategoryId": "5182",
+            "children": []
+          },
+          {
+            "id": "54565245-866f-47e9-be47-525ef602557c",
+            "name": "Kryddor från Polen",
+            "productCount": 11,
+            "fullURLPath": "Skafferi/Smaker-från-världen/Polen/Kryddor-från-Polen",
+            "retailerCategoryId": "5183",
+            "children": []
+          }
+        ]
+      },
+      {
+        "id": "33b8ebfc-2764-4057-ab7f-51194e71c28b",
+        "name": "Indien",
+        "productCount": 26,
+        "fullURLPath": "Skafferi/Smaker-från-världen/Indien",
+        "retailerCategoryId": "2909",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "92dc546e-6541-462e-8082-520f78ce30f8",
+    "name": "Mjöl & Bakning",
+    "productCount": 572,
+    "fullURLPath": "Skafferi/Mjöl-Bakning",
+    "retailerCategoryId": "5244",
+    "children": []
+  },
+  {
+    "id": "53c05e35-a19c-497d-9a1d-2624d482be97",
+    "name": "Kryddor & smaksättare",
+    "productCount": 893,
+    "fullURLPath": "Skafferi/Kryddor-smaksättare",
+    "retailerCategoryId": "943",
+    "children": []
+  },
+  {
+    "id": "81827787-f0ca-4cfa-b50a-7114bc5fe459",
+    "name": "Pasta, ris & mos",
+    "productCount": 310,
+    "fullURLPath": "Skafferi/Pasta-ris-mos",
+    "retailerCategoryId": "942",
+    "children": []
+  },
+  {
+    "id": "f9aaf11f-e7f0-4f0b-a597-7a66339ebde9",
+    "name": "Fisk & köttkonserver",
+    "productCount": 41,
+    "fullURLPath": "Skafferi/Fisk-köttkonserver",
+    "retailerCategoryId": "2200",
+    "children": []
+  },
+  {
+    "id": "eabaae0d-558c-4e1b-abaa-3886d8119c83",
+    "name": "Grönsakskonserver",
+    "productCount": 246,
+    "fullURLPath": "Skafferi/Grönsakskonserver",
+    "retailerCategoryId": "945",
+    "children": []
+  },
+  {
+    "id": "f092d4cd-ef86-49fa-b5a5-200ba09fca76",
+    "name": "Bönor, linser & fröer",
+    "productCount": 85,
+    "fullURLPath": "Skafferi/Bönor-linser-fröer",
+    "retailerCategoryId": "941",
+    "children": []
+  },
+  {
+    "id": "5b2224ba-f8a8-4501-9ee8-e54b6972d729",
+    "name": "Flingor, müsli & gryner",
+    "productCount": 193,
+    "fullURLPath": "Skafferi/Flingor-müsli-gryner",
+    "retailerCategoryId": "940",
+    "children": []
+  },
+  {
+    "id": "1a948a92-f4cf-4088-874c-eb9c909c5290",
+    "name": "Sylt, mos & marmelad",
+    "productCount": 151,
+    "fullURLPath": "Skafferi/Sylt-mos-marmelad",
+    "retailerCategoryId": "948",
+    "children": []
+  },
+  {
+    "id": "79682d3f-bcd6-47b2-b01c-36c4cd8f0248",
+    "name": "Desserter",
+    "productCount": 61,
+    "fullURLPath": "Skafferi/Desserter",
+    "retailerCategoryId": "949",
+    "children": []
+  },
+  {
+    "id": "60df6ebc-1558-4f58-8296-89159ca04a15",
+    "name": "Kaffe, te & choklad",
+    "productCount": 452,
+    "fullURLPath": "Skafferi/Kaffe-te-choklad",
+    "retailerCategoryId": "328",
+    "children": []
+  }
+]

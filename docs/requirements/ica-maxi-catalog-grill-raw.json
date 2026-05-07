@@ -1,0 +1,108 @@
+[
+  {
+    "id": "1f3b1f24-4eaf-46aa-99f1-faaa99611eca",
+    "name": "Grillar & Grillredskap",
+    "productCount": 80,
+    "fullURLPath": "Grill/Grillar-Grillredskap",
+    "retailerCategoryId": "5216",
+    "children": []
+  },
+  {
+    "id": "0cf84345-17d9-4986-998a-fcab3ad4f74b",
+    "name": "Grilla Kött",
+    "productCount": 69,
+    "fullURLPath": "Grill/Grilla-Kött",
+    "retailerCategoryId": "3652",
+    "children": [
+      {
+        "id": "607df1d3-fff1-411b-8f61-6d901cccf0c0",
+        "name": "Färdigkryddat Kött",
+        "productCount": 24,
+        "fullURLPath": "Grill/Grilla-Kött/Färdigkryddat-Kött",
+        "retailerCategoryId": "2467",
+        "children": []
+      },
+      {
+        "id": "4fc43320-94da-4812-8142-b61eb01a98fb",
+        "name": "Grilla Nötkött",
+        "productCount": 27,
+        "fullURLPath": "Grill/Grilla-Kött/Grilla-Nötkött",
+        "retailerCategoryId": "2468",
+        "children": []
+      },
+      {
+        "id": "db2cd4ac-2c54-42db-a9f7-47fb14a2e312",
+        "name": "Grilla Fläskkött",
+        "productCount": 19,
+        "fullURLPath": "Grill/Grilla-Kött/Grilla-Fläskkött",
+        "retailerCategoryId": "2469",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "69a28288-a253-4371-b3f0-21d85cc381de",
+    "name": "Grilla Kyckling",
+    "productCount": 24,
+    "fullURLPath": "Grill/Grilla-Kyckling",
+    "retailerCategoryId": "2451",
+    "children": []
+  },
+  {
+    "id": "f9374999-f2ae-441d-8cd2-d00bc5f738f0",
+    "name": "Grilla Fisk, Skaldjur & Ost",
+    "productCount": 62,
+    "fullURLPath": "Grill/Grilla-Fisk-Skaldjur-Ost",
+    "retailerCategoryId": "3653",
+    "children": []
+  },
+  {
+    "id": "d8b7d22c-32e8-4c82-a276-eacf7ca31c22",
+    "name": "Grilla Grönsaker & Vego",
+    "productCount": 66,
+    "fullURLPath": "Grill/Grilla-Grönsaker-Vego",
+    "retailerCategoryId": "3654",
+    "children": []
+  },
+  {
+    "id": "833a0222-35f5-4de0-b804-d77afae9c0b4",
+    "name": "Grilla Korv & Hamburgare",
+    "productCount": 141,
+    "fullURLPath": "Grill/Grilla-Korv-Hamburgare",
+    "retailerCategoryId": "3655",
+    "children": [
+      {
+        "id": "7af039c6-3490-4c62-a210-a020d59026d9",
+        "name": "Grilla korv",
+        "productCount": 62,
+        "fullURLPath": "Grill/Grilla-Korv-Hamburgare/Grilla-korv",
+        "retailerCategoryId": "4070",
+        "children": []
+      },
+      {
+        "id": "133d2a9d-519c-4d88-a934-fce24715911c",
+        "name": "Grilla hamburgare",
+        "productCount": 80,
+        "fullURLPath": "Grill/Grilla-Korv-Hamburgare/Grilla-hamburgare",
+        "retailerCategoryId": "4071",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "44328115-7b23-45be-9511-7ac03bdec35b",
+    "name": "Gott till grillat",
+    "productCount": 233,
+    "fullURLPath": "Grill/Gott-till-grillat",
+    "retailerCategoryId": "3656",
+    "children": []
+  },
+  {
+    "id": "12b5281e-3d95-4d23-9393-1c8d0a81247f",
+    "name": "Grillnyheter",
+    "productCount": 48,
+    "fullURLPath": "Grill/Grillnyheter",
+    "retailerCategoryId": "5312",
+    "children": []
+  }
+]

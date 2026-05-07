@@ -1,0 +1,180 @@
+[
+  {
+    "id": "9dacd6ae-f4a6-4873-a697-c9d30a746534",
+    "name": "Blöjor & Tvättservetter",
+    "productCount": 106,
+    "fullURLPath": "Barn/Blöjor-Tvättservetter",
+    "retailerCategoryId": "459",
+    "children": [
+      {
+        "id": "c5465331-d90e-4c54-917a-ba4689a60856",
+        "name": "Öppna blöjor",
+        "productCount": 24,
+        "fullURLPath": "Barn/Blöjor-Tvättservetter/Öppna-blöjor",
+        "retailerCategoryId": "4179",
+        "children": []
+      },
+      {
+        "id": "431ebf07-2df3-4c7c-a16a-4acc9a6dfd48",
+        "name": "Byxblöjor",
+        "productCount": 32,
+        "fullURLPath": "Barn/Blöjor-Tvättservetter/Byxblöjor",
+        "retailerCategoryId": "4180",
+        "children": []
+      },
+      {
+        "id": "83bfc170-cbb7-498c-87fb-15c598c5572e",
+        "name": "Blöjor för nyfödda",
+        "productCount": 16,
+        "fullURLPath": "Barn/Blöjor-Tvättservetter/Blöjor-för-nyfödda",
+        "retailerCategoryId": "4181",
+        "children": []
+      },
+      {
+        "id": "e6552b77-5cf8-4c8e-a8f0-d2af0f72b99a",
+        "name": "Badblöjor",
+        "productCount": 2,
+        "fullURLPath": "Barn/Blöjor-Tvättservetter/Badblöjor",
+        "retailerCategoryId": "4182",
+        "children": []
+      },
+      {
+        "id": "ffea3a45-0d4b-460e-a046-c5394e3b5b02",
+        "name": "Nattblöjor",
+        "productCount": 6,
+        "fullURLPath": "Barn/Blöjor-Tvättservetter/Nattblöjor",
+        "retailerCategoryId": "4183",
+        "children": []
+      },
+      {
+        "id": "f1904b47-7dac-40e3-8975-7d562b41254c",
+        "name": "Tvättservetter & blöjbyte",
+        "productCount": 27,
+        "fullURLPath": "Barn/Blöjor-Tvättservetter/Tvättservetter-blöjbyte",
+        "retailerCategoryId": "2160",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "d1201a6f-6f03-4c7f-9cd3-b3ddaa0f6bea",
+    "name": "Barnmat",
+    "productCount": 79,
+    "fullURLPath": "Barn/Barnmat",
+    "retailerCategoryId": "435",
+    "children": [
+      {
+        "id": "ba226105-7bdf-4424-821e-2685036d6c11",
+        "name": "Barnmat 4 mån",
+        "productCount": 8,
+        "fullURLPath": "Barn/Barnmat/Barnmat-4-mån",
+        "retailerCategoryId": "436",
+        "children": []
+      },
+      {
+        "id": "ff638258-83e5-4850-bbcf-fe064267cf61",
+        "name": "Barnmat 5-7 mån",
+        "productCount": 27,
+        "fullURLPath": "Barn/Barnmat/Barnmat-5-7-mån",
+        "retailerCategoryId": "437",
+        "children": []
+      },
+      {
+        "id": "2d98bc97-b213-43ff-91eb-dd614eef4cfa",
+        "name": "Barnmat 8 mån",
+        "productCount": 25,
+        "fullURLPath": "Barn/Barnmat/Barnmat-8-mån",
+        "retailerCategoryId": "438",
+        "children": []
+      },
+      {
+        "id": "a4ff8dcd-2e9e-420d-82d5-cd2c180efc57",
+        "name": "Barnmat 12+ mån",
+        "productCount": 19,
+        "fullURLPath": "Barn/Barnmat/Barnmat-12-mån",
+        "retailerCategoryId": "440",
+        "children": []
+      }
+    ]
+  },
+  {
+    "id": "ea0d4d28-c362-4d08-9bd9-15292aa4f342",
+    "name": "Barngröt & Välling",
+    "productCount": 89,
+    "fullURLPath": "Barn/Barngröt-Välling",
+    "retailerCategoryId": "445",
+    "children": []
+  },
+  {
+    "id": "f6bd29ba-3910-4322-90f5-f777b2742837",
+    "name": "Mjölkersättning",
+    "productCount": 40,
+    "fullURLPath": "Barn/Mjölkersättning",
+    "retailerCategoryId": "2184",
+    "children": []
+  },
+  {
+    "id": "bf5d5106-070e-4102-996c-f167d80f2844",
+    "name": "Mellanmål & Barndryck",
+    "productCount": 129,
+    "fullURLPath": "Barn/Mellanmål-Barndryck",
+    "retailerCategoryId": "2180",
+    "children": []
+  },
+  {
+    "id": "40233562-19f6-4316-8668-0ab49b592d65",
+    "name": "Matning & Babytillbehör",
+    "productCount": 117,
+    "fullURLPath": "Barn/Matning-Babytillbehör",
+    "retailerCategoryId": "2154",
+    "children": []
+  },
+  {
+    "id": "8504d61f-c9e8-4fc4-81a6-6bc3819fbc78",
+    "name": "Barn- & Babyvård",
+    "productCount": 99,
+    "fullURLPath": "Barn/Barn-Babyvård",
+    "retailerCategoryId": "2159",
+    "children": []
+  },
+  {
+    "id": "f455948e-9183-430b-aa77-50e279220909",
+    "name": "Barn & Ungdomsböcker",
+    "productCount": 165,
+    "fullURLPath": "Barn/Barn-Ungdomsböcker",
+    "retailerCategoryId": "2932",
+    "children": []
+  },
+  {
+    "id": "94828ec1-5a2c-4208-b7cc-760e2cd4f755",
+    "name": "Leksaker",
+    "productCount": 661,
+    "fullURLPath": "Barn/Leksaker",
+    "retailerCategoryId": "3746",
+    "children": []
+  },
+  {
+    "id": "a9807c3f-5215-4e31-9af5-1da9b9214c46",
+    "name": "Barnkläder",
+    "productCount": 114,
+    "fullURLPath": "Barn/Barnkläder",
+    "retailerCategoryId": "3923",
+    "children": []
+  },
+  {
+    "id": "5453158f-fde8-4ee8-ac69-481dee8b48ed",
+    "name": "Babykläder",
+    "productCount": 31,
+    "fullURLPath": "Barn/Babykläder",
+    "retailerCategoryId": "3539",
+    "children": []
+  },
+  {
+    "id": "62b74f20-4ac5-4f6f-9914-c2e55778499d",
+    "name": "Barnkalas",
+    "productCount": 25,
+    "fullURLPath": "Barn/Barnkalas",
+    "retailerCategoryId": "3370",
+    "children": []
+  }
+]

@@ -10,6 +10,11 @@ export type PromoPickerItem = {
   id: string;
   name: string;
   watchlistText: string;
+  labels?: {
+    sv: string;
+    en: string;
+    vi: string;
+  };
   fullURLPath: string;
   parentCategoryId: string;
   departmentId: string;

@@ -55,6 +55,10 @@ dashboard/src/
 | `/learning` | Learning | `GET/POST /api/learning/profiles`, feedback, log |
 | `/context` | Context | `GET/PUT /api/context`, `GET/PUT /api/context/[key]` |
 | `/growing` | Growing | `GET/POST /api/growing/sources`, `GET /api/growing/knowledge`, `GET /api/growing/weekly`, profile, convert, process |
+| `/recipes` | Recipes hub | Cook/search/plan, Manage library/import/generate, Collect family ideas, Share read-only recipe links |
+| `/recipes/[id]/cook` | Focused recipe cooking view | `GET /api/recipes/[id]/cook`, optional `PATCH /api/recipes/[id]` for owner feedback |
+| `/recipes/shared/[slug]` | Public recipe share | `GET /api/public/recipe-shares/[slug]` via anon RPC |
+| `/vietnamese-meals` | Vietnamese meals | `GET/POST /api/vietnamese-meals`, enrichment, recipe suggestions, recipe links |
 
 ## Auth
 
@@ -70,7 +74,7 @@ dashboard/src/
 3. **API route** → `getAuthedSupabase()` then Supabase client (`.from(...).select()`, `.insert()`, etc.). No direct DB URL/keys in the client.
 4. **Supabase** → PostgreSQL with RLS; only rows allowed by policies are returned.
 
-Manual “process” flows (e.g. growing extract) go Dashboard → API route → HTTP call to Worker (`GROWING_WORKER_URL`) → Worker → Supabase.
+Manual “process” flows (e.g. growing extract or recipe import queue runs) go Dashboard → API route → HTTP call to Worker (`GROWING_WORKER_URL` or a feature-specific Worker URL) → Worker → Supabase.
 
 ## Feature Areas
 
@@ -78,6 +82,9 @@ Manual “process” flows (e.g. growing extract) go Dashboard → API route →
 - **Learning**: Profiles, lesson log, feedback; stored in Supabase with RLS.
 - **Context**: Key-value store for family context; CRUD via `/api/context` and `/api/context/[key]`.
 - **Growing**: Sources (YouTube URLs), knowledge library, weekly suggestions, profile; optional `GROWING_WORKER_URL` for manual extraction.
+- **Recipes**: Hub at `/recipes` with **Cook**, **Manage**, **Collect**, and
+  **Share** sections. Legacy top-level recipe routes redirect into the hub while
+  edit/import detail routes remain available.
 
 ## Environment
 
@@ -85,5 +92,7 @@ See [ARCHITECTURE.md](ARCHITECTURE.md) for the full list. Dashboard-specific:
 
 - `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY` — required for auth and data.
 - `GROWING_WORKER_URL` — optional; base URL of the Worker for “Extract now” (growing sources).
+- `RECIPE_IMPORT_WORKER_URL` — optional; base URL of the Worker for “Run queue now” on recipe imports. Falls back to `GROWING_WORKER_URL` when omitted.
+- `WORKER_ADMIN_TOKEN` — server-side bearer token used by recipe import queue manual runs.
 
 Setup and run instructions: [Dashboard README](../dashboard/README.md).

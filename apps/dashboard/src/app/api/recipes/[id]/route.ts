@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { errorResponse, getAuthedSupabase } from "@/lib/api";
+import { isValidFoodTypeId } from "@/lib/recipe-food-types";
 import { parseFeedbackPatch, parseRecipePartialUpdate } from "@/lib/recipe-request";
 import { SAVED_RECIPE_COLUMNS } from "@/lib/saved-recipe-columns";
 import { parseSimilarRecipeUrl } from "@/lib/recipe-source";
@@ -82,6 +83,12 @@ export async function PATCH(request: Request, { params }: Params) {
   const recipePartial = parseRecipePartialUpdate(o);
   if ("error" in recipePartial) {
     return errorResponse(recipePartial.error, 400);
+  }
+  if (
+    typeof recipePartial.patch.food_type_id === "string" &&
+    !isValidFoodTypeId(recipePartial.patch.food_type_id)
+  ) {
+    return errorResponse("food_type_id is invalid", 400);
   }
   Object.assign(patch, recipePartial.patch);
 

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { errorResponse, getAuthedSupabase } from "@/lib/api";
 import { ensureCookPlan } from "@/lib/cook-plan-server";
 import type { RecipeI18nColumn } from "@/lib/recipe-locale";
+import { createServiceRoleClient } from "@/lib/supabase/service-role";
 
 export async function GET() {
   const auth = await getAuthedSupabase();
@@ -45,10 +46,29 @@ export async function GET() {
     return errorResponse(itemsError.message, 500);
   }
 
+  const recipeIds = (items ?? []).map((row) => row.recipe_id).filter(Boolean);
+  const serviceSupabase = createServiceRoleClient();
+  const recipesById = new Map<string, Record<string, unknown>>();
+  if (serviceSupabase && recipeIds.length > 0) {
+    const { data: recipeRows, error: recipeError } = await serviceSupabase
+      .from("saved_recipes")
+      .select(
+        "id, title, title_en, title_vi, summary, meal_kind, ingredients, food_type_id, vegetarian, estimated_cook_time, i18n",
+      )
+      .in("id", recipeIds);
+
+    if (recipeError) {
+      return errorResponse(recipeError.message, 500);
+    }
+    for (const recipe of recipeRows ?? []) {
+      recipesById.set(recipe.id as string, recipe as Record<string, unknown>);
+    }
+  }
+
   const normalized =
     items?.map((row) => {
       const raw = row.saved_recipes as Record<string, unknown> | Record<string, unknown>[] | null;
-      const r = Array.isArray(raw) ? raw[0] : raw;
+      const r = recipesById.get(row.recipe_id) ?? (Array.isArray(raw) ? raw[0] : raw);
       return {
         id: row.id,
         sort_order: row.sort_order,

@@ -13,6 +13,7 @@ export type WeeklyPromotionImportItem = {
 
 export type WeeklyPromotionImportPayload = {
   storeKey: string;
+  storeName: string | null;
   promotions: WeeklyPromotionImportItem[];
 };
 
@@ -67,6 +68,22 @@ export function makeWeeklyPromotionDedupeKey(item: WeeklyPromotionImportItem): s
   ].join("|");
 }
 
+export function slugifyWeeklyPromotionName(value: string): string {
+  return value
+    .toLocaleLowerCase("sv-SE")
+    .normalize("NFKD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
+export function makeWeeklyPromotionMergeKey(item: {
+  storeKey: string;
+  title: string;
+}): string {
+  return `${item.storeKey}|${slugifyWeeklyPromotionName(item.title)}`;
+}
+
 export function parseWeeklyPromotionsJson(raw: unknown):
   | { ok: true; data: WeeklyPromotionImportPayload }
   | { ok: false; error: string } {
@@ -84,6 +101,7 @@ export function parseWeeklyPromotionsJson(raw: unknown):
   }
 
   const fallbackStoreKey = isRecord(raw) ? optionalString(raw.storeKey) ?? null : null;
+  const storeName = isRecord(raw) ? optionalString(raw.storeName) ?? null : null;
   const parsed: WeeklyPromotionImportItem[] = [];
   for (let i = 0; i < rootPromotions.length; i++) {
     const item = parsePromotionItem(rootPromotions[i], fallbackStoreKey, i);
@@ -108,6 +126,7 @@ export function parseWeeklyPromotionsJson(raw: unknown):
     ok: true,
     data: {
       storeKey,
+      storeName,
       promotions: parsed,
     },
   };

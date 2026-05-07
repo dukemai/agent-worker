@@ -49,14 +49,16 @@ test.describe("ICA Maxi Barkarbystaden — extract promotions", () => {
 
     const scrapedPayload = {
       storeKey: icaMaxiBarkarbystadenStrategy.storeKey,
+      storeName: icaMaxiBarkarbystadenStrategy.storeName,
       count: promotions.length,
       promotions,
     };
-    test.info().attach("scraped-promotions.json", {
+    const scrapedFilename = `${icaMaxiBarkarbystadenStrategy.storeKey}-scraped-promotions.json`;
+    test.info().attach(scrapedFilename, {
       body: Buffer.from(JSON.stringify(scrapedPayload, null, 2)),
       contentType: "application/json",
     });
-    const scrapedPath = writePromoRunJson("scraped-promotions.json", scrapedPayload);
+    const scrapedPath = writePromoRunJson(scrapedFilename, scrapedPayload);
     if (scrapedPath) {
       console.log(`[promo-run] wrote ${scrapedPath}`);
     }

@@ -47,34 +47,51 @@ Dashboard UI uses **cookie auth** via existing context routes; scrapers use the 
 | `DASHBOARD_BASE_URL` | Shell / `.env` when running `pnpm promo:download-watchlist` | Base URL of the running dashboard (e.g. `http://localhost:3000`, no trailing slash) |
 | `SCRAPE_SYNC_SECRET` | Same as above, in the shell that runs the script | Passed as `Authorization: Bearer …` by [`download-promo-watchlist.mjs`](../../apps/playwright-tools/scripts/download-promo-watchlist.mjs) |
 
-### Weekly promotion import (all offers, dashboard filtering)
+### Weekly promotion import by store (all offers, dashboard filtering)
 
 The current strategy is to import **all** weekly promotions first, then let the
 dashboard filter them for the signed-in user. This replaces the older
 matched-only upload as the primary flow.
 
+Weekly imports are scoped by `storeKey` so several stores can coexist for the
+same week. Stores can also have multiple imports in one ISO week when they run
+separate promotion batches. Each upload creates one `promotion_import_runs` row
+with its `store_key`; all child offers copy the same store key. Dashboard
+current-week reads aggregate every import for the selected store/week instead of
+collapsing to the latest run. When the same offer appears in more than one run,
+the aggregate view merges it by `storeKey` + slugified offer title and keeps the
+latest visible row for that store.
+
 | Method | Path | Use |
 |--------|------|-----|
-| POST | `/api/promotions/import-weekly` | Cookie-auth. Body: `application/json` or multipart field `file` containing `scraped-promotions.json` (`{ storeKey, count, promotions }`) from Playwright. Creates `promotion_import_runs` + `weekly_promotions`. |
-| GET | `/api/promotions/current-week` | Cookie-auth. Returns `{ run }` for the latest weekly promotion import. |
-| GET | `/api/promotions/current-week/items` | Cookie-auth. Returns `{ run, items }` for all promotions in the latest import, ordered by scrape order. |
-| POST | `/api/promotions/filter` | Cookie-auth. Body `{ "runId": "<uuid>" }` optional. Matches `weekly_promotions` against `family_context.promo_watchlist` and rewrites `weekly_promotion_matches` for that run. |
-| GET | `/api/promotions/current-week/matches` | Cookie-auth. Returns matched offers for the latest run (or `?runId=`). |
+| POST | `/api/promotions/import-weekly` | Cookie-auth. Body: `application/json` or multipart field `file` containing `<store-key>-scraped-promotions.json` (`{ storeKey, storeName, count, promotions }`) from Playwright. Creates `promotion_import_runs` + `weekly_promotions`; response echoes `{ runId, storeKey, storeName, weekNumber, isoYear, itemCount }`. |
+| GET | `/api/promotions/stores` | Cookie-auth. Returns known store keys from previous imports, with latest week/count metadata for a selector. |
+| GET | `/api/promotions/current-week?storeKey=` | Cookie-auth. Returns `{ run }` for the latest weekly promotion import, optionally scoped to one store. |
+| GET | `/api/promotions/current-week/items?storeKey=` | Cookie-auth. Returns `{ run, items }` for all promotions in the latest import, ordered by scrape order. Also accepts `?runId=` or `?scope=current-week` to aggregate all current-week imports; `scope=current-week&storeKey=...` aggregates all current-week imports for one store. |
+| POST | `/api/promotions/filter` | Cookie-auth. Body `{ "runId": "<uuid>" }` optional, or `{ "storeKey": "..." }` to filter the latest run for one store. Matches `weekly_promotions` against `family_context.promo_watchlist` and rewrites `weekly_promotion_matches` for that run. The dashboard calls this once per visible current-week run when filtering an aggregate store/week view. |
+| GET | `/api/promotions/current-week/matches?storeKey=` | Cookie-auth. Returns matched offers for the latest run, optionally scoped to one store. Also accepts `?runId=` or `?scope=current-week` to view all matched promotions from all current-week imports; `scope=current-week&storeKey=...` limits the aggregate to one store. |
+| POST | `/api/promotions/recipe-recommendations` | Cookie-auth. Body `{ "matchIds": ["<weekly_promotion_match_id>"] }`. Scores selected matched promotions against the signed-in user’s saved recipe library and returns up to 12 recommendations with plan status. |
 
 Dashboard flow:
 
-1. Upload all promotions for this week.
-2. Store canonical weekly promotions.
-3. Run filtering for this user and week.
-4. Show **matched offers** and allow viewing **all promotions**.
+1. Upload all promotions for this week and store.
+2. Store canonical weekly promotions under that `storeKey`.
+3. Pick **All matched this week** or one store in the dashboard. Store views show all imports for that store in the current ISO week.
+4. Run filtering for this user, store, and week. If there are multiple visible imports, the dashboard filters each run and aggregates the result.
+5. Show **matched offers** and allow viewing **all promotions** for the selected store.
+6. Select matched offers to get rules-based saved recipe recommendations, then add chosen recipes to **Plan to cook**.
+
+Recipe recommendations are v1 deterministic: selected match interests and offer
+titles are scored against saved recipe `ingredient_picks`, structured
+`ingredients`, title, and summary. No Gemini call or schema change is required.
 
 ### Food-style favorite suggestions
 
 The watchlist editor also supports adding favorites by food style. The mapping is
 stored in `food_style_favorite_suggestions`, seeded with initial Vietnamese,
-Korean, and Swedish/Nordic suggestions. The dashboard includes a separate
-**Manage mapping** modal so suggestions can be added or removed without editing
-raw JSON.
+Korean, and Swedish/Nordic suggestions. The dashboard includes a standalone
+`/recipe-generator/mapping` admin page so suggestions can be added or removed
+without editing raw JSON.
 
 The modal can ask AI for help: it sends the selected **food style** plus the
 ICA picker catalog categories/items from
@@ -115,14 +132,14 @@ Server helper **`deletePromoMatchRun`** in `apps/dashboard/src/lib/promo-matches
 - **Primary editor**: Dedicated page; generic Context page links here and does not list `promo_watchlist` rows.
 - **Item list layout:** **`table`** with **`#`**, **`Item`**, **`Actions`** (remove); horizontal scroll on small viewports; table caption for assistive tech.
 - **Add flow:** ICA-aligned picker catalog (`apps/dashboard/public/data/ica-maxi-promo-picker-catalog.json`, runtime-validated) plus **Add my own text**; clear-all with confirm (`DELETE` the context row).
-- **Add by food style:** Pick a style such as Vietnamese, Korean, or Swedish/Nordic; select mapped suggestions; **Manage mapping** opens a modal with manual edit and AI-assisted suggestion generation.
+- **Add by food style:** Pick a style such as Vietnamese, Korean, or Swedish/Nordic; select mapped suggestions; **Manage mapping** opens `/recipe-generator/mapping` for manual edit and AI-assisted suggestion generation.
 - **Persistence**: Immediate save per add/remove (TanStack Query).
 - **Copy**: Example weekly offers link (ICA Maxi Barkarbystaden), `pnpm promo:download-watchlist`, note that per-store scrapers read the same list.
 
 ## Out of scope (this requirement)
 
 - Automatic scrape scheduling from the dashboard.
-- Separate DB lists per retailer in v1 (single `promo_watchlist`; multi-store is a future shape if needed).
+- Separate watchlists per retailer in v1 (single `promo_watchlist`; promotion imports are multi-store).
 - LLM interpretation of list items (matching logic is Playwright package / shared `score*` later).
 
 ## Acceptance criteria
@@ -137,10 +154,10 @@ Server helper **`deletePromoMatchRun`** in `apps/dashboard/src/lib/promo-matches
 Local flow (see `apps/playwright-tools`):
 
 1. **Download watchlist** — with dashboard running and env set: `pnpm promo:download-watchlist` (writes `apps/playwright-tools/data/promo-watchlist.json`; gitignored).
-2. **Scrape ICA offers** — `pnpm playwright:test -- tests/ica-maxi-extract-promotions.spec.ts` (network; writes **`scraped-promotions.json`** with all offers).
-3. **Dashboard import + match** — upload **`scraped-promotions.json`**; `POST /api/promotions/filter` scores each stored offer against every watchlist string (full substring after Swedish case-fold, or all tokens ≥2 chars).
+2. **Scrape ICA offers** — from the repo root, run `pnpm promo:scrape:ica-maxi-barkarbystaden` or `pnpm promo:scrape:ica-nara-kallhall` (network; writes **`ica-maxi-barkarbystaden-scraped-promotions.json`** or **`ica-nara-kallhall-scraped-promotions.json`** with all offers for that store). From `apps/playwright-tools`, the equivalent scripts omit the `promo:` prefix.
+3. **Dashboard import + match** — upload the store-specific **`<store-key>-scraped-promotions.json`**; `POST /api/promotions/filter` scores each stored offer against every watchlist string (full substring after Swedish case-fold, or all tokens ≥2 chars).
 
-**On-disk outputs (no report download):** under **`apps/playwright-tools/data/promo-run/`** — **`watchlist-matches-only.json`** (`{ interests, matches }`, same as the report attachment) whenever the watchlist file has items; **`watchlist-matches.json`** (slim summary + `watchlist-matches.json`-style rows) from the main extract test; the rank-only test overwrites **`watchlist-matches-only.json`** if both run. Full **`scraped-promotions.json`** stays a Playwright attachment only unless you copy from the report. Set **`PROMO_NO_DISK_OUTPUT=1`** to skip disk writes.
+**On-disk outputs (no report download):** under **`apps/playwright-tools/data/promo-run/`** — full store exports named **`<store-key>-scraped-promotions.json`** (`{ storeKey, storeName, count, promotions }`), plus **`watchlist-matches-only.json`** (`{ interests, matches }`, same as the report attachment) whenever the watchlist file has items; **`watchlist-matches.json`** (slim summary + `watchlist-matches.json`-style rows) from the main extract test; the rank-only test overwrites **`watchlist-matches-only.json`** if both run. Set **`PROMO_NO_DISK_OUTPUT=1`** to skip disk writes.
 
 Tuning: add broader or narrower phrases on the dashboard; optional `minScore` (default 50) when calling `matchPromotionsToWatchlist`.
 

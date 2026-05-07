@@ -1,0 +1,58 @@
+[
+  {
+    "id": "2147a428-d74c-4b44-ac4a-f72702d55f7a",
+    "name": "Glass",
+    "productCount": 257,
+    "fullURLPath": "Glass-Godis-Snacks/Glass",
+    "retailerCategoryId": "2267",
+    "children": []
+  },
+  {
+    "id": "985e6074-329f-4b29-9c6f-451a838c2cf3",
+    "name": "Godis",
+    "productCount": 311,
+    "fullURLPath": "Glass-Godis-Snacks/Godis",
+    "retailerCategoryId": "432",
+    "children": []
+  },
+  {
+    "id": "1fa477c3-52d0-4203-a6a7-89f3b35d37fc",
+    "name": "Choklad",
+    "productCount": 294,
+    "fullURLPath": "Glass-Godis-Snacks/Choklad",
+    "retailerCategoryId": "414",
+    "children": []
+  },
+  {
+    "id": "6ab34ce3-167f-42f4-9e88-efa76970d09b",
+    "name": "Chips & snacks",
+    "productCount": 253,
+    "fullURLPath": "Glass-Godis-Snacks/Chips-snacks",
+    "retailerCategoryId": "424",
+    "children": []
+  },
+  {
+    "id": "870a49f4-b887-48cf-a07e-9bcab04f1262",
+    "name": "Naturgodis, Nötter & Bars",
+    "productCount": 194,
+    "fullURLPath": "Glass-Godis-Snacks/Naturgodis-Nötter-Bars",
+    "retailerCategoryId": "431",
+    "children": []
+  },
+  {
+    "id": "171f5aff-f65e-420d-9962-edda5d7c5817",
+    "name": "Tuggummi",
+    "productCount": 45,
+    "fullURLPath": "Glass-Godis-Snacks/Tuggummi",
+    "retailerCategoryId": "419",
+    "children": []
+  },
+  {
+    "id": "80289b93-ae7b-47d4-bbde-c8381ef52808",
+    "name": "Halstabletter",
+    "productCount": 65,
+    "fullURLPath": "Glass-Godis-Snacks/Halstabletter",
+    "retailerCategoryId": "1271",
+    "children": []
+  }
+]

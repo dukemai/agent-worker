@@ -104,7 +104,7 @@ async function fetchRecipe(id: string): Promise<SavedRecipeRow> {
   return json.recipe;
 }
 
-const RECIPE_GENERATOR_IMPORT_TAB = "/recipe-generator?tab=import";
+const RECIPE_GENERATOR_IMPORT_TAB = "/recipe-generator/import";
 
 type ImportRecipeFromSourcePageProps = {
   recipeId: string;

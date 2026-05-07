@@ -8,4 +8,5 @@ export interface Env {
   RESEND_API_KEY?: string;
   DIGEST_RECIPIENT_EMAIL?: string;
   OPENWEATHER_API_KEY?: string;
+  WORKER_ADMIN_TOKEN?: string;
 }

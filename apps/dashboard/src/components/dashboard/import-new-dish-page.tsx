@@ -169,7 +169,7 @@ export function ImportNewDishPage() {
     <main className="mx-auto w-full max-w-4xl space-y-6 px-4 py-8">
       <div>
         <Button asChild variant="ghost" size="sm" className="-ml-2 mb-1 h-8 gap-1 px-2 text-muted-foreground">
-          <Link href="/recipe-generator?tab=import">
+          <Link href="/recipe-generator/import">
             <ArrowLeft className="size-4" aria-hidden />
             Recipe generator · Import
           </Link>
@@ -479,7 +479,7 @@ export function ImportNewDishPage() {
 
               <div className="flex flex-col gap-2 border-t pt-4 sm:flex-row sm:justify-end">
                 <Button type="button" variant="outline" disabled={busy} asChild>
-                  <Link href="/recipe-generator?tab=import">Cancel</Link>
+                  <Link href="/recipe-generator/import">Cancel</Link>
                 </Button>
                 <Button
                   type="button"

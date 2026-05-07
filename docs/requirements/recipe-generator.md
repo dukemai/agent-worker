@@ -12,17 +12,34 @@ This is **assistive cooking**, not medical or nutrition advice.
 
 ## User flow
 
-1. Open **Recipe library** (dedicated dashboard route; currently `/recipe-generator`).
-2. **Library** is the default view: search by recipe name/summary, filter by style/tested status, view/edit/delete, mark **Want to try**, mark **Tested**, and open linked flows for **Generate recipe ideas** or **Import from source**.
+1. Open **Recipes** (`/recipes`). The hub defaults to **Cook** and groups recipe
+   work into **Manage**, **Cook**, **Collect**, and **Share**. The old
+   `/recipe-generator`, `/plan-to-cook`, and `/family/recipes` entrypoints
+   redirect into the matching hub sections.
+2. **Library** is the default view: search by recipe name/summary, filter by style/tested status, view/edit/delete, mark **Want to try**, mark **Tested**, and open linked standalone flows for **Generate recipe ideas** (`/recipe-generator/generate`) or **Import from source** (`/recipe-generator/import`).
+2a. **Import queue** — on `/recipe-generator/import`, the user can paste a source URL/label and markdown into a queue. A scheduled Worker extracts queued items into `saved_recipes` daily. The queue UI can also manually trigger the same Worker processor for testing.
 3. **Type of food** — single choice from the preset list below (loaded from [`recipe-food-types.json`](../../apps/dashboard/public/data/recipe-food-types.json)). This is the primary input for generation.
 4. **Focus ingredients (optional)** — pick zero or more items through two source modes: **Food-style mapping**, which uses the ingredients configured in Manage food-style mapping (`food_style_favorite_suggestions`) for the selected style, and **Browse ICA catalog**, which keeps the previous free-pick behavior across the **ICA Maxi promo picker catalog** (`apps/dashboard/public/data/ica-maxi-promo-picker-catalog.json`). The recipe UI lists **food departments only** in catalog mode (see [`recipe-picker-food-departments.ts`](../../apps/dashboard/src/lib/recipe-picker-food-departments.ts)); the promo watchlist still uses the full catalog. Each selection stores a **`watchlistText`** string (or equivalent) so labels match what Swedes see in stores.
+4a. **Food-style ingredient mapping** lives under `/recipe-generator/mapping`, linked from the Recipes → Manage library header.
+It is the admin home for `food_style_favorite_suggestions`, which is reused by
+recipe generation, recipe search ingredient picking, and promo grocery watchlist
+helpers.
 5. **Vegetarian** — **checkbox** (off by default). When checked, the AI must suggest **only vegetarian** meals (no meat, fish, or shellfish); eggs and dairy are allowed unless you later add a separate vegan option.
 6. **Exclude meals (optional)** — list of **meal titles** the model must **not** reproduce or closely imitate. Used to get **fresh suggestions** on a second (or third) generation with the same food type: e.g. titles from the **previous batch**, dishes they dislike, or meals already in the **saved library**. The UI can offer **Exclude recipes already saved in this food style** plus **Use titles from last result** and manual add/remove rows.
 7. **Difficulty** — recipes store a simple cooking difficulty: `easy`, `medium`, or `hard`. AI generation/import proposes it; edit/import screens let the user adjust it. Existing recipes default to `medium`.
 8. **Generate** → structured **meal ideas** (title, ingredient list, estimated time, difficulty, optional short summary; cooking steps come from trusted source import or manual editing).
 9. User **adds** selected recipes to the library (not auto-save all).
 10. **Library** table: title, type of food, estimated cook time, **Difficulty**, **Vegetarian** (whether the request was vegetarian—see data model), **Tested**, actions.
-11. **Plan to cook → prepare → shopping list** (Phase A — [shared-shopping-list.md](shared-shopping-list.md)): from the library, user adds **several saved recipes** to a **plan to cook**; opens **prepare** to mark ingredients **at home** vs **need**; generates a **shared shopping list** with a link for someone else to shop. Implementation order may start with **one recipe** before multi-recipe plans.
+11. **Cooking view** — each saved or household-visible recipe has a focused
+    cooking URL at `/recipes/[id]/cook`. This view is authenticated, optimized
+    for standing in the kitchen, supports the shared recipe language selector,
+    keeps step check-off progress locally per browser, and can keep the screen
+    awake when the browser supports the Wake Lock API.
+12. **Plan to cook → prepare → shopping list** (Phase A — [shared-shopping-list.md](shared-shopping-list.md)): from the library, user adds **several saved recipes** to a **plan to cook**; opens **prepare** to mark ingredients **at home** vs **need**; generates a **shared shopping list** with a link for someone else to shop. Implementation order may start with **one recipe** before multi-recipe plans.
+13. **Share read-only recipe knowledge** — from the **Share** section, the owner
+    can create opaque public links for either a single saved recipe or all saved
+    recipes in one food style. Food-style links auto-update as recipes are added
+    to that style and expose a read-only filter page at `/recipes/shared/[slug]`.
 
 ## Import language handling
 
@@ -31,8 +48,16 @@ Recipe import still stores Swedish as the primary library body (`summary`,
 source markdown is detected as English or Vietnamese, extraction also returns
 the original-language title/body and saves it into the cached recipe `i18n`
 column (`en` or `vi`). This lets the family/cooking views switch language
-immediately without a second translation step when the source was already in
-that language.
+immediately when the source was already in that language. For English and
+Vietnamese sources, import also runs a Swedish normalization pass from the
+original-language body so copied source text does not become the primary saved
+recipe body.
+
+Translation and import prompts use a small Vietnamese ingredient glossary for
+culturally specific ingredients so Swedish labels stay useful for shopping
+without collapsing distinct products into generic Swedish terms. Example:
+`hạt nêm` should become `vietnamesiskt buljongpulver`, not plain
+`buljongpulver`.
 
 ## Family collaboration
 
@@ -46,7 +71,28 @@ Initial scope:
 - Route: `/family/recipes`.
 - Owner can create a collaborator invite link.
 - Household members can add recipe candidates from a modal with title, source
-  URL, notes, and optional pasted recipe text/markdown.
+  URL, ingredient notes, cooking notes, family notes, and optional pasted recipe
+  text/markdown/transcript. They can also upload reference images for the recipe
+  while creating or reviewing the candidate. This supports sources such as
+  YouTube or TikTok where the app may have a link but no reliable extractor.
+- Household members can ask AI to complete a candidate from those manual notes.
+  The result is saved as a shared `saved_recipes` row, the reviewer is sent to
+  the saved recipe edit page, and the completed candidate is removed from the
+  Review Queue.
+- Household members can use `/family/recipes/search` to search shared recipes
+  by recipe name/summary, selected ICA ingredient source rows, and food style.
+  The ingredient control should autocomplete from the ICA ingredient source index
+  instead of accepting unconstrained free text. The page uses the shared recipe
+  language selector (`sv`, `en`, `vi`) so search results show translated recipe
+  titles/summaries/ingredients when cached and the ingredient picker displays
+  ICA source labels in the selected language.
+- Admin/owner can use `/recipe-generator/ingredients` from the Recipe library to
+  inspect the ingredient source index: ICA Swedish labels, departments, catalog
+  product counts, and missing English/Vietnamese translation or alias coverage.
+  Swedish ICA labels are the initial source of truth; EN/VI aliases are expected
+  follow-on data.
+- Household members can add visible shared recipes to their own **Plan to cook**
+  from search results or the focused food-style review page.
 - Household members can see an overview of shared saved recipe counts by food
   style, showing only styles that currently have recipes.
 - Selecting a food style opens a focused style page where household members
@@ -54,9 +100,11 @@ Initial scope:
   want-to-cook status, and give lightweight recipe feedback such as verified,
   looks good, or needs changes.
 - Household members can review candidates by status:
-  `new`, `want_to_try`, `looks_good`, `needs_changes`, `accepted`, `rejected`.
-- Canonical saved recipes remain separate from recipe candidates; accepting a
-  candidate is the handoff point for later conversion into `saved_recipes`.
+  `new`, `want_to_try`, `looks_good`, `needs_changes`, `accepted`, `rejected`,
+  `done`. Candidates marked `done` are hidden from the default review queue.
+- Canonical saved recipes remain separate from recipe candidates; AI completion
+  is the handoff point into `saved_recipes`, after which the candidate leaves
+  the queue.
 
 Data tables:
 
@@ -73,9 +121,26 @@ Collaborator dashboard boundary:
 - Collaborators are account-backed users, but they should not see the full
   owner dashboard.
 - Allowed starting surfaces: family recipes, plan to cook, and birthdays.
+- The consolidated `/recipes` hub is allowed for collaborators, while owner-only
+  admin pieces remain guarded by API and middleware boundaries.
 - Owner-only operational areas such as tasks, renewals, learning, growing,
   context, digest preview, and promo watchlist remain hidden/blocked for
   collaborators.
+
+## Read-only recipe sharing
+
+The owner can create **anyone-with-link** read-only shares from
+`/recipes?tab=share`.
+
+- **Single recipe share**: shows one recipe detail and steps.
+- **Food-style share**: shows all current owner recipes with that `food_type_id`
+  (for example `brunch-breakfast-light` = “Brunch / frukost / lätt lunch”).
+- Public visitors can filter food-style shares by search text, vegetarian,
+  difficulty, and selected “ingredients at home.”
+- Ingredient filtering uses **match any** semantics so family members get useful
+  suggestions even when only one selected ingredient matches.
+- Public shares expose only safe recipe fields and never raw source markdown,
+  admin notes, planning actions, feedback, or mutations.
 
 ## Why ICA catalog for ingredients
 
@@ -311,6 +376,28 @@ Array of saved rows; each item includes `id`, `title`, `food_type_id`, `vegetari
 | POST | `/api/recipes` | Save one recipe (+ metadata above). |
 | PATCH | `/api/recipes/[id]` | Includes `{ "tested": boolean }`. |
 | DELETE | `/api/recipes/[id]` | Remove. |
+| GET | `/api/recipes/[id]/cook` | Authenticated cooking payload for owner or household-visible recipes; returns safe recipe fields plus whether the current user can edit/mark tested. |
+| GET | `/api/recipes/import-queue` | List the user’s queued source imports, newest first, with markdown preview only. |
+| POST | `/api/recipes/import-queue` | Add `{ source_url?, source_label?, source_markdown }` for scheduled extraction. |
+| DELETE | `/api/recipes/import-queue/[id]` | Delete a non-processing queue item. |
+
+## Async import queue
+
+`recipe_import_queue` stores pasted source markdown separately from
+`saved_recipes` until the Worker processes it. Queue states are `pending`,
+`processing`, `completed`, and `failed`; completed rows link to
+`created_recipe_id`. The Worker uses the same new-dish markdown parser as the
+interactive import flow, writes Swedish primary recipe fields, preserves EN/VI
+source-language bodies in `saved_recipes.i18n`, and stores `source_markdown`
+plus `similar_recipe_url` on the created recipe.
+
+Manual testing route:
+
+- `POST /run-recipe-import-queue`
+- Header: `Authorization: Bearer <WORKER_ADMIN_TOKEN>`
+- Optional JSON: `{ "limit": 1, "queueItemId": "..." }`
+- Dashboard button: `/api/recipes/import-queue/run` proxies this call from the
+  import queue UI, keeping `WORKER_ADMIN_TOKEN` server-side.
 
 ## AI contract
 
@@ -333,6 +420,8 @@ Array of saved rows; each item includes `id`, `title`, `food_type_id`, `vegetari
 5. Saved recipes store and show **Difficulty** (`easy`, `medium`, `hard`), and edit/import can adjust it.
 6. Library shows whether the recipe was saved from a **vegetarian** generation run.
 7. User can supply **`excludeMealTitles`** (including reusing last batch titles and recipes already saved in a selected style) and get **new** suggestions without changing food type; server enforces caps on the list.
+8. User can add source markdown to the import queue and see status/error/created recipe link after the Worker runs.
+9. User can open `/recipes/[id]/cook` from recipe search, library detail, or plan-to-cook and get a focused ingredients/steps view with local step progress.
 
 ## Out of scope (v1)
 

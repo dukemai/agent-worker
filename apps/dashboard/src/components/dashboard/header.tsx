@@ -2,7 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import { getUserHousehold } from "@/lib/household";
 import { DashboardNav } from "@/components/dashboard/header-nav";
 
-export async function DashboardHeader() {
+export async function DashboardHeader({ showNav = true }: { showNav?: boolean } = {}) {
   const supabase = await createClient();
   const {
     data: { user },
@@ -17,7 +17,7 @@ export async function DashboardHeader() {
           <h1 className="text-lg font-semibold">Dad-Ops Agent</h1>
           <span className="hidden text-sm text-muted-foreground sm:inline">Dashboard</span>
         </div>
-        <DashboardNav signedIn={!!user} role={role} />
+        {showNav ? <DashboardNav signedIn={!!user} role={role} /> : null}
       </div>
     </header>
   );

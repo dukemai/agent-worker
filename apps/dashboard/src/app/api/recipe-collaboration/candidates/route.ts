@@ -10,6 +10,7 @@ export type RecipeCandidateRow = {
   source_url: string | null;
   notes: string;
   raw_text: string;
+  image_urls: string[];
   status: string;
   converted_recipe_id: string | null;
   created_at: string;
@@ -39,6 +40,23 @@ function cleanUrl(value: unknown): string | null {
   }
 }
 
+function cleanImageUrls(value: unknown): string[] {
+  if (!Array.isArray(value)) {
+    return [];
+  }
+  const urls = new Set<string>();
+  for (const item of value) {
+    const url = cleanUrl(item);
+    if (url) {
+      urls.add(url);
+    }
+    if (urls.size >= 6) {
+      break;
+    }
+  }
+  return Array.from(urls);
+}
+
 export async function GET() {
   const auth = await getAuthedSupabase();
   if (auth.error || !auth.supabase || !auth.user) {
@@ -56,7 +74,7 @@ export async function GET() {
   const { data, error } = await auth.supabase
     .from("recipe_candidates")
     .select(
-      "id, household_id, submitted_by, title, source_url, notes, raw_text, status, converted_recipe_id, created_at, updated_at",
+      "id, household_id, submitted_by, title, source_url, notes, raw_text, image_urls, status, converted_recipe_id, created_at, updated_at",
     )
     .eq("household_id", household.household.id)
     .order("created_at", { ascending: false });
@@ -87,8 +105,17 @@ export async function POST(request: Request) {
   }
 
   const sourceUrl = cleanUrl(body.sourceUrl);
-  const notes = cleanLongText(body.notes, 2000);
+  const notes = cleanLongText(body.notes, 6000);
+  const ingredientNotes = cleanLongText(body.ingredientNotes, 2000);
+  const cookingNotes = cleanLongText(body.cookingNotes, 3000);
   const rawText = cleanLongText(body.rawText, 12000);
+  const imageUrls = cleanImageUrls(body.imageUrls);
+  const noteSections = [
+    ingredientNotes ? `Ingredient notes:\n${ingredientNotes}` : "",
+    cookingNotes ? `Cooking notes:\n${cookingNotes}` : "",
+    notes ? `Recipe notes:\n${notes}` : "",
+  ].filter(Boolean);
+  const combinedNotes = noteSections.length > 0 ? noteSections.join("\n\n") : notes;
 
   const household = await ensureUserHousehold(auth.supabase, auth.user);
   if (household.error) {
@@ -102,12 +129,13 @@ export async function POST(request: Request) {
       submitted_by: auth.user.id,
       title,
       source_url: sourceUrl,
-      notes,
+      notes: combinedNotes,
       raw_text: rawText,
+      image_urls: imageUrls,
       status: "new",
     })
     .select(
-      "id, household_id, submitted_by, title, source_url, notes, raw_text, status, converted_recipe_id, created_at, updated_at",
+      "id, household_id, submitted_by, title, source_url, notes, raw_text, image_urls, status, converted_recipe_id, created_at, updated_at",
     )
     .single();
 

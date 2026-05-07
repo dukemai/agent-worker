@@ -200,3 +200,36 @@ export async function PATCH(request: Request, context: { params: Promise<{ id: s
 
   return NextResponse.json({ list: listOut, items: itemsOut ?? [] });
 }
+
+export async function DELETE(_request: Request, context: { params: Promise<{ id: string }> }) {
+  const auth = await getAuthedSupabase();
+  if (auth.error || !auth.supabase || !auth.user) {
+    return auth.error;
+  }
+
+  const { id } = await context.params;
+  if (!id) {
+    return errorResponse("Missing id", 400);
+  }
+
+  const { data: list, error: listError } = await auth.supabase
+    .from("shared_shopping_lists")
+    .select("id")
+    .eq("id", id)
+    .eq("user_id", auth.user.id)
+    .maybeSingle();
+
+  if (listError) {
+    return errorResponse(listError.message, 500);
+  }
+  if (!list) {
+    return errorResponse("Not found", 404);
+  }
+
+  const { error } = await auth.supabase.from("shared_shopping_lists").delete().eq("id", id);
+  if (error) {
+    return errorResponse(error.message, 500);
+  }
+
+  return NextResponse.json({ ok: true });
+}

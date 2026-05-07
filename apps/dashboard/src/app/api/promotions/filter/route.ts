@@ -5,6 +5,7 @@ import { parsePromoWatchlistValue, PROMO_WATCHLIST_KEY } from "@/lib/promo-watch
 
 type FilterBody = {
   runId?: unknown;
+  storeKey?: unknown;
 };
 
 export async function POST(request: Request) {
@@ -22,12 +23,16 @@ export async function POST(request: Request) {
 
   let runId = typeof body.runId === "string" && body.runId.trim() ? body.runId.trim() : null;
   if (!runId) {
-    const { data: latestRun, error: runError } = await auth.supabase
+    const storeKey = typeof body.storeKey === "string" ? body.storeKey.trim() : "";
+    let runQuery = auth.supabase
       .from("promotion_import_runs")
       .select("id")
       .order("created_at", { ascending: false })
-      .limit(1)
-      .maybeSingle();
+      .limit(1);
+    if (storeKey) {
+      runQuery = runQuery.eq("store_key", storeKey);
+    }
+    const { data: latestRun, error: runError } = await runQuery.maybeSingle();
     if (runError) {
       return errorResponse(runError.message, 500);
     }

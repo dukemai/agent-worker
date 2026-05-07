@@ -17,8 +17,16 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { fetchFoodTypes } from "@/components/dashboard/recipe-generator-api";
+import { RecipeLanguageToolbar } from "@/components/dashboard/recipe-language-toolbar";
+import { RecipeStepsDisplay } from "@/components/dashboard/recipe-steps-display";
+import { useRecipeLocale } from "@/components/dashboard/recipe-locale-provider";
 import { formatSavedRecipeSourceLabel } from "@/lib/recipe-source";
 import { RECIPE_DIFFICULTIES, formatRecipeDifficulty } from "@/lib/recipe-difficulty";
+import {
+  getRecipeDisplayFields,
+  type SavedRecipeWithI18n,
+} from "@/lib/recipe-locale";
 import {
   type RecipeEditDraft,
   type SavedRecipeRow,
@@ -49,11 +57,50 @@ type EditRecipePageProps = {
   recipeId: string;
 };
 
+function TranslatedIngredientsTable({
+  ingredients,
+}: {
+  ingredients: RecipeGeneratorMeal["ingredients"];
+}) {
+  if (ingredients.length === 0) {
+    return (
+      <p className="rounded-md border border-dashed px-3 py-6 text-center text-sm text-muted-foreground">
+        No translated ingredients yet.
+      </p>
+    );
+  }
+
+  return (
+    <div className="overflow-x-auto rounded-md border">
+      <table className="w-full min-w-[34rem] border-collapse text-sm">
+        <thead>
+          <tr className="border-b bg-muted/50">
+            <th className="px-2 py-1.5 text-left font-medium">Label</th>
+            <th className="px-2 py-1.5 text-left font-medium">Amount</th>
+            <th className="px-2 py-1.5 text-left font-medium">Text</th>
+          </tr>
+        </thead>
+        <tbody>
+          {ingredients.map((row, i) => (
+            <tr key={`tr-ing-${i}`} className="border-b last:border-0">
+              <td className="px-2 py-1.5 align-top">{row.ingredient_label}</td>
+              <td className="px-2 py-1.5 align-top">{row.amount}</td>
+              <td className="px-2 py-1.5 align-top">{row.text}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
 export function EditRecipePage({ recipeId }: EditRecipePageProps) {
   const router = useRouter();
   const queryClient = useQueryClient();
+  const { locale } = useRecipeLocale();
   const [draft, setDraft] = useState<RecipeEditDraft | null>(null);
   const [stepsText, setStepsText] = useState("");
+  const [foodTypeId, setFoodTypeId] = useState("");
   const [cookTime, setCookTime] = useState("");
   const [difficulty, setDifficulty] = useState("medium");
   const [similarUrl, setSimilarUrl] = useState("");
@@ -67,6 +114,11 @@ export function EditRecipePage({ recipeId }: EditRecipePageProps) {
     enabled: validId,
   });
 
+  const foodTypesQuery = useQuery({
+    queryKey: ["recipe-food-types"],
+    queryFn: fetchFoodTypes,
+  });
+
   /* eslint-disable react-hooks/set-state-in-effect -- hydrate editable form state after the recipe query resolves. */
   useEffect(() => {
     const r = recipeQuery.data;
@@ -75,6 +127,7 @@ export function EditRecipePage({ recipeId }: EditRecipePageProps) {
     }
     setDraft(savedRowToEditDraft(r));
     setStepsText(recipeStepsToMarkdown(r.steps));
+    setFoodTypeId(r.food_type_id);
     setCookTime(r.estimated_cook_time);
     setDifficulty(r.difficulty ?? "medium");
     setSimilarUrl(r.similar_recipe_url);
@@ -90,6 +143,7 @@ export function EditRecipePage({ recipeId }: EditRecipePageProps) {
       title_vi: string;
       summary: string;
       meal_kind: string;
+      food_type_id: string;
       ingredients: RecipeGeneratorMeal["ingredients"];
       steps: string[];
       estimated_cook_time: string;
@@ -110,12 +164,19 @@ export function EditRecipePage({ recipeId }: EditRecipePageProps) {
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["saved-recipes"] });
       await queryClient.invalidateQueries({ queryKey: ["recipe", recipeId] });
+      await queryClient.invalidateQueries({ queryKey: ["recipe-collaboration-style-counts"] });
+      await queryClient.invalidateQueries({ queryKey: ["recipe-collaboration-style-recipes"] });
+      await queryClient.invalidateQueries({ queryKey: ["recipe-collaboration-search"] });
       router.push("/recipe-generator?tab=library");
     },
   });
 
   const recipe = recipeQuery.data;
   const saving = saveMutation.isPending;
+  const displayRecipe = recipe
+    ? getRecipeDisplayFields(recipe as SavedRecipeWithI18n, locale)
+    : null;
+  const localeLabel = locale === "sv" ? "Swedish" : locale === "en" ? "English" : "Vietnamese";
 
   const onSave = () => {
     if (!draft || !recipe) {
@@ -127,6 +188,10 @@ export function EditRecipePage({ recipeId }: EditRecipePageProps) {
     );
     if (!draft.title.trim()) {
       setLocalError("Swedish title is required.");
+      return;
+    }
+    if (!foodTypeId.trim()) {
+      setLocalError("Choose a food style.");
       return;
     }
     if (ingredients.length === 0) {
@@ -145,6 +210,7 @@ export function EditRecipePage({ recipeId }: EditRecipePageProps) {
       title_vi: draft.title_vi.trim(),
       summary: draft.summary.trim(),
       meal_kind: draft.meal_kind,
+      food_type_id: foodTypeId.trim(),
       ingredients,
       steps,
       estimated_cook_time: cookTime,
@@ -218,6 +284,61 @@ export function EditRecipePage({ recipeId }: EditRecipePageProps) {
       ) : null}
 
       <Card>
+        <CardHeader>
+          <CardTitle className="text-lg">Translation preview</CardTitle>
+          <CardDescription>
+            Switch recipe language or generate a cached translation. The edit form below still
+            changes the Swedish primary recipe.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-5">
+          <RecipeLanguageToolbar
+            recipeId={recipe.id}
+            recipe={recipe as SavedRecipeWithI18n}
+            onTranslated={(translated) => {
+              queryClient.setQueryData<SavedRecipeRow>(["recipe", recipeId], (old) =>
+                old ? { ...old, ...translated } as SavedRecipeRow : translated as SavedRecipeRow,
+              );
+            }}
+          />
+          {displayRecipe ? (
+            <div className="space-y-4 rounded-md border bg-muted/20 p-3">
+              <div>
+                <p className="text-xs font-medium text-muted-foreground">{localeLabel} title</p>
+                <p className="text-base font-semibold text-foreground">{displayRecipe.title}</p>
+              </div>
+              {displayRecipe.showingSourceFallback ? (
+                <p className="rounded-md border border-amber-300/70 bg-amber-50 px-3 py-2 text-xs text-amber-900">
+                  No cached {localeLabel.toLowerCase()} body yet; showing the Swedish recipe body.
+                </p>
+              ) : null}
+              <div>
+                <p className="text-xs font-medium text-muted-foreground">Summary</p>
+                <p className="text-sm text-foreground">{displayRecipe.summary}</p>
+              </div>
+              <div>
+                <p className="mb-2 text-xs font-medium text-muted-foreground">Ingredients</p>
+                <TranslatedIngredientsTable ingredients={displayRecipe.ingredients} />
+              </div>
+              <div>
+                <p className="mb-2 text-xs font-medium text-muted-foreground">Steps</p>
+                {displayRecipe.steps.length > 0 ? (
+                  <RecipeStepsDisplay
+                    className="list-decimal space-y-1.5 pl-5 text-sm"
+                    steps={displayRecipe.steps}
+                  />
+                ) : (
+                  <p className="rounded-md border border-dashed px-3 py-6 text-center text-sm text-muted-foreground">
+                    No translated steps yet.
+                  </p>
+                )}
+              </div>
+            </div>
+          ) : null}
+        </CardContent>
+      </Card>
+
+      <Card>
         <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div>
             <CardTitle className="text-lg">Source information</CardTitle>
@@ -257,7 +378,9 @@ export function EditRecipePage({ recipeId }: EditRecipePageProps) {
       <Card>
         <CardHeader>
           <CardTitle className="text-lg">Basics</CardTitle>
-          <CardDescription>Swedish title, short summary, and when you eat this meal.</CardDescription>
+          <CardDescription>
+            Swedish title, short summary, food style, and when you eat this meal.
+          </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-1.5">
@@ -297,6 +420,24 @@ export function EditRecipePage({ recipeId }: EditRecipePageProps) {
                 ))}
               </SelectContent>
             </Select>
+          </div>
+          <div className="space-y-1.5">
+            <span className="text-xs font-medium text-muted-foreground">Food style</span>
+            <Select value={foodTypeId} onValueChange={setFoodTypeId} disabled={saving}>
+              <SelectTrigger className="h-9 w-full max-w-xs">
+                <SelectValue placeholder="Choose food style" />
+              </SelectTrigger>
+              <SelectContent>
+                {(foodTypesQuery.data?.options ?? []).map((style) => (
+                  <SelectItem key={style.id} value={style.id}>
+                    {style.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {foodTypesQuery.error instanceof Error ? (
+              <p className="text-xs text-destructive">{foodTypesQuery.error.message}</p>
+            ) : null}
           </div>
         </CardContent>
       </Card>

@@ -19,10 +19,16 @@ function isCategory(v: unknown): v is PromoPickerCategory {
 function isItem(v: unknown): v is PromoPickerItem {
   if (!v || typeof v !== "object") return false;
   const o = v as Record<string, unknown>;
+  const labels = o.labels as Record<string, unknown> | undefined;
   return (
     isNonEmptyString(o.id) &&
     isNonEmptyString(o.name) &&
     isNonEmptyString(o.watchlistText) &&
+    (labels === undefined ||
+      (typeof labels === "object" &&
+        isNonEmptyString(labels.sv) &&
+        typeof labels.en === "string" &&
+        typeof labels.vi === "string")) &&
     typeof o.fullURLPath === "string" &&
     isNonEmptyString(o.parentCategoryId) &&
     isNonEmptyString(o.departmentId)

@@ -10,7 +10,8 @@ import {
 import { SAVED_RECIPE_COLUMNS } from "@/lib/saved-recipe-columns";
 import { createServiceRoleClient } from "@/lib/supabase/service-role";
 
-const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+const UUID_RE =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const RECIPE_WITH_ACCESS_COLUMNS = `${SAVED_RECIPE_COLUMNS}, user_id, household_id`;
 
 type RecipeAccessRow = {

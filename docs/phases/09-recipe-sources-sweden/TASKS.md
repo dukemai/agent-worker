@@ -170,6 +170,103 @@
 
 ---
 
+### Task 9.5: Async import queue + Worker extraction — 2h
+
+**Goal**: Let the import tab enqueue source URL/markdown and let the Worker create saved recipes later.
+
+**Steps**:
+
+1. [x] Add `recipe_import_queue` table with owner RLS, status, retry metadata, raw markdown, and `created_recipe_id`.
+2. [x] Add dashboard queue APIs: list, create, delete non-processing items.
+3. [x] Add `/recipe-generator?tab=import` queue panel with add form, status list, errors, and created recipe link.
+4. [x] Add Worker `runRecipeImportQueue` processor using the existing new-dish markdown parser.
+5. [x] Add daily cron and protected manual trigger `POST /run-recipe-import-queue`.
+6. [x] Add import-tab buttons to run the whole queue or a single pending/failed item through the dashboard proxy.
+7. [ ] Verify against a real Supabase/Gemini environment.
+
+**Files**:
+
+- [`supabase/migrations/037_recipe_import_queue.sql`](../../../supabase/migrations/037_recipe_import_queue.sql)
+- [`apps/dashboard/src/app/api/recipes/import-queue/route.ts`](../../../apps/dashboard/src/app/api/recipes/import-queue/route.ts)
+- [`apps/dashboard/src/components/dashboard/recipe-import-queue-panel.tsx`](../../../apps/dashboard/src/components/dashboard/recipe-import-queue-panel.tsx)
+- [`apps/worker/src/crons/recipe-import-queue.ts`](../../../apps/worker/src/crons/recipe-import-queue.ts)
+- [`apps/worker/src/handlers/fetch/run-recipe-import-queue.ts`](../../../apps/worker/src/handlers/fetch/run-recipe-import-queue.ts)
+
+**Done when**: A queued import can be manually triggered into a saved recipe, and the queue row moves to `completed`.
+
+---
+
+### Task 10: Collaboration search + shared plan entry — 1h 30m
+
+**Goal**: Make the family recipe workspace useful for collaborators who need to find recipes and add them to their own cook plan.
+
+**Steps**:
+
+1. [x] Add a household-aware search API for shared recipes by name/summary, ingredients, and food style.
+2. [x] Add `/family/recipes/search` as a collaborator-visible search page.
+3. [x] Allow household-visible recipes to be added to **Plan to cook**, including recipes owned by another household member.
+4. [x] Add **Add to plan** from the focused food-style recipe review page.
+5. [x] Replace free-text ingredient search with ICA ingredient source autocomplete and selected ingredient chips.
+6. [x] Add `/recipe-generator/ingredients` read-only recipe-library admin overview for ICA rows and EN/VI alias coverage.
+7. [x] Add Review Queue action menu, appended ingredient/recipe/cooking notes, candidate image uploads, and AI-complete handoff to saved recipe edit.
+
+**Files**:
+
+- [`apps/dashboard/src/app/api/recipe-collaboration/search/route.ts`](../../apps/dashboard/src/app/api/recipe-collaboration/search/route.ts)
+- [`apps/dashboard/src/app/api/recipes/ingredient-sources/route.ts`](../../apps/dashboard/src/app/api/recipes/ingredient-sources/route.ts)
+- [`apps/dashboard/src/components/dashboard/family-recipe-search-page.tsx`](../../apps/dashboard/src/components/dashboard/family-recipe-search-page.tsx)
+- [`apps/dashboard/src/components/dashboard/family-ingredient-sources-page.tsx`](../../apps/dashboard/src/components/dashboard/family-ingredient-sources-page.tsx)
+- [`apps/dashboard/src/app/api/cook-plan/items/route.ts`](../../apps/dashboard/src/app/api/cook-plan/items/route.ts)
+- [`apps/dashboard/src/components/dashboard/family-recipe-style-page.tsx`](../../apps/dashboard/src/components/dashboard/family-recipe-style-page.tsx)
+
+**Done when**: Collaborators can search shared recipes and add a visible recipe to their plan without using the owner account.
+
+---
+
+### Task 11: Recipes hub + read-only recipe sharing — 2h 30m
+
+**Goal**: Organize recipe work under `/recipes` and let the owner share public,
+read-only recipe/style links.
+
+**Steps**:
+
+1. [x] Add `/recipes` hub with **Cook**, **Manage**, **Collect**, and **Share** sections.
+2. [x] Redirect old top-level recipe routes into the matching hub sections.
+3. [x] Add `recipe_share_links` with owner RLS, opaque slug, active-link reuse,
+   disable support, and anon read RPC.
+4. [x] Add owner share-link APIs and Share UI.
+5. [x] Add public `/recipes/shared/[slug]` page for single recipe and food-style shares.
+
+**Done when**: Owner can copy a read-only recipe/style link, anonymous visitors
+can open it, disabled links return not found, and food-style shares support
+match-any ingredient filtering.
+
+---
+
+### Task 12: Focused recipe cooking view — 1h 30m
+
+**Goal**: Give each recipe a stable kitchen-friendly URL separate from the
+library and plan-management screens.
+
+**Steps**:
+
+1. [x] Add authenticated `/recipes/[id]/cook` page.
+2. [x] Add `GET /api/recipes/[id]/cook` using existing household-visible recipe
+   access rules.
+3. [x] Add focused cooking UI with ingredients, large steps, local step
+   progress, recipe language toolbar, optional screen wake lock, and owner-only
+   **Mark tested** action.
+4. [x] Link to the cooking view from plan-to-cook, the plan cooking overview,
+   family recipe search, and saved recipe detail.
+5. [ ] Verify in a real authenticated browser session with owner and
+   collaborator recipes.
+
+**Done when**: Opening a recipe cooking URL loads the recipe without the full
+library UI, step progress survives refresh in the same browser, and
+collaborator-visible recipes can open through the same route.
+
+---
+
 ## Order
 
 Execute **Task 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8**. Tasks 4 and 5 can overlap in development only after Task 3 exports a stable function signature.

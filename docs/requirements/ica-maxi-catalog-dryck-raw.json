@@ -1,0 +1,90 @@
+[
+  {
+    "id": "dc6130bd-074e-4f8f-bab0-2038b54d914b",
+    "name": "Vatten",
+    "productCount": 88,
+    "fullURLPath": "Dryck/Vatten",
+    "retailerCategoryId": "318",
+    "children": []
+  },
+  {
+    "id": "9f48d43d-b48d-4796-80e7-d4e93fc4de9d",
+    "name": "Läsk",
+    "productCount": 156,
+    "fullURLPath": "Dryck/Läsk",
+    "retailerCategoryId": "307",
+    "children": []
+  },
+  {
+    "id": "928442f0-3bfd-42b3-9dee-af2e0fcce838",
+    "name": "Stilldrink",
+    "productCount": 39,
+    "fullURLPath": "Dryck/Stilldrink",
+    "retailerCategoryId": "1224",
+    "children": []
+  },
+  {
+    "id": "b2a28421-4651-4bc5-90f5-0b35ba48661d",
+    "name": "Energidryck & Sportdryck",
+    "productCount": 86,
+    "fullURLPath": "Dryck/Energidryck-Sportdryck",
+    "retailerCategoryId": "2207",
+    "children": []
+  },
+  {
+    "id": "0dcfe4a9-cee4-4fd3-8a72-455c2a652b23",
+    "name": "Öl, cider & must",
+    "productCount": 129,
+    "fullURLPath": "Dryck/Öl-cider-must",
+    "retailerCategoryId": "312",
+    "children": []
+  },
+  {
+    "id": "cb83379a-e5b5-4e56-bdf8-beb8ad78789e",
+    "name": "Vin",
+    "productCount": 30,
+    "fullURLPath": "Dryck/Vin",
+    "retailerCategoryId": "347",
+    "children": []
+  },
+  {
+    "id": "60df6ebc-1558-4f58-8296-89159ca04a15",
+    "name": "Kaffe, te & choklad",
+    "productCount": 452,
+    "fullURLPath": "Dryck/Kaffe-te-choklad",
+    "retailerCategoryId": "328",
+    "children": []
+  },
+  {
+    "id": "071547c8-85dc-4bac-8d3e-4f1f4d02c562",
+    "name": "Saft & Lightdryck",
+    "productCount": 66,
+    "fullURLPath": "Dryck/Saft-Lightdryck",
+    "retailerCategoryId": "322",
+    "children": []
+  },
+  {
+    "id": "10d7c0ee-e1e8-418b-89e8-cd45c160630b",
+    "name": "Drinkmix & koncentrat",
+    "productCount": 39,
+    "fullURLPath": "Dryck/Drinkmix-koncentrat",
+    "retailerCategoryId": "352",
+    "children": []
+  },
+  {
+    "id": "c4e30eb9-a7e6-4a1b-9f99-9f60edc4cadd",
+    "name": "Juice & Fruktdryck",
+    "productCount": 303,
+    "fullURLPath": "Dryck/Juice-Fruktdryck",
+    "retailerCategoryId": "2585",
+    "children": []
+  },
+  {
+    "id": "f6ba37a6-a690-4259-bb98-5bef15f93a91",
+    "name": "Vätskeersättning",
+    "productCount": 16,
+    "fullURLPath": "Dryck/Vätskeersättning",
+    "retailerCategoryId": "2063",
+    "children": []
+  }
+]

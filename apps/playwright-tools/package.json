@@ -8,6 +8,8 @@
     "test:headed": "playwright test --headed",
     "test:ui": "playwright test --ui",
     "download-watchlist": "node scripts/download-promo-watchlist.mjs",
+    "scrape:ica-maxi-barkarbystaden": "playwright test tests/ica-maxi-extract-promotions.spec.ts",
+    "scrape:ica-nara-kallhall": "playwright test tests/ica-nara-kallhall-extract-promotions.spec.ts",
     "test:match-rules": "playwright test tests/match-promotions.spec.ts"
   },
   "devDependencies": {

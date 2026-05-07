@@ -6,13 +6,26 @@ import {
   type RecipeGeneratorMeal,
 } from "@agent/shared";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Eye, FileInput, Pencil, Search, Sparkles, Star, Trash2 } from "lucide-react";
+import {
+  ArrowLeft,
+  ChefHat,
+  Database,
+  Eye,
+  FileInput,
+  Pencil,
+  Search,
+  SlidersHorizontal,
+  Sparkles,
+  Star,
+  Trash2,
+} from "lucide-react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
+import { FormEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { FoodStyleFavoriteSuggestionRow } from "@/app/api/promo-food-style-suggestions/route";
 import { useRecipeLocale } from "@/components/dashboard/recipe-locale-provider";
 import { ImportRecipeFromSourcePage } from "@/components/dashboard/import-recipe-from-source-page";
+import { RecipeImportQueuePanel } from "@/components/dashboard/recipe-import-queue-panel";
 import { RecipeLanguageToolbar } from "@/components/dashboard/recipe-language-toolbar";
 import { RecipeStepsDisplay } from "@/components/dashboard/recipe-steps-display";
 import { Button } from "@/components/ui/button";
@@ -32,7 +45,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { PlanToCookDashboard } from "@/components/dashboard/plan-to-cook-dashboard";
 import {
@@ -85,6 +98,7 @@ const IMPORT_SOURCE_WITH_MARKDOWN_ONLY = "with_source";
 
 const IMPORT_RECIPE_UUID_RE =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+type RecipeManageView = "library" | "plan" | "generate" | "import";
 
 type FoodStyleSuggestionsResponse = {
   suggestions: FoodStyleFavoriteSuggestionRow[];
@@ -112,7 +126,19 @@ async function fetchFoodStyleSuggestions(): Promise<FoodStyleSuggestionsResponse
   return { suggestions: Array.isArray(data.suggestions) ? data.suggestions : [] };
 }
 
-export function RecipeGeneratorDashboard() {
+export function RecipeGeneratorDashboard({
+  basePath = "/recipe-generator",
+  tabParamName = "tab",
+  lockedParentTab,
+  fixedRecipeTab,
+  libraryHref: libraryHrefProp,
+}: {
+  basePath?: string;
+  tabParamName?: string;
+  lockedParentTab?: string;
+  fixedRecipeTab?: RecipeManageView;
+  libraryHref?: string;
+}) {
   const [departmentId, setDepartmentId] = useState<string>(ALL_DEPARTMENTS);
   const [search, setSearch] = useState("");
   const [picks, setPicks] = useState<string[]>([]);
@@ -150,13 +176,47 @@ export function RecipeGeneratorDashboard() {
     [detailRecipe, locale],
   );
 
+  const buildDashboardHref = useCallback(
+    (updates?: Record<string, string | null | undefined>): string => {
+      const next = new URLSearchParams(searchParams.toString());
+      if (lockedParentTab) {
+        next.set("tab", lockedParentTab);
+      }
+      for (const [key, value] of Object.entries(updates ?? {})) {
+        if (value === null || value === undefined || value === "") {
+          next.delete(key);
+        } else {
+          next.set(key, value);
+        }
+      }
+      const q = next.toString();
+      return q ? `${basePath}?${q}` : basePath;
+    },
+    [basePath, lockedParentTab, searchParams],
+  );
+
+  const buildDashboardHrefFromParams = useCallback(
+    (params: URLSearchParams): string => {
+      const next = new URLSearchParams(params.toString());
+      if (lockedParentTab) {
+        next.set("tab", lockedParentTab);
+      }
+      const q = next.toString();
+      return q ? `${basePath}?${q}` : basePath;
+    },
+    [basePath, lockedParentTab],
+  );
+
   const activeRecipeTab = useMemo(() => {
-    const t = searchParams.get("tab");
+    if (fixedRecipeTab) {
+      return fixedRecipeTab;
+    }
+    const t = searchParams.get(tabParamName);
     if (t === "library" || t === "plan" || t === "generate" || t === "import") {
       return t;
     }
     return "library";
-  }, [searchParams]);
+  }, [fixedRecipeTab, searchParams, tabParamName]);
 
   const importRecipeParamRaw = searchParams.get("importRecipe")?.trim() ?? "";
   const importRecipeSelectedId = useMemo(
@@ -172,10 +232,9 @@ export function RecipeGeneratorDashboard() {
     if (raw && !IMPORT_RECIPE_UUID_RE.test(raw)) {
       const next = new URLSearchParams(searchParams.toString());
       next.delete("importRecipe");
-      const q = next.toString();
-      router.replace(q ? `/recipe-generator?${q}` : "/recipe-generator?tab=import", { scroll: false });
+      router.replace(buildDashboardHrefFromParams(next), { scroll: false });
     }
-  }, [activeRecipeTab, router, searchParams]);
+  }, [activeRecipeTab, buildDashboardHrefFromParams, router, searchParams]);
 
   useEffect(() => {
     if (appliedPickFromUrl.current) {
@@ -199,10 +258,9 @@ export function RecipeGeneratorDashboard() {
       });
       const next = new URLSearchParams(paramsSnapshot);
       next.delete("pick");
-      const q = next.toString();
-      router.replace(q ? `/recipe-generator?${q}` : "/recipe-generator", { scroll: false });
+      router.replace(buildDashboardHrefFromParams(next), { scroll: false });
     });
-  }, [router, searchParams]);
+  }, [buildDashboardHrefFromParams, router, searchParams]);
 
   const catalogQuery = useQuery({
     queryKey: ["promo-picker-catalog"],
@@ -710,47 +768,32 @@ export function RecipeGeneratorDashboard() {
     (savedRecipePatchMutation.error instanceof Error
       ? savedRecipePatchMutation.error.message
       : null);
+  const libraryHref = libraryHrefProp ?? buildDashboardHref({ [tabParamName]: "library" });
 
   return (
     <main className="mx-auto w-full max-w-7xl space-y-4 px-4 py-6">
       <Tabs
         value={activeRecipeTab}
         onValueChange={(v) => {
+          if (fixedRecipeTab) {
+            return;
+          }
           const next = new URLSearchParams(searchParams.toString());
-          next.set("tab", v);
-          const q = next.toString();
-          router.replace(q ? `/recipe-generator?${q}` : "/recipe-generator", { scroll: false });
+          next.set(tabParamName, v);
+          if (lockedParentTab) {
+            next.set("tab", lockedParentTab);
+          }
+          router.replace(buildDashboardHrefFromParams(next), { scroll: false });
         }}
         className="min-w-0 space-y-4"
       >
-        <TabsList className="grid w-full grid-cols-2 items-stretch gap-1 rounded-lg bg-muted p-1 group-data-[orientation=horizontal]/tabs:!h-auto group-data-[orientation=horizontal]/tabs:min-h-11 sm:grid-cols-4 sm:w-full">
-          <TabsTrigger
-            value="library"
-            className="!h-auto min-h-11 justify-center py-2.5 whitespace-normal shadow-none data-[state=active]:shadow-none"
-          >
-            Library
-          </TabsTrigger>
-          <TabsTrigger
-            value="generate"
-            className="!h-auto min-h-11 justify-center py-2.5 whitespace-normal shadow-none data-[state=active]:shadow-none"
-          >
-            Generate
-          </TabsTrigger>
-          <TabsTrigger
-            value="import"
-            className="!h-auto min-h-11 justify-center py-2.5 whitespace-normal shadow-none data-[state=active]:shadow-none"
-          >
-            Import
-          </TabsTrigger>
-          <TabsTrigger
-            value="plan"
-            className="!h-auto min-h-11 justify-center py-2.5 whitespace-normal shadow-none data-[state=active]:shadow-none"
-          >
-            Plan to cook
-          </TabsTrigger>
-        </TabsList>
-
         <TabsContent value="generate" className="space-y-6">
+          <Button asChild variant="ghost" size="sm" className="gap-2">
+            <Link href={libraryHref}>
+              <ArrowLeft className="size-4" aria-hidden />
+              Library
+            </Link>
+          </Button>
           <Card>
             <CardHeader>
               <CardTitle>Generate recipe ideas</CardTitle>
@@ -1258,6 +1301,12 @@ export function RecipeGeneratorDashboard() {
         </TabsContent>
 
         <TabsContent value="import" className="min-w-0 space-y-4">
+          <Button asChild variant="ghost" size="sm" className="gap-2">
+            <Link href={libraryHref}>
+              <ArrowLeft className="size-4" aria-hidden />
+              Library
+            </Link>
+          </Button>
           {importRecipeSelectedId ? (
             <ImportRecipeFromSourcePage
               key={importRecipeSelectedId}
@@ -1266,6 +1315,8 @@ export function RecipeGeneratorDashboard() {
             />
           ) : (
             <>
+              <RecipeImportQueuePanel />
+
               <Card>
                 <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                   <div>
@@ -1509,7 +1560,10 @@ export function RecipeGeneratorDashboard() {
                                         asChild
                                       >
                                         <Link
-                                          href={`/recipe-generator?tab=import&importRecipe=${encodeURIComponent(r.id)}`}
+                                          href={buildDashboardHref({
+                                            [tabParamName]: fixedRecipeTab ? null : "import",
+                                            importRecipe: r.id,
+                                          })}
                                           title="Import from external source"
                                         >
                                           <FileInput className="size-4" aria-hidden />
@@ -1549,15 +1603,27 @@ export function RecipeGeneratorDashboard() {
               </div>
               <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
                 <Button asChild className="w-full shrink-0 gap-2 sm:w-auto">
-                  <Link href="/recipe-generator?tab=generate">
+                  <Link href="/recipe-generator/generate">
                     <Sparkles className="size-4" aria-hidden />
-                    Generate recipe ideas
+                    Generate
                   </Link>
                 </Button>
                 <Button asChild variant="secondary" className="w-full shrink-0 gap-2 sm:w-auto">
-                  <Link href="/recipe-generator?tab=import">
+                  <Link href="/recipe-generator/import">
                     <FileInput className="size-4" aria-hidden />
-                    Import from source
+                    Import
+                  </Link>
+                </Button>
+                <Button asChild variant="outline" className="w-full shrink-0 gap-2 sm:w-auto">
+                  <Link href="/recipe-generator/mapping">
+                    <SlidersHorizontal className="size-4" aria-hidden />
+                    Mapping
+                  </Link>
+                </Button>
+                <Button asChild variant="outline" className="w-full shrink-0 gap-2 sm:w-auto">
+                  <Link href="/recipe-generator/ingredients">
+                    <Database className="size-4" aria-hidden />
+                    Sources
                   </Link>
                 </Button>
               </div>
@@ -2219,14 +2285,25 @@ export function RecipeGeneratorDashboard() {
                         steps={recipeReadDisplay?.steps ?? detailRecipe.steps}
                       />
                     </div>
-                    <Button type="button" variant="secondary" className="w-full sm:w-auto" asChild>
-                      <Link
-                        href={`/recipe-generator/${detailRecipe.id}/edit`}
-                        onClick={() => setDetailRecipe(null)}
-                      >
-                        Edit recipe
-                      </Link>
-                    </Button>
+                    <div className="flex flex-wrap gap-2">
+                      <Button type="button" variant="secondary" className="w-full sm:w-auto" asChild>
+                        <Link
+                          href={`/recipes/${encodeURIComponent(detailRecipe.id)}/cook`}
+                          onClick={() => setDetailRecipe(null)}
+                        >
+                          <ChefHat className="size-4" aria-hidden />
+                          Cook
+                        </Link>
+                      </Button>
+                      <Button type="button" variant="outline" className="w-full sm:w-auto" asChild>
+                        <Link
+                          href={`/recipe-generator/${detailRecipe.id}/edit`}
+                          onClick={() => setDetailRecipe(null)}
+                        >
+                          Edit recipe
+                        </Link>
+                      </Button>
+                    </div>
                   </div>
                 </>
               ) : null}

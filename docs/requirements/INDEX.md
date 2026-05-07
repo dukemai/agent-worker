@@ -18,6 +18,8 @@ Doc routing for feature-specific specs. Use [GLOSSARY.md](../GLOSSARY.md) for do
 | [ica-maxi-picker-catalog-source.md](ica-maxi-picker-catalog-source.md) | ICA Maxi Handla **category** tree from `ica-maxi-initial-state-raw.json`; regenerate via `scripts/build-ica-maxi-category-menu.mjs` |
 | [ica-maxi-promo-picker-catalog.json](ica-maxi-promo-picker-catalog.json) | Generated picker catalog (`pnpm promo:picker-catalog`): `categories` + `items` with `watchlistText` for promo watchlist |
 | [recipe-generator.md](recipe-generator.md) | Ingredients + cuisine → AI recipe suggestions; saved library with **tested** flag ([Phase 9](../phases/09-recipe-sources-sweden/SCOPE.md)) |
+| [vietnamese-meals.md](vietnamese-meals.md) | Recipe-first Vietnamese meal catalog, AI enrichment, and links to saved recipes |
 | [shared-shopping-list.md](shared-shopping-list.md) | **Phase A:** recipe library → **plan to cook** → **prepare** → **shopping list** + opaque share URL (`/shop/[slug]`); `cook_plans` + shared list tables |
 | [promo-shopping-pipeline-phases.md](promo-shopping-pipeline-phases.md) | **Sub-phases A–G:** crawl → DB promos → in-app matching → triggers → pantry/meals → integration with shared list (focus ladder) |
+| [trip-ops.md](trip-ops.md) | Family/group trip planning scope: trips, options, decisions, participants, itinerary, and task integration |
 | [learning.md](learning.md) | Profiles, lessons, feedback (deferred items) |

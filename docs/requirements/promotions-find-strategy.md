@@ -9,7 +9,7 @@ Describe how **weekly retail offers** are discovered in code: store-specific Pla
 1. **Intent** — User maintains strings on [Promo grocery watchlist](promo-watchlist.md) (dashboard + `GET /api/scrape/promo-watchlist` for machines).
 2. **Download locally** — `pnpm promo:download-watchlist` writes `apps/playwright-tools/data/promo-watchlist.json` (gitignored).
 3. **Open the right surfaces** — A `StorePromotionStrategy` navigates to offer grids. For ICA Maxi the **target** is to derive **categories from those interests** first, then open each relevant category (offers filter and/or Handla aisle—see below). **v1** opens a single weekly offers hub.
-4. **Extract tiles** — Strategy-specific DOM logic collects one record per offer (title, card text, optional price line, **product `imageUrl` when the tile has an `img`**, page URL, stable index on the page).
+4. **Extract tiles** — Strategy-specific DOM logic collects one record per offer (title, card text, optional price line, **product `imageUrl` when the tile has an `img`**, page URL, stable index on the page). The Playwright export is named `<store-key>-scraped-promotions.json` and carries both `storeKey` and `storeName`.
 5. **Match** — [`match-promotions.ts`](../../apps/playwright-tools/src/match-promotions.ts) scores each offer against each watchlist string; results can be attached in tests as `watchlist-matches.json`.
 
 ## Code layout
@@ -21,7 +21,7 @@ Describe how **weekly retail offers** are discovered in code: store-specific Pla
 | [`match-promotions.ts`](../../apps/playwright-tools/src/match-promotions.ts) | Normalization, scoring, `matchPromotionsToWatchlist` |
 | Tests under `apps/playwright-tools/tests/` | e.g. `ica-maxi-extract-promotions.spec.ts` wires strategy + optional watchlist match |
 
-Adding a new store means implementing `gotoOffersPage` + `extractPromotions` and pointing tests at the new strategy.
+Adding a new store means setting `storeKey` + `storeName`, implementing `gotoOffersPage` + `extractPromotions`, and pointing tests at the new strategy.
 
 ## ICA Maxi — category-first strategy (target)
 
@@ -38,11 +38,14 @@ Weekly **erbjudanden** pages can expose hundreds of tiles; loading everything at
 
 **Status:** Weekly-offers **filter chips** + catalog mapping are implemented when `extractPromotions` is called with `watchlistInterests` (see below). Handla PLP URLs per `fullURLPath` remain a future option if needed.
 
-## ICA Maxi Barkarbystaden (current implementation)
+## ICA weekly offers template (current implementation)
 
 Implementation: [`ica-maxi-barkarbystaden.ts`](../../apps/playwright-tools/src/strategies/ica-maxi-barkarbystaden.ts). Catalog helpers: [`promo-picker-catalog.ts`](../../apps/playwright-tools/src/ica-maxi/promo-picker-catalog.ts) reading [`ica-maxi-promo-picker-catalog.json`](ica-maxi-promo-picker-catalog.json).
 
-**URL** — Fixed ICA Maxi stormarknad **weekly offers** hub (`defaultOffersUrl` in the strategy).
+**URLs** — Fixed ICA **weekly offers** hubs (`defaultOffersUrl` in each strategy export):
+
+- `ica-maxi-barkarbystaden` — `https://www.ica.se/erbjudanden/maxi-ica-stormarknad-barkarbystaden-1003408/`
+- `ica-nara-kallhall` — `https://www.ica.se/erbjudanden/ica-nara-kallhall-1004315/`
 
 **Watchlist-scoped scrape** — If `watchlistInterests` is non-empty, each string is scored against catalog `watchlistText` + `name` (same rules as [`match-promotions.ts`](../../apps/playwright-tools/src/match-promotions.ts)). Matched items contribute their row’s **`departmentId`** → department **`name`**. **`mergeIcaMaxiWeeklyOffersDepartments`** then adds promotion-only filters **`Färskvaror`** and **`Djupfryst`** (weekly-offers chips not present as Handla top-level categories in [`ica-maxi-promo-picker-catalog.json`](ica-maxi-promo-picker-catalog.json)). Available chips are read from **`.categoriesContainer`** (prefer **`aria-label`**). Each department is **matched only to chips that appear** (`findChipLabelForDepartment`); missing chips are **skipped** (logged). If nothing from the catalog matches the watchlist, extraction still tries those weekly-offers-only departments before falling back to a full scrape when no chips match.
 
