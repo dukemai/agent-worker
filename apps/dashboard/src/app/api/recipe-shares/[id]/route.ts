@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { errorResponse, getAuthedSupabase } from "@/lib/api";
+import { createServiceRoleClient } from "@/lib/supabase/service-role";
 
 type Params = { params: Promise<{ id: string }> };
 
@@ -14,7 +15,9 @@ export async function DELETE(_request: Request, { params }: Params) {
     return errorResponse("Missing id", 400);
   }
 
-  const { data: link, error: fetchError } = await auth.supabase
+  const writeSupabase = createServiceRoleClient() ?? auth.supabase;
+
+  const { data: link, error: fetchError } = await writeSupabase
     .from("recipe_share_links")
     .select("id")
     .eq("id", id)
@@ -28,7 +31,7 @@ export async function DELETE(_request: Request, { params }: Params) {
     return errorResponse("Share link not found", 404);
   }
 
-  const { error } = await auth.supabase
+  const { error } = await writeSupabase
     .from("recipe_share_links")
     .update({ disabled_at: new Date().toISOString() })
     .eq("id", id)

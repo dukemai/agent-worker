@@ -1,3 +1,4 @@
+import { RecipeLocaleProvider } from "@/components/dashboard/recipe-locale-provider";
 import { PublicRecipeSharePage } from "@/components/recipes/public-recipe-share-page";
 
 type Props = {
@@ -6,5 +7,9 @@ type Props = {
 
 export default async function SharedRecipePage({ params }: Props) {
   const { slug } = await params;
-  return <PublicRecipeSharePage slug={slug} />;
+  return (
+    <RecipeLocaleProvider>
+      <PublicRecipeSharePage slug={slug} />
+    </RecipeLocaleProvider>
+  );
 }

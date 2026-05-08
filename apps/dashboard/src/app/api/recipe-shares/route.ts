@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { errorResponse, getAuthedSupabase } from "@/lib/api";
 import { PUBLIC_COOKBOOK_RECIPE_COLUMNS } from "@/lib/cookbook-public";
 import { getFoodTypeLabelSv, isValidFoodTypeId } from "@/lib/recipe-food-types";
+import { createServiceRoleClient } from "@/lib/supabase/service-role";
 
 type CreateShareBody = {
   scopeType?: unknown;
@@ -23,7 +24,9 @@ export async function GET() {
     return auth.error;
   }
 
-  const { data: links, error } = await auth.supabase
+  const readSupabase = createServiceRoleClient() ?? auth.supabase;
+
+  const { data: links, error } = await readSupabase
     .from("recipe_share_links")
     .select(SHARE_COLUMNS)
     .eq("user_id", auth.user.id)
@@ -50,6 +53,7 @@ export async function POST(request: Request) {
   if (auth.error || !auth.supabase || !auth.user) {
     return auth.error;
   }
+  const writeSupabase = createServiceRoleClient() ?? auth.supabase;
 
   let body: CreateShareBody;
   try {
@@ -86,7 +90,7 @@ export async function POST(request: Request) {
       return errorResponse("Recipe not found", 404);
     }
 
-    const { data: existing, error: existingError } = await auth.supabase
+    const { data: existing, error: existingError } = await writeSupabase
       .from("recipe_share_links")
       .select(SHARE_COLUMNS)
       .eq("user_id", auth.user.id)
@@ -102,7 +106,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ link: existing, reused: true });
     }
 
-    const { data: link, error } = await auth.supabase
+    const { data: link, error } = await writeSupabase
       .from("recipe_share_links")
       .insert({
         user_id: auth.user.id,
@@ -128,7 +132,7 @@ export async function POST(request: Request) {
     return errorResponse("foodTypeId is invalid", 400);
   }
 
-  const { data: existing, error: existingError } = await auth.supabase
+  const { data: existing, error: existingError } = await writeSupabase
     .from("recipe_share_links")
     .select(SHARE_COLUMNS)
     .eq("user_id", auth.user.id)
@@ -144,7 +148,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ link: existing, reused: true });
   }
 
-  const { data: link, error } = await auth.supabase
+  const { data: link, error } = await writeSupabase
     .from("recipe_share_links")
     .insert({
       user_id: auth.user.id,

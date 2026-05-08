@@ -402,7 +402,6 @@ async function extractPromotionsScopedByDepartments(
 ): Promise<ScrapedPromotion[]> {
   const chips = await listIcaMaxiOfferCategoryChips(page);
   const storeKey = storeKeyForPage(page);
-  console.log(`[${storeKey}] Offer categories (${chips.length}):`, chips.join(" | "));
 
   const skippedNoChip: string[] = [];
   const visits: { catalogDepartment: string; chipLabel: string }[] = [];

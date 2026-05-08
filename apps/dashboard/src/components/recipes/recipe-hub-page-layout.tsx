@@ -17,7 +17,7 @@ export function RecipeHubPageLayout({
 
   return (
     <>
-      <DashboardHeader showNav={false} />
+      <DashboardHeader />
       <Suspense fallback={fallback}>{content}</Suspense>
     </>
   );

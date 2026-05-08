@@ -4,6 +4,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ChefHat, Search, ShoppingCart, Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import { RecipeShareButton } from "@/components/recipes/recipe-share-button";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -378,12 +379,18 @@ export function PlanToCookDashboard({ embedded = false }: { embedded?: boolean }
                       </div>
                       <div className="flex shrink-0 flex-wrap items-center gap-1">
                         {row.recipe ? (
-                          <Button asChild variant="outline" size="sm">
-                            <Link href={`/recipes/${encodeURIComponent(row.recipe.id)}/cook`}>
-                              <ChefHat className="size-4" aria-hidden />
-                              Cook
-                            </Link>
-                          </Button>
+                          <>
+                            <Button asChild variant="outline" size="sm">
+                              <Link href={`/recipes/${encodeURIComponent(row.recipe.id)}/cook`}>
+                                <ChefHat className="size-4" aria-hidden />
+                                Cook
+                              </Link>
+                            </Button>
+                            <RecipeShareButton
+                              recipeId={row.recipe.id}
+                              title={row.recipe.title}
+                            />
+                          </>
                         ) : null}
                         <Button
                           type="button"

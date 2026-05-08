@@ -8,10 +8,13 @@ import { SignOutButton } from "@/components/dashboard/sign-out-button";
 const cookingLinks = [
   { href: "/promo-grocery-watchlist", label: "Promo grocery watchlist" },
   { href: "/recipes", label: "Recipes" },
+  { href: "/cookbook", label: "Shared cookbook (preview)" },
+] as const;
+
+const recipeChildLinks = [
   { href: "/recipes?tab=manage", label: "Manage recipes" },
   { href: "/recipes?tab=collect", label: "Collect ideas" },
   { href: "/recipes?tab=share", label: "Share recipes" },
-  { href: "/cookbook", label: "Shared cookbook (preview)" },
 ] as const;
 
 const moreLinks = [
@@ -88,14 +91,29 @@ export function DashboardNav({
             aria-label="Cooking"
           >
             {cookingLinks.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className="block rounded-sm px-3 py-2.5 text-sm outline-none hover:bg-accent hover:text-accent-foreground"
-                role="menuitem"
-              >
-                {item.label}
-              </Link>
+              <div key={item.href}>
+                <Link
+                  href={item.href}
+                  className="block rounded-sm px-3 py-2.5 text-sm outline-none hover:bg-accent hover:text-accent-foreground"
+                  role="menuitem"
+                >
+                  {item.label}
+                </Link>
+                {item.href === "/recipes" ? (
+                  <div className="mb-1 ml-3 border-l pl-2" role="group" aria-label="Recipes">
+                    {recipeChildLinks.map((child) => (
+                      <Link
+                        key={child.href}
+                        href={child.href}
+                        className="block rounded-sm px-3 py-2 text-sm text-muted-foreground outline-none hover:bg-accent hover:text-accent-foreground"
+                        role="menuitem"
+                      >
+                        {child.label}
+                      </Link>
+                    ))}
+                  </div>
+                ) : null}
+              </div>
             ))}
           </div>
         </details>
@@ -149,9 +167,25 @@ export function DashboardNav({
             <div className="my-1 border-t pt-2">
               <p className="px-3 pb-1 text-xs font-medium text-muted-foreground">Cooking</p>
               {cookingLinks.map((item) => (
-                <Button key={item.href} asChild variant="ghost" className="justify-start">
-                  <Link href={item.href}>{item.label}</Link>
-                </Button>
+                <div key={item.href}>
+                  <Button asChild variant="ghost" className="w-full justify-start">
+                    <Link href={item.href}>{item.label}</Link>
+                  </Button>
+                  {item.href === "/recipes" ? (
+                    <div className="ml-3 border-l pl-2">
+                      {recipeChildLinks.map((child) => (
+                        <Button
+                          key={child.href}
+                          asChild
+                          variant="ghost"
+                          className="w-full justify-start text-muted-foreground"
+                        >
+                          <Link href={child.href}>{child.label}</Link>
+                        </Button>
+                      ))}
+                    </div>
+                  ) : null}
+                </div>
               ))}
             </div>
             <div className="my-1 border-t pt-2">

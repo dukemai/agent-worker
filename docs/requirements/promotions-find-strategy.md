@@ -75,9 +75,23 @@ Rules-only; no LLM.
 
 Tune behavior by changing phrases on the watchlist or passing a different `minScore` when calling `matchPromotionsToWatchlist`.
 
+## Coop Kallhäll flyer template
+
+Implementation: [`coop-kallhall.ts`](../../apps/playwright-tools/src/strategies/coop-kallhall.ts).
+
+**URLs** — The strategy starts from the public store page:
+
+- `coop-kallhall` — `https://www.coop.se/butiker-erbjudanden/coop/coop-kallhall/`
+
+Coop's store page is mostly client-rendered. The scraper first tries to discover a live **Veckans reklamblad / Öppna nu** link on the store page and logs relevant discovery requests. If that link is not present in the rendered DOM, it falls back to Coop's digital flyer URL for store id `026827`: `https://dr.coop.se/Butik/?store=026827`.
+
+**Extraction** — Coop flyers are not guaranteed to expose ICA-style product cards. The strategy therefore attempts structured DOM extraction first (`article`, product/offer/campaign-like elements with price copy). When the live flyer URL returns a PDF, it downloads the PDF, extracts text with `pdfjs-dist`, then pairs Coop's per-page product blocks with the page's grouped offer prices. As a fallback, it can parse visible page text into offer windows around Swedish price markers (`kr`, `:-`, `/kg`, `/st`, `2 för`, `medlemspris`, `jfr-pris`, etc.). Each row is normalized to the shared `ScrapedPromotion` shape and exported as `coop-kallhall-scraped-promotions.json`.
+
+**Limits** — Product images are best-effort and may be missing when the flyer is text/PDF-like. Text grouping is heuristic until Coop's live flyer endpoint is inspected across several weeks.
+
 ## How to run
 
-See [promo-watchlist.md — Playwright section](promo-watchlist.md#playwright-match-weekly-promotions-to-the-watchlist): download watchlist, run the ICA extract spec, inspect attachments when `promo-watchlist.json` exists.
+See [promo-watchlist.md — Playwright section](promo-watchlist.md#playwright-match-weekly-promotions-to-the-watchlist): download watchlist, run a store extract spec, inspect attachments when `promo-watchlist.json` exists.
 
 ## Related
 

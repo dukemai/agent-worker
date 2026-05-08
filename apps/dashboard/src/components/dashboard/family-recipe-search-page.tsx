@@ -17,6 +17,7 @@ import { FormEvent, useMemo, useState } from "react";
 import { LocaleSwitcher } from "@/components/dashboard/locale-switcher";
 import { useRecipeLocale } from "@/components/dashboard/recipe-locale-provider";
 import { RecipeStepsDisplay } from "@/components/dashboard/recipe-steps-display";
+import { RecipeShareButton } from "@/components/recipes/recipe-share-button";
 import type { FoodStyleFavoriteSuggestionRow } from "@/app/api/promo-food-style-suggestions/route";
 import {
   type FoodTypesJson,
@@ -613,6 +614,11 @@ export function FamilyRecipeSearchPage({ compact = false }: { compact?: boolean 
                       Cook
                     </Link>
                   </Button>
+                  <RecipeShareButton
+                    recipeId={detailRecipe.id}
+                    title={detailRecipeDisplay.title}
+                    variant="outline"
+                  />
                   <Button
                     type="button"
                     disabled={addToPlanMutation.isPending && addingRecipeId === detailRecipe.id}
@@ -685,6 +691,12 @@ export function FamilyRecipeSearchPage({ compact = false }: { compact?: boolean 
                           <ChefHat className="size-4" aria-hidden />
                         </Link>
                       </Button>
+                      <RecipeShareButton
+                        recipeId={recipe.id}
+                        title={display.title}
+                        size="icon-sm"
+                        iconOnly
+                      />
                       <Button
                         type="button"
                         size="icon-sm"

@@ -10,11 +10,13 @@
     "download-watchlist": "node scripts/download-promo-watchlist.mjs",
     "scrape:ica-maxi-barkarbystaden": "playwright test tests/ica-maxi-extract-promotions.spec.ts",
     "scrape:ica-nara-kallhall": "playwright test tests/ica-nara-kallhall-extract-promotions.spec.ts",
+    "scrape:coop-kallhall": "playwright test tests/coop-kallhall-extract-promotions.spec.ts",
     "test:match-rules": "playwright test tests/match-promotions.spec.ts"
   },
   "devDependencies": {
     "@playwright/test": "^1.51.0",
     "@types/node": "^20",
+    "pdfjs-dist": "^5.7.284",
     "typescript": "^5.5.0"
   }
 }
