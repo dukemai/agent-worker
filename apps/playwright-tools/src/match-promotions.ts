@@ -12,12 +12,88 @@ function normalize(s: string): string {
   return s.toLocaleLowerCase("sv-SE").replace(/\s+/g, " ").trim();
 }
 
+type PromotionMatchRule = {
+  aliases: string[];
+  blockedTerms?: string[];
+  allowedCategoryTerms?: string[];
+};
+
+const PROMOTION_MATCH_RULES: Record<string, PromotionMatchRule> = {
+  "ägg": {
+    aliases: ["ägg"],
+    blockedTerms: ["vägg", "lägg"],
+    allowedCategoryTerms: ["ägg", "mejeri", "ost"],
+  },
+  "svamp": {
+    aliases: ["svamp", "champinjon", "champinjoner", "portabello", "skogschampinjon"],
+    blockedTerms: ["rengöringssvamp", "disksvamp", "tvättsvamp"],
+    allowedCategoryTerms: ["svamp", "frukt", "grönt", "färskvaror"],
+  },
+};
+
+function tokens(s: string): string[] {
+  return normalize(s)
+    .split(/[^\p{L}\p{N}]+/u)
+    .map((t) => t.trim())
+    .filter(Boolean);
+}
+
+function phraseAppearsAsTokens(phrase: string, haystackTokens: string[]): boolean {
+  const phraseTokens = tokens(phrase);
+  if (phraseTokens.length === 0 || phraseTokens.length > haystackTokens.length) {
+    return false;
+  }
+
+  for (let i = 0; i <= haystackTokens.length - phraseTokens.length; i += 1) {
+    if (phraseTokens.every((token, offset) => haystackTokens[i + offset] === token)) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+function categoryMatchesRule(rule: PromotionMatchRule, categoryText?: string): boolean {
+  if (!categoryText || !rule.allowedCategoryTerms?.length) {
+    return true;
+  }
+  const normalizedCategoryText = normalize(categoryText);
+  return rule.allowedCategoryTerms.some((term) => normalizedCategoryText.includes(normalize(term)));
+}
+
+function ruleForInterest(interest: string): PromotionMatchRule | null {
+  return PROMOTION_MATCH_RULES[normalize(interest)] ?? null;
+}
+
+function tokenMatchesPromotionText(
+  token: string,
+  haystackTokens: string[],
+  normalizedHaystack: string,
+): boolean {
+  return phraseAppearsAsTokens(token, haystackTokens) || (token.length >= 4 && normalizedHaystack.includes(token));
+}
+
+function aliasMatchesPromotionText(
+  alias: string,
+  haystackTokens: string[],
+  normalizedHaystack: string,
+): boolean {
+  const normalizedAlias = normalize(alias);
+  return phraseAppearsAsTokens(normalizedAlias, haystackTokens) ||
+    (normalizedAlias.length >= 4 && normalizedHaystack.includes(normalizedAlias));
+}
+
 /**
  * Score how well `interest` matches normalized haystack (same rules as promotions).
- * - Full phrase as substring (after normalize) → 100.
- * - Otherwise: split into tokens (length ≥ 2); if every token appears in haystack → 90 + min(9, token count) (cap 99).
+ * - Catalog-backed aliases as whole tokens → 100.
+ * - Full phrase as whole tokens or a long compound-safe substring (after normalize) → 100.
+ * - Otherwise: split into tokens (length ≥ 2); if every token appears as a whole token or long compound-safe substring → 90 + min(9, token count) (cap 99).
  */
-export function scoreInterestAgainstHaystack(interest: string, haystack: string): number {
+export function scoreInterestAgainstHaystack(
+  interest: string,
+  haystack: string,
+  options?: { categoryText?: string },
+): number {
   const raw = interest.trim();
   if (raw.length < 2) {
     return 0;
@@ -27,21 +103,38 @@ export function scoreInterestAgainstHaystack(interest: string, haystack: string)
   if (needle.length < 2) {
     return 0;
   }
-  if (h.includes(needle)) {
+  const rule = ruleForInterest(needle);
+  const haystackTokens = tokens(h);
+  if (rule) {
+    if (!categoryMatchesRule(rule, options?.categoryText)) {
+      return 0;
+    }
+    if (
+      rule.blockedTerms?.some((term) => phraseAppearsAsTokens(term, haystackTokens) || h.includes(normalize(term)))
+    ) {
+      return 0;
+    }
+    if (rule.aliases.some((alias) => aliasMatchesPromotionText(alias, haystackTokens, h))) {
+      return 100;
+    }
+    return 0;
+  } else if (phraseAppearsAsTokens(needle, haystackTokens)) {
+    return 100;
+  } else if (needle.length >= 4 && h.includes(needle)) {
     return 100;
   }
-  const tokens = needle
+  const needleTokens = needle
     .split(/\s+/)
     .map((t) => t.trim())
     .filter((t) => t.length >= 2);
-  if (tokens.length === 0) {
+  if (needleTokens.length === 0) {
     return 0;
   }
-  const allHit = tokens.every((t) => h.includes(t));
+  const allHit = needleTokens.every((t) => tokenMatchesPromotionText(t, haystackTokens, h));
   if (!allHit) {
     return 0;
   }
-  return Math.min(99, 90 + Math.min(tokens.length, 9));
+  return Math.min(99, 90 + Math.min(needleTokens.length, 9));
 }
 
 /**
@@ -56,6 +149,7 @@ export function scoreInterestAgainstPromotion(
   return scoreInterestAgainstHaystack(
     interest,
     `${promotion.title}\n${promotion.cardText}`,
+    { categoryText: [promotion.categoryKey, promotion.categoryName].filter(Boolean).join(" ") },
   );
 }
 

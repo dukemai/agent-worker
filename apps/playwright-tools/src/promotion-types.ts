@@ -15,6 +15,9 @@ export type ScrapedPromotion = {
   title: string;
   /** Full visible card copy — safest input for later NLP */
   cardText: string;
+  /** Optional weekly-offers category/chip metadata when the scraper visited scoped views. */
+  categoryKey?: string;
+  categoryName?: string;
   /** Heuristic price / offer line if detected */
   priceHint?: string;
   /** Product photo URL when the tile exposes one (absolute https). */

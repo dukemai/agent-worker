@@ -155,11 +155,11 @@ Local flow (see `apps/playwright-tools`):
 
 1. **Download watchlist** — with dashboard running and env set: `pnpm promo:download-watchlist` (writes `apps/playwright-tools/data/promo-watchlist.json`; gitignored).
 2. **Scrape store offers** — from the repo root, run `pnpm promo:scrape:ica-maxi-barkarbystaden`, `pnpm promo:scrape:ica-nara-kallhall`, or `pnpm promo:scrape:coop-kallhall` (network; writes **`<store-key>-scraped-promotions.json`** with all offers for that store). From `apps/playwright-tools`, the equivalent scripts omit the `promo:` prefix.
-3. **Dashboard import + match** — upload the store-specific **`<store-key>-scraped-promotions.json`**; `POST /api/promotions/filter` scores each stored offer against every watchlist string (full substring after Swedish case-fold, or all tokens ≥2 chars).
+3. **Dashboard import + match** — upload the store-specific **`<store-key>-scraped-promotions.json`**; `POST /api/promotions/filter` scores each stored offer against every watchlist string using Swedish-aware whole-token matching plus catalog-backed aliases/blocks for ambiguous grocery terms.
 
 **On-disk outputs (no report download):** under **`apps/playwright-tools/data/promo-run/`** — full store exports named **`<store-key>-scraped-promotions.json`** (`{ storeKey, storeName, count, promotions }`), plus **`watchlist-matches-only.json`** (`{ interests, matches }`, same as the report attachment) whenever the watchlist file has items; **`watchlist-matches.json`** (slim summary + `watchlist-matches.json`-style rows) from the main extract test; the rank-only test overwrites **`watchlist-matches-only.json`** if both run. Set **`PROMO_NO_DISK_OUTPUT=1`** to skip disk writes.
 
-Tuning: add broader or narrower phrases on the dashboard; optional `minScore` (default 50) when calling `matchPromotionsToWatchlist`.
+Tuning: add broader or narrower phrases on the dashboard; optional `minScore` (default 50) when calling `matchPromotionsToWatchlist`. For noisy ICA catalog terms, add aliases/blocked terms/category guards in the shared matcher instead of relying on raw substring behavior.
 
 ## Related
 

@@ -69,9 +69,11 @@ Implementation: [`ica-maxi-barkarbystaden.ts`](../../apps/playwright-tools/src/s
 Rules-only; no LLM.
 
 - **Normalize** — Swedish locale lowercasing, collapse whitespace for both interest and `title` + `cardText`.
-- **Substring** — If the full normalized interest appears in that haystack → score **100**.
-- **Tokens** — Else split interest on spaces; keep tokens with length ≥ 2. If **every** token appears somewhere in the haystack → score **90 + min(9, token count)** (capped at **99**).
-- **Filter** — Default `minScore` is **50**, so only substring and all-token hits are kept.
+- **Catalog rules** — Ambiguous ICA catalog concepts can define aliases, blocked terms, and allowed category terms. Example: `svamp` matches `champinjoner` in food categories but not `rengöringssvamp`; `ägg` does not match `vägg`/`lägg` compounds.
+- **Phrase / compound** — If the full normalized interest appears as whole Swedish-aware tokens, or as a long non-catalog substring (length ≥ 4) inside a compound product word, score **100**.
+- **Tokens** — Else split interest on spaces; keep tokens with length ≥ 2. If **every** token appears as a whole token, or as a long non-catalog substring, in the haystack → score **90 + min(9, token count)** (capped at **99**).
+- **Category context** — When scrapes/imports include `categoryKey`/`categoryName`, matching uses that text as an extra guard for catalog rules. If category context is missing, text aliases and blocked terms still apply.
+- **Filter** — Default `minScore` is **50**, so only exact rule/phrase and all-token hits are kept.
 
 Tune behavior by changing phrases on the watchlist or passing a different `minScore` when calling `matchPromotionsToWatchlist`.
 

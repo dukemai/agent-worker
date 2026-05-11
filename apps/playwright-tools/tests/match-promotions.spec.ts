@@ -32,9 +32,62 @@ test.describe("match-promotions (watchlist)", () => {
     expect(scoreInterestAgainstPromotion(p, "Valio smör")).toBe(0);
   });
 
+  test("long non-dictionary terms can match grocery compounds", () => {
+    const p = samplePromo({
+      title: "Kycklingfilé",
+      cardText: "Färsk kycklingfilé. 900 g.",
+    });
+    expect(scoreInterestAgainstPromotion(p, "kyckling")).toBe(100);
+  });
+
   test("no match when phrase missing", () => {
     const p = samplePromo();
     expect(scoreInterestAgainstPromotion(p, "laxfilé")).toBe(0);
+  });
+
+  test("does not match ägg inside unrelated compounds", () => {
+    const p = samplePromo({
+      title: "Väggslangvinda",
+      cardText: "Praktisk slangvinda för vägg. 199 kr/st.",
+      categoryName: "Hem & fritid",
+    });
+    expect(scoreInterestAgainstPromotion(p, "ägg")).toBe(0);
+  });
+
+  test("matches ägg as a catalog token", () => {
+    const p = samplePromo({
+      title: "Ägg 12-pack",
+      cardText: "Frigående höns. 12-pack. 29.90 kr/st.",
+      categoryName: "Mejeri & Ost",
+    });
+    expect(scoreInterestAgainstPromotion(p, "ägg")).toBe(100);
+  });
+
+  test("does not match svamp inside cleaning products", () => {
+    const p = samplePromo({
+      title: "Rengöringssvamp",
+      cardText: "Rengöringssvamp 10-pack. 19.90 kr/st.",
+      categoryName: "Hem & städ",
+    });
+    expect(scoreInterestAgainstPromotion(p, "svamp")).toBe(0);
+  });
+
+  test("matches svamp using catalog-backed aliases", () => {
+    const p = samplePromo({
+      title: "Champinjoner",
+      cardText: "Färska champinjoner i ask. 250 g.",
+      categoryName: "Frukt & Grönt",
+    });
+    expect(scoreInterestAgainstPromotion(p, "svamp")).toBe(100);
+  });
+
+  test("matches catalog aliases inside grocery compounds", () => {
+    const p = samplePromo({
+      title: "Förkokta majskolvar 2-pack",
+      cardText: "Majskolvar. Förkokta. 2-pack.",
+      categoryName: "Frukt & Grönt",
+    });
+    expect(scoreInterestAgainstPromotion(p, "majs")).toBe(100);
   });
 
   test("matchPromotionsToWatchlist returns sorted hits", () => {

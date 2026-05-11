@@ -2,6 +2,7 @@ import { matchWeeklyPromotionsToWatchlist, type WeeklyPromotionForMatching } fro
 import { NextResponse } from "next/server";
 import { errorResponse, getAuthedSupabase } from "@/lib/api";
 import { parsePromoWatchlistValue, PROMO_WATCHLIST_KEY } from "@/lib/promo-watchlist";
+import { buildPromoWatchlistMatchRules } from "@/lib/promo-watchlist-match-rules";
 
 type FilterBody = {
   runId?: unknown;
@@ -60,7 +61,9 @@ export async function POST(request: Request) {
 
   const { data: promotionRows, error: promotionsError } = await auth.supabase
     .from("weekly_promotions")
-    .select("id, sort_order, store_key, source_url, promotion_index, title, card_text, price_hint, image_url")
+    .select(
+      "id, sort_order, store_key, source_url, promotion_index, title, card_text, price_hint, image_url, category_key, category_name",
+    )
     .eq("run_id", runId)
     .order("sort_order", { ascending: true });
   if (promotionsError) {
@@ -74,11 +77,17 @@ export async function POST(request: Request) {
     index: typeof row.promotion_index === "number" ? row.promotion_index : row.sort_order,
     title: row.title,
     cardText: row.card_text ?? "",
+    categoryKey: row.category_key,
+    categoryName: row.category_name,
     priceHint: row.price_hint,
     imageUrl: row.image_url,
   })) satisfies WeeklyPromotionForMatching[];
 
-  const matches = matchWeeklyPromotionsToWatchlist(promotions, watchlist, { minScore: 50 });
+  const matchRulesByInterest = buildPromoWatchlistMatchRules(watchlist);
+  const matches = matchWeeklyPromotionsToWatchlist(promotions, watchlist, {
+    minScore: 50,
+    matchRulesByInterest,
+  });
 
   const { error: deleteError } = await auth.supabase
     .from("weekly_promotion_matches")

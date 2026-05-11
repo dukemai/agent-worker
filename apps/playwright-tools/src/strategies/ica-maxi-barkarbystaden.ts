@@ -436,7 +436,7 @@ async function extractPromotionsScopedByDepartments(
   const merged: ScrapedPromotion[] = [];
   let globalIndex = 0;
 
-  for (const { chipLabel } of visits) {
+  for (const { catalogDepartment, chipLabel } of visits) {
     const ok = await clickOffersCategoryChipByResolvedLabel(page, chipLabel);
     if (!ok) {
       continue;
@@ -451,6 +451,11 @@ async function extractPromotionsScopedByDepartments(
       merged.push({
         ...row,
         index: globalIndex,
+        categoryKey: normalizeOfferChipBase(chipLabel)
+          .toLocaleLowerCase("sv-SE")
+          .replace(/[^a-zåäö0-9]+/gi, "-")
+          .replace(/^-+|-+$/g, ""),
+        categoryName: catalogDepartment,
       });
       globalIndex += 1;
     }
