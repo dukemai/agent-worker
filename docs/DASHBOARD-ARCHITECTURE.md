@@ -58,6 +58,9 @@ dashboard/src/
 | `/recipes` | Recipes hub | Cook/search/plan, Manage library/import/generate, Collect family ideas, Share read-only recipe links |
 | `/recipes/[id]/cook` | Focused recipe cooking view | `GET /api/recipes/[id]/cook`, optional `PATCH /api/recipes/[id]` for owner feedback |
 | `/recipes/shared/[slug]` | Public recipe share | `GET /api/public/recipe-shares/[slug]` via anon RPC |
+| `/trips` | Trip Ops list | `GET/POST /api/trips` |
+| `/trips/[id]` | Trip Ops detail | `GET/PATCH /api/trips/[id]`, nested options, decisions, itinerary, starter, tasks |
+| `/trips/preferences` | Trip preference admin | `GET/POST /api/trip-preference-suggestions`, `PATCH/DELETE /api/trip-preference-suggestions/[id]` |
 | `/vietnamese-meals` | Vietnamese meals | `GET/POST /api/vietnamese-meals`, enrichment, recipe suggestions, recipe links |
 
 ## Auth
@@ -85,6 +88,11 @@ Manual “process” flows (e.g. growing extract or recipe import queue runs) go
 - **Recipes**: Hub at `/recipes` with **Cook**, **Manage**, **Collect**, and
   **Share** sections. Legacy top-level recipe routes redirect into the hub while
   edit/import detail routes remain available.
+- **Trip Ops**: `/trips` creates and groups trips by lifecycle; `/trips/[id]`
+  edits logistics, Markdown knowledge, options, decisions, itinerary blocks,
+  and creates normal dashboard tasks with `metadata.item_type = "trip_task"`.
+  `/trips/preferences` manages curated preference suggestions used by the trip
+  detail picker.
 
 ## Environment
 

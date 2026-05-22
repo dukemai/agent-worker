@@ -6,7 +6,7 @@
 - Machine export: `GET /api/scrape/promo-watchlist` + `pnpm promo:download-watchlist`; env documented under [promo-watchlist.md](../../requirements/promo-watchlist.md#environment-dashboard--machine-export).
 - Weekly import path: `POST /api/promo-matches/import`, latest run UI, meal plan (`POST /api/promo-matches/meal-plan`) + `PromoMealPlanWeekView`.
 - Playwright: watchlist-aware matching; ICA strategy **`expandLazyLoadedOfferTiles`** to load lazy-rendered weekly-offer tiles before scraping.
-- Roadmap: Phase 8 marked **done**; recipe corpus work scheduled as **Phase 9** ([`../09-recipe-sources-sweden/SCOPE.md`](../09-recipe-sources-sweden/SCOPE.md)); YouTube → **10**, learning agents → **11**.
+- Roadmap: Phase 8 marked **done**; recipe corpus work scheduled as **Phase 9** ([`../09-recipe-sources-sweden/SCOPE.md`](../09-recipe-sources-sweden/SCOPE.md)); Trip Ops → **10**, YouTube → **11**, learning agents → **12**.
 
 ## Deferred
 

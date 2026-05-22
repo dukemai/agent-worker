@@ -59,15 +59,21 @@
 - [x] Ingredients + food-type UI → Gemini structured recipes → add chosen rows to `saved_recipes` with **tested** toggle (`docs/phases/09-recipe-sources-sweden/SCOPE.md`, [`recipe-generator.md`](requirements/recipe-generator.md))
 - [ ] Optional later: curated corpus / RAG grounding (same phase folder)
 
-### Phase 10: YouTube Knowledge Extraction — planned
+### Phase 10: Trip Ops — MVP implemented
+- [x] Trip detail page for known logistics, participants, options, decisions, tasks, itinerary, and notes
+- [x] Already visited / avoid list so repeat trips prioritize new places
+- [x] Ranked option shortlist and loose itinerary blocks for a real four-day Gotland trip
+- [x] Trip tasks integrated into normal task buckets (dedicated daily digest section remains follow-up; see `docs/phases/10-trip-ops/TASKS.md`)
+
+### Phase 11: YouTube Knowledge Extraction — planned
 - [ ] Reliable transcript/caption pipeline into `growing_knowledge`
 - [ ] Enrichment (tags, titles) and Sources tab status/re-extract UX
 - [ ] Guardrails for failures, length, and dedupe
 
-### Phase 11: Learning Agent Specialization — planned
+### Phase 12: Learning Agent Specialization — planned
 - [ ] Dedicated agents per topic (economy, deep AI, growing) with independent cadence
 - [ ] Agent-specific progression memory and feedback / difficulty loops
-- [ ] Prompt tuning and eval fixtures per agent as needed (see `docs/phases/11-learning-agents/SCOPE.md`)
+- [ ] Prompt tuning and eval fixtures per agent as needed (see `docs/phases/12-learning-agents/SCOPE.md`)
 
 ### Deferred (not scheduled as numbered phases)
 - **State tracker mobile app** (was `08-state-tracker`): resumable work/learning states—parked until reprioritized

@@ -29,6 +29,7 @@ Each trip should capture:
 - Destination candidates
 - Date windows
 - Participants
+- Structured participant counts and kid ages
 - Travel options
 - Accommodation options
 - Food plans
@@ -36,6 +37,7 @@ Each trip should capture:
 - Decisions
 - Tasks
 - Notes
+- Curated preference suggestions
 
 ### Participants
 
@@ -52,6 +54,25 @@ For group trips, useful fields include:
 - Notes or open replies
 
 The first version can keep this lightweight and editable by the primary user.
+The MVP stores freeform participant notes plus structured `adult_count`, `kid_count`, and `kid_ages` so suggestions can reason about the family shape without needing named people.
+
+### Preferences
+
+Preferences combine freeform notes with curated reusable suggestions. The user can manage suggestion presets in `/trips/preferences`, then apply active suggestions from the trip detail page.
+
+Useful categories:
+
+- Pace
+- Kids
+- Weather
+- Food
+- Nature
+- Culture
+- Logistics
+- Budget
+- Planning style
+
+Selected preferences are stored on the trip as text rows and may later seed AI prompts for options and itinerary blocks.
 
 ### Options
 
@@ -129,6 +150,7 @@ The first version should support planning one real trip end to end:
 A trip detail page should provide these sections:
 
 - Overview
+- Knowledge
 - Options
 - Decisions
 - Tasks
@@ -152,7 +174,16 @@ AI should act as a trip coordinator, producing editable structured outputs rathe
 
 Useful AI flows:
 
+- Extract pasted Markdown inspiration into reusable trip knowledge, including approximate areas and locations for places and activities
+- Merge processed trip knowledge into an overview grouped by canonical Gotland areas, with duplicate places, activities, and area-name variants combined across sources
+- Favorite merged places and activities so promising candidates can be carried forward into options and itinerary planning
+- Create trip options directly from refined knowledge places or activities
+- Attach optional stories to places and activities so visits can include historical, natural, cultural, or kid-friendly context
+- Generate starter trip knowledge from logistics and preferences when the user has not collected sources yet
+- Preview and edit the option-generation prompt before sending it to AI
 - Turn a messy pasted note into structured trip options
+- Plan an option into a day/block itinerary item and mark the option as planned
+- Suggest local follow-up options from an itinerary block using nearby unplanned options in the same area
 - Compare destination, travel, or accommodation options
 - Generate a packing checklist based on dates, destination, kids, and transport
 - Draft a message to the group
@@ -160,11 +191,16 @@ Useful AI flows:
 - Summarize unresolved decisions
 - Extract tasks from trip-related emails or notes
 
-AI output should land as trip options, decisions, notes, or tasks that the user can edit.
+AI output should land as trip knowledge, options, decisions, notes, or tasks that the user can edit.
 
 ## Group Trip Sharing
 
-Later versions can add lightweight sharing:
+Trip workspaces can be shared with signed-in household members. New trips attach
+to the creator's household when one exists or can be created, and household
+members can open the trip list/detail workspace and collaborate on trip options,
+decisions, itinerary blocks, knowledge, and favorites.
+
+Later versions can add lighter external sharing:
 
 - Opaque read-only trip link
 - Shared option list
@@ -196,13 +232,11 @@ The dashboard should not initially:
 - Require accounts for external families
 - Build a full collaborative travel social product
 
-## Phase Candidate
+## Scheduled Phase
 
-Trip Ops is a good candidate for a future phase after meal and shopping workflows stabilize.
+Trip Ops is scheduled as Phase 10, inserted before the YouTube knowledge extraction and learning-agent specialization phases because a real Gotland planning need can validate the product shape now.
 
-Suggested phase:
-
-**Phase 12: Trip Ops**
+**Phase 10: Trip Ops**
 
 Success criteria:
 

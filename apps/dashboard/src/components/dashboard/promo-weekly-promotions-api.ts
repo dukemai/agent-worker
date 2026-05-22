@@ -37,6 +37,12 @@ export type WeeklyPromotionsFilterResponse = {
   promotionCount: number;
 };
 
+export type WeeklyPromotionsClearResponse = {
+  deleted: true;
+  deletedRunCount: number;
+  storeKey: string | null;
+};
+
 export type WeeklyPromotionStoresResponse = {
   stores: PromotionStoreOption[];
 };
@@ -88,6 +94,21 @@ export async function fetchWeeklyPromotionMatches(
     await throwApiError(response, "Failed to load matched promotions");
   }
   return response.json() as Promise<WeeklyPromotionsMatchesResponse>;
+}
+
+export async function clearCurrentWeeklyPromotions(
+  storeKey?: string | null,
+): Promise<WeeklyPromotionsClearResponse> {
+  const response = await fetch(
+    `/api/promotions/current-week${promotionQuery(storeKey, "latest")}`,
+    {
+      method: "DELETE",
+    },
+  );
+  if (!response.ok) {
+    await throwApiError(response, "Failed to clear weekly promotions");
+  }
+  return response.json() as Promise<WeeklyPromotionsClearResponse>;
 }
 
 export async function importWeeklyPromotions(

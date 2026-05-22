@@ -26,6 +26,7 @@
     "promo:scrape:ica-maxi-barkarbystaden": "pnpm --filter @agent/playwright-tools scrape:ica-maxi-barkarbystaden",
     "promo:scrape:ica-nara-kallhall": "pnpm --filter @agent/playwright-tools scrape:ica-nara-kallhall",
     "promo:scrape:coop-kallhall": "pnpm --filter @agent/playwright-tools scrape:coop-kallhall",
+    "promo:scrape:coop-barkarby": "pnpm --filter @agent/playwright-tools scrape:coop-barkarby",
     "promo:picker-catalog": "node scripts/build-ica-maxi-promo-picker-catalog.mjs"
   },
   "devDependencies": {

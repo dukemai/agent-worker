@@ -1,4 +1,4 @@
-# Phase 10: YouTube Knowledge Extraction — Scope
+# Phase 11: YouTube Knowledge Extraction — Scope
 
 **Status**: planned
 
@@ -30,4 +30,4 @@ Improve **knowledge ingestion from YouTube** so transcripts (or captions) become
 
 ## Related later phase
 
-**Phase 11** ([Learning Agent Specialization](../11-learning-agents/SCOPE.md)) builds per-topic agents on top of a stronger knowledge base; Phase 10 does not include agent behavior—only ingestion and UX for YouTube → knowledge.
+**Phase 12** ([Learning Agent Specialization](../12-learning-agents/SCOPE.md)) builds per-topic agents on top of a stronger knowledge base; Phase 11 does not include agent behavior—only ingestion and UX for YouTube → knowledge.

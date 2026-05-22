@@ -18,6 +18,9 @@ const MATCH_RULE_OVERRIDES: Record<string, MatchRuleOverride> = {
     aliases: ["champinjon", "champinjoner", "portabello", "skogschampinjon"],
     blockedTerms: ["rengöringssvamp", "disksvamp", "tvättsvamp"],
   },
+  "smör": {
+    blockedTerms: ["smörgås", "smörgåsmat"],
+  },
 };
 
 let cachedCatalog: PromoPickerCatalog | null = null;

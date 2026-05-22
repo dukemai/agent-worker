@@ -108,7 +108,7 @@ export const PROMO_MEAL_SUGGESTIONS_SAMPLE: PromoMealSuggestion[] = [
   {
     id: "7",
     title: "Tacos på nötfärs",
-    summary: "Snabb vardagsmiddag: krydda färsen, servera med tortilla och grönt.",
+    summary: "Enkel middag: krydda färsen, servera med tortilla och grönt.",
     meal_kind: "dinner",
     ingredients: [
       "Nötfärs",

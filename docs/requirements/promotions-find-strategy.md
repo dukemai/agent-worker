@@ -77,19 +77,20 @@ Rules-only; no LLM.
 
 Tune behavior by changing phrases on the watchlist or passing a different `minScore` when calling `matchPromotionsToWatchlist`.
 
-## Coop Kallhäll flyer template
+## Coop Kallhäll HTML offers template
 
 Implementation: [`coop-kallhall.ts`](../../apps/playwright-tools/src/strategies/coop-kallhall.ts).
 
 **URLs** — The strategy starts from the public store page:
 
 - `coop-kallhall` — `https://www.coop.se/butiker-erbjudanden/coop/coop-kallhall/`
+- `stora-coop-barkarby` — `https://www.coop.se/butiker-erbjudanden/stora-coop/stora-coop-barkarby/`
 
-Coop's store page is mostly client-rendered. The scraper first tries to discover a live **Veckans reklamblad / Öppna nu** link on the store page and logs relevant discovery requests. If that link is not present in the rendered DOM, it falls back to Coop's digital flyer URL for store id `026827`: `https://dr.coop.se/Butik/?store=026827`.
+Coop's store page is client-rendered, so the scraper stays in Playwright and extracts from the rendered HTML page rather than the digital flyer/PDF. Before scrolling it checks for the cookie consent modal with id `cmpbox` and clicks **Endast nödvändiga cookies** when present.
 
-**Extraction** — Coop flyers are not guaranteed to expose ICA-style product cards. The strategy therefore attempts structured DOM extraction first (`article`, product/offer/campaign-like elements with price copy). When the live flyer URL returns a PDF, it downloads the PDF, extracts text with `pdfjs-dist`, then pairs Coop's per-page product blocks with the page's grouped offer prices. As a fallback, it can parse visible page text into offer windows around Swedish price markers (`kr`, `:-`, `/kg`, `/st`, `2 för`, `medlemspris`, `jfr-pris`, etc.). Each row is normalized to the shared `ScrapedPromotion` shape and exported as `coop-kallhall-scraped-promotions.json`.
+**Extraction** — Coop offer cards are anchored by rendered buttons whose text is **Spara i lista** or **Se N varor**. The scraper scrolls until the number of those anchors stabilizes, walks up from each anchor to the nearest card-like ancestor, then extracts title, full card text, optional price hint, optional image URL, and the Coop store page URL. Each row is normalized to the shared `ScrapedPromotion` shape and exported as `coop-kallhall-scraped-promotions.json`.
 
-**Limits** — Product images are best-effort and may be missing when the flyer is text/PDF-like. Text grouping is heuristic until Coop's live flyer endpoint is inspected across several weeks.
+**Limits** — Product images and price hints are best-effort because they depend on the rendered HTML card content. The scraper intentionally avoids Coop's PDF flyer even when a flyer link is available.
 
 ## How to run
 

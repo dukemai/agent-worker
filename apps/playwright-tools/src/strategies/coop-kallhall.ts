@@ -5,11 +5,12 @@ const COOP_KALLHALL_STORE_KEY = "coop-kallhall";
 const COOP_KALLHALL_STORE_NAME = "Coop Kallhäll";
 const COOP_KALLHALL_STORE_PAGE_URL =
   "https://www.coop.se/butiker-erbjudanden/coop/coop-kallhall/";
-const COOP_KALLHALL_DR_FALLBACK_URL = "https://dr.coop.se/Butik/?store=026827";
+const COOP_BARKARBY_STORE_KEY = "stora-coop-barkarby";
+const COOP_BARKARBY_STORE_NAME = "Stora Coop Barkarby";
+const COOP_BARKARBY_STORE_PAGE_URL =
+  "https://www.coop.se/butiker-erbjudanden/stora-coop/stora-coop-barkarby/";
 
 const pageStoreKey = new WeakMap<Page, string>();
-const pageFlyerSourceUrl = new WeakMap<Page, string>();
-const pageFlyerText = new WeakMap<Page, string>();
 
 function storeKeyForPage(page: Page): string {
   return pageStoreKey.get(page) ?? COOP_KALLHALL_STORE_KEY;
@@ -17,14 +18,6 @@ function storeKeyForPage(page: Page): string {
 
 function normalizeSpace(s: string): string {
   return s.replace(/\u00a0/g, " ").replace(/\s+/g, " ").trim();
-}
-
-function normalizeLines(s: string): string[] {
-  return s
-    .replace(/\u00a0/g, " ")
-    .split(/\r?\n/)
-    .map(normalizeSpace)
-    .filter((line) => line.length > 0);
 }
 
 function dedupeKey(p: Pick<ScrapedPromotion, "title" | "cardText">): string {
@@ -35,412 +28,101 @@ function dedupeKey(p: Pick<ScrapedPromotion, "title" | "cardText">): string {
     .slice(0, 260)}`;
 }
 
-function looksLikePriceLine(line: string): boolean {
-  return (
-    /\d/.test(line) &&
-    /(kr|:-|för|\/kg|\/st|\/liter|\/l|rabatt|medlemspris|ord\.?\s*pris|jfr-pris|%)/i.test(
-      line,
-    )
-  );
-}
-
-function looksLikeOfferPriceMarker(line: string): boolean {
-  return (
-    /^(\d+\s*för|medlemspris|eko)$/i.test(line) ||
-    /^\d{1,4}k$/i.test(line) ||
-    /^\d{1,4}$/.test(line) ||
-    /^\/(kg|st|pack|l|liter)$/i.test(line)
-  );
-}
-
-function looksLikeStandalonePricePart(line: string): boolean {
-  return (
-    /^\d{1,4}([:,.]\d{1,2})?$/.test(line) ||
-    /^\/(kg|st|pack|l|liter)$/i.test(line)
-  );
-}
-
-function looksLikeTitleLine(line: string): boolean {
-  if (line.length < 3 || line.length > 140) {
-    return false;
-  }
-  if (looksLikePriceLine(line) || looksLikeStandalonePricePart(line)) {
-    return false;
-  }
-  if (
-    /^(du sparar|ord\.?\s*pris|jfr-pris|medlemspris|våra erbjudanden|aktuella|sänkt moms|sänkt pris|max \d|eko)\b/i.test(
-      line,
-    )
-  ) {
-    return false;
-  }
-  if (/^(välj mellan|kyld\.?|fryst\.?|frysta\.?|klass 1|i bit\.?|1 liter\.?|oparfymerade\.?)/i.test(line)) {
-    return false;
-  }
-  if (looksLikeOfferPriceMarker(line)) {
-    return false;
-  }
-  return /[a-zåäö]/i.test(line);
-}
-
-function titleFromLines(lines: string[], fallback: string): string {
-  return (
-    lines.find(looksLikeTitleLine) ??
-    lines.find((line) => /[a-zåäö]/i.test(line) && line.length >= 3) ??
-    fallback
-  ).slice(0, 160);
-}
-
-function priceHintFromLines(lines: string[]): string | undefined {
-  const joined = lines.join(" ");
-  const joinedPrice = joined.match(
-    /(?:\d+\s*för\s*)?\d{1,4}(?::|-|,)?\d{0,2}\s*(?:kr|:-)?\s*(?:\/\s*(?:kg|st|l|liter))?/i,
-  )?.[0];
-  return lines.find(looksLikePriceLine) ?? joinedPrice;
-}
-
-function splitCoopFlyerPages(lines: string[]): string[][] {
-  const pages: string[][] = [];
-  let current: string[] = [];
-  for (const line of lines) {
-    if (/^cn_\d+_.*sid/i.test(line) && current.length > 0) {
-      pages.push(current);
-      current = [];
-      continue;
-    }
-    current.push(line);
-  }
-  if (current.length > 0) {
-    pages.push(current);
-  }
-  return pages;
-}
-
-function looksLikeCoopProductStart(lines: string[], index: number): boolean {
-  const line = lines[index] ?? "";
-  if (!looksLikeTitleLine(line)) {
-    return false;
-  }
-  if (!/^[A-ZÅÄÖ0-9]/.test(line)) {
-    return false;
-  }
-  if (
-    /^(nu är|läs mer|almunge|här finns|du hittar|reservation|tryck:|coop marknad|försäkra|extra rabatt|ta med|teckna|max \d|välj mellan|kyld|fryst|frysta|klass 1|i bit|1 liter|oparfymerade)/i.test(
-      line,
-    )
-  ) {
-    return false;
-  }
-  const lookahead = lines.slice(index + 1, index + 5).join(" ");
-  return /(jfr-pris|klass 1|kyld|fryst|frysta|välj mellan|fetthalt|kruka|g\.|ml\.|liter|pack)/i.test(
-    lookahead,
-  );
-}
-
-function collectCoopProductBlocks(pageLines: string[]): string[][] {
-  const products: string[][] = [];
-  for (let i = 0; i < pageLines.length; i += 1) {
-    if (!looksLikeCoopProductStart(pageLines, i)) {
-      continue;
-    }
-
-    const block = [pageLines[i]];
-    let j = i + 1;
-    for (; j < Math.min(pageLines.length, i + 6); j += 1) {
-      const line = pageLines[j] ?? "";
-      if (looksLikeOfferPriceMarker(line)) {
-        break;
-      }
-      if (j > i + 1 && looksLikeCoopProductStart(pageLines, j)) {
-        break;
-      }
-      if (/^(almunge|aktuella|priser|\d+\/\d|cn_\d+|här finns|försäkra)/i.test(line)) {
-        break;
-      }
-      block.push(line);
-      if (/jfr-pris/i.test(line)) {
-        j += 1;
-        break;
-      }
-    }
-
-    if (block.length >= 2) {
-      products.push(block);
-      i = Math.max(i, j - 1);
-    }
-  }
-  return products;
-}
-
-function collectCoopOfferPrices(pageLines: string[]): string[] {
-  const prices: string[] = [];
-  let pendingMemberPrice = false;
-  const withPrefix = (price: string) => {
-    const value = pendingMemberPrice ? `MEDLEMSPRIS ${price}` : price;
-    pendingMemberPrice = false;
-    return value;
-  };
-
-  for (let i = 0; i < pageLines.length; i += 1) {
-    const line = pageLines[i] ?? "";
-    const next = pageLines[i + 1] ?? "";
-    const next2 = pageLines[i + 2] ?? "";
-    const next3 = pageLines[i + 3] ?? "";
-
-    if (/^medlemspris$/i.test(line)) {
-      pendingMemberPrice = true;
-      continue;
-    }
-
-    if (/^\d+\s*för$/i.test(line) && /^\d+k$/i.test(next)) {
-      prices.push(withPrefix(`${line} ${next}`));
-      i += 1;
-      continue;
-    }
-
-    if (/^\d+k$/i.test(line)) {
-      if (/^\/(kg|st|pack|l|liter)$/i.test(next)) {
-        prices.push(withPrefix(`${line} ${next}`));
-        i += 1;
-      } else {
-        prices.push(withPrefix(line));
-      }
-      continue;
-    }
-
-    if (/^\d+$/.test(line) && /^\d{2}$/.test(next)) {
-      const unit = /^\/(kg|st|pack|l|liter)$/i.test(next2) ? ` ${next2}` : "";
-      prices.push(withPrefix(`${line}:${next}${unit}`));
-      i += unit ? 2 : 1;
-      continue;
-    }
-
-    if (/^\d+$/.test(line) && /^\/(kg|st|pack|l|liter)$/i.test(next)) {
-      prices.push(withPrefix(`${line}k ${next}`));
-      i += 1;
-      continue;
-    }
-
-    if (/^\d+\s*för$/i.test(line) && /^\d+$/.test(next) && /^\d{2}$/.test(next2)) {
-      const unit = /^\/(kg|st|pack|l|liter)$/i.test(next3) ? ` ${next3}` : "";
-      prices.push(withPrefix(`${line} ${next}:${next2}${unit}`));
-      i += unit ? 3 : 2;
-    }
-  }
-  return prices;
-}
-
-async function extractTextFromPdfBytes(bytes: Uint8Array): Promise<string> {
-  const pdfjs = await import("pdfjs-dist/legacy/build/pdf.mjs");
-  const task = pdfjs.getDocument({
-    data: bytes,
-    useSystemFonts: true,
-  });
-  const pdf = await task.promise;
-  const pageTexts: string[] = [];
-
-  try {
-    for (let pageNumber = 1; pageNumber <= pdf.numPages; pageNumber += 1) {
-      const pdfPage = await pdf.getPage(pageNumber);
-      const content = await pdfPage.getTextContent();
-      const text = content.items
-        .map((item) => {
-          if (typeof item === "object" && item !== null && "str" in item) {
-            return String((item as { str: unknown }).str);
-          }
-          return "";
-        })
-        .join("\n");
-      pageTexts.push(text);
-    }
-  } finally {
-    await pdf.destroy();
-  }
-
-  return pageTexts.join("\n");
-}
-
-function parseCoopFlyerTextRows(text: string): Omit<ScrapedPromotion, "storeKey" | "sourceUrl">[] {
-  const lines = normalizeLines(text).filter((line) => line.length <= 260);
-  const structuredRows: Omit<ScrapedPromotion, "storeKey" | "sourceUrl">[] = [];
-
-  for (const pageLines of splitCoopFlyerPages(lines)) {
-    const products = collectCoopProductBlocks(pageLines);
-    const prices = collectCoopOfferPrices(pageLines);
-    const count = Math.min(products.length, prices.length);
-
-    for (let i = 0; i < count; i += 1) {
-      const product = products[i] ?? [];
-      const priceHint = prices[i];
-      const title = titleFromLines(product, product[0] ?? "");
-      structuredRows.push({
-        index: structuredRows.length,
-        title,
-        cardText: normalizeSpace([...product, priceHint].filter(Boolean).join(" ")),
-        priceHint,
-      });
-    }
-  }
-
-  if (structuredRows.length >= 8) {
-    return structuredRows;
-  }
-
-  const out: Omit<ScrapedPromotion, "storeKey" | "sourceUrl">[] = [];
-
-  for (let i = 0; i < lines.length; i += 1) {
-    const current = lines[i] ?? "";
-    const next = lines[i + 1] ?? "";
-    const next2 = lines[i + 2] ?? "";
-    const priceish =
-      looksLikePriceLine(current) ||
-      (/^\d{1,4}$/.test(current) && /^(\d{1,2}|\/(?:kg|st|l|liter))$/i.test(next)) ||
-      (/^\d{1,4}$/.test(current) && /^\/(?:kg|st|l|liter)$/i.test(next2));
-
-    if (!priceish) {
-      continue;
-    }
-
-    const windowLines = lines.slice(Math.max(0, i - 4), Math.min(lines.length, i + 5));
-    const cardText = normalizeSpace(windowLines.join(" "));
-    if (cardText.length < 25) {
-      continue;
-    }
-
-    const before = lines.slice(Math.max(0, i - 4), i).reverse();
-    const title = titleFromLines(before, windowLines[0] ?? cardText);
-    out.push({
-      index: out.length,
-      title,
-      cardText,
-      priceHint: priceHintFromLines(windowLines),
-    });
-  }
-
-  const seen = new Set<string>();
-  return out.filter((row) => {
-    const key = `${row.title.toLocaleLowerCase("sv-SE")}|${row.cardText
-      .toLocaleLowerCase("sv-SE")
-      .slice(0, 220)}`;
-    if (seen.has(key)) {
-      return false;
-    }
-    seen.add(key);
-    return true;
-  });
-}
-
 async function dismissCoopCookieWallIfPresent(page: Page): Promise<void> {
-  const buttons = [
-    page.getByRole("button", { name: /avvisa alla/i }).first(),
-    page.getByRole("button", { name: /neka alla/i }).first(),
-    page.getByRole("button", { name: /acceptera alla/i }).first(),
-    page.getByRole("button", { name: /godkänn alla/i }).first(),
-  ];
-
-  for (const button of buttons) {
-    if (await button.isVisible({ timeout: 1_000 }).catch(() => false)) {
-      await button.click();
+  const modal = page.locator("#cmpbox").first();
+  if (await modal.isVisible({ timeout: 1_000 }).catch(() => false)) {
+    const necessaryOnly = modal
+      .getByRole("button", { name: /endast\s+nödvändiga\s+cookies/i })
+      .first();
+    if (await necessaryOnly.isVisible({ timeout: 1_000 }).catch(() => false)) {
+      await necessaryOnly.click();
+      await modal.waitFor({ state: "hidden", timeout: 8_000 }).catch(() => undefined);
       return;
     }
   }
+
+  const fallback = page
+    .getByRole("button", { name: /endast\s+nödvändiga\s+cookies/i })
+    .first();
+  if (await fallback.isVisible({ timeout: 500 }).catch(() => false)) {
+    await fallback.click();
+  }
 }
 
-async function findCoopFlyerUrl(page: Page): Promise<string | null> {
-  const urls = await page.evaluate(() => {
-    const candidates: string[] = [];
-    for (const a of document.querySelectorAll("a[href]")) {
-      const href = a.getAttribute("href") ?? "";
-      const text = (a.textContent ?? "").replace(/\s+/g, " ").trim();
-      const aria = a.getAttribute("aria-label") ?? "";
-      if (
-        /dr\.coop\.se|reklamblad|erbjudanden|veckans|öppna/i.test(href) ||
-        /veckans|reklamblad|öppna nu|erbjudanden/i.test(`${text} ${aria}`)
-      ) {
-        try {
-          candidates.push(new URL(href, location.href).href);
-        } catch {
-          /* skip invalid hrefs */
-        }
+async function htmlOfferAnchorCount(page: Page): Promise<number> {
+  const saveButtons = await page.getByRole("button", { name: /spara\s+i\s+lista/i }).count();
+  const seeItemButtons = await page
+    .getByRole("button", { name: /se\s+\d+\s+varor/i })
+    .count();
+  return saveButtons + seeItemButtons;
+}
+
+async function waitForHtmlOfferAnchors(page: Page): Promise<void> {
+  for (let i = 0; i < 30; i += 1) {
+    await dismissCoopCookieWallIfPresent(page);
+    if ((await htmlOfferAnchorCount(page)) > 0) {
+      return;
+    }
+    await page.evaluate(() => window.scrollBy(0, Math.floor(window.innerHeight * 0.8)));
+    await page.waitForTimeout(350);
+  }
+
+  throw new Error(
+    "Could not find Coop HTML offer buttons: expected 'Spara i lista' or 'Se N varor'.",
+  );
+}
+
+async function expandLazyLoadedHtmlOffers(page: Page): Promise<void> {
+  let lastCount = await htmlOfferAnchorCount(page);
+  let noIncreaseStreak = 0;
+
+  for (let i = 0; i < 80; i += 1) {
+    await dismissCoopCookieWallIfPresent(page);
+    await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
+    await page.waitForTimeout(450);
+    const count = await htmlOfferAnchorCount(page);
+    if (count <= lastCount) {
+      noIncreaseStreak += 1;
+      if (noIncreaseStreak >= 5 && lastCount > 0) {
+        break;
       }
+    } else {
+      noIncreaseStreak = 0;
     }
-    return candidates;
-  });
-
-  return urls.find((url) => /dr\.coop\.se/i.test(url)) ?? null;
+    lastCount = count;
+  }
 }
 
-async function gotoCoopOffersPage(page: Page): Promise<void> {
-  pageStoreKey.set(page, COOP_KALLHALL_STORE_KEY);
-  const seenRequests = new Set<string>();
-  page.on("request", (request) => {
-    const url = request.url();
-    if (/dr\.coop\.se|erbjud|reklamblad|butik/i.test(url)) {
-      seenRequests.add(url);
-    }
-  });
-
-  const response = await page.goto(COOP_KALLHALL_STORE_PAGE_URL, {
+async function gotoCoopOffersPage(
+  page: Page,
+  storeKey: string,
+  offersUrl: string,
+): Promise<void> {
+  pageStoreKey.set(page, storeKey);
+  const response = await page.goto(offersUrl, {
     waitUntil: "domcontentloaded",
   });
   if (!response?.ok()) {
     throw new Error(`Failed to load Coop store page: HTTP ${response?.status()}`);
   }
   await dismissCoopCookieWallIfPresent(page);
-
   await page.waitForLoadState("networkidle", { timeout: 12_000 }).catch(() => undefined);
-  const flyerUrl = await findCoopFlyerUrl(page);
-  const targetUrl = flyerUrl ?? COOP_KALLHALL_DR_FALLBACK_URL;
-  if (!flyerUrl) {
-    console.warn(
-      `[${COOP_KALLHALL_STORE_KEY}] Could not discover flyer link on store page; falling back to ${targetUrl}`,
-    );
-  } else {
-    console.log(`[${COOP_KALLHALL_STORE_KEY}] Discovered Coop flyer URL: ${flyerUrl}`);
-  }
-
-  pageFlyerSourceUrl.set(page, targetUrl);
-
-  const directResponse = await page.request.get(targetUrl);
-  if (directResponse.ok()) {
-    const contentType = directResponse.headers()["content-type"] ?? "";
-    if (/application\/pdf/i.test(contentType)) {
-      const pdfBytes = new Uint8Array(await directResponse.body());
-      const pdfByteLength = pdfBytes.byteLength;
-      const pdfText = await extractTextFromPdfBytes(pdfBytes);
-      pageFlyerText.set(page, pdfText);
-      console.log(
-        `[${COOP_KALLHALL_STORE_KEY}] Downloaded Coop PDF flyer (${pdfByteLength} bytes, ${normalizeLines(pdfText).length} text lines)`,
-      );
-      return;
-    }
-  }
-
-  const flyerResponse = await page.goto(targetUrl, { waitUntil: "domcontentloaded" });
-  if (!flyerResponse?.ok()) {
-    throw new Error(`Failed to load Coop flyer: HTTP ${flyerResponse?.status()}`);
-  }
-  await page.waitForLoadState("networkidle", { timeout: 15_000 }).catch(() => undefined);
-
-  if (seenRequests.size > 0) {
-    console.log(
-      `[${COOP_KALLHALL_STORE_KEY}] Coop discovery requests:\n${[...seenRequests]
-        .slice(0, 20)
-        .join("\n")}`,
-    );
-  }
+  await waitForHtmlOfferAnchors(page);
 }
 
-async function scrapeStructuredCoopOfferElements(
-  page: Page,
-): Promise<Omit<ScrapedPromotion, "storeKey" | "sourceUrl">[]> {
-  return page.evaluate(() => {
+async function scrapeHtmlCoopOfferElements(page: Page): Promise<ScrapedPromotion[]> {
+  const storeKey = storeKeyForPage(page);
+  const sourceUrl = page.url();
+  await expandLazyLoadedHtmlOffers(page);
+
+  const rows = await page.evaluate(() => {
     const normalize = (s: string) =>
       s.replace(/\u00a0/g, " ").replace(/\s+/g, " ").trim();
+    const ctaRx = /(?:spara\s+i\s+lista|se\s+\d+\s+varor)/i;
     const priceRx =
-      /\d.*(kr|:-|för|\/kg|\/st|\/liter|\/l|rabatt|medlemspris|ord\.?\s*pris|jfr-pris|%)/i;
+      /\d.*(?:kr|:-|för|\/kg|\/st|\/liter|\/l|rabatt|medlemspris|ord\.?\s*pris|jfr-pris|%)/i;
 
-    function productImageFromCard(card: Element): string | undefined {
+    function productImageFromCard(card: Element): { imageUrl?: string; imageAlt?: string } {
       for (const img of card.querySelectorAll("img")) {
         const raw =
           img.getAttribute("src") ||
@@ -457,85 +139,109 @@ async function scrapeStructuredCoopOfferElements(
             continue;
           }
           if (/^https?:\/\//i.test(abs)) {
-            return abs;
+            return {
+              imageUrl: abs,
+              imageAlt: normalize(img.getAttribute("alt") ?? ""),
+            };
           }
         } catch {
-          /* skip */
+          /* skip invalid URLs */
         }
       }
-      return undefined;
+      return {};
     }
 
-    const selectors = [
-      "article",
-      "li",
-      '[class*="offer" i]',
-      '[class*="deal" i]',
-      '[class*="product" i]',
-      '[class*="campaign" i]',
-      '[data-testid*="offer" i]',
-      '[data-testid*="product" i]',
-    ].join(",");
+    function linesFromText(text: string): string[] {
+      return text
+        .replace(/\u00a0/g, " ")
+        .split(/\r?\n/)
+        .map(normalize)
+        .filter(Boolean);
+    }
+
+    function titleFromLines(lines: string[], cardText: string): string {
+      return (
+        lines.find(
+          (line) =>
+            line.length >= 3 &&
+            line.length <= 140 &&
+            /[a-zåäö]/i.test(line) &&
+            !ctaRx.test(line) &&
+            !priceRx.test(line) &&
+            !/^(medlemspris|ord\.?\s*pris|jfr-pris|du sparar)$/i.test(line),
+        ) ??
+        lines.find((line) => /[a-zåäö]/i.test(line) && !ctaRx.test(line)) ??
+        cardText.slice(0, 140)
+      );
+    }
+
+    const ctas = [
+      ...document.querySelectorAll("button, a[href], [role='button']"),
+    ].filter((node) => ctaRx.test(node.textContent ?? ""));
 
     const out: {
-      index: number;
       title: string;
       cardText: string;
       priceHint?: string;
       imageUrl?: string;
     }[] = [];
-    const seen = new Set<string>();
 
-    for (const node of document.querySelectorAll(selectors)) {
-      const cardText = normalize(node.textContent ?? "");
-      if (cardText.length < 30 || cardText.length > 1800 || !priceRx.test(cardText)) {
+    for (const cta of ctas) {
+      let card: Element | null = null;
+      let node: Element | null = cta;
+
+      for (let depth = 0; depth < 14 && node; depth += 1) {
+        node = node.parentElement;
+        if (!node) {
+          break;
+        }
+        const text = normalize(node.textContent ?? "");
+        const ctaHits = (text.match(new RegExp(ctaRx.source, "gi")) ?? []).length;
+        if (ctaHits === 1 && text.length >= 30 && text.length <= 2500) {
+          card = node;
+          if (priceRx.test(text) || /se\s+\d+\s+varor/i.test(text)) {
+            break;
+          }
+        }
+      }
+
+      if (!card) {
         continue;
       }
-      const lines = cardText
-        .split(/\r?\n/)
-        .map(normalize)
-        .filter(Boolean);
-      const title =
-        lines.find((line) => /[a-zåäö]/i.test(line) && !priceRx.test(line)) ??
-        lines[0] ??
-        cardText.slice(0, 140);
-      const priceHint = lines.find((line) => priceRx.test(line));
-      const key = `${title.toLocaleLowerCase("sv-SE")}|${cardText
-        .toLocaleLowerCase("sv-SE")
-        .slice(0, 220)}`;
-      if (seen.has(key)) {
-        continue;
-      }
-      seen.add(key);
+
+      const renderedText =
+        "innerText" in card ? ((card as HTMLElement).innerText ?? "") : "";
+      const cardText = normalize(renderedText || card.textContent || "");
+      const lines = linesFromText(cardText).filter((line) => !ctaRx.test(line));
+      const { imageUrl, imageAlt } = productImageFromCard(card);
+      const h3Title = normalize(card.querySelector("h3")?.textContent ?? "");
+      const title = normalize(
+        h3Title && h3Title.length >= 3 && h3Title.length <= 140
+          ? h3Title
+          : imageAlt && imageAlt.length >= 3 && imageAlt.length <= 140
+          ? imageAlt
+          : titleFromLines(lines, cardText),
+      );
+      const priceHint =
+        cardText.match(
+          /(?:medlemspris\s*)?(?:\d+\s*för\s*)?\d{1,4}(?::|,)?\d{0,2}\s*(?:kr|:-)\s*(?:\/\s*(?:kg|st|l|liter))?/i,
+        )?.[0] ??
+        lines.find((line) => /(medlemspris|\d+\s*för\s*\d+\s*kr|\d+\s*kr)/i.test(line));
       out.push({
-        index: out.length,
-        title: title.slice(0, 160),
+        title,
         cardText,
         priceHint,
-        imageUrl: productImageFromCard(node),
+        imageUrl,
       });
     }
 
     return out;
   });
-}
-
-async function extractCoopPromotions(page: Page): Promise<ScrapedPromotion[]> {
-  const sourceUrl = pageFlyerSourceUrl.get(page) ?? page.url();
-  const storeKey = storeKeyForPage(page);
-  const downloadedFlyerText = pageFlyerText.get(page);
-  const structuredRows = downloadedFlyerText
-    ? []
-    : await scrapeStructuredCoopOfferElements(page);
-  const textRows =
-    structuredRows.length > 0
-      ? structuredRows
-      : parseCoopFlyerTextRows(downloadedFlyerText ?? (await page.locator("body").innerText()));
 
   const seen = new Set<string>();
   const promotions: ScrapedPromotion[] = [];
 
-  for (const row of textRows) {
+  for (const row of rows) {
     const promotion: ScrapedPromotion = {
       storeKey,
       sourceUrl,
@@ -556,10 +262,29 @@ async function extractCoopPromotions(page: Page): Promise<ScrapedPromotion[]> {
   return promotions;
 }
 
-export const coopKallhallStrategy: StorePromotionStrategy = {
+function createCoopHtmlStrategy(config: {
+  storeKey: string;
+  storeName: string;
+  offersUrl: string;
+}): StorePromotionStrategy {
+  return {
+    storeKey: config.storeKey,
+    storeName: config.storeName,
+    defaultOffersUrl: config.offersUrl,
+    gotoOffersPage: (page) =>
+      gotoCoopOffersPage(page, config.storeKey, config.offersUrl),
+    extractPromotions: scrapeHtmlCoopOfferElements,
+  };
+}
+
+export const coopKallhallStrategy = createCoopHtmlStrategy({
   storeKey: COOP_KALLHALL_STORE_KEY,
   storeName: COOP_KALLHALL_STORE_NAME,
-  defaultOffersUrl: COOP_KALLHALL_STORE_PAGE_URL,
-  gotoOffersPage: gotoCoopOffersPage,
-  extractPromotions: extractCoopPromotions,
-};
+  offersUrl: COOP_KALLHALL_STORE_PAGE_URL,
+});
+
+export const coopBarkarbyStrategy = createCoopHtmlStrategy({
+  storeKey: COOP_BARKARBY_STORE_KEY,
+  storeName: COOP_BARKARBY_STORE_NAME,
+  offersUrl: COOP_BARKARBY_STORE_PAGE_URL,
+});

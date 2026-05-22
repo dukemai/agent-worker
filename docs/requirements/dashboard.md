@@ -15,6 +15,7 @@ Mobile-first Next.js app. Primary interface for viewing and acting on tasks.
 - **Recipe library/admin** — Managed under `/recipes?tab=manage` with legacy redirects from `/recipe-generator`; saved recipes default view, search/filter, linked standalone generation/import flows, style-first AI recipe ideas, and admin-managed ICA ingredient source overview (`saved_recipes`)
 - **Family recipes** — Managed under `/recipes?tab=collect` with legacy redirects from `/family/recipes`; household invite, collaborator account join, recipe candidate submission/review, shared recipe search with ICA ingredient autocomplete, and add-to-plan collaboration
 - **Birthdays** — Route `/birthdays`; shared birthday/event view available to collaborators
+- **Trip Ops** — Route `/trips`; family travel logistics, structured participants, curated preference suggestions (`/trips/preferences`), option shortlist, decisions, itinerary blocks, and trip task conversion
 - **Growing** — Seasonal suggestions, sources, knowledge, windows
 
 ## Interactions

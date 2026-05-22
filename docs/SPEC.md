@@ -28,7 +28,8 @@ One user: a busy dad in Stockholm who checks email every morning and has fragmen
 | Recipe sharing | [requirements/recipe-generator.md](requirements/recipe-generator.md) | `/recipes` hub with read-only recipe/style shares via opaque URL (`/recipes/shared/[slug]`) |
 | Vietnamese meals | [requirements/vietnamese-meals.md](requirements/vietnamese-meals.md) | Curated Vietnamese meal catalog for recipe inspiration and future tourist app reuse |
 | Promo shopping pipeline (phases) | [requirements/promo-shopping-pipeline-phases.md](requirements/promo-shopping-pipeline-phases.md) | Later sub-phases B–G (crawl, DB, matching, meals) around promos + shared list |
-| Learning | [requirements/learning.md](requirements/learning.md) | Topic/category lessons; multi-agent specialization → Phase 11 (`docs/phases/11-learning-agents/`) |
+| Trip Ops | [requirements/trip-ops.md](requirements/trip-ops.md) | `/trips`; logistics, structured participants, curated preferences, decisions, itinerary blocks, and trip tasks |
+| Learning | [requirements/learning.md](requirements/learning.md) | Topic/category lessons; multi-agent specialization → Phase 12 (`docs/phases/12-learning-agents/`) |
 
 ## Data Schema (Supabase)
 
@@ -44,6 +45,7 @@ One user: a busy dad in Stockholm who checks email every morning and has fragmen
 | `growing_windows` | id, item_name, suggestion_kind, start_month, end_month, stockholm_note | Seasonal activity catalog |
 | `growing_knowledge` | id, source_id, title, content, category | Reference nuggets from sources |
 | `growing_suggestions_log` | id, window_id, week_number, title, details, status, converted_task_id | Weekly suggestion lifecycle (ISO week number) |
+| `trips` / `trip_options` / `trip_decisions` / `trip_itinerary_items` / `trip_preference_suggestions` | household-visible trip plan rows plus user-owned preference suggestions | [trip-ops.md](requirements/trip-ops.md) |
 | `cook_plans` / `cook_plan_items` | (planned) user’s **plan to cook**; FK to `saved_recipes` | [shared-shopping-list.md](requirements/shared-shopping-list.md) |
 | `shared_shopping_lists` / `shared_shopping_list_items` | (planned) opaque `public_slug`; items: label, line state, optional `source_recipe_id` | Output of prepare; shareable buy list |
 | `recipe_share_links` | opaque `public_slug`, `scope_type`, optional `recipe_id` / `food_type_id`, `disabled_at` | Read-only public recipe or food-style share links |

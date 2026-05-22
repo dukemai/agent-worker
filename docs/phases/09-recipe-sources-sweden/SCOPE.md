@@ -33,5 +33,5 @@ Optional later: **grounding** from a curated corpus or RAG—v1 is **generate-fi
 
 ## Related phases
 
-- [Phase 10: YouTube knowledge extraction](../10-youtube-knowledge-extraction/SCOPE.md) — separate pipeline.
-- [Phase 11: Learning agent specialization](../11-learning-agents/SCOPE.md).
+- [Phase 11: YouTube knowledge extraction](../11-youtube-knowledge-extraction/SCOPE.md) — separate pipeline.
+- [Phase 12: Learning agent specialization](../12-learning-agents/SCOPE.md).

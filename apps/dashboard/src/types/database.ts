@@ -6,6 +6,24 @@ export type LearningProfileType = "topic" | "category";
 export type GrowingSuggestionKind = "action" | "inspiration";
 export type GrowingSuggestionStatus = "pending" | "dismissed" | "converted" | "done";
 export type GrowingSourceStatus = "queued" | "processing" | "done" | "failed";
+export type TripStatus = "ideas" | "planning" | "upcoming" | "archived";
+export type TripOptionStatus = "maybe" | "shortlisted" | "planned" | "rejected";
+export type TripOptionType = "activity" | "food" | "rainy_day" | "scenic_stop" | "logistics" | "other";
+export type TripEffort = "low" | "medium" | "high";
+export type TripWeatherFit = "sun" | "rain" | "any";
+export type TripKidFit = "low" | "medium" | "high";
+export type TripDecisionStatus = "open" | "waiting" | "decided";
+export type TripItineraryBlock = "morning" | "lunch" | "afternoon" | "backup" | "drop_first";
+export type TripPreferenceCategory =
+  | "pace"
+  | "kids"
+  | "weather"
+  | "food"
+  | "nature"
+  | "culture"
+  | "logistics"
+  | "budget"
+  | "planning";
 export type GrowingKnowledgeCategory =
   | "technique"
   | "plant-profile"
@@ -165,6 +183,113 @@ export interface Birthday {
   wishlist: string | null;
   notes: string | null;
   status: BirthdayStatus;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface Trip {
+  id: string;
+  user_id: string;
+  household_id: string | null;
+  title: string;
+  destination: string;
+  status: TripStatus;
+  start_date: string | null;
+  end_date: string | null;
+  logistics: string | null;
+  participants: string | null;
+  adult_count: number;
+  kid_count: number;
+  kid_ages: number[];
+  already_done: string | null;
+  already_done_items: unknown[];
+  preferences: string | null;
+  selected_preferences: string[];
+  logistics_details: Record<string, unknown>;
+  notes: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface TripPreferenceSuggestion {
+  id: string;
+  user_id: string;
+  category: TripPreferenceCategory;
+  label: string;
+  description: string | null;
+  preference_text: string;
+  tags: string[];
+  sort_order: number;
+  active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface TripKnowledgeItem {
+  id: string;
+  trip_id: string;
+  title: string;
+  source_url: string | null;
+  raw_markdown: string;
+  extraction: Record<string, unknown>;
+  status: "queued" | "processed" | "failed";
+  error_message: string | null;
+  tags: string[];
+  extracted_at: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface TripKnowledgeFavorite {
+  id: string;
+  trip_id: string;
+  item_type: "place" | "activity";
+  name: string;
+  area: string;
+  created_at: string;
+}
+
+export interface TripOption {
+  id: string;
+  trip_id: string;
+  title: string;
+  option_type: TripOptionType;
+  status: TripOptionStatus;
+  location: string | null;
+  best_for: string | null;
+  effort: TripEffort | null;
+  weather_fit: TripWeatherFit | null;
+  kid_fit: TripKidFit | null;
+  booking_needed: boolean;
+  why: string | null;
+  notes: string | null;
+  sort_order: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface TripDecision {
+  id: string;
+  trip_id: string;
+  title: string;
+  status: TripDecisionStatus;
+  owner: string | null;
+  due_date: string | null;
+  outcome: string | null;
+  notes: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface TripItineraryItem {
+  id: string;
+  trip_id: string;
+  day_number: number;
+  block: TripItineraryBlock;
+  title: string;
+  option_id: string | null;
+  notes: string | null;
+  sort_order: number;
   created_at: string;
   updated_at: string;
 }

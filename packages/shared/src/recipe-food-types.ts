@@ -22,7 +22,6 @@ export const RECIPE_FOOD_TYPE_OPTIONS: RecipeFoodTypeOption[] = [
   { id: "spanish-tapas", label: "Spanskt / tapas" },
   { id: "brunch-breakfast-light", label: "Brunch / frukost / lätt lunch" },
   { id: "soup-stew", label: "Soppa / gryta / mustigt" },
-  { id: "quick-weekday", label: "Snabb vardagsmiddag" },
   { id: "fest-weekend", label: "Fest / helg" },
   { id: "grill-summer", label: "Grill / sommar" },
 ];

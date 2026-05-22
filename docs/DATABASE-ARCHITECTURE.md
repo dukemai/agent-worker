@@ -19,6 +19,10 @@ erDiagram
     growing_sources ||--o{ growing_windows : "defines"
     
     learning_profile ||--o{ learning_log : "tracks"
+    trips ||--o{ trip_options : "collects"
+    trips ||--o{ trip_decisions : "tracks"
+    trips ||--o{ trip_itinerary_items : "plans"
+    trip_options ||--o{ trip_itinerary_items : "can seed"
 ```
 
 ---
@@ -54,6 +58,19 @@ A curriculum-based system for daily micro-learning.
 | `learning_profile` | Defines topics and current learning progress. | - |
 | `learning_log` | History of daily lessons and user feedback. | `profile_id` -> `learning_profile.id` |
 
+### 4. Trip Ops
+Family travel planning with dedicated user-owned rows and task integration.
+
+| Table | Purpose | Key Relationships |
+|-------|---------|-------------------|
+| `trips` | Trip shell: lifecycle, dates, logistics, participants, already-done history, preferences. Household-visible when attached to a household. | `user_id` -> `auth.users.id`, nullable `household_id` -> `households.id` |
+| `trip_options` | Comparable activities, food stops, rainy-day backups, logistics options. | `trip_id` -> `trips.id` |
+| `trip_decisions` | Open/waiting/decided trip choices. | `trip_id` -> `trips.id` |
+| `trip_itinerary_items` | Loose day/block itinerary rows. | `trip_id` -> `trips.id`, optional `option_id` -> `trip_options.id` |
+| `trip_preference_suggestions` | User-owned curated preference catalog for the suggestion picker. | `user_id` -> `auth.users.id` |
+| `trip_knowledge_items` | Raw Markdown inspiration plus extracted trip knowledge used by option suggestions. | `trip_id` -> `trips.id` |
+| `trip_knowledge_favorites` | Favorited merged places and activities from trip knowledge. | `trip_id` -> `trips.id` |
+
 ---
 
 ## Key Connections & Data Flow
@@ -65,9 +82,10 @@ A curriculum-based system for daily micro-learning.
 
 ### Task Conversion & Metadata
 Tasks generated from other domains (like Renewals or Growing) store their origin in both direct columns and the `metadata` JSONB column:
-- `item_type`: "growing", "renewal", "promotion"
+- `item_type`: "growing", "renewal", "promotion", "trip_task"
 - `window_id` (UUID): Direct reference to `growing_windows.id` (for growing tasks).
 - `suggestion_id`: The specific log entry from the weekly run.
+- `trip_id`: Trip Ops reference for trip planning tasks.
 
 ---
 

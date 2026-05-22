@@ -175,11 +175,10 @@ Committed file: [`apps/dashboard/public/data/recipe-food-types.json`](../../apps
 | `spanish-tapas` | Spanskt / tapas |
 | `brunch-breakfast-light` | Brunch / frukost / lätt lunch |
 | `soup-stew` | Soppa / gryta / mustigt |
-| `quick-weekday` | Snabb vardagsmiddag |
 | `fest-weekend` | Fest / helg |
 | `grill-summer` | Grill / sommar |
 
-**Rationale (Sweden):** Covers **husman** and **fisk/skaldjur** (very common home and store focus), **major restaurant cuisines** available in most Swedish cities (Italian, various Asian, Indian, Middle Eastern, American, Mexican), **Mediterranean** cluster, **everyday vs fest**, **soup/stew**, **quick weekday**, and **grill** (strong seasonal pattern).
+**Rationale (Sweden):** Covers **husman** and **fisk/skaldjur** (very common home and store focus), **major restaurant cuisines** available in most Swedish cities (Italian, various Asian, Indian, Middle Eastern, American, Mexican), **Mediterranean** cluster, **brunch/light lunch**, **fest/weekend**, **soup/stew**, and **grill** (strong seasonal pattern).
 
 **Vegetarian** is **not** a row in this list — it is only the **checkbox** so it can combine with any food type (e.g. `italian` + vegetarian).
 

@@ -1,6 +1,7 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { Trash2 } from "lucide-react";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { Badge } from "@/components/ui/badge";
@@ -9,6 +10,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { formatRecipeDifficulty } from "@/lib/recipe-difficulty";
 import {
   addRecipeToCookPlan,
+  clearCurrentWeeklyPromotions,
   fetchWeeklyPromotionMatches,
   fetchWeeklyPromotionStores,
   fetchWeeklyPromotions,
@@ -110,6 +112,24 @@ export function PromoWeeklyPromotionsSection() {
     mutationFn: filterWeeklyPromotionRuns,
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ["weekly-promotions-matches"] });
+      setViewMode("matches");
+    },
+  });
+
+  const clearMutation = useMutation({
+    mutationFn: () => clearCurrentWeeklyPromotions(selectedStoreQueryKey || null),
+    onSuccess: async () => {
+      setSelectedMatchIds([]);
+      setRequestedMatchKey("");
+      setSelectedRecipeIds([]);
+      setAddedRecipeIds(new Set());
+      recommendationsMutation.reset();
+      addRecommendationsMutation.reset();
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ["weekly-promotion-stores"] }),
+        queryClient.invalidateQueries({ queryKey: ["weekly-promotions-current"] }),
+        queryClient.invalidateQueries({ queryKey: ["weekly-promotions-matches"] }),
+      ]);
       setViewMode("matches");
     },
   });
@@ -225,6 +245,8 @@ export function PromoWeeklyPromotionsSection() {
     importMutation.error instanceof Error ? importMutation.error.message : null;
   const filterError =
     filterMutation.error instanceof Error ? filterMutation.error.message : null;
+  const clearError =
+    clearMutation.error instanceof Error ? clearMutation.error.message : null;
   const loadError =
     promotionsQuery.error instanceof Error
       ? promotionsQuery.error.message
@@ -367,8 +389,10 @@ export function PromoWeeklyPromotionsSection() {
             {filterMutation.data.watchlistCount} watchlist items.
           </p>
         ) : null}
-        {importError || filterError || loadError ? (
-          <p className="text-sm text-red-600">{importError ?? filterError ?? loadError}</p>
+        {importError || filterError || clearError || loadError ? (
+          <p className="text-sm text-red-600">
+            {importError ?? filterError ?? clearError ?? loadError}
+          </p>
         ) : null}
 
         {promotionsQuery.isLoading ? (
@@ -424,6 +448,31 @@ export function PromoWeeklyPromotionsSection() {
                 All promotions ({promotions.length})
               </Button>
             </div>
+            <Button
+              type="button"
+              variant="destructive"
+              size="sm"
+              className="w-full sm:w-auto"
+              disabled={
+                clearMutation.isPending || importMutation.isPending || filterMutation.isPending
+              }
+              onClick={() => {
+                const target =
+                  selectedStoreKey === CURRENT_WEEK_FILTER
+                    ? "all current-week promotion imports"
+                    : `current-week promotion imports for ${selectedStoreKey}`;
+                if (
+                  window.confirm(
+                    `Clear ${target}? This removes imported offers and matches so you can reimport clean data.`,
+                  )
+                ) {
+                  clearMutation.mutate();
+                }
+              }}
+            >
+              <Trash2 className="size-4" aria-hidden />
+              {clearMutation.isPending ? "Clearing..." : "Clear weekly offers"}
+            </Button>
           </div>
         ) : null}
 

@@ -76,7 +76,8 @@ Full schema in [SPEC.md](SPEC.md).
 | 07-stability-and-polish | Growing weekly stability, supporting knowledge, dashboard polish |
 | 08-meal-shopping-from-promotions | Meal plan + shopping list from promotion letters |
 | 09-recipe-sources-sweden | Recipe generator UI, AI suggestions, `saved_recipes` + **tested**; optional corpus/RAG later |
-| 10-youtube-knowledge-extraction | YouTube → growing knowledge pipeline and UX |
-| 11-learning-agents | Per-topic learning agents, cadence, progression memory |
+| 10-trip-ops | Family trip planning: logistics, options, decisions, itinerary blocks, tasks, digest |
+| 11-youtube-knowledge-extraction | YouTube → growing knowledge pipeline and UX |
+| 12-learning-agents | Per-topic learning agents, cadence, progression memory |
 
 Details in `docs/phases/NN-name/SCOPE.md`.

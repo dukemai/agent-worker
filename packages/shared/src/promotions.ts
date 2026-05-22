@@ -41,6 +41,11 @@ const DEFAULT_PROMOTION_MATCH_RULES: WeeklyPromotionMatchRulesByInterest = {
     blockedTerms: ["rengöringssvamp", "disksvamp", "tvättsvamp"],
     allowedCategoryTerms: ["svamp", "frukt", "grönt", "färskvaror"],
   },
+  "smör": {
+    aliases: ["smör"],
+    blockedTerms: ["smörgås", "smörgåsmat"],
+    allowedCategoryTerms: ["smör", "margarin", "mejeri", "ost"],
+  },
 };
 
 function promotionTextTokens(value: string): string[] {

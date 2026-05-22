@@ -1,5 +1,12 @@
 # Dad-Ops Agent — Decision Log
 
+## 2026-05-13: [Roadmap] Phase 10 — Trip Ops; renumber YouTube → 11, learning agents → 12
+
+**Context**: A real Gotland planning need exposed a strong Dad-Ops fit: ferry tickets and dates are fixed, but deciding what to do across four days still creates family operational load. Existing Trip Ops requirements already define travel planning as decisions, options, itinerary, tasks, and digest integration rather than a booking product.
+**Decision**: Insert **Phase 10: Trip Ops** (`docs/phases/10-trip-ops/`) before YouTube knowledge extraction. Renumber **YouTube knowledge extraction** to **Phase 11** (`docs/phases/11-youtube-knowledge-extraction/`) and **Learning agent specialization** to **Phase 12** (`docs/phases/12-learning-agents/`). The first validation use case is planning a four-day Gotland trip while prioritizing places not already visited.
+**Alternatives considered**: Keep Trip Ops as an unnumbered future candidate (rejected: the current trip is a concrete product validation case); put Trip Ops after learning agents (rejected: travel planning is closer to core ops/task load and has immediate utility).
+**Status**: accepted
+
 ## 2026-04-09: [Shared shopping list] Phase A — opaque URL, dedicated tables, read-only public
 
 **Context:** Need a shippable “mini buy list” share link before full weekly ICA crawl + promotions DB.
@@ -10,7 +17,7 @@
 ## 2026-04-08: [Roadmap] Phase 09 — Swedish recipe sources; renumber YouTube → 10, learning agents → 11
 
 **Context**: Meal planning from promos benefits from a deliberate recipe corpus for Sweden; YouTube extraction and learning agents were already numbered 9 and 10.
-**Decision**: Insert **Phase 9: Swedish recipe sources & grounding** (`docs/phases/09-recipe-sources-sweden/`). Renumber **YouTube knowledge extraction** to **Phase 10** (`docs/phases/10-youtube-knowledge-extraction/`) and **Learning agent specialization** to **Phase 11** (`docs/phases/11-learning-agents/`). Earlier decisions that refer to “Phase 9 = YouTube” and “Phase 10 = learning agents” describe the pre-2026-04-08 numbering.
+**Decision**: Insert **Phase 9: Swedish recipe sources & grounding** (`docs/phases/09-recipe-sources-sweden/`). Renumber **YouTube knowledge extraction** to **Phase 10** (`docs/phases/10-youtube-knowledge-extraction/`) and **Learning agent specialization** to **Phase 11** (`docs/phases/11-learning-agents/`). Earlier decisions that refer to “Phase 9 = YouTube” and “Phase 10 = learning agents” describe the pre-2026-04-08 numbering. A later 2026-05-13 decision moved these again to Phase 11 and Phase 12.
 **Alternatives considered**: Fold recipe work into Phase 8 (rejected: Phase 8 is watchlist + promo import + meal-plan v1); defer recipe phase without a number (rejected: you want it scheduled explicitly).
 **Status**: accepted
 
@@ -26,14 +33,14 @@
 **Context**: After re-scoping phases 8–9, learning agent specialization no longer had a numbered phase.
 **Decision**: Schedule **Phase 10: Learning Agent Specialization** (per-topic agents, cadence, progression) **after Phase 9** (YouTube knowledge extraction). Documented in `docs/phases/10-learning-agents/SCOPE.md` and `docs/ROADMAP.md`.
 **Alternatives considered**: Keep learning agents only in a vague “deferred” bucket (rejected: you still want it on the roadmap); merge agents into Phase 9 (rejected: different scope—ingestion vs agent behavior).
-**Status**: accepted
+**Status**: accepted; superseded by later roadmap renumbering on 2026-04-08 and 2026-05-13.
 
 ## 2026-04-03: [Roadmap] Phases 8–9 — meal/shopping from promotions, YouTube knowledge extraction
 
 **Context**: Phase 7 (stability & polish) is complete. Former planned work included a state-tracker mobile app (`08-state-tracker`) and learning-agent specialization (`09-learning-agents`).
 **Decision**: Numbered phases **8** and **9** are now **meal & shopping plan from promotion letters** and **YouTube → growing knowledge extraction**, respectively. State-tracker remains **deferred** (listed in `docs/ROADMAP.md`). Learning agents are **Phase 10** (see decision above).
 **Alternatives considered**: Keep old phase folders and insert new phases as 10/11 (rejected: would desync mental model and ROADMAP numbering); merge both new ideas into one phase (rejected: different domains and delivery paths).
-**Status**: accepted
+**Status**: accepted; superseded by later roadmap renumbering on 2026-04-08 and 2026-05-13.
 
 ## 2026-02-25: [Phase 5] Growing suggestions: generate Sun/Wed, show in digest Mon/Fri
 

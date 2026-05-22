@@ -29,6 +29,11 @@ const PROMOTION_MATCH_RULES: Record<string, PromotionMatchRule> = {
     blockedTerms: ["rengöringssvamp", "disksvamp", "tvättsvamp"],
     allowedCategoryTerms: ["svamp", "frukt", "grönt", "färskvaror"],
   },
+  "smör": {
+    aliases: ["smör"],
+    blockedTerms: ["smörgås", "smörgåsmat"],
+    allowedCategoryTerms: ["smör", "margarin", "mejeri", "ost"],
+  },
 };
 
 function tokens(s: string): string[] {

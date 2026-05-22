@@ -90,6 +90,15 @@ test.describe("match-promotions (watchlist)", () => {
     expect(scoreInterestAgainstPromotion(p, "majs")).toBe(100);
   });
 
+  test("does not match smör inside smörgås compounds", () => {
+    const p = samplePromo({
+      title: "Smörgåsmat",
+      cardText: "Chark och pålägg till smörgås. 99 kr/kg.",
+      categoryName: "Kött, Chark & Fågel",
+    });
+    expect(scoreInterestAgainstPromotion(p, "smör")).toBe(0);
+  });
+
   test("matchPromotionsToWatchlist returns sorted hits", () => {
     const promotions: ScrapedPromotion[] = [
       samplePromo({ index: 0, title: "Gräddfilé", cardText: "Gräddfilé 500g" }),
