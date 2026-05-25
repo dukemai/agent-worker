@@ -59,7 +59,8 @@ dashboard/src/
 | `/recipes/[id]/cook` | Focused recipe cooking view | `GET /api/recipes/[id]/cook`, optional `PATCH /api/recipes/[id]` for owner feedback |
 | `/recipes/shared/[slug]` | Public recipe share | `GET /api/public/recipe-shares/[slug]` via anon RPC |
 | `/trips` | Trip Ops list | `GET/POST /api/trips` |
-| `/trips/[id]` | Trip Ops detail | `GET/PATCH /api/trips/[id]`, nested options, decisions, itinerary, starter, tasks |
+| `/trips/[id]` | Trip Ops detail | `GET/PATCH /api/trips/[id]`, nested options, decisions, itinerary, starter, tasks, share links |
+| `/trips/shared/[slug]` | Public trip share | `GET /api/public/trip-shares/[slug]` via anon RPC |
 | `/trips/preferences` | Trip preference admin | `GET/POST /api/trip-preference-suggestions`, `PATCH/DELETE /api/trip-preference-suggestions/[id]` |
 | `/vietnamese-meals` | Vietnamese meals | `GET/POST /api/vietnamese-meals`, enrichment, recipe suggestions, recipe links |
 

@@ -25,6 +25,7 @@ This use case should shape the MVP flow:
 - **Trips list**: group trips by lifecycle (`ideas`, `planning`, `upcoming`, `archived`).
 - **Trip detail page**: dense operational view with Overview, Options, Decisions, Tasks, Itinerary, and Notes.
 - **Known logistics**: dates, destination, participants, travel/accommodation notes, important links.
+- **Accommodation timing**: multiple stays can be extracted into structured logistics and added to the itinerary as separate check-in/check-out blocks.
 - **Structured participants**: adult count, kid count, and kid ages alongside freeform participant notes.
 - **Already done / avoid list**: reusable travel memory so suggestions prioritize new places.
 - **Curated preferences**: admin-managed preference catalog with picker modal on trip detail.
@@ -34,6 +35,7 @@ This use case should shape the MVP flow:
 - **Task integration**: create trip-related rows in `tasks` using `metadata.item_type = "trip_task"` and `metadata.trip_id`.
 - **Digest integration**: upcoming trip tasks and near-trip planning reminders appear in the morning digest.
 - **Gotland starter**: seed editable shortlist, decisions, and itinerary blocks for the first validation trip.
+- **Public trip links**: create opaque read-only links for friends to view a trip without signing in.
 
 ## Product Principles
 
@@ -75,7 +77,7 @@ Structured counts, selected preferences, future logistics extraction, and future
 - Daily automation for extracting queued Markdown trip knowledge items.
 - AI extraction from prior-visit notes into `already_done_items`.
 - Dedicated digest section for upcoming trip planning reminders.
-- Group trip sharing and lightweight voting.
+- Lightweight voting.
 
 ## Acceptance Criteria
 

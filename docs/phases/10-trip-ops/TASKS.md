@@ -15,16 +15,19 @@
 - [x] Add `Suggest preferences` modal backed by active curated preferences.
 - [x] Add trip knowledge base for Markdown inspiration, AI extraction, and option-suggestion grounding.
 - [x] Add merged knowledge overview for places and activities across processed sources.
+- [x] Add story extraction and a Stories knowledge tab for historical, natural, cultural, and kid-friendly destination context.
 
 ## Follow-Ups
 
-- [ ] Add story extraction for historical, nature, cultural, and kid-friendly context attached to places and activities.
+- [x] Add story extraction for historical, nature, cultural, and kid-friendly context attached to places and activities.
 - [x] Add real AI generation from trip constraints and already-visited history.
 - [x] Add AI extraction for logistics notes into `logistics_details`.
+- [x] Add multi-accommodation check-in/check-out logistics and itinerary presets.
 - [ ] Add AI extraction for already-done / avoid-repeat notes into `already_done_items`.
 - [ ] Add daily automation for extracting queued trip knowledge items.
 - [ ] Add edit/delete flows for options, decisions, and itinerary items beyond status changes.
 - [ ] Add daily digest rendering of upcoming trip tasks as a dedicated section.
 - [x] Add account-backed household sharing for trip workspaces.
-- [ ] Add lightweight external sharing/voting for group trips after household sharing is stable.
+- [x] Add lightweight read-only external trip sharing after household sharing is stable.
+- [ ] Add lightweight external voting for group trips.
 - [ ] Add browser smoke coverage after a seeded auth session or local test harness exists.

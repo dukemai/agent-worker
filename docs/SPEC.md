@@ -45,7 +45,7 @@ One user: a busy dad in Stockholm who checks email every morning and has fragmen
 | `growing_windows` | id, item_name, suggestion_kind, start_month, end_month, stockholm_note | Seasonal activity catalog |
 | `growing_knowledge` | id, source_id, title, content, category | Reference nuggets from sources |
 | `growing_suggestions_log` | id, window_id, week_number, title, details, status, converted_task_id | Weekly suggestion lifecycle (ISO week number) |
-| `trips` / `trip_options` / `trip_decisions` / `trip_itinerary_items` / `trip_preference_suggestions` | household-visible trip plan rows plus user-owned preference suggestions | [trip-ops.md](requirements/trip-ops.md) |
+| `trips` / `trip_options` / `trip_decisions` / `trip_itinerary_items` / `trip_preference_suggestions` / `trip_share_links` | household-visible trip plan rows, user-owned preference suggestions, and read-only public trip links | [trip-ops.md](requirements/trip-ops.md) |
 | `cook_plans` / `cook_plan_items` | (planned) user’s **plan to cook**; FK to `saved_recipes` | [shared-shopping-list.md](requirements/shared-shopping-list.md) |
 | `shared_shopping_lists` / `shared_shopping_list_items` | (planned) opaque `public_slug`; items: label, line state, optional `source_recipe_id` | Output of prepare; shareable buy list |
 | `recipe_share_links` | opaque `public_slug`, `scope_type`, optional `recipe_id` / `food_type_id`, `disabled_at` | Read-only public recipe or food-style share links |

@@ -9,6 +9,7 @@ import type {
   TripOption,
   TripPreferenceSuggestion,
 } from "@/types/database";
+import type { TripShareLink } from "@/lib/trip-shares/types";
 import { readApiError } from "@/components/dashboard/tasks/api";
 
 export type TripDetail = {
@@ -34,6 +35,11 @@ export type CreateTripPayload = {
   already_done?: string | null;
   preferences?: string | null;
   selected_preferences?: string[];
+};
+
+export type CreateTripSharePayload = {
+  tripId: string;
+  title?: string;
 };
 
 export async function fetchTrips(): Promise<Trip[]> {
@@ -69,6 +75,28 @@ export async function updateTrip(id: string, payload: Partial<CreateTripPayload 
   if (!response.ok) await readApiError(response, "Failed to update trip");
   const json = (await response.json()) as { trip: Trip };
   return json.trip;
+}
+
+export async function fetchTripShares(): Promise<TripShareLink[]> {
+  const response = await fetch("/api/trip-shares", { cache: "no-store" });
+  if (!response.ok) await readApiError(response, "Failed to fetch trip shares");
+  const json = (await response.json()) as { links: TripShareLink[] };
+  return json.links ?? [];
+}
+
+export async function createTripShare(payload: CreateTripSharePayload): Promise<{ link: TripShareLink; reused: boolean }> {
+  const response = await fetch("/api/trip-shares", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+  if (!response.ok) await readApiError(response, "Failed to create trip share");
+  return (await response.json()) as { link: TripShareLink; reused: boolean };
+}
+
+export async function disableTripShare(id: string): Promise<void> {
+  const response = await fetch(`/api/trip-shares/${encodeURIComponent(id)}`, { method: "DELETE" });
+  if (!response.ok) await readApiError(response, "Failed to disable trip share");
 }
 
 export async function extractTripLogisticsDetails(id: string, logistics: string): Promise<Trip> {

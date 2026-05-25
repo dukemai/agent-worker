@@ -32,6 +32,7 @@ Each trip should capture:
 - Structured participant counts and kid ages
 - Travel options
 - Accommodation options
+- Multiple accommodations with separate check-in and check-out timing
 - Food plans
 - Activities
 - Decisions
@@ -158,6 +159,7 @@ A trip detail page should provide these sections:
 - Notes
 
 The page should be practical and dense, closer to an operations dashboard than a travel inspiration site.
+The itinerary should support fixed logistics blocks for arrival, departure, and accommodation check-in/check-out. Trips may include multiple accommodations, so structured logistics should preserve each stay separately and allow each stay's check-in and check-out to become itinerary blocks.
 
 ### Trip List
 
@@ -178,7 +180,7 @@ Useful AI flows:
 - Merge processed trip knowledge into an overview grouped by canonical Gotland areas, with duplicate places, activities, and area-name variants combined across sources
 - Favorite merged places and activities so promising candidates can be carried forward into options and itinerary planning
 - Create trip options directly from refined knowledge places or activities
-- Attach optional stories to places and activities so visits can include historical, natural, cultural, or kid-friendly context
+- Attach optional stories to places and activities so visits can include historical, natural, cultural, or kid-friendly context, surfaced separately from itinerary options
 - Generate starter trip knowledge from logistics and preferences when the user has not collected sources yet
 - Preview and edit the option-generation prompt before sending it to AI
 - Turn a messy pasted note into structured trip options
@@ -200,10 +202,15 @@ to the creator's household when one exists or can be created, and household
 members can open the trip list/detail workspace and collaborate on trip options,
 decisions, itinerary blocks, knowledge, and favorites.
 
-Later versions can add lighter external sharing:
+Trip plans can also be shared externally through opaque read-only public links at
+`/trips/shared/[slug]`. These links are meant for friends or other families who
+should see the current plan without signing in. The public payload includes trip
+basics, participant counts, selected preferences, options, decisions, itinerary
+blocks, and knowledge favorites. It intentionally omits authenticated task rows
+and raw knowledge Markdown, and does not expose rejected options.
 
-- Opaque read-only trip link
-- Shared option list
+Later versions can add lighter external participation:
+
 - Simple preference or vote capture
 - Per-family status such as `waiting`, `confirmed`, or `declined`
 

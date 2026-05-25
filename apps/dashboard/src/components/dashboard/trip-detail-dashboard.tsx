@@ -1,10 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import type { ReactNode } from "react";
+import { Fragment, type ReactNode } from "react";
 import { useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ArrowDown, ArrowLeft, ArrowUp, BookOpenText, Bug, CalendarPlus, Check, CheckCircle2, Circle, ClipboardList, Eye, MapPinned, MoreHorizontal, Pencil, Plus, Sparkles, Star, Trash2, X, XCircle } from "lucide-react";
+import { ArrowDown, ArrowLeft, ArrowUp, BookOpenText, Bug, CalendarPlus, Check, CheckCircle2, Circle, ClipboardList, Copy, ExternalLink, Eye, Link2, MapPinned, MoreHorizontal, Pencil, Plus, Sparkles, Star, Trash2, X, XCircle } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -20,6 +20,7 @@ import {
   createTripDecision,
   createTripItineraryItem,
   createTripOption,
+  createTripShare,
   createTripTask,
   deleteTripItineraryItem,
   deleteTripKnowledge,
@@ -27,10 +28,12 @@ import {
   deleteTripDecision,
   deleteTripOption,
   deleteTripTask,
+  disableTripShare,
   extractTripKnowledgeItem,
   extractTripLogisticsDetails,
   fetchTripDetail,
   fetchTripPreferenceSuggestions,
+  fetchTripShares,
   generateTripKnowledgeStarterForTrip,
   previewTripOptionsPromptForTrip,
   suggestTripOptionsForTrip,
@@ -81,6 +84,7 @@ export function TripDetailDashboard({ tripId }: { tripId: string }) {
             <p className="text-sm text-muted-foreground">{detail.trip.destination || "No destination"} · {formatDates(detail.trip)}</p>
           </div>
         </div>
+        <TripShareControl tripId={tripId} tripTitle={detail.trip.title} onError={setError} />
       </div>
       {error ? <p className="rounded-md border border-destructive/30 bg-destructive/5 p-3 text-sm text-destructive">{error}</p> : null}
 
@@ -354,6 +358,99 @@ function TripLogisticsSummary({ trip, preferenceCatalog }: { trip: Trip; prefere
   );
 }
 
+function TripShareControl({
+  tripId,
+  tripTitle,
+  onError,
+}: {
+  tripId: string;
+  tripTitle: string;
+  onError: (error: string | null) => void;
+}) {
+  const queryClient = useQueryClient();
+  const [lastCopiedSlug, setLastCopiedSlug] = useState<string | null>(null);
+  const sharesQuery = useQuery({ queryKey: ["trip-shares"], queryFn: fetchTripShares });
+  const activeShare = (sharesQuery.data ?? []).find((link) => link.trip_id === tripId && !link.disabled_at);
+
+  const createMutation = useMutation({
+    mutationFn: () => createTripShare({ tripId, title: tripTitle }),
+    onSuccess: async (data) => {
+      await queryClient.invalidateQueries({ queryKey: ["trip-shares"] });
+      await copyShareUrl(data.link.public_slug);
+      onError(null);
+    },
+    onError: (err) => onError(err instanceof Error ? err.message : "Failed to create share link"),
+  });
+
+  const disableMutation = useMutation({
+    mutationFn: (id: string) => disableTripShare(id),
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["trip-shares"] });
+      setLastCopiedSlug(null);
+      onError(null);
+    },
+    onError: (err) => onError(err instanceof Error ? err.message : "Failed to disable share link"),
+  });
+
+  async function copyShareUrl(slug: string) {
+    const url = `${window.location.origin}/trips/shared/${slug}`;
+    await navigator.clipboard.writeText(url);
+    setLastCopiedSlug(slug);
+  }
+
+  const disabled = sharesQuery.isLoading || createMutation.isPending || disableMutation.isPending;
+
+  return (
+    <div className="flex flex-wrap items-center gap-2">
+      {activeShare ? (
+        <>
+          <Button
+            type="button"
+            variant="secondary"
+            size="sm"
+            disabled={disabled}
+            onClick={() => void copyShareUrl(activeShare.public_slug)}
+          >
+            <Copy className="size-4" aria-hidden />
+            {lastCopiedSlug === activeShare.public_slug ? "Copied" : "Copy public link"}
+          </Button>
+          <Button asChild variant="outline" size="icon" title="Open public trip link">
+            <Link href={`/trips/shared/${activeShare.public_slug}`} target="_blank">
+              <ExternalLink className="size-4" aria-hidden />
+            </Link>
+          </Button>
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            disabled={disabled}
+            title="Disable public trip link"
+            aria-label={`Disable public link for ${tripTitle}`}
+            onClick={() => {
+              if (window.confirm(`Disable public link for "${tripTitle}"? Friends with the link will lose access.`)) {
+                void disableMutation.mutateAsync(activeShare.id);
+              }
+            }}
+          >
+            <Trash2 className="size-4" aria-hidden />
+          </Button>
+        </>
+      ) : (
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          disabled={disabled}
+          onClick={() => void createMutation.mutateAsync()}
+        >
+          <Link2 className="size-4" aria-hidden />
+          {createMutation.isPending ? "Creating..." : "Share"}
+        </Button>
+      )}
+    </div>
+  );
+}
+
 function SummaryGroup({ title, rows, empty, compact = false }: { title: string; rows: [string, string][]; empty?: string; compact?: boolean }) {
   return (
     <section className={`${compact ? "space-y-2 p-2.5" : "space-y-3 p-3"} rounded-md border bg-background`}>
@@ -465,6 +562,7 @@ function ExtractedLogistics({ details }: { details: Record<string, unknown> | nu
   if (!details || Object.keys(details).length === 0) {
     return null;
   }
+  const accommodations = getAccommodationLogistics(details);
 
   const scalarRows = [
     ["Transport", details.transport_mode],
@@ -472,11 +570,8 @@ function ExtractedLogistics({ details }: { details: Record<string, unknown> | nu
     ["Outbound arrive", joinParts(details.outbound_arrival_location, details.outbound_arrival_time)],
     ["Return depart", joinParts(details.return_departure_location, details.return_departure_time)],
     ["Return arrive", joinParts(details.return_arrival_location, details.return_arrival_time)],
-    ["Accommodation", joinParts(details.accommodation_name, details.accommodation_address)],
     ["Base area", details.base_area],
     ["Local transport", details.local_transport],
-    ["Check-in", details.check_in_time],
-    ["Check-out", details.check_out_time],
     ["Parking", details.parking_notes],
   ].filter((row): row is [string, string] => typeof row[1] === "string" && row[1].trim().length > 0);
 
@@ -487,7 +582,7 @@ function ExtractedLogistics({ details }: { details: Record<string, unknown> | nu
     ["Review notes", details.confidence_notes],
   ].filter((row): row is [string, string[]] => Array.isArray(row[1]) && row[1].length > 0);
 
-  if (scalarRows.length === 0 && listRows.length === 0) return null;
+  if (scalarRows.length === 0 && listRows.length === 0 && accommodations.length === 0) return null;
 
   return (
     <div className="space-y-3 md:col-span-2">
@@ -500,6 +595,26 @@ function ExtractedLogistics({ details }: { details: Record<string, unknown> | nu
             </div>
           ))}
         </dl>
+      ) : null}
+      {accommodations.length > 0 ? (
+        <div className="space-y-2">
+          <div className="text-xs font-medium text-muted-foreground">Accommodations</div>
+          <div className="space-y-2">
+            {accommodations.map((accommodation, index) => (
+              <div key={`${accommodation.name ?? "stay"}-${index}`} className="rounded-md bg-muted/30 p-2">
+                <div className="text-sm font-medium">{accommodation.name ?? `Accommodation ${index + 1}`}</div>
+                <dl className="mt-1 grid gap-1 text-sm md:grid-cols-2">
+                  {accommodation.address ? <SummaryValue label="Address" value={accommodation.address} /> : null}
+                  {accommodation.area ? <SummaryValue label="Area" value={accommodation.area} /> : null}
+                  {formatAccommodationTiming("Check-in", accommodation.check_in_date, accommodation.check_in_time)}
+                  {formatAccommodationTiming("Check-out", accommodation.check_out_date, accommodation.check_out_time)}
+                  {accommodation.booking_reference ? <SummaryValue label="Booking ref" value={accommodation.booking_reference} /> : null}
+                </dl>
+                {accommodation.notes ? <p className="mt-1 text-sm text-muted-foreground">{accommodation.notes}</p> : null}
+              </div>
+            ))}
+          </div>
+        </div>
       ) : null}
       {listRows.map(([label, values]) => (
         <div key={label}>
@@ -580,6 +695,40 @@ function buildKnowledgeOverview(knowledge: TripKnowledgeItem[], favorites: TripK
     places: sortOverviewItems(Array.from(places.values())),
     activities: sortOverviewItems(Array.from(activities.values())),
   };
+}
+
+function buildKnowledgeStories(knowledge: TripKnowledgeItem[]): KnowledgeStoryItem[] {
+  const stories = new Map<string, KnowledgeStoryItem>();
+
+  for (const item of knowledge) {
+    if (item.status !== "processed") continue;
+    for (const story of getKnowledgeStoryRows(item.extraction?.stories)) {
+      const area = getCanonicalAreaLabel(story.area);
+      const key = `${normalizeKnowledgeName(story.title)}::${normalizeKnowledgeName(story.related_place ?? "")}`;
+      const existing = stories.get(key);
+      if (existing) {
+        stories.set(key, {
+          ...existing,
+          summary: existing.summary ?? story.summary,
+          story: existing.story ?? story.story,
+          why_it_matters: existing.why_it_matters ?? story.why_it_matters,
+          what_to_notice: mergeUniqueStrings(existing.what_to_notice, story.what_to_notice),
+          good_for: mergeUniqueStrings(existing.good_for, story.good_for),
+          sourceTitles: mergeUniqueStrings(existing.sourceTitles, [item.title]),
+          sourceLinks: mergeSourceLinks(existing.sourceLinks, getKnowledgeSourceLinks(item)),
+        });
+      } else {
+        stories.set(key, {
+          ...story,
+          area,
+          sourceTitles: [item.title],
+          sourceLinks: getKnowledgeSourceLinks(item),
+        });
+      }
+    }
+  }
+
+  return Array.from(stories.values()).sort((a, b) => a.area.localeCompare(b.area) || a.title.localeCompare(b.title));
 }
 
 const UNKNOWN_AREA_LABEL = "Unknown area";
@@ -701,6 +850,10 @@ function mergeSourceLinks(current: KnowledgeSourceLink[], next: KnowledgeSourceL
   return Array.from(links.values());
 }
 
+function mergeUniqueStrings(current: string[], next: string[]) {
+  return Array.from(new Set([...current, ...next].map((value) => value.trim()).filter(Boolean)));
+}
+
 type KnowledgePlaceRow = {
   name: string;
   area: string | null;
@@ -716,6 +869,18 @@ type KnowledgeActivityRow = {
   approx_location: string | null;
   why: string | null;
   time_needed: string | null;
+};
+
+type KnowledgeStoryRow = {
+  title: string;
+  story_type: string | null;
+  area: string | null;
+  related_place: string | null;
+  summary: string | null;
+  story: string | null;
+  why_it_matters: string | null;
+  what_to_notice: string[];
+  good_for: string[];
 };
 
 function getKnowledgePlaceRows(value: unknown): KnowledgePlaceRow[] {
@@ -763,6 +928,45 @@ function getKnowledgeActivityRows(value: unknown): KnowledgeActivityRow[] {
       };
     })
     .filter((item): item is KnowledgeActivityRow => item !== null);
+}
+
+function getKnowledgeStoryRows(value: unknown): KnowledgeStoryRow[] {
+  if (!Array.isArray(value)) return [];
+  return value
+    .map((item): KnowledgeStoryRow | null => {
+      if (typeof item === "string") {
+        const title = item.trim();
+        return title
+          ? {
+              title,
+              story_type: null,
+              area: null,
+              related_place: null,
+              summary: null,
+              story: null,
+              why_it_matters: null,
+              what_to_notice: [],
+              good_for: [],
+            }
+          : null;
+      }
+      if (!item || typeof item !== "object") return null;
+      const record = item as Record<string, unknown>;
+      const title = getKnowledgeString(record.title);
+      if (!title) return null;
+      return {
+        title,
+        story_type: getKnowledgeString(record.story_type),
+        area: getKnowledgeString(record.area),
+        related_place: getKnowledgeString(record.related_place),
+        summary: getKnowledgeString(record.summary),
+        story: getKnowledgeString(record.story),
+        why_it_matters: getKnowledgeString(record.why_it_matters),
+        what_to_notice: getStringArray(record.what_to_notice),
+        good_for: getStringArray(record.good_for),
+      };
+    })
+    .filter((item): item is KnowledgeStoryRow => item !== null);
 }
 
 function getKnowledgeString(value: unknown): string | null {
@@ -814,6 +1018,7 @@ function TripKnowledgePanel({
 }: PanelProps & { knowledge: TripKnowledgeItem[]; favorites: TripKnowledgeFavorite[] }) {
   const [draft, setDraft] = useState({ title: "", source_url: "", raw_markdown: "" });
   const overview = useMemo(() => buildKnowledgeOverview(knowledge, favorites), [knowledge, favorites]);
+  const stories = useMemo(() => buildKnowledgeStories(knowledge), [knowledge]);
   const createMutation = useMutation({
     mutationFn: () => createTripKnowledge(tripId, {
       title: draft.title,
@@ -886,6 +1091,7 @@ function TripKnowledgePanel({
           Knowledge
           <Badge variant="secondary">{overview.places.length} places</Badge>
           <Badge variant="secondary">{overview.activities.length} activities</Badge>
+          <Badge variant="secondary">{stories.length} stories</Badge>
         </>
       )}
       icon={<BookOpenText className="size-4" aria-hidden />}
@@ -899,10 +1105,11 @@ function TripKnowledgePanel({
       contentClassName=""
     >
           <Tabs defaultValue="overview" className="space-y-4">
-            <TabsList className="grid w-full grid-cols-2 sm:w-fit">
+            <TabsList className="grid w-full grid-cols-3 sm:w-fit">
               <TabsTrigger value="overview">
                 Overview
               </TabsTrigger>
+              <TabsTrigger value="stories">Stories</TabsTrigger>
               <TabsTrigger value="queue">
                 Queue
                 <Badge variant="secondary" className="ml-2">{queuedCount > 0 ? `${queuedCount} queued` : knowledge.length}</Badge>
@@ -919,6 +1126,14 @@ function TripKnowledgePanel({
                   onUnfavorite={(favoriteId) => unfavoriteMutation.mutate(favoriteId)}
                   isFavoritePending={favoriteMutation.isPending || unfavoriteMutation.isPending}
                 />
+              )}
+            </TabsContent>
+
+            <TabsContent value="stories" className="space-y-4">
+              {stories.length === 0 ? (
+                <p className="text-sm text-muted-foreground">No stories yet. Extract knowledge from sources that include history, culture, nature, or local context.</p>
+              ) : (
+                <TripKnowledgeStories stories={stories} />
               )}
             </TabsContent>
 
@@ -1030,10 +1245,11 @@ function TripKnowledgeCard({
   const summary = typeof extraction.summary === "string" ? extraction.summary : null;
   const places = getKnowledgePlaceRows(extraction.places);
   const activities = getKnowledgeActivityRows(extraction.activities);
+  const stories = getKnowledgeStoryRows(extraction.stories);
   const candidateTitles = getStringArray(extraction.candidate_option_titles);
   const extractedSummary = item.status === "queued"
     ? "Not extracted"
-    : `${places.length} places · ${activities.length} activities · ${candidateTitles.length} candidates`;
+    : `${places.length} places · ${activities.length} activities · ${stories.length} stories · ${candidateTitles.length} candidates`;
 
   function resetDraft() {
     setDraft({
@@ -1186,6 +1402,16 @@ function TripKnowledgeCard({
                 }))}
               />
             ) : null}
+            {stories.length > 0 ? (
+              <KnowledgeRows
+                title="Stories"
+                rows={stories.map((story) => ({
+                  title: story.title,
+                  meta: joinParts(story.story_type?.replace(/_/g, " "), story.related_place, story.area),
+                  detail: story.summary ?? story.why_it_matters ?? story.story,
+                }))}
+              />
+            ) : null}
             {candidateTitles.length > 0 ? (
               <div className="space-y-1">
                 <div className="text-xs font-medium uppercase text-muted-foreground">Candidate options</div>
@@ -1196,7 +1422,7 @@ function TripKnowledgeCard({
                 </ul>
               </div>
             ) : null}
-            {!summary && places.length === 0 && activities.length === 0 && candidateTitles.length === 0 ? (
+            {!summary && places.length === 0 && activities.length === 0 && stories.length === 0 && candidateTitles.length === 0 ? (
               <p className="text-sm text-muted-foreground">No extracted knowledge yet.</p>
             ) : null}
           </div>
@@ -1256,6 +1482,12 @@ function KnowledgeStatusIcon({ status }: { status: TripKnowledgeItem["status"] }
 type KnowledgeOverview = {
   places: KnowledgeOverviewItem[];
   activities: KnowledgeOverviewItem[];
+};
+
+type KnowledgeStoryItem = KnowledgeStoryRow & {
+  area: string;
+  sourceTitles: string[];
+  sourceLinks: KnowledgeSourceLink[];
 };
 
 type KnowledgeOverviewItem = {
@@ -1351,6 +1583,92 @@ function TripKnowledgeOverview({
               />
             ) : null}
           </div>
+        </DialogContent>
+      </Dialog>
+    </section>
+  );
+}
+
+function TripKnowledgeStories({ stories }: { stories: KnowledgeStoryItem[] }) {
+  const [selectedStory, setSelectedStory] = useState<KnowledgeStoryItem | null>(null);
+  const areaNames = Array.from(new Set(stories.map((story) => story.area)));
+
+  return (
+    <section className="space-y-4">
+      {areaNames.map((area) => {
+        const areaStories = stories.filter((story) => story.area === area);
+        return (
+          <section key={area} className="space-y-3">
+            <div className="flex flex-wrap items-center gap-2">
+              <h3 className="text-sm font-semibold">{area}</h3>
+              <Badge variant="outline">{areaStories.length} stor{areaStories.length === 1 ? "y" : "ies"}</Badge>
+            </div>
+            <div className="grid gap-3 lg:grid-cols-2">
+              {areaStories.map((story) => (
+                <article key={`${story.area}-${story.related_place ?? ""}-${story.title}`} className="space-y-2 rounded-md border bg-background p-3">
+                  <div className="flex flex-wrap items-start justify-between gap-3">
+                    <div className="min-w-0 space-y-1">
+                      <div className="font-medium">{story.title}</div>
+                      <div className="flex flex-wrap gap-2">
+                        {story.story_type ? <Badge variant="outline">{story.story_type.replace(/_/g, " ")}</Badge> : null}
+                        {story.related_place ? <Badge variant="secondary">{story.related_place}</Badge> : null}
+                      </div>
+                    </div>
+                    <Button type="button" size="sm" variant="outline" onClick={() => setSelectedStory(story)}>
+                      <Eye className="size-4" aria-hidden />
+                      Read
+                    </Button>
+                  </div>
+                  {story.summary ? <p className="text-sm text-muted-foreground">{truncateText(story.summary, 160)}</p> : null}
+                  {story.what_to_notice.length > 0 ? (
+                    <div className="text-xs text-muted-foreground">Notice: {story.what_to_notice.slice(0, 3).join(", ")}</div>
+                  ) : null}
+                </article>
+              ))}
+            </div>
+          </section>
+        );
+      })}
+      <Dialog open={selectedStory !== null} onOpenChange={(open) => {
+        if (!open) setSelectedStory(null);
+      }}>
+        <DialogContent className="sm:max-w-3xl">
+          <DialogHeader>
+            <DialogTitle>{selectedStory?.title ?? "Story"}</DialogTitle>
+          </DialogHeader>
+          {selectedStory ? (
+            <div className="max-h-[70vh] space-y-4 overflow-y-auto pr-1">
+              <div className="flex flex-wrap gap-2">
+                <Badge variant="secondary">{selectedStory.area}</Badge>
+                {selectedStory.story_type ? <Badge variant="outline">{selectedStory.story_type.replace(/_/g, " ")}</Badge> : null}
+                {selectedStory.related_place ? <Badge variant="outline">{selectedStory.related_place}</Badge> : null}
+                {selectedStory.good_for.map((value) => <Badge key={value} variant="outline">{value}</Badge>)}
+              </div>
+              {selectedStory.summary ? <SummaryValue label="Summary" value={selectedStory.summary} /> : null}
+              {selectedStory.story ? <SummaryValue label="Story" value={selectedStory.story} /> : null}
+              {selectedStory.why_it_matters ? <SummaryValue label="Why it matters" value={selectedStory.why_it_matters} /> : null}
+              {selectedStory.what_to_notice.length > 0 ? (
+                <div>
+                  <div className="text-xs font-medium text-muted-foreground">What to notice</div>
+                  <ul className="mt-1 list-inside list-disc text-sm">
+                    {selectedStory.what_to_notice.map((value) => <li key={value}>{value}</li>)}
+                  </ul>
+                </div>
+              ) : null}
+              <div className="text-xs text-muted-foreground">
+                Sources: {selectedStory.sourceLinks.length > 0 ? (
+                  selectedStory.sourceLinks.map((source, index) => (
+                    <span key={source.url}>
+                      <a className="underline underline-offset-2 hover:text-foreground" href={source.url} target="_blank" rel="noreferrer">
+                        {source.title}
+                      </a>
+                      {index < selectedStory.sourceLinks.length - 1 ? ", " : null}
+                    </span>
+                  ))
+                ) : selectedStory.sourceTitles.join(", ")}
+              </div>
+            </div>
+          ) : null}
         </DialogContent>
       </Dialog>
     </section>
@@ -1866,38 +2184,61 @@ function buildLogisticsPresetNotes(payload: ItineraryPresetDraft) {
   ].filter((line): line is string => Boolean(line)).join("\n\n") || null;
 }
 
-function buildLogisticsPresetDraft(kind: "arrival" | "departure", dayCount: number, details: Record<string, unknown> | null): ItineraryPresetDraft {
+function buildLogisticsPresetDraft(
+  kind: ItineraryPresetKind,
+  dayCount: number,
+  startDate: string | null,
+  details: Record<string, unknown> | null,
+  accommodation?: AccommodationLogistics
+): ItineraryPresetDraft {
   const arrival = kind === "arrival";
+  const departure = kind === "departure";
+  const checkIn = kind === "check_in";
   const notes = arrival
     ? [
         getLogisticsLine("Transport", details?.transport_mode),
         getLogisticsLine("Depart from", joinParts(details?.outbound_departure_location, details?.outbound_departure_time)),
         getLogisticsLine("Arrive at", joinParts(details?.outbound_arrival_location, details?.outbound_arrival_time)),
-        getLogisticsLine("Accommodation", joinParts(details?.accommodation_name, details?.accommodation_address)),
-        getLogisticsLine("Check-in", details?.check_in_time),
         getLogisticsListLine("Booking refs", details?.booking_references),
         getLogisticsListLine("Links", details?.important_links),
         getLogisticsListLine("Constraints", details?.constraints),
       ]
-    : [
+    : departure
+      ? [
         getLogisticsLine("Transport", details?.transport_mode),
         getLogisticsLine("Depart from", joinParts(details?.return_departure_location, details?.return_departure_time)),
         getLogisticsLine("Arrive at", joinParts(details?.return_arrival_location, details?.return_arrival_time)),
-        getLogisticsLine("Check-out", details?.check_out_time),
         getLogisticsLine("Parking", details?.parking_notes),
         getLogisticsListLine("Booking refs", details?.booking_references),
         getLogisticsListLine("Links", details?.important_links),
         getLogisticsListLine("Constraints", details?.constraints),
+      ]
+      : [
+        getLogisticsLine("Accommodation", joinParts(accommodation?.name, accommodation?.address)),
+        getLogisticsLine("Area", accommodation?.area),
+        getLogisticsLine(checkIn ? "Check-in" : "Check-out", joinParts(checkIn ? accommodation?.check_in_date : accommodation?.check_out_date, checkIn ? accommodation?.check_in_time : accommodation?.check_out_time)),
+        getLogisticsLine("Booking ref", accommodation?.booking_reference),
+        getLogisticsLine("Notes", accommodation?.notes),
       ];
+  const accommodationDate = checkIn ? accommodation?.check_in_date : accommodation?.check_out_date;
+  const accommodationDay = getTripDayFromDate(startDate, accommodationDate);
 
   return {
     kind,
-    day_number: arrival ? 1 : dayCount,
-    block: arrival ? "morning" : "drop_first",
-    time: getLogisticsString(arrival ? details?.outbound_arrival_time : details?.return_departure_time) ?? "",
-    location: getLogisticsString(arrival ? details?.outbound_arrival_location : details?.return_departure_location) ?? getLogisticsString(details?.base_area) ?? "",
+    title: getPresetTitle(kind, accommodation),
+    day_number: arrival ? 1 : departure ? dayCount : Math.min(dayCount, Math.max(1, accommodationDay ?? (checkIn ? 1 : dayCount))),
+    block: arrival ? "morning" : departure ? "drop_first" : checkIn ? "afternoon" : "morning",
+    time: getLogisticsString(arrival ? details?.outbound_arrival_time : departure ? details?.return_departure_time : checkIn ? accommodation?.check_in_time : accommodation?.check_out_time) ?? "",
+    location: getLogisticsString(arrival ? details?.outbound_arrival_location : departure ? details?.return_departure_location : accommodation?.address) ?? getLogisticsString(accommodation?.area) ?? getLogisticsString(details?.base_area) ?? "",
     notes: notes.filter((line): line is string => Boolean(line)).join("\n"),
   };
+}
+
+function getPresetTitle(kind: ItineraryPresetKind, accommodation?: AccommodationLogistics) {
+  if (kind === "arrival") return "Arrival";
+  if (kind === "departure") return "Departure";
+  const stay = accommodation?.name?.trim();
+  return `${kind === "check_in" ? "Check-in" : "Check-out"}${stay ? `: ${stay}` : ""}`;
 }
 
 function getLogisticsLine(label: string, value: unknown) {
@@ -1913,6 +2254,47 @@ function getLogisticsListLine(label: string, value: unknown) {
 
 function getLogisticsString(value: unknown) {
   return typeof value === "string" && value.trim().length > 0 ? value.trim() : null;
+}
+
+function getAccommodationLogistics(details: Record<string, unknown> | null | undefined): AccommodationLogistics[] {
+  if (!details) return [];
+  const rows = Array.isArray(details.accommodations)
+    ? details.accommodations
+        .map((item) => normalizeAccommodationLogistics(item))
+        .filter((item): item is AccommodationLogistics => item !== null)
+    : [];
+  if (rows.length > 0) return rows;
+  const fallback = normalizeAccommodationLogistics({
+    name: details.accommodation_name,
+    address: details.accommodation_address,
+    area: details.base_area,
+    check_in_time: details.check_in_time,
+    check_out_time: details.check_out_time,
+    booking_reference: Array.isArray(details.booking_references) ? details.booking_references[0] : null,
+  });
+  return fallback ? [fallback] : [];
+}
+
+function normalizeAccommodationLogistics(value: unknown): AccommodationLogistics | null {
+  if (!value || typeof value !== "object") return null;
+  const row = value as Record<string, unknown>;
+  const accommodation = {
+    name: getLogisticsString(row.name),
+    address: getLogisticsString(row.address),
+    area: getLogisticsString(row.area),
+    check_in_date: getLogisticsString(row.check_in_date),
+    check_in_time: getLogisticsString(row.check_in_time),
+    check_out_date: getLogisticsString(row.check_out_date),
+    check_out_time: getLogisticsString(row.check_out_time),
+    booking_reference: getLogisticsString(row.booking_reference),
+    notes: getLogisticsString(row.notes),
+  };
+  return Object.values(accommodation).some(Boolean) ? accommodation : null;
+}
+
+function formatAccommodationTiming(label: string, date: string | null, time: string | null) {
+  const value = joinParts(date, time);
+  return value ? <SummaryValue label={label} value={value} /> : null;
 }
 
 function getItineraryNoteField(notes: string | null, field: string) {
@@ -2110,6 +2492,7 @@ function TripItineraryPanel({
   const [presetDraft, setPresetDraft] = useState<ItineraryPresetDraft | null>(null);
   const [moveDraft, setMoveDraft] = useState({ day_number: 1, block: "morning" as TripItineraryBlock, location: "" });
   const optionById = useMemo(() => new Map(options.map((option) => [option.id, option])), [options]);
+  const accommodations = useMemo(() => getAccommodationLogistics(logisticsDetails), [logisticsDetails]);
   const plannedOptionIds = useMemo(
     () => new Set(itinerary.map((item) => item.option_id).filter((id): id is string => typeof id === "string" && id.length > 0)),
     [itinerary]
@@ -2198,11 +2581,11 @@ function TripItineraryPanel({
   });
   const presetMutation = useMutation({
     mutationFn: (payload: ItineraryPresetDraft) => createTripItineraryItem(tripId, {
-      title: payload.kind === "arrival" ? "Arrival" : "Departure",
+      title: payload.title,
       day_number: payload.day_number,
       block: payload.block,
       notes: buildLogisticsPresetNotes(payload),
-      sort_order: payload.kind === "arrival" ? -100 : 1000,
+      sort_order: payload.kind === "arrival" ? -100 : payload.kind === "departure" ? 1000 : payload.kind === "check_in" ? 5 : 900,
     }),
     onSuccess: () => {
       setPresetDraft(null);
@@ -2221,8 +2604,8 @@ function TripItineraryPanel({
     setMovingItem(item);
   }
 
-  function openPresetDialog(kind: "arrival" | "departure") {
-    setPresetDraft(buildLogisticsPresetDraft(kind, dayCount, logisticsDetails));
+  function openPresetDialog(kind: ItineraryPresetKind, accommodation?: AccommodationLogistics) {
+    setPresetDraft(buildLogisticsPresetDraft(kind, dayCount, startDate, logisticsDetails, accommodation));
   }
 
   const followupAnchor = followupItem ? optionById.get(followupItem.option_id ?? "") ?? null : null;
@@ -2260,105 +2643,130 @@ function TripItineraryPanel({
             <CalendarPlus className="size-4" aria-hidden />
             Add departure
           </Button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button type="button" size="sm" variant="outline" disabled={accommodations.length === 0}>
+                <CalendarPlus className="size-4" aria-hidden />
+                Add stay timing
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-64">
+              <DropdownMenuLabel>Accommodation blocks</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              {accommodations.map((accommodation, index) => (
+                <Fragment key={`${accommodation.name ?? "stay"}-${index}`}>
+                  <DropdownMenuItem onClick={() => openPresetDialog("check_in", accommodation)}>
+                    Check-in: {truncateText(accommodation.name ?? `Accommodation ${index + 1}`, 34)}
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => openPresetDialog("check_out", accommodation)}>
+                    Check-out: {truncateText(accommodation.name ?? `Accommodation ${index + 1}`, 34)}
+                  </DropdownMenuItem>
+                  {index < accommodations.length - 1 ? <DropdownMenuSeparator /> : null}
+                </Fragment>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
       )}
       contentClassName="space-y-4"
     >
-        <div className="grid gap-4 lg:grid-cols-2">
+        <div className="space-y-6">
           {Array.from({ length: dayCount }, (_, index) => index + 1).map((day) => {
             const dateLabel = formatItineraryDayDate(startDate, day);
             const dayItems = sortItineraryItems(itinerary.filter((item) => item.day_number === day));
             return (
-              <section key={day} className="space-y-2">
+              <section key={day} className="space-y-3 border-b pb-6 last:border-b-0 last:pb-0">
                 <h3 className="text-sm font-semibold">
                   Day {day}
                   {dateLabel ? <span className="ml-1 text-muted-foreground">· {dateLabel}</span> : null}
                 </h3>
                 {dayItems.length === 0 ? <p className="text-sm text-muted-foreground">No blocks</p> : null}
-                {dayItems.map((item) => {
-                  const timeLabel = getItineraryNoteField(item.notes, "Time");
-                  const itemOption = optionById.get(item.option_id ?? "") ?? null;
-                  const locationLabel = getItineraryAnchorLocation(item, itemOption);
-                  const itemIndex = dayItems.findIndex((candidate) => candidate.id === item.id);
-                  return (
-                    <div key={item.id} className="rounded-md border p-3">
-                      <div className="flex flex-wrap justify-end gap-1">
-                        <Button
-                          type="button"
-                          size="sm"
-                          variant="ghost"
-                          onClick={() => reorderMutation.mutate({ item, direction: "up" })}
-                          disabled={reorderMutation.isPending || itemIndex === 0}
-                          aria-label={`Move ${item.title} earlier`}
-                        >
-                          <ArrowUp className="size-4" aria-hidden />
-                        </Button>
-                        <Button
-                          type="button"
-                          size="sm"
-                          variant="ghost"
-                          onClick={() => reorderMutation.mutate({ item, direction: "down" })}
-                          disabled={reorderMutation.isPending || itemIndex === dayItems.length - 1}
-                          aria-label={`Move ${item.title} later`}
-                        >
-                          <ArrowDown className="size-4" aria-hidden />
-                        </Button>
-                        <Button
-                          type="button"
-                          size="sm"
-                          variant="ghost"
-                          onClick={() => setDetailItem(item)}
-                          aria-label={`View ${item.title}`}
-                        >
-                          <Eye className="size-4" aria-hidden />
-                        </Button>
-                        <Button
-                          type="button"
-                          size="sm"
-                          variant="ghost"
-                          onClick={() => {
-                            const anchor = optionById.get(item.option_id ?? "") ?? null;
-                            setFollowupAreaOverride(getItineraryAnchorLocation(item, anchor) ?? "");
-                            setFollowupItem(item);
-                          }}
-                          aria-label={`Find follow-ups for ${item.title}`}
-                        >
-                          <Sparkles className="size-4" aria-hidden />
-                        </Button>
-                        <Button
-                          type="button"
-                          size="sm"
-                          variant="ghost"
-                          onClick={() => openMoveDialog(item)}
-                          disabled={moveMutation.isPending}
-                          aria-label={`Move ${item.title}`}
-                        >
-                          <Pencil className="size-4" aria-hidden />
-                        </Button>
-                        <Button
-                          type="button"
-                          size="sm"
-                          variant="ghost"
-                          className="text-destructive hover:text-destructive"
-                          onClick={() => deleteMutation.mutate(item.id)}
-                          disabled={deleteMutation.isPending}
-                          aria-label={`Delete ${item.title}`}
-                        >
-                          <Trash2 className="size-4" aria-hidden />
-                        </Button>
-                      </div>
-                      <div className="mt-2">
-                        <div className="flex flex-wrap gap-2">
-                          <Badge variant="outline">{item.block}</Badge>
-                          {timeLabel ? <Badge variant="secondary">{timeLabel}</Badge> : null}
-                          {locationLabel ? <Badge variant="secondary">{locationLabel}</Badge> : null}
+                <div className="grid gap-3 lg:grid-cols-2">
+                  {dayItems.map((item) => {
+                    const timeLabel = getItineraryNoteField(item.notes, "Time");
+                    const itemOption = optionById.get(item.option_id ?? "") ?? null;
+                    const locationLabel = getItineraryAnchorLocation(item, itemOption);
+                    const itemIndex = dayItems.findIndex((candidate) => candidate.id === item.id);
+                    return (
+                      <div key={item.id} className="rounded-md border p-3">
+                        <div className="flex flex-wrap justify-end gap-1">
+                          <Button
+                            type="button"
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => reorderMutation.mutate({ item, direction: "up" })}
+                            disabled={reorderMutation.isPending || itemIndex === 0}
+                            aria-label={`Move ${item.title} earlier`}
+                          >
+                            <ArrowUp className="size-4" aria-hidden />
+                          </Button>
+                          <Button
+                            type="button"
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => reorderMutation.mutate({ item, direction: "down" })}
+                            disabled={reorderMutation.isPending || itemIndex === dayItems.length - 1}
+                            aria-label={`Move ${item.title} later`}
+                          >
+                            <ArrowDown className="size-4" aria-hidden />
+                          </Button>
+                          <Button
+                            type="button"
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => setDetailItem(item)}
+                            aria-label={`View ${item.title}`}
+                          >
+                            <Eye className="size-4" aria-hidden />
+                          </Button>
+                          <Button
+                            type="button"
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => {
+                              const anchor = optionById.get(item.option_id ?? "") ?? null;
+                              setFollowupAreaOverride(getItineraryAnchorLocation(item, anchor) ?? "");
+                              setFollowupItem(item);
+                            }}
+                            aria-label={`Find follow-ups for ${item.title}`}
+                          >
+                            <Sparkles className="size-4" aria-hidden />
+                          </Button>
+                          <Button
+                            type="button"
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => openMoveDialog(item)}
+                            disabled={moveMutation.isPending}
+                            aria-label={`Move ${item.title}`}
+                          >
+                            <Pencil className="size-4" aria-hidden />
+                          </Button>
+                          <Button
+                            type="button"
+                            size="sm"
+                            variant="ghost"
+                            className="text-destructive hover:text-destructive"
+                            onClick={() => deleteMutation.mutate(item.id)}
+                            disabled={deleteMutation.isPending}
+                            aria-label={`Delete ${item.title}`}
+                          >
+                            <Trash2 className="size-4" aria-hidden />
+                          </Button>
                         </div>
-                        {!itemOption ? <div className="mt-2 font-medium">{item.title}</div> : null}
+                        <div className="mt-2">
+                          <div className="flex flex-wrap gap-2">
+                            <Badge variant="outline">{item.block}</Badge>
+                            {timeLabel ? <Badge variant="secondary">{timeLabel}</Badge> : null}
+                            {locationLabel ? <Badge variant="secondary">{locationLabel}</Badge> : null}
+                          </div>
+                          {!itemOption ? <div className="mt-2 font-medium">{item.title}</div> : null}
+                        </div>
+                        <ItineraryBlockDescription item={item} option={itemOption} compact />
                       </div>
-                      <ItineraryBlockDescription item={item} option={itemOption} compact />
-                    </div>
-                  );
-                })}
+                    );
+                  })}
+                </div>
               </section>
             );
           })}
@@ -2533,7 +2941,7 @@ function TripItineraryPanel({
       }}>
         <DialogContent className="sm:max-w-lg">
           <DialogHeader>
-            <DialogTitle>{presetDraft?.kind === "arrival" ? "Add arrival block" : "Add departure block"}</DialogTitle>
+            <DialogTitle>{presetDraft ? `Add ${presetDraft.title.toLowerCase()} block` : "Add logistics block"}</DialogTitle>
           </DialogHeader>
           {presetDraft ? (
             <form
@@ -2702,12 +3110,27 @@ function ItineraryBlockDescription({ item, option, compact = false }: { item: Tr
 }
 
 type ItineraryPresetDraft = {
-  kind: "arrival" | "departure";
+  kind: ItineraryPresetKind;
+  title: string;
   day_number: number;
   block: TripItineraryBlock;
   time: string;
   location: string;
   notes: string;
+};
+
+type ItineraryPresetKind = "arrival" | "departure" | "check_in" | "check_out";
+
+type AccommodationLogistics = {
+  name: string | null;
+  address: string | null;
+  area: string | null;
+  check_in_date: string | null;
+  check_in_time: string | null;
+  check_out_date: string | null;
+  check_out_time: string | null;
+  booking_reference: string | null;
+  notes: string | null;
 };
 
 function TripTasksPanel({ tasks, onError, onDone }: { tasks: Task[]; onError: (error: string | null) => void; onDone: () => void }) {
@@ -2797,6 +3220,14 @@ function formatItineraryDayDate(startDate: string | null, dayNumber: number) {
   const date = new Date(start);
   date.setUTCDate(start.getUTCDate() + dayNumber - 1);
   return new Intl.DateTimeFormat("en", { weekday: "short", month: "short", day: "numeric", timeZone: "UTC" }).format(date);
+}
+
+function getTripDayFromDate(startDate: string | null, value: string | null | undefined) {
+  if (!startDate || !value || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return null;
+  const start = new Date(`${startDate}T00:00:00Z`).getTime();
+  const target = new Date(`${value}T00:00:00Z`).getTime();
+  if (Number.isNaN(start) || Number.isNaN(target) || target < start) return null;
+  return Math.round((target - start) / 86400000) + 1;
 }
 
 function formatTripDuration(startDate: string, endDate: string) {

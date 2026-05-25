@@ -68,11 +68,24 @@ export interface TripLogisticsExtractionResult {
   local_transport: string | null;
   check_in_time: string | null;
   check_out_time: string | null;
+  accommodations: TripAccommodationLogistics[];
   booking_references: string[];
   important_links: string[];
   parking_notes: string | null;
   constraints: string[];
   confidence_notes: string[];
+}
+
+export interface TripAccommodationLogistics {
+  name: string | null;
+  address: string | null;
+  area: string | null;
+  check_in_date: string | null;
+  check_in_time: string | null;
+  check_out_date: string | null;
+  check_out_time: string | null;
+  booking_reference: string | null;
+  notes: string | null;
 }
 
 export interface TripOptionSuggestion {
@@ -250,6 +263,32 @@ const stringArray = (description: string): Schema =>
     items: { type: SchemaType.STRING } as Schema,
   }) as Schema;
 
+const TRIP_ACCOMMODATION_SCHEMA: ObjectSchema = {
+  type: SchemaType.OBJECT,
+  properties: {
+    name: nullableString("Accommodation name if present."),
+    address: nullableString("Accommodation address if present."),
+    area: nullableString("Town, neighborhood, or base area for this accommodation."),
+    check_in_date: nullableString("Check-in date as YYYY-MM-DD when clear, otherwise as written, or null."),
+    check_in_time: nullableString("Check-in time or time window as written."),
+    check_out_date: nullableString("Check-out date as YYYY-MM-DD when clear, otherwise as written, or null."),
+    check_out_time: nullableString("Check-out time or time window as written."),
+    booking_reference: nullableString("Booking or reservation reference specific to this accommodation."),
+    notes: nullableString("Short operational notes for this accommodation."),
+  },
+  required: [
+    "name",
+    "address",
+    "area",
+    "check_in_date",
+    "check_in_time",
+    "check_out_date",
+    "check_out_time",
+    "booking_reference",
+    "notes",
+  ],
+};
+
 const TRIP_LOGISTICS_SCHEMA: ObjectSchema = {
   type: SchemaType.OBJECT,
   properties: {
@@ -268,6 +307,12 @@ const TRIP_LOGISTICS_SCHEMA: ObjectSchema = {
     local_transport: nullableString("Transport during the trip, such as own car, rental car, bike, bus, walking."),
     check_in_time: nullableString("Accommodation check-in time if present."),
     check_out_time: nullableString("Accommodation check-out time if present."),
+    accommodations: {
+      type: SchemaType.ARRAY,
+      description:
+        "Every accommodation/stay mentioned in the notes. Include multiple rows when the family changes hotels, cabins, rentals, or bases.",
+      items: TRIP_ACCOMMODATION_SCHEMA as Schema,
+    } as Schema,
     booking_references: stringArray("Booking numbers or reservation references."),
     important_links: stringArray("Important URLs found in the notes."),
     parking_notes: nullableString("Parking, loading, ferry queue, or car-related notes."),
@@ -290,6 +335,7 @@ const TRIP_LOGISTICS_SCHEMA: ObjectSchema = {
     "local_transport",
     "check_in_time",
     "check_out_time",
+    "accommodations",
     "booking_references",
     "important_links",
     "parking_notes",
@@ -496,6 +542,8 @@ export async function extractTripLogistics(
     "Extract structured family trip logistics from the notes.",
     "Only use facts present in the notes or obvious from the trip metadata.",
     "Use null for unknown scalar fields and [] for unknown list fields.",
+    "If the notes mention more than one accommodation, put each stay in accommodations with its own check-in and check-out details.",
+    "Keep the legacy accommodation_name, accommodation_address, check_in_time, and check_out_time fields populated from the primary or first accommodation when possible.",
     "Keep times as concise human-readable strings. Do not invent booking references or addresses.",
     "",
     `Trip title: ${input.title ?? ""}`,
@@ -531,6 +579,25 @@ export async function extractTripLogistics(
           .filter(Boolean)
           .slice(0, 12)
       : [];
+  const cleanAccommodation = (value: unknown): TripAccommodationLogistics | null => {
+    if (!value || typeof value !== "object") return null;
+    const row = value as Record<string, unknown>;
+    const cleaned = {
+      name: cleanString(row.name),
+      address: cleanString(row.address),
+      area: cleanString(row.area),
+      check_in_date: cleanString(row.check_in_date),
+      check_in_time: cleanString(row.check_in_time),
+      check_out_date: cleanString(row.check_out_date),
+      check_out_time: cleanString(row.check_out_time),
+      booking_reference: cleanString(row.booking_reference),
+      notes: cleanString(row.notes),
+    };
+    return Object.values(cleaned).some(Boolean) ? cleaned : null;
+  };
+  const accommodations = Array.isArray(parsed.accommodations)
+    ? parsed.accommodations.map(cleanAccommodation).filter((item): item is TripAccommodationLogistics => item !== null).slice(0, 12)
+    : [];
 
   return {
     transport_mode: cleanString(parsed.transport_mode),
@@ -548,6 +615,7 @@ export async function extractTripLogistics(
     local_transport: cleanString(parsed.local_transport),
     check_in_time: cleanString(parsed.check_in_time),
     check_out_time: cleanString(parsed.check_out_time),
+    accommodations,
     booking_references: cleanArray(parsed.booking_references),
     important_links: cleanArray(parsed.important_links),
     parking_notes: cleanString(parsed.parking_notes),

@@ -4,6 +4,7 @@ export type TripKnowledgeExtraction = {
   summary: string;
   places: TripKnowledgePlace[];
   activities: TripKnowledgeActivity[];
+  stories: TripKnowledgeStory[];
   food_spots: string[];
   rainy_day_ideas: string[];
   kid_relevance: string | null;
@@ -12,6 +13,18 @@ export type TripKnowledgeExtraction = {
   avoid_if: string | null;
   candidate_option_titles: string[];
   tags: string[];
+};
+
+export type TripKnowledgeStory = {
+  title: string;
+  story_type: "place_story" | "history" | "culture" | "nature" | "local_life" | "kid_story" | null;
+  area: string | null;
+  related_place: string | null;
+  summary: string | null;
+  story: string | null;
+  why_it_matters: string | null;
+  what_to_notice: string[];
+  good_for: string[];
 };
 
 export type TripKnowledgePlace = {
@@ -56,8 +69,9 @@ export async function extractTripKnowledge(
   const prompt = [
     "Return JSON only.",
     "Extract family trip planning knowledge from the markdown inspiration.",
-    "Shape: {\"summary\":\"...\",\"places\":[{\"name\":\"...\",\"area\":null,\"approx_location\":null,\"why\":null,\"best_for\":[],\"weather_fit\":null,\"time_needed\":null}],\"activities\":[{\"name\":\"...\",\"happens_at\":null,\"area\":null,\"approx_location\":null,\"effort\":null,\"kid_fit\":null,\"weather_fit\":null,\"time_needed\":null,\"pair_with\":[],\"why\":null}],\"food_spots\":[],\"rainy_day_ideas\":[],\"kid_relevance\":null,\"season_or_weather_notes\":null,\"booking_or_logistics_notes\":null,\"avoid_if\":null,\"candidate_option_titles\":[],\"tags\":[]}",
+    "Shape: {\"summary\":\"...\",\"places\":[{\"name\":\"...\",\"area\":null,\"approx_location\":null,\"why\":null,\"best_for\":[],\"weather_fit\":null,\"time_needed\":null}],\"activities\":[{\"name\":\"...\",\"happens_at\":null,\"area\":null,\"approx_location\":null,\"effort\":null,\"kid_fit\":null,\"weather_fit\":null,\"time_needed\":null,\"pair_with\":[],\"why\":null}],\"stories\":[{\"title\":\"...\",\"story_type\":null,\"area\":null,\"related_place\":null,\"summary\":null,\"story\":null,\"why_it_matters\":null,\"what_to_notice\":[],\"good_for\":[]}],\"food_spots\":[],\"rainy_day_ideas\":[],\"kid_relevance\":null,\"season_or_weather_notes\":null,\"booking_or_logistics_notes\":null,\"avoid_if\":null,\"candidate_option_titles\":[],\"tags\":[]}",
     "For places and activities, include approximate area and location when the source implies it. Useful areas include Visby, North Gotland, Fårö, East coast, South Gotland, West coast, Central Gotland, near ferry, near accommodation, or unknown.",
+    "For stories, extract historical, cultural, natural, local-life, or kid-friendly context that would make a visit more meaningful. Connect each story to a related_place and area when possible.",
     "Keep every field practical for deciding trip options. Do not invent facts not supported by the source.",
     "",
     `Trip: ${input.tripTitle}`,
@@ -111,8 +125,9 @@ export async function generateTripKnowledgeStarter(
   const prompt = [
     "Return JSON only.",
     "Create starter trip knowledge for Dad-Ops: a practical first list of places and activities to research.",
-    "Shape: {\"summary\":\"...\",\"places\":[{\"name\":\"...\",\"area\":null,\"approx_location\":null,\"why\":null,\"best_for\":[],\"weather_fit\":null,\"time_needed\":null}],\"activities\":[{\"name\":\"...\",\"happens_at\":null,\"area\":null,\"approx_location\":null,\"effort\":null,\"kid_fit\":null,\"weather_fit\":null,\"time_needed\":null,\"pair_with\":[],\"why\":null}],\"food_spots\":[],\"rainy_day_ideas\":[],\"kid_relevance\":null,\"season_or_weather_notes\":null,\"booking_or_logistics_notes\":null,\"avoid_if\":null,\"candidate_option_titles\":[],\"tags\":[]}",
+    "Shape: {\"summary\":\"...\",\"places\":[{\"name\":\"...\",\"area\":null,\"approx_location\":null,\"why\":null,\"best_for\":[],\"weather_fit\":null,\"time_needed\":null}],\"activities\":[{\"name\":\"...\",\"happens_at\":null,\"area\":null,\"approx_location\":null,\"effort\":null,\"kid_fit\":null,\"weather_fit\":null,\"time_needed\":null,\"pair_with\":[],\"why\":null}],\"stories\":[{\"title\":\"...\",\"story_type\":null,\"area\":null,\"related_place\":null,\"summary\":null,\"story\":null,\"why_it_matters\":null,\"what_to_notice\":[],\"good_for\":[]}],\"food_spots\":[],\"rainy_day_ideas\":[],\"kid_relevance\":null,\"season_or_weather_notes\":null,\"booking_or_logistics_notes\":null,\"avoid_if\":null,\"candidate_option_titles\":[],\"tags\":[]}",
     "Suggest approximately 8-14 places and 8-14 activities. Include approximate area and location for planning route clusters.",
+    "Also include 6-12 stories about history, culture, nature, local life, or kid-friendly context. Stories should enrich visits, not become standalone itinerary options.",
     "Prefer family-practical ideas. Respect already-done / avoid-repeat notes and existing knowledge titles.",
     "Use areas such as Visby, North Gotland, Fårö, East coast, South Gotland, West coast, Central Gotland, near ferry, near accommodation, or unknown.",
     "",
@@ -163,6 +178,7 @@ function sanitizeExtraction(parsed: unknown): TripKnowledgeExtraction {
     summary: cleanString(value.summary, 800) ?? "No summary extracted.",
     places: cleanPlaces(value.places),
     activities: cleanActivities(value.activities),
+    stories: cleanStories(value.stories),
     food_spots: cleanStringArray(value.food_spots, 20, 160),
     rainy_day_ideas: cleanStringArray(value.rainy_day_ideas, 20, 160),
     kid_relevance: cleanString(value.kid_relevance, 500),
@@ -172,6 +188,46 @@ function sanitizeExtraction(parsed: unknown): TripKnowledgeExtraction {
     candidate_option_titles: cleanStringArray(value.candidate_option_titles, 20, 140),
     tags: cleanStringArray(value.tags, 20, 60),
   };
+}
+
+function cleanStories(value: unknown): TripKnowledgeStory[] {
+  if (!Array.isArray(value)) return [];
+  return value
+    .map((item): TripKnowledgeStory | null => {
+      if (typeof item === "string") {
+        const title = cleanString(item, 160);
+        return title
+          ? {
+              title,
+              story_type: null,
+              area: null,
+              related_place: null,
+              summary: null,
+              story: null,
+              why_it_matters: null,
+              what_to_notice: [],
+              good_for: [],
+            }
+          : null;
+      }
+      if (!item || typeof item !== "object") return null;
+      const record = item as Record<string, unknown>;
+      const title = cleanString(record.title, 160);
+      if (!title) return null;
+      return {
+        title,
+        story_type: cleanEnum(record.story_type, ["place_story", "history", "culture", "nature", "local_life", "kid_story"]),
+        area: cleanString(record.area, 80),
+        related_place: cleanString(record.related_place, 160),
+        summary: cleanString(record.summary, 400),
+        story: cleanString(record.story, 1600),
+        why_it_matters: cleanString(record.why_it_matters, 600),
+        what_to_notice: cleanStringArray(record.what_to_notice, 10, 120),
+        good_for: cleanStringArray(record.good_for, 10, 80),
+      };
+    })
+    .filter((item): item is TripKnowledgeStory => item !== null)
+    .slice(0, 30);
 }
 
 function cleanPlaces(value: unknown): TripKnowledgePlace[] {

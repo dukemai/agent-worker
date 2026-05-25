@@ -70,6 +70,7 @@ Family travel planning with dedicated user-owned rows and task integration.
 | `trip_preference_suggestions` | User-owned curated preference catalog for the suggestion picker. | `user_id` -> `auth.users.id` |
 | `trip_knowledge_items` | Raw Markdown inspiration plus extracted trip knowledge used by option suggestions. | `trip_id` -> `trips.id` |
 | `trip_knowledge_favorites` | Favorited merged places and activities from trip knowledge. | `trip_id` -> `trips.id` |
+| `trip_share_links` | Opaque read-only public links for friends to view a trip plan. | `user_id` -> `auth.users.id`, `trip_id` -> `trips.id` |
 
 ---
 
@@ -241,6 +242,19 @@ Read-only public sharing for the `/recipes` hub.
 - **Access**: authenticated users manage their own links through RLS; anonymous
   readers use the `get_recipe_share_by_slug` SECURITY DEFINER RPC, which returns
   only public-safe recipe fields and never `source_markdown`.
+
+#### `trip_share_links`
+Read-only public sharing for Trip Ops.
+- **Purpose**: Opaque public links for one trip, served at
+  `/trips/shared/[slug]`.
+- **Columns**: `public_slug`, `trip_id`, `title`, `disabled_at`, and
+  timestamps.
+- **Access**: authenticated users manage links for trips they own or can access
+  through household membership; anonymous readers use the
+  `get_trip_share_by_slug` SECURITY DEFINER RPC. The public payload includes
+  trip basics, participant counts, non-rejected options, decisions, itinerary
+  blocks, and knowledge favorites, but omits task rows and raw trip knowledge
+  Markdown.
 
 #### `vietnamese_meals` & `vietnamese_meal_recipe_links`
 Recipe-first Vietnamese food catalog for `/vietnamese-meals`.
