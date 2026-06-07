@@ -33,7 +33,7 @@ export async function POST(request: Request, { params }: Params) {
 
   const { data: knowledgeItems, error: knowledgeError } = await auth.supabase
     .from("trip_knowledge_items")
-    .select("title, source_url, extraction, tags, extracted_at")
+    .select("title, source_url, extraction, extraction_focus, tags, extracted_at")
     .eq("trip_id", id)
     .eq("status", "processed")
     .order("extracted_at", { ascending: false })
@@ -60,7 +60,14 @@ export async function POST(request: Request, { params }: Params) {
     already_done: trip.already_done,
     preferences: trip.preferences,
     selected_preferences: Array.isArray(trip.selected_preferences) ? trip.selected_preferences : [],
-    knowledge_context: knowledgeItems ?? [],
+    knowledge_context: (knowledgeItems ?? []).map((item) => ({
+      title: item.title,
+      source_url: item.source_url,
+      extracted_at: item.extracted_at,
+      extraction_focus: item.extraction_focus,
+      tags: item.tags,
+      planning: getPlanningExtraction(item.extraction),
+    })),
     favorite_knowledge: favorites ?? [],
     existing_options: (existingOptions ?? []).map((option) => option.title).filter(Boolean),
   };
@@ -106,6 +113,14 @@ export async function POST(request: Request, { params }: Params) {
   if (insertError) return errorResponse(insertError.message, 500);
 
   return NextResponse.json({ options: options ?? [] }, { status: 201 });
+}
+
+function getPlanningExtraction(extraction: unknown): unknown {
+  if (!extraction || typeof extraction !== "object" || Array.isArray(extraction)) return {};
+  const record = extraction as Record<string, unknown>;
+  return record.planning && typeof record.planning === "object" && !Array.isArray(record.planning)
+    ? record.planning
+    : record;
 }
 
 async function readRequestBody(request: Request): Promise<{ value: Record<string, unknown>; error?: never } | { value?: never; error: NextResponse }> {

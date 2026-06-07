@@ -8,6 +8,8 @@ import type {
   TripKnowledgeItem,
   TripOption,
   TripPreferenceSuggestion,
+  TripStoryContent,
+  TripWeatherForecast,
 } from "@/types/database";
 import type { TripShareLink } from "@/lib/trip-shares/types";
 import { readApiError } from "@/components/dashboard/tasks/api";
@@ -19,6 +21,8 @@ export type TripDetail = {
   itinerary: TripItineraryItem[];
   knowledge: TripKnowledgeItem[];
   knowledge_favorites: TripKnowledgeFavorite[];
+  story_contents: TripStoryContent[];
+  weather_forecasts: TripWeatherForecast[];
   tasks: Task[];
 };
 
@@ -150,7 +154,7 @@ export async function suggestTripOptionsForTrip(tripId: string, prompt?: string)
 
 export async function createTripKnowledge(
   tripId: string,
-  payload: Pick<TripKnowledgeItem, "title" | "raw_markdown"> & Partial<Pick<TripKnowledgeItem, "source_url">>
+  payload: Pick<TripKnowledgeItem, "title" | "raw_markdown" | "extraction_focus"> & Partial<Pick<TripKnowledgeItem, "source_url" | "source_research_leads">>
 ): Promise<TripKnowledgeItem> {
   const response = await fetch(`/api/trips/${tripId}/knowledge`, {
     method: "POST",
@@ -169,9 +173,97 @@ export async function generateTripKnowledgeStarterForTrip(tripId: string): Promi
   return json.knowledge;
 }
 
+export async function refreshTripWeatherForecast(tripId: string, location: string, forecastDate?: string | null): Promise<TripWeatherForecast[]> {
+  const response = await fetch(`/api/trips/${tripId}/weather/refresh`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ location, forecast_date: forecastDate ?? null }),
+  });
+  if (!response.ok) await readApiError(response, "Failed to refresh weather forecast");
+  const json = (await response.json()) as { forecasts: TripWeatherForecast[] };
+  return json.forecasts ?? [];
+}
+
+export async function createTripKnowledgeResearchLead(
+  tripId: string,
+  payload: {
+    title: string;
+    lead_type: "place" | "person" | "event" | "concept" | "building" | "nature" | "food" | "tradition" | "other";
+    area?: string | null;
+    related_place?: string | null;
+    source_reason?: string | null;
+    why_interesting?: string | null;
+    suggested_search_terms?: string[];
+    potential_content_types?: string[];
+    source_url?: string | null;
+  }
+): Promise<TripKnowledgeItem> {
+  const response = await fetch(`/api/trips/${tripId}/knowledge/research-leads`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+  if (!response.ok) await readApiError(response, "Failed to create research lead");
+  const json = (await response.json()) as { knowledge: TripKnowledgeItem };
+  return json.knowledge;
+}
+
+export type TripResearchLeadAiDraftPayload = {
+  title: string;
+  lead_type: string;
+  area?: string | null;
+  related_place?: string | null;
+  source_reason?: string | null;
+  why_interesting?: string | null;
+  research_questions?: string[];
+  suggested_search_terms?: string[];
+  potential_content_types?: string[];
+  priority?: string;
+};
+
+export type TripResearchLeadAiDraft = {
+  title: string;
+  raw_markdown: string;
+  confidence: "low" | "medium" | "high";
+  verification_notes: string[];
+};
+
+export async function generateTripResearchLeadAiDraft(
+  tripId: string,
+  lead: TripResearchLeadAiDraftPayload
+): Promise<TripResearchLeadAiDraft> {
+  const response = await fetch(`/api/trips/${tripId}/knowledge/research-leads/ai-draft`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ lead }),
+  });
+  if (!response.ok) await readApiError(response, "Failed to generate AI research draft");
+  const json = (await response.json()) as { draft: TripResearchLeadAiDraft };
+  return json.draft;
+}
+
+export type CreateTripStoryContentPayload = {
+  subject?: string | null;
+  area?: string | null;
+  content_style: string;
+  selected_materials: unknown[];
+  selected_research_leads?: unknown[];
+};
+
+export async function createTripStoryContentScaffold(tripId: string, payload: CreateTripStoryContentPayload): Promise<TripStoryContent> {
+  const response = await fetch(`/api/trips/${tripId}/story-contents/scaffold`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+  if (!response.ok) await readApiError(response, "Failed to create story content");
+  const json = (await response.json()) as { content: TripStoryContent };
+  return json.content;
+}
+
 export async function updateTripKnowledge(
   id: string,
-  payload: Partial<Pick<TripKnowledgeItem, "title" | "source_url" | "raw_markdown">>
+  payload: Partial<Pick<TripKnowledgeItem, "title" | "source_url" | "raw_markdown" | "extraction_focus">>
 ): Promise<TripKnowledgeItem> {
   const response = await fetch(`/api/trip-knowledge-items/${id}`, {
     method: "PATCH",

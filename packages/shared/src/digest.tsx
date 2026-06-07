@@ -9,6 +9,7 @@ import type {
   RecentGrowingKnowledgeItem,
   RecentGrowingWindowItem,
   BirthdayDigestItem,
+  TripDigestItem,
   Task,
 } from "./types";
 import type { GrowingWindowKnowledgeLink } from "./types/growing";
@@ -251,6 +252,41 @@ export async function fetchUpcomingBirthdays(
 }
 
 /**
+ * Loads upcoming trips close enough to be useful in the daily digest.
+ * Keeps non-archived trips starting in the next 45 days.
+ */
+export async function fetchUpcomingTrips(
+  supabase: SupabaseClient
+): Promise<TripDigestItem[]> {
+  const now = new Date();
+  const today = now.toISOString().slice(0, 10);
+  const { data, error } = await supabase
+    .from("trips")
+    .select("id, title, destination, start_date, end_date, status")
+    .neq("status", "archived")
+    .gte("start_date", today)
+    .order("start_date", { ascending: true })
+    .limit(8);
+
+  if (error || !data) return [];
+
+  return (data as any[])
+    .filter((row) => typeof row.start_date === "string" && typeof row.title === "string")
+    .map((row) => ({
+      id: row.id,
+      title: row.title,
+      destination: typeof row.destination === "string" && row.destination.trim().length > 0 ? row.destination : null,
+      startDate: row.start_date,
+      endDate: typeof row.end_date === "string" ? row.end_date : null,
+      status: typeof row.status === "string" ? row.status : "planning",
+      daysLeft: utcCalendarDaysUntilDue(row.start_date, now),
+    }))
+    .filter((item) => item.daysLeft >= 0 && item.daysLeft <= 45)
+    .sort((a, b) => a.daysLeft - b.daysLeft)
+    .slice(0, 5);
+}
+
+/**
  * Formats a list of tasks as plain text for the briefing context (e.g. "  • Title — due YYYY-MM-DD").
  * Uses Swedish locale for dates. Returns "  (none)" when the list is empty.
  */
@@ -351,6 +387,7 @@ export async function generateBriefingNarrative(
   thisWeekTasks: Task[],
   laterTasks: Task[],
   birthdayItems: BirthdayDigestItem[],
+  tripItems: TripDigestItem[],
   rainForecast: boolean
 ): Promise<string> {
   const now = new Date();
@@ -388,6 +425,18 @@ export async function generateBriefingNarrative(
     } else {
       lines.push(
         `Det är bara ${b.daysLeft} ${b.daysLeft === 1 ? "dag" : "dagar"} kvar till ${b.name} fyller år.`
+      );
+    }
+  }
+
+  const urgentTrips = tripItems.filter((trip) => trip.daysLeft <= 14);
+  for (const trip of urgentTrips) {
+    const label = trip.destination ?? trip.title;
+    if (trip.daysLeft === 0) {
+      lines.push(`Idag börjar resan till ${label}.`);
+    } else {
+      lines.push(
+        `Det är ${trip.daysLeft} ${trip.daysLeft === 1 ? "dag" : "dagar"} kvar till resan till ${label}.`
       );
     }
   }
@@ -457,6 +506,7 @@ export async function buildEmailHtml(
   recentGrowingKnowledge: RecentGrowingKnowledgeItem[],
   recentGrowingWindows: RecentGrowingWindowItem[],
   birthdayItems: BirthdayDigestItem[],
+  tripItems: TripDigestItem[],
   narrative: string,
   dashboardUrl: string
 ): Promise<string> {
@@ -483,6 +533,7 @@ export async function buildEmailHtml(
       recentGrowingKnowledge={recentGrowingKnowledge}
       recentGrowingWindows={recentGrowingWindows}
       narrative={narrative}
+      tripItems={tripItems}
       dashboardUrl={dashboardUrl}
     />
   );
@@ -519,6 +570,7 @@ export type DigestEmailContent = {
   promotionItems: PromotionDigestItem[];
   renewalItems: RenewalDigestItem[];
   birthdayItems: BirthdayDigestItem[];
+  tripItems: TripDigestItem[];
   growingSuggestions: GrowingSuggestionDigestItem[];
   recentGrowingKnowledge: RecentGrowingKnowledgeItem[];
   recentGrowingWindows: RecentGrowingWindowItem[];
@@ -536,11 +588,12 @@ export async function loadDigestEmailContent(
 ): Promise<DigestEmailContent> {
   const lessons = options.lessons ?? [];
 
-  const [todayTasks, thisWeekTasks, laterTasks, birthdayItems] = await Promise.all([
+  const [todayTasks, thisWeekTasks, laterTasks, birthdayItems, tripItems] = await Promise.all([
     fetchPendingTasksForBucket(supabase, "today_tasks"),
     fetchPendingTasksForBucket(supabase, "this_week_tasks"),
     fetchPendingTasksForBucket(supabase, "later_tasks"),
     fetchUpcomingBirthdays(supabase),
+    fetchUpcomingTrips(supabase),
   ]);
   const allTasks = [...todayTasks, ...thisWeekTasks, ...laterTasks];
   const promotionItems = extractPromotionItems(allTasks);
@@ -601,6 +654,7 @@ export async function loadDigestEmailContent(
         thisWeekTasks,
         laterTasks,
         birthdayItems,
+        tripItems,
         options.rainForecast
       );
     } catch (err) {
@@ -619,6 +673,7 @@ export async function loadDigestEmailContent(
     promotionItems,
     renewalItems,
     birthdayItems,
+    tripItems,
     growingSuggestions,
     recentGrowingKnowledge: relatedGrowingKnowledge,
     recentGrowingWindows,
@@ -646,8 +701,8 @@ export async function buildDigestEmailHtml(
     content.recentGrowingKnowledge,
     content.recentGrowingWindows,
     content.birthdayItems,
+    content.tripItems,
     content.narrative,
     dashboardUrl
   );
 }
-

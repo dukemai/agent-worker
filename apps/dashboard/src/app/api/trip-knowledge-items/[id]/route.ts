@@ -29,6 +29,13 @@ export async function PATCH(request: Request, { params }: Params) {
     updates.status = "queued";
     updates.error_message = null;
   }
+  if (payload.extraction_focus !== undefined) {
+    const extractionFocus = parseExtractionFocus(payload.extraction_focus);
+    if (!extractionFocus) return errorResponse("extraction_focus must be planning, stories, or both");
+    updates.extraction_focus = extractionFocus;
+    updates.status = "queued";
+    updates.error_message = null;
+  }
 
   if (Object.keys(updates).length === 0) return errorResponse("No valid fields to update");
 
@@ -43,6 +50,10 @@ export async function PATCH(request: Request, { params }: Params) {
   if (!knowledge) return errorResponse("Trip knowledge not found", 404);
 
   return NextResponse.json({ knowledge });
+}
+
+function parseExtractionFocus(value: unknown) {
+  return value === "planning" || value === "stories" || value === "both" ? value : null;
 }
 
 export async function DELETE(_: Request, { params }: Params) {

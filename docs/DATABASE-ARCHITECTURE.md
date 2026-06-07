@@ -68,8 +68,9 @@ Family travel planning with dedicated user-owned rows and task integration.
 | `trip_decisions` | Open/waiting/decided trip choices. | `trip_id` -> `trips.id` |
 | `trip_itinerary_items` | Loose day/block itinerary rows. | `trip_id` -> `trips.id`, optional `option_id` -> `trip_options.id` |
 | `trip_preference_suggestions` | User-owned curated preference catalog for the suggestion picker. | `user_id` -> `auth.users.id` |
-| `trip_knowledge_items` | Raw Markdown inspiration plus extracted trip knowledge used by option suggestions. | `trip_id` -> `trips.id` |
+| `trip_knowledge_items` | Raw Markdown inspiration plus separated planning/story extraction used by option suggestions and destination context. Queued research sources can preserve `source_research_leads` provenance so extracted story materials can be linked back to the lead that created the queue item. | `trip_id` -> `trips.id` |
 | `trip_knowledge_favorites` | Favorited merged places and activities from trip knowledge. | `trip_id` -> `trips.id` |
+| `trip_story_contents` | Generated content scaffolds built from selected story materials and a chosen content style. | `trip_id` -> `trips.id` |
 | `trip_share_links` | Opaque read-only public links for friends to view a trip plan. | `user_id` -> `auth.users.id`, `trip_id` -> `trips.id` |
 
 ---

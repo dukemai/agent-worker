@@ -145,6 +145,7 @@ The first version should support planning one real trip end to end:
 - Convert trip items into normal dashboard tasks
 - Show trip tasks in existing task buckets
 - Include upcoming trip tasks in the daily digest
+- Include upcoming trips in the daily digest with a countdown as the start date gets close
 
 ### Trip Detail Page
 
@@ -177,15 +178,24 @@ AI should act as a trip coordinator, producing editable structured outputs rathe
 Useful AI flows:
 
 - Extract pasted Markdown inspiration into reusable trip knowledge, including approximate areas and locations for places and activities
+- Choose whether each knowledge source should extract planning knowledge, destination story materials, or both
 - Merge processed trip knowledge into an overview grouped by canonical Gotland areas, with duplicate places, activities, and area-name variants combined across sources
 - Favorite merged places and activities so promising candidates can be carried forward into options and itinerary planning
 - Create trip options directly from refined knowledge places or activities
-- Attach optional stories to places and activities so visits can include historical, natural, cultural, or kid-friendly context, surfaced separately from itinerary options
+- Extract destination story materials as a separate knowledge product so historical, natural, cultural, local-life, and kid-friendly context can later power a destination content hub or expert
+- Surface research leads from destination knowledge, such as places, buildings, people, events, traditions, or concepts that need deeper investigation before becoming rich content, with search terms in English and the useful local/source language such as Swedish for Gotland topics
+- Create research leads manually from refined places and activities in the knowledge overview when something looks worth investigating further
+- Send a research lead back into the knowledge queue as a story-material-focused source draft with prefilled research questions and search terms, preserving an explicit lead-to-source provenance link so extracted story materials can later be filtered by the lead that created them
+- Generate a reviewable AI background draft for a research lead when general model knowledge is enough to start, then let the user edit and accept it into the story-material queue while preserving the lead provenance
+- Apply copyright hygiene during knowledge extraction by avoiding copied or closely paraphrased source text, and treating no-reproduction sources as research-lead-first rather than polished content
 - Generate starter trip knowledge from logistics and preferences when the user has not collected sources yet
 - Preview and edit the option-generation prompt before sending it to AI
 - Turn a messy pasted note into structured trip options
 - Plan an option into a day/block itinerary item and mark the option as planned
 - Suggest local follow-up options from an itinerary block using nearby unplanned options in the same area
+- Surface related destination story materials inside itinerary blocks so each planned stop can show what to notice and why it matters
+- Generate reusable destination content scaffolds from a dedicated builder page where research leads and story materials can be reviewed without modal scroll constraints; AI derives the subject/title from the selected bundle and curated styles such as concise guide, family-friendly, historical deep dive, place profile, walking-tour narration, and content hub article
+- Fetch flexible per-day location-based weather forecasts and show daily weather context inside the itinerary
 - Compare destination, travel, or accommodation options
 - Generate a packing checklist based on dates, destination, kids, and transport
 - Draft a message to the group

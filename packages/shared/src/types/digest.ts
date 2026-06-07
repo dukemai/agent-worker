@@ -67,6 +67,16 @@ export interface BirthdayDigestItem {
   category: string;
 }
 
+export interface TripDigestItem {
+  id: string;
+  title: string;
+  destination: string | null;
+  startDate: string;
+  endDate: string | null;
+  status: string;
+  daysLeft: number;
+}
+
 /** Minimal lesson shape for digest email (profile_type, topic, content). */
 export interface DigestLessonItem {
   profile_type: string;

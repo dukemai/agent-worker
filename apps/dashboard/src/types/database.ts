@@ -232,6 +232,8 @@ export interface TripKnowledgeItem {
   source_url: string | null;
   raw_markdown: string;
   extraction: Record<string, unknown>;
+  extraction_focus: "planning" | "stories" | "both";
+  source_research_leads?: TripKnowledgeSourceResearchLead[];
   status: "queued" | "processed" | "failed";
   error_message: string | null;
   tags: string[];
@@ -240,6 +242,22 @@ export interface TripKnowledgeItem {
   updated_at: string;
 }
 
+export type TripKnowledgeSourceResearchLead = {
+  key: string;
+  title: string;
+  lead_type: string;
+  area: string | null;
+  related_place: string | null;
+  source_reason: string | null;
+  why_interesting: string | null;
+  research_questions: string[];
+  suggested_search_terms: string[];
+  potential_content_types: string[];
+  priority: string;
+  source_titles: string[];
+  source_links: { title: string; url: string }[];
+};
+
 export interface TripKnowledgeFavorite {
   id: string;
   trip_id: string;
@@ -247,6 +265,40 @@ export interface TripKnowledgeFavorite {
   name: string;
   area: string;
   created_at: string;
+}
+
+export interface TripStoryContent {
+  id: string;
+  trip_id: string;
+  subject: string;
+  area: string | null;
+  content_style: string;
+  selected_materials: unknown[];
+  scaffold: Record<string, unknown>;
+  status: "generated" | "archived";
+  created_at: string;
+  updated_at: string;
+}
+
+export interface TripWeatherForecast {
+  id: string;
+  trip_id: string;
+  forecast_date: string;
+  provider: string;
+  location_label: string;
+  latitude: number;
+  longitude: number;
+  summary: string | null;
+  weather_code: number | null;
+  temperature_min_c: number | null;
+  temperature_max_c: number | null;
+  precipitation_probability: number | null;
+  precipitation_mm: number | null;
+  wind_speed_mps: number | null;
+  raw_forecast: Record<string, unknown>;
+  fetched_at: string;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface TripOption {

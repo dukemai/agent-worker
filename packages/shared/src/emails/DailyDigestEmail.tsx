@@ -22,6 +22,7 @@ import type {
   RecentGrowingWindowItem,
   RenewalDigestItem,
   BirthdayDigestItem,
+  TripDigestItem,
   Task,
 } from "../types";
 
@@ -39,6 +40,7 @@ type Props = {
   recentGrowingKnowledge: RecentGrowingKnowledgeItem[];
   recentGrowingWindows: RecentGrowingWindowItem[];
   birthdayItems: BirthdayDigestItem[];
+  tripItems: TripDigestItem[];
   narrative: string;
   dashboardUrl: string;
 };
@@ -95,6 +97,7 @@ export function DailyDigestEmail(props: Props) {
     recentGrowingKnowledge,
     recentGrowingWindows,
     birthdayItems,
+    tripItems,
     narrative,
     dashboardUrl,
   } = props;
@@ -168,6 +171,36 @@ export function DailyDigestEmail(props: Props) {
           className={`m-0 text-[16px] text-gray-700 leading-[26px] ${idx === arr.length - 1 ? "" : "mb-[16px]"}`}
         >
           <span className="text-pink-700 font-bold">Idag fyller {name} år!</span> 🎂 Glöm inte att fira.
+        </Text>
+      );
+    }
+
+    const tripCountdown = p.match(/^Det är (\d+)\s+(dag|dagar)\s+kvar till resan till (.+)\.$/);
+    if (tripCountdown) {
+      const [, days, unit, destination] = tripCountdown;
+      return (
+        <Text
+          key={idx}
+          className={`m-0 text-[16px] text-gray-700 leading-[26px] ${idx === arr.length - 1 ? "" : "mb-[16px]"}`}
+        >
+          Det är{" "}
+          <span className="text-sky-700 font-bold">
+            {days} {unit}
+          </span>{" "}
+          kvar till resan till <span className="text-sky-700 font-bold">{destination}</span>.
+        </Text>
+      );
+    }
+
+    const tripToday = p.match(/^Idag börjar resan till (.+)\.$/);
+    if (tripToday) {
+      const [, destination] = tripToday;
+      return (
+        <Text
+          key={idx}
+          className={`m-0 text-[16px] text-gray-700 leading-[26px] ${idx === arr.length - 1 ? "" : "mb-[16px]"}`}
+        >
+          <span className="text-sky-700 font-bold">Idag börjar resan till {destination}.</span>
         </Text>
       );
     }
@@ -479,6 +512,46 @@ export function DailyDigestEmail(props: Props) {
                                 <>In <strong>{item.daysLeft} days</strong></>
                               )}
                               <span className="ml-[8px] opacity-60">({item.category.replace('_', ' ')})</span>
+                            </Text>
+                         </Column>
+                      </Row>
+                    </Fragment>
+                  ))}
+                </Section>
+              </Section>
+            )}
+
+            {/* Upcoming Trips */}
+            {tripItems.length > 0 && (
+              <Section className="mb-[48px]">
+                <Heading className="m-0 text-[22px] font-bold text-gray-950 mb-[16px]">
+                  Upcoming Trips
+                </Heading>
+                <Section className="bg-sky-50/50 rounded-xl p-[20px] border border-solid border-sky-100">
+                  {tripItems.map((item, index) => (
+                    <Fragment key={item.id}>
+                      {index > 0 && <Hr className="border-sky-100/50 my-[12px]" />}
+                      <Row>
+                         <Column width="24" valign="top">
+                           <Text className="m-0 text-[14px]">🧳</Text>
+                         </Column>
+                         <Column>
+                            <Text className="m-0 font-semibold text-[15px] text-sky-900">
+                              <a href={`${dashboardUrl}/trips/${item.id}`} className="text-sky-900 no-underline hover:underline">
+                                {item.title}
+                              </a>
+                            </Text>
+                            <Text className="m-0 text-[13px] text-sky-700 mt-[2px]">
+                              {item.daysLeft === 0 ? (
+                                <strong>Starts today</strong>
+                              ) : (
+                                <>Starts in <strong>{item.daysLeft} days</strong></>
+                              )}
+                              {item.destination ? <span className="ml-[8px] opacity-70">{item.destination}</span> : null}
+                              <span className="ml-[8px] opacity-60">
+                                {new Date(item.startDate).toLocaleDateString("sv-SE")}
+                                {item.endDate ? ` - ${new Date(item.endDate).toLocaleDateString("sv-SE")}` : ""}
+                              </span>
                             </Text>
                          </Column>
                       </Row>

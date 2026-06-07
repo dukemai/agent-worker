@@ -21,6 +21,7 @@ Morning email sent at 06:30 Stockholm time. Primary decision surface for the day
 - **Upcoming Renewals** — T-30 to T-1
 - **Today's Learning** — Bite-sized lessons
 - **Deals for You** — Matched promotions
+- **Upcoming Trips** — Trips starting in the next 45 days, with countdowns highlighted in the briefing during the final 14 days
 
 ## Growing Section Schedule
 

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { errorResponse, getAuthedSupabase } from "@/lib/api";
-import { extractTripKnowledge } from "@/lib/trip-knowledge-extraction";
+import { extractTripKnowledge, getTripKnowledgeExtractionTags } from "@/lib/trip-knowledge-extraction";
 
 type Params = { params: Promise<{ id: string }> };
 
@@ -34,6 +34,7 @@ export async function POST(_: Request, { params }: Params) {
       knowledgeTitle: knowledge.title,
       sourceUrl: knowledge.source_url,
       rawMarkdown: knowledge.raw_markdown,
+      focus: knowledge.extraction_focus ?? "both",
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Failed to extract trip knowledge";
@@ -48,7 +49,7 @@ export async function POST(_: Request, { params }: Params) {
     .from("trip_knowledge_items")
     .update({
       extraction,
-      tags: extraction.tags,
+      tags: getTripKnowledgeExtractionTags(extraction),
       status: "processed",
       error_message: null,
       extracted_at: new Date().toISOString(),

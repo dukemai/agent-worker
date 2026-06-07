@@ -24,12 +24,14 @@ export async function GET(_: Request, { params }: Params) {
     return errorResponse("Trip not found", 404);
   }
 
-  const [optionsResult, decisionsResult, itineraryResult, knowledgeResult, favoritesResult, tasksResult] = await Promise.all([
+  const [optionsResult, decisionsResult, itineraryResult, knowledgeResult, favoritesResult, storyContentsResult, weatherResult, tasksResult] = await Promise.all([
     auth.supabase.from("trip_options").select("*").eq("trip_id", id).order("sort_order").order("created_at"),
     auth.supabase.from("trip_decisions").select("*").eq("trip_id", id).order("due_date", { nullsFirst: false }).order("created_at"),
     auth.supabase.from("trip_itinerary_items").select("*").eq("trip_id", id).order("day_number").order("sort_order"),
     auth.supabase.from("trip_knowledge_items").select("*").eq("trip_id", id).order("updated_at", { ascending: false }),
     auth.supabase.from("trip_knowledge_favorites").select("*").eq("trip_id", id).order("created_at", { ascending: false }),
+    auth.supabase.from("trip_story_contents").select("*").eq("trip_id", id).eq("status", "generated").order("updated_at", { ascending: false }),
+    auth.supabase.from("trip_weather_forecasts").select("*").eq("trip_id", id).order("forecast_date"),
     auth.supabase
       .from("tasks")
       .select("*")
@@ -39,7 +41,7 @@ export async function GET(_: Request, { params }: Params) {
       .order("created_at", { ascending: false }),
   ]);
 
-  const error = optionsResult.error ?? decisionsResult.error ?? itineraryResult.error ?? knowledgeResult.error ?? favoritesResult.error ?? tasksResult.error;
+  const error = optionsResult.error ?? decisionsResult.error ?? itineraryResult.error ?? knowledgeResult.error ?? favoritesResult.error ?? storyContentsResult.error ?? weatherResult.error ?? tasksResult.error;
   if (error) {
     return errorResponse(error.message, 500);
   }
@@ -51,6 +53,8 @@ export async function GET(_: Request, { params }: Params) {
     itinerary: itineraryResult.data ?? [],
     knowledge: knowledgeResult.data ?? [],
     knowledge_favorites: favoritesResult.data ?? [],
+    story_contents: storyContentsResult.data ?? [],
+    weather_forecasts: weatherResult.data ?? [],
     tasks: tasksResult.data ?? [],
   });
 }

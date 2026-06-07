@@ -8,6 +8,7 @@ import type {
   RecentGrowingWindowItem,
   RenewalDigestItem,
   BirthdayDigestItem,
+  TripDigestItem,
 } from "@agent/shared";
 import { getAuthedSupabase } from "@/lib/api";
 import type { Bucket } from "@/types/database";
@@ -45,6 +46,7 @@ export type DigestPreviewResponse = {
   learning: DigestLessonItem[];
   promotions: PromotionDigestItem[];
   birthdays: BirthdayDigestItem[];
+  trips: TripDigestItem[];
 };
 
 function getPreviewDate(): string {
@@ -113,6 +115,7 @@ export async function GET(request: Request) {
     learning: content.lessons,
     promotions: content.promotionItems,
     birthdays: content.birthdayItems,
+    trips: content.tripItems,
   };
 
   return NextResponse.json(response);
