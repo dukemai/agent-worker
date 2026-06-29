@@ -22,4 +22,6 @@ Doc routing for feature-specific specs. Use [GLOSSARY.md](../GLOSSARY.md) for do
 | [shared-shopping-list.md](shared-shopping-list.md) | **Phase A:** recipe library → **plan to cook** → **prepare** → **shopping list** + opaque share URL (`/shop/[slug]`); `cook_plans` + shared list tables |
 | [promo-shopping-pipeline-phases.md](promo-shopping-pipeline-phases.md) | **Sub-phases A–G:** crawl → DB promos → in-app matching → triggers → pantry/meals → integration with shared list (focus ladder) |
 | [trip-ops.md](trip-ops.md) | Family/group trip planning scope: trips, options, decisions, participants, itinerary, and task integration |
+| [trip-content-factory.md](trip-content-factory.md) | Deferred Trip Ops content-creation pipeline: research leads, multi-angle sorting, knowledge graph links, and destination content scaffolds |
+| [summer-activities.md](summer-activities.md) | Kids summer activity extraction: reusable local activity library, seasonal instances, weekly panel, and digest suggestions |
 | [learning.md](learning.md) | Profiles, lessons, feedback (deferred items) |

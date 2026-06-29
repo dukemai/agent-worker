@@ -75,5 +75,24 @@
 - [ ] Agent-specific progression memory and feedback / difficulty loops
 - [ ] Prompt tuning and eval fixtures per agent as needed (see `docs/phases/12-learning-agents/SCOPE.md`)
 
+### Phase 13: Summer Activities — paused after MVP
+- [ ] Markdown activity source intake
+- [ ] AI extraction into reusable local activities and seasonal activity instances
+- [ ] `/activities` weekly dashboard and daily digest section
+
+### Phase 13.1: Digest Countdown Polish — implemented
+- [x] Show human-scale red-day countdowns in the digest, using days only when the date is close and weeks/months for longer lead times
+- [x] Keep a later follow-up for a configurable public-days knowledge base beyond default red days
+
+### Phase 14: Trip Ops Post-Use Improvements — planned after Summer Activities
+- [ ] Fast access to current/relevant trips and a read-first trip run sheet
+- [ ] Itinerary-aware digest behavior before and during trips
+- [ ] Event-risk alerts, opening-hours validation, archive/knowledge capture, and weekend trip discovery
+
+### Phase 15: Public Days Knowledge Base — planned
+- [ ] Replace the hard-coded red-day countdown list with configurable public/planning days
+- [ ] Default to Swedish red days and support family dates like kids back to school, sportlov, school breaks, bridge days, and local closure days
+- [ ] Reuse the Phase 13.1 human-scale countdown behavior in the digest
+
 ### Deferred (not scheduled as numbered phases)
 - **State tracker mobile app** (was `08-state-tracker`): resumable work/learning states—parked until reprioritized

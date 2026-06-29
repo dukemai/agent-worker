@@ -81,6 +81,8 @@ export type KnowledgeResearchLeadItem = KnowledgeResearchLeadRow & {
   sourceItemIds: string[];
   deletableSourceIds: string[];
   sourceLinks: KnowledgeSourceLink[];
+  queuedSourceCount: number;
+  storyMaterialCount: number;
 };
 
 export type ItineraryStoryMatch = {

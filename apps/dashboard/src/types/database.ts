@@ -6,6 +6,36 @@ export type LearningProfileType = "topic" | "category";
 export type GrowingSuggestionKind = "action" | "inspiration";
 export type GrowingSuggestionStatus = "pending" | "dismissed" | "converted" | "done";
 export type GrowingSourceStatus = "queued" | "processing" | "done" | "failed";
+export type ActivitySourceStatus = "queued" | "processing" | "processed" | "failed";
+export type ActivitySourceCategory =
+  | "official_city"
+  | "municipality"
+  | "museum"
+  | "library"
+  | "event_platform"
+  | "venue"
+  | "blog"
+  | "community"
+  | "unknown";
+export type ActivitySourceTrust = "official" | "partner" | "community" | "unknown";
+export type ActivitySourceLanguage = "sv" | "en" | "mixed" | "unknown";
+export type ActivityType =
+  | "museum"
+  | "library"
+  | "playground"
+  | "sport"
+  | "nature"
+  | "swimming"
+  | "workshop"
+  | "event"
+  | "food"
+  | "other";
+export type ActivityCostLevel = "free" | "low" | "medium" | "high" | "unknown";
+export type ActivityWeatherFit = "indoor" | "outdoor" | "mixed";
+export type ActivityEnergyLevel = "low" | "medium" | "high";
+export type ActivityStatus = "active" | "dismissed" | "archived";
+export type SeasonalActivityStatus = "active" | "dismissed" | "expired" | "archived";
+export type ActivityConfidence = "low" | "medium" | "high";
 export type TripStatus = "ideas" | "planning" | "upcoming" | "archived";
 export type TripOptionStatus = "maybe" | "shortlisted" | "planned" | "rejected";
 export type TripOptionType = "activity" | "food" | "rainy_day" | "scenic_stop" | "logistics" | "other";
@@ -167,6 +197,100 @@ export interface GrowingKnowledge {
   location_note: string | null;
   verified: boolean;
   created_at: string;
+}
+
+export interface ActivitySource {
+  id: string;
+  title: string;
+  source_url: string | null;
+  raw_markdown: string;
+  status: ActivitySourceStatus;
+  error_message: string | null;
+  activities_extracted: number;
+  source_domain: string | null;
+  source_name: string | null;
+  source_category: ActivitySourceCategory;
+  source_scope: string;
+  source_trust: ActivitySourceTrust;
+  source_language: ActivitySourceLanguage;
+  processed_at: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ActivitySourceMapping {
+  id: string;
+  source_domain: string;
+  source_name: string | null;
+  source_category: ActivitySourceCategory;
+  source_scope: string;
+  source_trust: ActivitySourceTrust;
+  source_language: ActivitySourceLanguage;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface LocalActivity {
+  id: string;
+  source_id: string | null;
+  activity_key: string;
+  title: string;
+  description: string | null;
+  activity_type: ActivityType;
+  age_min: number | null;
+  age_max: number | null;
+  age_notes: string | null;
+  address: string | null;
+  area: string | null;
+  location_url: string | null;
+  cost_level: ActivityCostLevel;
+  price_text: string | null;
+  cost_notes: string | null;
+  booking_required: boolean;
+  booking_notes: string | null;
+  weather_fit: ActivityWeatherFit;
+  energy_level: ActivityEnergyLevel;
+  usual_duration_minutes: number | null;
+  tags: string[];
+  status: ActivityStatus;
+  is_evergreen: boolean;
+  favorite: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface SeasonalActivityInstance {
+  id: string;
+  source_id: string | null;
+  activity_id: string | null;
+  instance_key: string;
+  season: string;
+  title: string;
+  description: string | null;
+  valid_from: string | null;
+  valid_until: string | null;
+  occurrence_dates: string[];
+  time_text: string | null;
+  address: string | null;
+  area: string | null;
+  cost_level: ActivityCostLevel;
+  price_text: string | null;
+  cost_notes: string | null;
+  booking_required: boolean;
+  booking_deadline: string | null;
+  booking_url: string | null;
+  weather_fit: ActivityWeatherFit;
+  energy_level: ActivityEnergyLevel;
+  age_min: number | null;
+  age_max: number | null;
+  age_notes: string | null;
+  tags: string[];
+  status: SeasonalActivityStatus;
+  favorite: boolean;
+  extraction_confidence: ActivityConfidence;
+  created_at: string;
+  updated_at: string;
+  activity?: Pick<LocalActivity, "id" | "title" | "activity_type" | "is_evergreen"> | null;
 }
 
 export type BirthdayCategory = "family" | "close_friend" | "friend" | "kid_friend";

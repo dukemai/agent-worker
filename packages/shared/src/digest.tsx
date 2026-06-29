@@ -9,6 +9,7 @@ import type {
   RecentGrowingKnowledgeItem,
   RecentGrowingWindowItem,
   BirthdayDigestItem,
+  ActivityDigestItem,
   TripDigestItem,
   Task,
 } from "./types";
@@ -286,6 +287,165 @@ export async function fetchUpcomingTrips(
     .slice(0, 5);
 }
 
+function formatActivityDateLabel(row: any): string | null {
+  const occurrenceDates = Array.isArray(row.occurrence_dates) ? row.occurrence_dates.filter(Boolean) : [];
+  if (occurrenceDates.length > 0) return occurrenceDates.slice(0, 3).join(", ");
+  if (typeof row.valid_from === "string" && typeof row.valid_until === "string") {
+    return `${row.valid_from} - ${row.valid_until}`;
+  }
+  if (typeof row.valid_from === "string") return `From ${row.valid_from}`;
+  if (typeof row.valid_until === "string") return `Until ${row.valid_until}`;
+  return null;
+}
+
+function seasonalOverlaps(row: any, start: string, end: string): boolean {
+  const occurrenceDates = Array.isArray(row.occurrence_dates) ? row.occurrence_dates.filter(Boolean) : [];
+  if (occurrenceDates.some((date: string) => date >= start && date <= end)) return true;
+  const validFrom = typeof row.valid_from === "string" ? row.valid_from : start;
+  const validUntil = typeof row.valid_until === "string" ? row.valid_until : end;
+  return validFrom <= end && validUntil >= start;
+}
+
+function addUtcDays(date: Date, days: number): Date {
+  const next = new Date(date);
+  next.setUTCDate(next.getUTCDate() + days);
+  return next;
+}
+
+/**
+ * Loads a concise set of kid activity suggestions for the digest.
+ * Prioritizes today/this-week seasonal instances, booking deadlines, rainy-day fits, then evergreen fallbacks.
+ */
+export async function fetchActivityDigestItems(
+  supabase: SupabaseClient,
+  options?: { rainForecast?: boolean }
+): Promise<ActivityDigestItem[]> {
+  const today = new Date().toISOString().slice(0, 10);
+  const weekEnd = addUtcDays(new Date(), 6).toISOString().slice(0, 10);
+
+  const [seasonalResult, evergreenResult] = await Promise.all([
+    supabase
+      .from("seasonal_activity_instances")
+      .select(
+        "id, title, description, valid_from, valid_until, occurrence_dates, time_text, address, area, cost_level, booking_required, booking_deadline, booking_url, weather_fit, tags, status"
+      )
+      .eq("status", "active")
+      .limit(80),
+    supabase
+      .from("local_activities")
+      .select("id, title, description, address, area, cost_level, booking_required, location_url, weather_fit, tags, status")
+      .eq("status", "active")
+      .eq("is_evergreen", true)
+      .limit(30),
+  ]);
+
+  if (seasonalResult.error && evergreenResult.error) return [];
+
+  const seasonal = ((seasonalResult.data ?? []) as any[])
+    .filter((row) => seasonalOverlaps(row, today, weekEnd))
+    .sort((a, b) => {
+      const deadlineA = typeof a.booking_deadline === "string" ? a.booking_deadline : "9999-12-31";
+      const deadlineB = typeof b.booking_deadline === "string" ? b.booking_deadline : "9999-12-31";
+      const dateA = typeof a.valid_from === "string" ? a.valid_from : "9999-12-31";
+      const dateB = typeof b.valid_from === "string" ? b.valid_from : "9999-12-31";
+      return deadlineA.localeCompare(deadlineB) || dateA.localeCompare(dateB);
+    });
+
+  const evergreen = ((evergreenResult.data ?? []) as any[])
+    .filter((row) => !options?.rainForecast || row.weather_fit === "indoor" || row.weather_fit === "mixed")
+    .slice(0, 2);
+
+  const picked: ActivityDigestItem[] = [];
+  const seen = new Set<string>();
+  const push = (item: ActivityDigestItem) => {
+    if (seen.has(item.id) || picked.length >= 5) return;
+    seen.add(item.id);
+    picked.push(item);
+  };
+
+  seasonal
+    .filter((row) => seasonalOverlaps(row, today, today))
+    .forEach((row) =>
+      push({
+        id: row.id,
+        title: row.title,
+        description: row.description ?? null,
+        itemType: "seasonal",
+        dateLabel: formatActivityDateLabel(row),
+        timeText: row.time_text ?? null,
+        area: row.area ?? null,
+        address: row.address ?? null,
+        weatherFit: row.weather_fit ?? "mixed",
+        costLevel: row.cost_level ?? "unknown",
+        bookingRequired: row.booking_required === true,
+        bookingDeadline: row.booking_deadline ?? null,
+        bookingUrl: row.booking_url ?? null,
+        tags: Array.isArray(row.tags) ? row.tags : [],
+      })
+    );
+
+  seasonal
+    .filter((row) => row.booking_required === true)
+    .forEach((row) =>
+      push({
+        id: row.id,
+        title: row.title,
+        description: row.description ?? null,
+        itemType: "seasonal",
+        dateLabel: formatActivityDateLabel(row),
+        timeText: row.time_text ?? null,
+        area: row.area ?? null,
+        address: row.address ?? null,
+        weatherFit: row.weather_fit ?? "mixed",
+        costLevel: row.cost_level ?? "unknown",
+        bookingRequired: true,
+        bookingDeadline: row.booking_deadline ?? null,
+        bookingUrl: row.booking_url ?? null,
+        tags: Array.isArray(row.tags) ? row.tags : [],
+      })
+    );
+
+  seasonal.forEach((row) =>
+    push({
+      id: row.id,
+      title: row.title,
+      description: row.description ?? null,
+      itemType: "seasonal",
+      dateLabel: formatActivityDateLabel(row),
+      timeText: row.time_text ?? null,
+      area: row.area ?? null,
+      address: row.address ?? null,
+      weatherFit: row.weather_fit ?? "mixed",
+      costLevel: row.cost_level ?? "unknown",
+      bookingRequired: row.booking_required === true,
+      bookingDeadline: row.booking_deadline ?? null,
+      bookingUrl: row.booking_url ?? null,
+      tags: Array.isArray(row.tags) ? row.tags : [],
+    })
+  );
+
+  evergreen.forEach((row) =>
+    push({
+      id: row.id,
+      title: row.title,
+      description: row.description ?? null,
+      itemType: "evergreen",
+      dateLabel: null,
+      timeText: null,
+      area: row.area ?? null,
+      address: row.address ?? null,
+      weatherFit: row.weather_fit ?? "mixed",
+      costLevel: row.cost_level ?? "unknown",
+      bookingRequired: row.booking_required === true,
+      bookingDeadline: null,
+      bookingUrl: row.location_url ?? null,
+      tags: Array.isArray(row.tags) ? row.tags : [],
+    })
+  );
+
+  return picked;
+}
+
 /**
  * Formats a list of tasks as plain text for the briefing context (e.g. "  • Title — due YYYY-MM-DD").
  * Uses Swedish locale for dates. Returns "  (none)" when the list is empty.
@@ -321,11 +481,10 @@ const SWEDISH_HOLIDAYS = [
   { name: "Nyårsdagen", date: "2027-01-01", is_red_day: true },
 ];
 
-function getNextHoliday() {
-  const now = new Date();
+function getNextHoliday(now = new Date()) {
   for (const h of SWEDISH_HOLIDAYS) {
-    const holidayDate = new Date(h.date);
-    if (holidayDate >= now) {
+    const holidayDate = new Date(`${h.date}T00:00:00Z`);
+    if (utcCalendarDaysUntilDue(h.date, now) >= 0) {
       return { ...h, date: holidayDate };
     }
   }
@@ -338,6 +497,22 @@ function utcCalendarDaysUntilDue(ymd: string, now: Date): number {
   const dueUtc = Date.UTC(y, m - 1, d);
   const todayUtc = Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate());
   return Math.round((dueUtc - todayUtc) / (1000 * 60 * 60 * 24));
+}
+
+export function formatHumanScaleCountdown(days: number): string | null {
+  if (days < 0) return null;
+  if (days === 0) return "idag";
+  if (days === 1) return "imorgon";
+  if (days <= 13) return `${days} dagar`;
+  if (days <= 55) {
+    const weeks = Math.max(2, Math.round(days / 7));
+    return `cirka ${weeks} veckor`;
+  }
+  if (days <= 364) {
+    const months = Math.max(2, Math.round(days / 30));
+    return `cirka ${months} månader`;
+  }
+  return null;
 }
 
 /**
@@ -388,6 +563,7 @@ export async function generateBriefingNarrative(
   laterTasks: Task[],
   birthdayItems: BirthdayDigestItem[],
   tripItems: TripDigestItem[],
+  activityItems: ActivityDigestItem[],
   rainForecast: boolean
 ): Promise<string> {
   const now = new Date();
@@ -406,14 +582,16 @@ export async function generateBriefingNarrative(
   const lines: string[] = [];
 
   // 1) Countdown to Swedish Holiday
-  const nextHoliday = getNextHoliday();
+  const nextHoliday = getNextHoliday(now);
   if (nextHoliday) {
-    const diff = nextHoliday.date.getTime() - now.getTime();
-    const days = Math.ceil(diff / (1000 * 60 * 60 * 24));
+    const days = utcCalendarDaysUntilDue(nextHoliday.date.toISOString().slice(0, 10), now);
+    const countdown = formatHumanScaleCountdown(days);
     if (days === 0) {
       lines.push(`Idag är det ${nextHoliday.name}! Hoppas du får en fantastisk dag.`);
-    } else {
-      lines.push(`Det är ${days} ${days === 1 ? "dag" : "dagar"} kvar till ${nextHoliday.name}.`);
+    } else if (days === 1) {
+      lines.push(`Imorgon är det ${nextHoliday.name}.`);
+    } else if (countdown) {
+      lines.push(`Det är ${countdown} kvar till ${nextHoliday.name}.`);
     }
   }
 
@@ -439,6 +617,13 @@ export async function generateBriefingNarrative(
         `Det är ${trip.daysLeft} ${trip.daysLeft === 1 ? "dag" : "dagar"} kvar till resan till ${label}.`
       );
     }
+  }
+
+  const todayActivities = activityItems.filter((item) => item.dateLabel?.includes(new Date().toISOString().slice(0, 10)));
+  if (todayActivities.length > 0) {
+    lines.push(`Det finns ${todayActivities.length} ${todayActivities.length === 1 ? "sommaraktivitet" : "sommaraktiviteter"} som verkar passa idag.`);
+  } else if (activityItems.length > 0) {
+    lines.push(`Det finns ${activityItems.length} sommaraktiviteter att överväga den här veckan.`);
   }
 
   const allBucketTasks = [...todayTasks, ...thisWeekTasks, ...laterTasks];
@@ -507,6 +692,7 @@ export async function buildEmailHtml(
   recentGrowingWindows: RecentGrowingWindowItem[],
   birthdayItems: BirthdayDigestItem[],
   tripItems: TripDigestItem[],
+  activityItems: ActivityDigestItem[],
   narrative: string,
   dashboardUrl: string
 ): Promise<string> {
@@ -534,6 +720,7 @@ export async function buildEmailHtml(
       recentGrowingWindows={recentGrowingWindows}
       narrative={narrative}
       tripItems={tripItems}
+      activityItems={activityItems}
       dashboardUrl={dashboardUrl}
     />
   );
@@ -571,6 +758,7 @@ export type DigestEmailContent = {
   renewalItems: RenewalDigestItem[];
   birthdayItems: BirthdayDigestItem[];
   tripItems: TripDigestItem[];
+  activityItems: ActivityDigestItem[];
   growingSuggestions: GrowingSuggestionDigestItem[];
   recentGrowingKnowledge: RecentGrowingKnowledgeItem[];
   recentGrowingWindows: RecentGrowingWindowItem[];
@@ -588,12 +776,13 @@ export async function loadDigestEmailContent(
 ): Promise<DigestEmailContent> {
   const lessons = options.lessons ?? [];
 
-  const [todayTasks, thisWeekTasks, laterTasks, birthdayItems, tripItems] = await Promise.all([
+  const [todayTasks, thisWeekTasks, laterTasks, birthdayItems, tripItems, activityItems] = await Promise.all([
     fetchPendingTasksForBucket(supabase, "today_tasks"),
     fetchPendingTasksForBucket(supabase, "this_week_tasks"),
     fetchPendingTasksForBucket(supabase, "later_tasks"),
     fetchUpcomingBirthdays(supabase),
     fetchUpcomingTrips(supabase),
+    fetchActivityDigestItems(supabase, { rainForecast: options.rainForecast }),
   ]);
   const allTasks = [...todayTasks, ...thisWeekTasks, ...laterTasks];
   const promotionItems = extractPromotionItems(allTasks);
@@ -655,6 +844,7 @@ export async function loadDigestEmailContent(
         laterTasks,
         birthdayItems,
         tripItems,
+        activityItems,
         options.rainForecast
       );
     } catch (err) {
@@ -674,6 +864,7 @@ export async function loadDigestEmailContent(
     renewalItems,
     birthdayItems,
     tripItems,
+    activityItems,
     growingSuggestions,
     recentGrowingKnowledge: relatedGrowingKnowledge,
     recentGrowingWindows,
@@ -702,6 +893,7 @@ export async function buildDigestEmailHtml(
     content.recentGrowingWindows,
     content.birthdayItems,
     content.tripItems,
+    content.activityItems,
     content.narrative,
     dashboardUrl
   );

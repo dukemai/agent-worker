@@ -31,9 +31,11 @@
 - [x] Add real AI generation from trip constraints and already-visited history.
 - [x] Add AI extraction for logistics notes into `logistics_details`.
 - [x] Add multi-accommodation check-in/check-out logistics and itinerary presets.
+- [ ] Tune growing-season digest recommendations so high-season actions do not surface stale early-season work.
 - [ ] Add AI extraction for already-done / avoid-repeat notes into `already_done_items`.
 - [ ] Add daily automation for extracting queued trip knowledge items.
 - [ ] Add edit/delete flows for options, decisions, and itinerary items beyond status changes.
+- [ ] Resume deferred content factory work from [`trip-content-factory.md`](../../requirements/trip-content-factory.md): research-lead inbox, multi-angle sorter, and linker sidebar.
 - [x] Add daily digest rendering of upcoming trips with countdowns near the start date.
 - [x] Add account-backed household sharing for trip workspaces.
 - [x] Add lightweight read-only external trip sharing after household sharing is stable.

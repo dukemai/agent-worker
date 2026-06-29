@@ -17,6 +17,34 @@ Editable context persisted in `growing_profiles`: city, country code, space type
 
 The "This Week" system provides personalized, seasonal gardening tasks based on the user's profile and the current date in Stockholm.
 
+### Known Issue: High-Season Timing Drift
+
+Current recommendations can be technically seasonal but practically late during fast-moving growing-season weeks. For example, in early/mid June in Stockholm the system may still recommend `Avhärda försådda grönsaker` or `Blanda in jordförbättring före sådd/plantering`, even though optimal weather and rapid plant growth mean most vegetables should already be planted out and the useful action has shifted toward watering, feeding, tying/supporting, pest checks, thinning, succession sowing, and harvest readiness.
+
+The root cause is that eligibility is mostly month-range based (`start_month` / `end_month`) plus priority. A broad month window treats all days in the range as equally good, and it has no model for:
+
+- early / peak / late phase inside a month window
+- time-sensitive prep work that should decay quickly once planting season is underway
+- warm, dry, or unusually optimal weather that accelerates planting and maintenance urgency
+- catch-up tasks that should be labelled as late recovery rather than normal recommended actions
+
+### Strategy: Phase-Aware Recommendations
+
+Improve weekly selection so each catalog window can express a practical phase, not only a month span:
+
+- Add optional week-level timing fields such as `start_week`, `peak_start_week`, `peak_end_week`, and `end_week`, keeping month fields as a broad fallback.
+- Add an `action_phase` or `timing_role` classification: `prep`, `planting`, `maintenance`, `harvest`, `protect`, `catch_up`.
+- Apply recency decay after the peak window. Prep actions should lose score sharply after planting momentum has passed; maintenance and harvest actions should gain weight in high season.
+- Use Stockholm weather context as an urgency modifier: warm sunny periods boost watering, feeding, support, thinning, pest checks, and planting-out only if still within the viable peak; rain/cold shifts toward protection, greenhouse checks, and indoor prep.
+- Preserve late-but-useful actions as `catch_up` with honest copy, for example "Late catch-up: only do this if seedlings are still indoors", instead of presenting them as default best actions.
+- Include a digest-level freshness check that suppresses or demotes actions whose title/details contain prep cues (`före sådd`, `avhärda`, `försådda`) once the current ISO week is past the configured peak/end week.
+
+Success criteria:
+
+- In early/mid June, recommended actions should prioritize what a Stockholm balcony/garden actually needs now: planting only remaining warm-season starts, watering, feeding, support, pest checks, thinning, succession sowing, and first harvests.
+- Early-season prep can still appear as catch-up guidance when relevant, but should not crowd out high-season care.
+- Digest copy should explain timing confidence: `do now`, `watch this week`, or `late catch-up`.
+
 ### Selection & Filtering Logic
 Suggestions are pulled from the `growing_windows` catalog using the following constraints:
 - **Seasonal Relevance**: The current month must fall within the window's `start_month` and `end_month` (supports wrap-around windows).

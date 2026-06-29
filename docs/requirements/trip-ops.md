@@ -171,6 +171,87 @@ The trip list should group trips by lifecycle:
 - Upcoming
 - Archived
 
+### Relevant Trip Access
+
+Post-use feedback showed that the trip list/detail flow is useful for editing but too slow for daily use during an active trip. Trip Ops needs a read-first access path for the current relevant trips.
+
+Possible access patterns to discuss:
+
+- A dashboard card for the most relevant trip or trips.
+- A `/trips/current` route focused on the active or next upcoming trip.
+- A run sheet mode inside trip detail with deep links to today's itinerary, tasks, warnings, and share link.
+- Relevance rules based on trip lifecycle, start/end dates, open tasks, recently edited trips, and in-progress date windows.
+
+The editing-heavy trip detail page should remain available, but the primary travel-day surface should answer "what do we need now?" without scrolling through planning sections.
+
+### Pre-Trip And In-Trip Operations
+
+Trip Ops should support the days around a trip, not only the planning period.
+
+Useful operational states:
+
+- Before trip: unresolved decisions, booking reminders, packing checklist, travel documents, tickets, restaurant reservations, weather trend, and kid logistics.
+- Travel day: departure/arrival logistics, documents, tickets, parking, check-in timing, and first meal risk.
+- During trip: today's itinerary, next block, weather at destination, booking gaps, opening-hours warnings, event/crowd risks, and backup options.
+- After trip: archive prompt and memory capture.
+
+### Event Risk Awareness
+
+Trip Ops should help identify events that may affect the trip, especially when they create crowding, restaurant booking pressure, traffic, parking issues, accommodation cost spikes, or noisy/busy areas.
+
+Early versions can support manual event risk records before automated discovery. A useful event risk should capture:
+
+- Title
+- Date range
+- Location or area
+- Source URL
+- Impact type
+- Confidence
+- Mitigation notes
+
+Event risks should surface when they overlap the trip dates or itinerary areas, with practical advice such as booking restaurants earlier, choosing backup meal areas, reserving tickets, or adjusting timing.
+
+### Opening-Hours Validation
+
+Trip itinerary planning should treat opening hours as a first-class risk. A planned activity should not silently land on a closed day.
+
+Each planned place or activity should eventually have:
+
+- Opening-hours text or structured hours
+- Source URL
+- Last checked timestamp
+- Confidence/status: open, closed, possibly closed, unknown, or stale
+- Manual override notes
+
+Trip Ops should run opening-hours checks before departure and during the trip. At minimum, it should warn when a scheduled itinerary item is known to be closed, has unknown hours, or has stale seasonal data.
+
+### Archive And Trip Memory
+
+Finished trips need an archive flow that preserves useful memory for future planning.
+
+Archiving should:
+
+- Move the trip to archived lifecycle state.
+- Summarize what was actually done, skipped, liked, difficult, expensive, worth repeating, and worth avoiding.
+- Save reusable memories into Trip Ops knowledge or already-done/avoid-repeat structures.
+- Keep a concise historical trip summary visible from archived trips.
+
+### Weekend Trip Discovery
+
+Trip Ops should later support a discovery phase for short weekend trips from Stockholm with practical cost tradeoffs.
+
+Discovery should rank candidates by:
+
+- Estimated total cost
+- Travel time and effort
+- Kid fit
+- Seasonal/weather fit
+- Booking friction
+- Indoor backup availability
+- Novelty versus places already done
+
+A promising discovery candidate should be convertible into a trip idea with initial logistics notes, likely costs, options, and first tasks.
+
 ## AI Assistance
 
 AI should act as a trip coordinator, producing editable structured outputs rather than one large prose answer.
@@ -194,8 +275,15 @@ Useful AI flows:
 - Plan an option into a day/block itinerary item and mark the option as planned
 - Suggest local follow-up options from an itinerary block using nearby unplanned options in the same area
 - Surface related destination story materials inside itinerary blocks so each planned stop can show what to notice and why it matters
+- Explore destination knowledge as a map from research leads to story materials, places, and related follow-up topics, so planning can evolve into an on-location curiosity guide
 - Generate reusable destination content scaffolds from a dedicated builder page where research leads and story materials can be reviewed without modal scroll constraints; AI derives the subject/title from the selected bundle and curated styles such as concise guide, family-friendly, historical deep dive, place profile, walking-tour narration, and content hub article
 - Fetch flexible per-day location-based weather forecasts and show daily weather context inside the itinerary
+- Generate a run sheet for the current trip day from itinerary, logistics, weather, tasks, warnings, and links
+- Generate pre-trip checklist reminders based on dates, transport, kids, bookings, destination, and weather
+- Identify event risks from manually added events or destination/date research and suggest mitigations
+- Validate planned itinerary items against opening-hours notes and flag closed, unknown, or stale items
+- Summarize an archived trip into reusable trip knowledge and already-done memory
+- Discover weekend trip candidates optimized for cost, travel effort, kid fit, and seasonality
 - Compare destination, travel, or accommodation options
 - Generate a packing checklist based on dates, destination, kids, and transport
 - Draft a message to the group
@@ -261,3 +349,7 @@ Success criteria:
 - Decisions and tasks are visible from the dashboard
 - Trip tasks appear in the daily flow
 - AI can convert messy planning input into structured trip data
+
+**Phase 14: Trip Ops Post-Use Improvements**
+
+After real trip usage, the next Trip Ops phase should focus on fast access, itinerary-aware digest behavior, event-risk alerts, opening-hours validation, archive/knowledge capture, and weekend discovery. See [Phase 14 scope](../phases/14-trip-ops-post-use-improvements/SCOPE.md).

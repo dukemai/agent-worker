@@ -1,9 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useMemo, useState, type ReactNode } from "react";
 import { useMutation } from "@tanstack/react-query";
-import { BookOpenText, Bug, CheckCircle2, Circle, Copy, Eye, FileText, MoreHorizontal, Pencil, Plus, Search, Sparkles, Star, Trash2, XCircle } from "lucide-react";
+import { BookOpenText, Bug, CheckCircle2, Circle, Copy, Eye, FileText, GitBranch, MoreHorizontal, Pencil, Plus, Search, Sparkles, Star, Trash2, XCircle } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -153,10 +153,11 @@ export function TripKnowledgePanel({
       contentClassName=""
     >
           <Tabs defaultValue="overview" className="space-y-4">
-            <TabsList className="grid w-full grid-cols-5 sm:w-fit">
+            <TabsList className="grid w-full grid-cols-3 sm:grid-cols-6">
               <TabsTrigger value="overview">
                 Overview
               </TabsTrigger>
+              <TabsTrigger value="map">Map</TabsTrigger>
               <TabsTrigger value="stories">Story materials</TabsTrigger>
               <TabsTrigger value="content">Content</TabsTrigger>
               <TabsTrigger value="research">Research</TabsTrigger>
@@ -177,6 +178,18 @@ export function TripKnowledgePanel({
                   onCreateResearchLead={(item) => researchLeadMutation.mutate(item)}
                   isFavoritePending={favoriteMutation.isPending || unfavoriteMutation.isPending}
                   isResearchPending={researchLeadMutation.isPending}
+                />
+              )}
+            </TabsContent>
+
+            <TabsContent value="map" className="space-y-4">
+              {stories.length === 0 && researchLeads.length === 0 && overview.places.length === 0 && overview.activities.length === 0 ? (
+                <p className="text-sm text-muted-foreground">No knowledge map yet. Add or extract story materials and research leads first.</p>
+              ) : (
+                <TripKnowledgeMap
+                  overview={overview}
+                  stories={stories}
+                  leads={researchLeads}
                 />
               )}
             </TabsContent>
@@ -894,6 +907,312 @@ function StringList({ title, items }: { title: string; items: string[] }) {
   );
 }
 
+type KnowledgeMapNode =
+  | { id: string; type: "lead"; title: string; area: string; lead: KnowledgeResearchLeadItem }
+  | { id: string; type: "story"; title: string; area: string; story: KnowledgeStoryItem }
+  | { id: string; type: "place"; title: string; area: string; item: KnowledgeOverviewItem };
+
+function TripKnowledgeMap({
+  overview,
+  stories,
+  leads,
+}: {
+  overview: KnowledgeOverview;
+  stories: KnowledgeStoryItem[];
+  leads: KnowledgeResearchLeadItem[];
+}) {
+  const nodes = useMemo<KnowledgeMapNode[]>(() => {
+    const placeNodes: KnowledgeMapNode[] = [...overview.places, ...overview.activities].map((item) => ({
+      id: `place:${item.itemType}:${mapKey(item.area)}:${mapKey(item.name)}`,
+      type: "place",
+      title: item.name,
+      area: item.area,
+      item,
+    }));
+    const leadNodes: KnowledgeMapNode[] = leads.map((lead) => ({
+      id: `lead:${getResearchLeadKey(lead)}`,
+      type: "lead",
+      title: lead.title,
+      area: lead.area,
+      lead,
+    }));
+    const storyNodes: KnowledgeMapNode[] = stories.map((story) => ({
+      id: `story:${mapKey(story.area)}:${mapKey(story.related_place ?? "")}:${mapKey(story.title)}`,
+      type: "story",
+      title: story.title,
+      area: story.area,
+      story,
+    }));
+    return [...leadNodes, ...storyNodes, ...placeNodes];
+  }, [leads, overview.activities, overview.places, stories]);
+  const [selectedNodeId, setSelectedNodeId] = useState(nodes[0]?.id ?? "");
+  const selectedNode = nodes.find((node) => node.id === selectedNodeId) ?? nodes[0] ?? null;
+  const selectedNodeIds = useMemo(() => new Set(nodes.map((node) => node.id)), [nodes]);
+
+  if (!selectedNode) {
+    return <p className="text-sm text-muted-foreground">No connected knowledge yet.</p>;
+  }
+
+  const connectedStories = getConnectedStories(selectedNode, stories);
+  const connectedLeads = getConnectedLeads(selectedNode, leads);
+  const connectedPlaces = getConnectedPlaces(selectedNode, [...overview.places, ...overview.activities]);
+  const relatedStories = getRelatedStories(selectedNode, stories).filter((story) => !connectedStories.some((item) => storyMapId(item) === storyMapId(story))).slice(0, 4);
+
+  return (
+    <section className="grid gap-4 lg:grid-cols-[minmax(16rem,0.8fr)_minmax(0,1.2fr)]">
+      <div className="space-y-3 rounded-md border bg-background p-3">
+        <div className="flex flex-wrap items-center gap-2">
+          <GitBranch className="size-4 text-muted-foreground" aria-hidden />
+          <h3 className="text-sm font-semibold">Knowledge map</h3>
+          <Badge variant="outline">{nodes.length} nodes</Badge>
+        </div>
+        <div className="grid gap-2">
+          {nodes.map((node) => (
+            <button
+              key={node.id}
+              type="button"
+              className={`rounded-md border px-3 py-2 text-left text-sm transition-colors ${node.id === selectedNode.id ? "border-primary bg-primary/5" : "bg-muted/20 hover:bg-muted/40"}`}
+              onClick={() => setSelectedNodeId(node.id)}
+            >
+              <span className="flex flex-wrap items-center gap-2">
+                <Badge variant={node.type === "story" ? "secondary" : "outline"}>{getKnowledgeMapNodeLabel(node.type)}</Badge>
+                <span className="font-medium">{node.title}</span>
+              </span>
+              <span className="mt-1 block text-xs text-muted-foreground">{node.area}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="space-y-4">
+        <section className="space-y-3 rounded-md border bg-background p-3">
+          <div className="flex flex-wrap items-center gap-2">
+            <Badge variant={selectedNode.type === "story" ? "secondary" : "outline"}>{getKnowledgeMapNodeLabel(selectedNode.type)}</Badge>
+            <Badge variant="outline">{selectedNode.area}</Badge>
+          </div>
+          <h3 className="text-lg font-semibold">{selectedNode.title}</h3>
+          <KnowledgeMapFocusSummary node={selectedNode} />
+        </section>
+
+        <div className="grid gap-3 xl:grid-cols-3">
+          <KnowledgeMapConnectionGroup
+            title="Story materials"
+            empty="No connected story materials yet."
+            items={connectedStories}
+            renderItem={(story) => (
+              <KnowledgeMapConnectionButton
+                key={storyMapId(story)}
+                title={story.title}
+                meta={joinParts(story.related_place, story.story_type?.replace(/_/g, " "), story.area)}
+                detail={story.summary}
+                selectedNodeIds={selectedNodeIds}
+                targetId={`story:${storyMapId(story)}`}
+                onSelect={setSelectedNodeId}
+              />
+            )}
+          />
+          <KnowledgeMapConnectionGroup
+            title="Research leads"
+            empty="No connected leads yet."
+            items={connectedLeads}
+            renderItem={(lead) => (
+              <KnowledgeMapConnectionButton
+                key={getResearchLeadKey(lead)}
+                title={lead.title}
+                meta={joinParts(lead.related_place, lead.lead_type, lead.area)}
+                detail={lead.why_interesting}
+                selectedNodeIds={selectedNodeIds}
+                targetId={`lead:${getResearchLeadKey(lead)}`}
+                onSelect={setSelectedNodeId}
+              />
+            )}
+          />
+          <KnowledgeMapConnectionGroup
+            title="Places and activities"
+            empty="No connected places yet."
+            items={connectedPlaces}
+            renderItem={(item) => (
+              <KnowledgeMapConnectionButton
+                key={`${item.itemType}:${item.area}:${item.name}`}
+                title={item.name}
+                meta={joinParts(item.itemType, item.area, item.meta)}
+                detail={item.detail}
+                selectedNodeIds={selectedNodeIds}
+                targetId={`place:${item.itemType}:${mapKey(item.area)}:${mapKey(item.name)}`}
+                onSelect={setSelectedNodeId}
+              />
+            )}
+          />
+        </div>
+
+        {relatedStories.length > 0 ? (
+          <section className="space-y-3 rounded-md border bg-background p-3">
+            <div className="text-sm font-semibold">Nearby rabbit holes</div>
+            <div className="grid gap-2 md:grid-cols-2">
+              {relatedStories.map((story) => (
+                <KnowledgeMapConnectionButton
+                  key={storyMapId(story)}
+                  title={story.title}
+                  meta={joinParts(story.related_place, story.story_type?.replace(/_/g, " "), story.area)}
+                  detail={story.summary}
+                  selectedNodeIds={selectedNodeIds}
+                  targetId={`story:${storyMapId(story)}`}
+                  onSelect={setSelectedNodeId}
+                />
+              ))}
+            </div>
+          </section>
+        ) : null}
+      </div>
+    </section>
+  );
+}
+
+function KnowledgeMapFocusSummary({ node }: { node: KnowledgeMapNode }) {
+  if (node.type === "lead") {
+    return (
+      <div className="space-y-2 text-sm text-muted-foreground">
+        {node.lead.why_interesting ? <p>{node.lead.why_interesting}</p> : null}
+        <div className="flex flex-wrap gap-2">
+          <ResearchLeadProgressBadges lead={node.lead} />
+          {node.lead.potential_content_types.map((value) => <Badge key={value} variant="outline">{value}</Badge>)}
+        </div>
+        {node.lead.research_questions.length > 0 ? <div className="text-xs">Question: {node.lead.research_questions[0]}</div> : null}
+      </div>
+    );
+  }
+  if (node.type === "story") {
+    return (
+      <div className="space-y-2 text-sm text-muted-foreground">
+        {node.story.summary ? <p>{node.story.summary}</p> : null}
+        {node.story.what_to_notice.length > 0 ? <div className="text-xs">Notice: {node.story.what_to_notice.slice(0, 3).join(", ")}</div> : null}
+      </div>
+    );
+  }
+  return (
+    <div className="space-y-2 text-sm text-muted-foreground">
+      {node.item.detail ? <p>{node.item.detail}</p> : null}
+      {node.item.meta ? <div className="text-xs">{node.item.meta}</div> : null}
+    </div>
+  );
+}
+
+function KnowledgeMapConnectionGroup<T>({
+  title,
+  empty,
+  items,
+  renderItem,
+}: {
+  title: string;
+  empty: string;
+  items: T[];
+  renderItem: (item: T) => ReactNode;
+}) {
+  return (
+    <section className="space-y-2 rounded-md border bg-background p-3">
+      <div className="flex items-center justify-between gap-2">
+        <div className="text-sm font-semibold">{title}</div>
+        <Badge variant="outline">{items.length}</Badge>
+      </div>
+      {items.length === 0 ? <p className="text-sm text-muted-foreground">{empty}</p> : <div className="space-y-2">{items.map(renderItem)}</div>}
+    </section>
+  );
+}
+
+function KnowledgeMapConnectionButton({
+  title,
+  meta,
+  detail,
+  targetId,
+  selectedNodeIds,
+  onSelect,
+}: {
+  title: string;
+  meta: string | null;
+  detail: string | null;
+  targetId: string;
+  selectedNodeIds: Set<string>;
+  onSelect: (id: string) => void;
+}) {
+  const canFollow = selectedNodeIds.has(targetId);
+  return (
+    <button
+      type="button"
+      className="w-full rounded-md border bg-muted/20 px-3 py-2 text-left text-sm hover:bg-muted/40 disabled:cursor-default disabled:hover:bg-muted/20"
+      disabled={!canFollow}
+      onClick={() => onSelect(targetId)}
+    >
+      <span className="block font-medium">{title}</span>
+      {meta ? <span className="mt-1 block text-xs text-muted-foreground">{meta}</span> : null}
+      {detail ? <span className="mt-1 block text-xs text-muted-foreground">{truncateText(detail, 130)}</span> : null}
+    </button>
+  );
+}
+
+function getConnectedStories(node: KnowledgeMapNode, stories: KnowledgeStoryItem[]) {
+  if (node.type === "lead") {
+    return stories.filter((story) => isStoryConnectedToLead(story, node.lead));
+  }
+  if (node.type === "place") {
+    return stories.filter((story) => textMatches(story.related_place, node.item.name) || textMatches(story.title, node.item.name));
+  }
+  return [node.story];
+}
+
+function getConnectedLeads(node: KnowledgeMapNode, leads: KnowledgeResearchLeadItem[]) {
+  if (node.type === "story") {
+    return leads.filter((lead) => isStoryConnectedToLead(node.story, lead));
+  }
+  if (node.type === "place") {
+    return leads.filter((lead) => textMatches(lead.related_place, node.item.name) || textMatches(lead.title, node.item.name));
+  }
+  return [node.lead];
+}
+
+function getConnectedPlaces(node: KnowledgeMapNode, items: KnowledgeOverviewItem[]) {
+  if (node.type === "lead") {
+    return items.filter((item) => textMatches(item.name, node.lead.related_place) || textMatches(item.name, node.lead.title) || (node.lead.area !== "Unknown area" && item.area === node.lead.area)).slice(0, 6);
+  }
+  if (node.type === "story") {
+    return items.filter((item) => textMatches(item.name, node.story.related_place) || textMatches(item.name, node.story.title) || (node.story.area !== "Unknown area" && item.area === node.story.area)).slice(0, 6);
+  }
+  return [node.item];
+}
+
+function getRelatedStories(node: KnowledgeMapNode, stories: KnowledgeStoryItem[]) {
+  const area = node.area;
+  const place = node.type === "lead" ? node.lead.related_place : node.type === "story" ? node.story.related_place : node.item.name;
+  return stories.filter((story) => story.area === area || textMatches(story.related_place, place));
+}
+
+function isStoryConnectedToLead(story: KnowledgeStoryItem, lead: KnowledgeResearchLeadItem) {
+  const leadKey = getResearchLeadKey(lead);
+  return story.sourceResearchLeads.some((reference) => reference.key === leadKey || textMatches(reference.title, lead.title))
+    || textMatches(story.related_place, lead.related_place)
+    || textMatches(story.related_place, lead.title)
+    || textMatches(story.title, lead.related_place);
+}
+
+function getKnowledgeMapNodeLabel(type: KnowledgeMapNode["type"]) {
+  if (type === "lead") return "Lead";
+  if (type === "story") return "Material";
+  return "Place";
+}
+
+function storyMapId(story: KnowledgeStoryItem) {
+  return `${mapKey(story.area)}:${mapKey(story.related_place ?? "")}:${mapKey(story.title)}`;
+}
+
+function mapKey(value: string | null | undefined) {
+  return (value ?? "").trim().toLocaleLowerCase("sv-SE");
+}
+
+function textMatches(left: string | null | undefined, right: string | null | undefined) {
+  const a = mapKey(left);
+  const b = mapKey(right);
+  return Boolean(a && b && (a === b || a.includes(b) || b.includes(a)));
+}
+
 function TripKnowledgeResearchLeads({
   tripId,
   leads,
@@ -1006,6 +1325,7 @@ function TripKnowledgeResearchLeads({
                         <Badge variant={lead.priority === "high" ? "default" : "outline"}>{lead.priority}</Badge>
                         <Badge variant="outline">{lead.lead_type}</Badge>
                         {lead.related_place ? <Badge variant="secondary">{lead.related_place}</Badge> : null}
+                        <ResearchLeadProgressBadges lead={lead} />
                       </div>
                     </div>
                     <div className="flex flex-wrap gap-2">
@@ -1058,6 +1378,7 @@ function TripKnowledgeResearchLeads({
                 <Badge variant="outline">{selectedLead.lead_type}</Badge>
                 {selectedLead.related_place ? <Badge variant="outline">{selectedLead.related_place}</Badge> : null}
                 {selectedLead.potential_content_types.map((value) => <Badge key={value} variant="outline">{value}</Badge>)}
+                <ResearchLeadProgressBadges lead={selectedLead} />
               </div>
               {selectedLead.source_reason ? <SummaryValue label="Why it was suggested" value={selectedLead.source_reason} /> : null}
               {selectedLead.why_interesting ? <SummaryValue label="Why investigate" value={selectedLead.why_interesting} /> : null}
@@ -1196,6 +1517,19 @@ function TripKnowledgeResearchLeads({
         </DialogContent>
       </Dialog>
     </section>
+  );
+}
+
+function ResearchLeadProgressBadges({ lead }: { lead: KnowledgeResearchLeadItem }) {
+  return (
+    <>
+      {lead.queuedSourceCount > 0 ? (
+        <Badge variant="outline">{lead.queuedSourceCount} queued source{lead.queuedSourceCount === 1 ? "" : "s"}</Badge>
+      ) : null}
+      {lead.storyMaterialCount > 0 ? (
+        <Badge variant="secondary">{lead.storyMaterialCount} story material{lead.storyMaterialCount === 1 ? "" : "s"}</Badge>
+      ) : null}
+    </>
   );
 }
 

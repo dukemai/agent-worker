@@ -1,0 +1,106 @@
+# Summer Activities
+
+## Intent
+
+Summer Activities helps turn gathered Markdown suggestions into a reusable local activity library and a practical weekly panel for what the family can do with kids.
+
+The feature follows the same broad pattern as Growing knowledge extraction: collect sources, extract structured rows, review them, and surface timely suggestions in the dashboard and daily digest.
+
+## Product Shape
+
+Activities are split into two related concepts:
+
+- **Reusable local activities**: evergreen places or ideas that can be done any year, such as a museum, library, playground, swimming pool, nature walk, or recurring family outing.
+- **Seasonal activity instances**: time-bound opportunities for the current season, such as a summer workshop, reading challenge, event series, registration window, or temporary program.
+
+The first real season is `summer_2026`, but the data model should work later for autumn break, winter break, school-free days, and ordinary weekends.
+
+## MVP Workflow
+
+1. Add a Markdown source with an optional URL.
+2. Extract reusable activities and seasonal instances with AI.
+3. Review what was extracted in Library and Seasonal tabs.
+4. Show a default Week view with:
+   - today
+   - this week
+   - rainy-day backups
+   - needs booking
+   - evergreen fallbacks
+   - detail viewing and favorite marking from activity cards
+5. Include a concise Summer Activities section in the daily digest.
+
+## Source Classification
+
+Activity sources should carry deterministic provenance metadata so the Sources tab can show where activity ideas come from and how trustworthy/current they are.
+
+Known domains are mapped locally. Initial mappings:
+
+- `visitstockholm.se`: Visit Stockholm, official city source, scope `stockholm_city`, trust `official`, language `mixed`.
+- `upplevjarfalla.se`: Upplev Järfälla, municipality source, scope `jarfalla`, trust `official`, language `sv`.
+
+The known-source catalog is editable from the Sources tab. Mapping changes should reclassify saved sources as well as guide classification for future Markdown sources.
+
+Stockholm focus scopes should use canonical values so source provenance stays comparable:
+
+- city-wide and regional: `stockholm_city`, `stockholm_county`
+- primary nearby municipalities: `jarfalla`, `solna`, `sundbyberg`, `sollentuna`, `upplands_bro`, `upplands_vasby`
+- useful adjacent family-activity areas: `taby`, `danderyd`, `lidingo`, `nacka`, `huddinge`, `botkyrka`, `ekero`
+- fallback: `unknown`
+
+Each source should store:
+
+- domain
+- display name
+- category, such as official city, municipality, museum, library, event platform, venue, blog, community, or unknown
+- scope, such as `stockholm_city` or `jarfalla`
+- trust level: official, partner, community, or unknown
+- language: Swedish, English, mixed, or unknown
+
+## Extracted Fields
+
+Reusable activities should capture:
+
+- title and description
+- activity type
+- age fit
+- address, area, and optional location URL
+- cost level and notes
+- exact price text when stated, such as `120 kr` or `50 kr/person`
+- booking requirement and notes
+- indoor/outdoor/mixed weather fit
+- energy level
+- usual duration
+- tags
+
+Seasonal instances should capture:
+
+- title and description
+- optional link to a reusable activity
+- season
+- validity window
+- fixed occurrence dates
+- time text
+- address and area
+- cost
+- exact price text when stated
+- booking requirement, deadline, and URL
+- indoor/outdoor/mixed weather fit
+- energy level
+- age fit
+- extraction confidence
+
+## Digest Behavior
+
+The morning digest should include at most a few high-signal items:
+
+- fixed-time activities today
+- current-week activities still valid
+- booking-needed activities before their deadline
+- rainy-day options when relevant
+- one evergreen fallback when the week has little time-bound activity
+
+The section should reduce planning load, not become another event feed.
+
+## Phase Status
+
+Phase 13 MVP is paused after implementation work so Phase 13.1 can polish digest countdown behavior.

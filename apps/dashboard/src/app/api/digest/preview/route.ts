@@ -8,6 +8,7 @@ import type {
   RecentGrowingWindowItem,
   RenewalDigestItem,
   BirthdayDigestItem,
+  ActivityDigestItem,
   TripDigestItem,
 } from "@agent/shared";
 import { getAuthedSupabase } from "@/lib/api";
@@ -47,6 +48,7 @@ export type DigestPreviewResponse = {
   promotions: PromotionDigestItem[];
   birthdays: BirthdayDigestItem[];
   trips: TripDigestItem[];
+  activities: ActivityDigestItem[];
 };
 
 function getPreviewDate(): string {
@@ -116,6 +118,7 @@ export async function GET(request: Request) {
     promotions: content.promotionItems,
     birthdays: content.birthdayItems,
     trips: content.tripItems,
+    activities: content.activityItems,
   };
 
   return NextResponse.json(response);

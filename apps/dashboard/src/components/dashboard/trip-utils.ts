@@ -200,6 +200,26 @@ function mergeResearchLeadReferences<T extends { key: string; title: string }>(c
 
 export function buildKnowledgeResearchLeads(knowledge: TripKnowledgeItem[]): KnowledgeResearchLeadItem[] {
   const leads = new Map<string, KnowledgeResearchLeadItem>();
+  const linkedQueueCounts = new Map<string, number>();
+  const linkedStoryCounts = new Map<string, number>();
+
+  for (const item of knowledge) {
+    const sourceResearchLeads = item.source_research_leads ?? [];
+    if (sourceResearchLeads.length === 0) continue;
+    for (const reference of sourceResearchLeads) {
+      const key = getResearchReferenceLooseKey(reference.title, reference.lead_type);
+      if (!key) continue;
+      if (item.status === "queued") {
+        linkedQueueCounts.set(key, (linkedQueueCounts.get(key) ?? 0) + 1);
+      }
+      if (item.status === "processed") {
+        const storyCount = getKnowledgeStoryRows(getStoryExtraction(item.extraction).stories).length;
+        if (storyCount > 0) {
+          linkedStoryCounts.set(key, (linkedStoryCounts.get(key) ?? 0) + storyCount);
+        }
+      }
+    }
+  }
 
   for (const item of knowledge) {
     if (item.status !== "processed") continue;
@@ -207,6 +227,7 @@ export function buildKnowledgeResearchLeads(knowledge: TripKnowledgeItem[]): Kno
     for (const lead of getKnowledgeResearchLeadRows(storyExtraction.research_leads)) {
       const area = getCanonicalAreaLabel(lead.area);
       const key = `${normalizeKnowledgeName(lead.title)}::${lead.lead_type}`;
+      const linkedKey = getResearchReferenceLooseKey(lead.title, lead.lead_type);
       const existing = leads.get(key);
       if (existing) {
         leads.set(key, {
@@ -223,6 +244,8 @@ export function buildKnowledgeResearchLeads(knowledge: TripKnowledgeItem[]): Kno
           sourceItemIds: mergeUniqueStrings(existing.sourceItemIds, [item.id]),
           deletableSourceIds: isManualResearchLeadItem(item) ? mergeUniqueStrings(existing.deletableSourceIds, [item.id]) : existing.deletableSourceIds,
           sourceLinks: mergeSourceLinks(existing.sourceLinks, getKnowledgeSourceLinks(item)),
+          queuedSourceCount: linkedQueueCounts.get(linkedKey) ?? 0,
+          storyMaterialCount: linkedStoryCounts.get(linkedKey) ?? 0,
         });
       } else {
         leads.set(key, {
@@ -232,6 +255,8 @@ export function buildKnowledgeResearchLeads(knowledge: TripKnowledgeItem[]): Kno
           sourceItemIds: [item.id],
           deletableSourceIds: isManualResearchLeadItem(item) ? [item.id] : [],
           sourceLinks: getKnowledgeSourceLinks(item),
+          queuedSourceCount: linkedQueueCounts.get(linkedKey) ?? 0,
+          storyMaterialCount: linkedStoryCounts.get(linkedKey) ?? 0,
         });
       }
     }
@@ -240,6 +265,12 @@ export function buildKnowledgeResearchLeads(knowledge: TripKnowledgeItem[]): Kno
   return Array.from(leads.values()).sort(
     (a, b) => getPrioritySortIndex(a.priority) - getPrioritySortIndex(b.priority) || a.area.localeCompare(b.area) || a.title.localeCompare(b.title)
   );
+}
+
+function getResearchReferenceLooseKey(title: string | null | undefined, leadType: string | null | undefined) {
+  const cleanTitle = typeof title === "string" ? normalizeKnowledgeName(title) : "";
+  if (!cleanTitle) return "";
+  return `${cleanTitle}::${leadType || "other"}`;
 }
 
 export function getCanonicalAreaLabel(value: string | null | undefined) {

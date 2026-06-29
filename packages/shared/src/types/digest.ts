@@ -77,6 +77,23 @@ export interface TripDigestItem {
   daysLeft: number;
 }
 
+export interface ActivityDigestItem {
+  id: string;
+  title: string;
+  description: string | null;
+  itemType: "seasonal" | "evergreen";
+  dateLabel: string | null;
+  timeText: string | null;
+  area: string | null;
+  address: string | null;
+  weatherFit: "indoor" | "outdoor" | "mixed";
+  costLevel: "free" | "low" | "medium" | "high" | "unknown";
+  bookingRequired: boolean;
+  bookingDeadline: string | null;
+  bookingUrl: string | null;
+  tags: string[];
+}
+
 /** Minimal lesson shape for digest email (profile_type, topic, content). */
 export interface DigestLessonItem {
   profile_type: string;

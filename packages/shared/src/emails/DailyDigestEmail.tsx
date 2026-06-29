@@ -22,6 +22,7 @@ import type {
   RecentGrowingWindowItem,
   RenewalDigestItem,
   BirthdayDigestItem,
+  ActivityDigestItem,
   TripDigestItem,
   Task,
 } from "../types";
@@ -41,6 +42,7 @@ type Props = {
   recentGrowingWindows: RecentGrowingWindowItem[];
   birthdayItems: BirthdayDigestItem[];
   tripItems: TripDigestItem[];
+  activityItems: ActivityDigestItem[];
   narrative: string;
   dashboardUrl: string;
 };
@@ -98,6 +100,7 @@ export function DailyDigestEmail(props: Props) {
     recentGrowingWindows,
     birthdayItems,
     tripItems,
+    activityItems,
     narrative,
     dashboardUrl,
   } = props;
@@ -123,24 +126,6 @@ export function DailyDigestEmail(props: Props) {
           </span>{" "}
           kvar till deadline för{" "}
           <span className="text-red-700 font-bold">{subject}</span>.
-        </Text>
-      );
-    }
-
-    const holidayCountdown = p.match(/^Det är (\d+)\s+(dag|dagar)\s+kvar till\s+(.+)\.$/);
-    if (holidayCountdown) {
-      const [, days, unit, holidayName] = holidayCountdown;
-      return (
-        <Text
-          key={idx}
-          className={`m-0 text-[16px] text-gray-700 leading-[26px] ${idx === arr.length - 1 ? "" : "mb-[16px]"}`}
-        >
-          Det är{" "}
-          <span className="text-red-700 font-bold">
-            {days} {unit}
-          </span>{" "}
-          kvar till{" "}
-          <span className="text-red-700 font-bold">{holidayName}</span>.
         </Text>
       );
     }
@@ -201,6 +186,36 @@ export function DailyDigestEmail(props: Props) {
           className={`m-0 text-[16px] text-gray-700 leading-[26px] ${idx === arr.length - 1 ? "" : "mb-[16px]"}`}
         >
           <span className="text-sky-700 font-bold">Idag börjar resan till {destination}.</span>
+        </Text>
+      );
+    }
+
+    const holidayCountdown = p.match(
+      /^Det är ((?:cirka )?\d+\s+(?:dag|dagar|vecka|veckor|månad|månader))\s+kvar till\s+(.+)\.$/
+    );
+    if (holidayCountdown) {
+      const [, countdown, holidayName] = holidayCountdown;
+      return (
+        <Text
+          key={idx}
+          className={`m-0 text-[16px] text-gray-700 leading-[26px] ${idx === arr.length - 1 ? "" : "mb-[16px]"}`}
+        >
+          Det är <span className="text-red-700 font-bold">{countdown}</span> kvar till{" "}
+          <span className="text-red-700 font-bold">{holidayName}</span>.
+        </Text>
+      );
+    }
+
+    const holidayTomorrow = p.match(/^Imorgon är det (.+)\.$/);
+    if (holidayTomorrow) {
+      const [, holidayName] = holidayTomorrow;
+      return (
+        <Text
+          key={idx}
+          className={`m-0 text-[16px] text-gray-700 leading-[26px] ${idx === arr.length - 1 ? "" : "mb-[16px]"}`}
+        >
+          <span className="text-red-700 font-bold">Imorgon</span> är det{" "}
+          <span className="text-red-700 font-bold">{holidayName}</span>.
         </Text>
       );
     }
@@ -555,6 +570,56 @@ export function DailyDigestEmail(props: Props) {
                             </Text>
                          </Column>
                       </Row>
+                    </Fragment>
+                  ))}
+                </Section>
+              </Section>
+            )}
+
+            {/* Summer Activities */}
+            {activityItems.length > 0 && (
+              <Section className="mb-[48px]">
+                <Row className="mb-[16px]">
+                  <Column>
+                    <Heading className="m-0 text-[22px] font-bold text-gray-950">
+                      Summer Activities
+                    </Heading>
+                  </Column>
+                  <Column align="right">
+                    <a href={`${dashboardUrl}/activities`} className="text-[14px] font-semibold text-blue-600 no-underline">
+                      View all &rarr;
+                    </a>
+                  </Column>
+                </Row>
+                <Section className="bg-blue-50/40 rounded-xl p-[20px] border border-solid border-blue-100">
+                  {activityItems.map((item, index) => (
+                    <Fragment key={item.id}>
+                      {index > 0 && <Hr className="border-blue-100/50 my-[12px]" />}
+                      <Text className="m-0 font-semibold text-[15px] text-blue-950">
+                        {item.bookingUrl ? (
+                          <a href={item.bookingUrl} className="text-blue-950 no-underline hover:underline">
+                            {item.title}
+                          </a>
+                        ) : (
+                          item.title
+                        )}
+                        <span className="ml-[8px] text-[10px] bg-blue-100 text-blue-700 px-[6px] py-[2px] rounded uppercase font-bold tracking-tighter">
+                          {item.itemType}
+                        </span>
+                      </Text>
+                      <Text className="m-0 mt-[3px] text-[13px] text-blue-700 leading-[20px]">
+                        {item.dateLabel ? <span>{item.dateLabel}</span> : <span>Reusable fallback</span>}
+                        {item.timeText ? <span className="ml-[8px]">{item.timeText}</span> : null}
+                        {item.area ? <span className="ml-[8px]">{item.area}</span> : null}
+                        {item.bookingDeadline ? (
+                          <span className="ml-[8px] font-semibold">Book by {item.bookingDeadline}</span>
+                        ) : null}
+                      </Text>
+                      {item.description ? (
+                        <Text className="m-0 mt-[4px] text-[14px] text-gray-600 leading-[22px]">
+                          {item.description.length > 180 ? `${item.description.slice(0, 180)}...` : item.description}
+                        </Text>
+                      ) : null}
                     </Fragment>
                   ))}
                 </Section>
