@@ -1,6 +1,7 @@
 // Shared types and logic between worker and dashboard.
 
 export * from "./emails";
+export * from "./activity-extraction";
 export * from "./digest";
 export * from "./fetch-pending-tasks";
 export * from "./gemini";

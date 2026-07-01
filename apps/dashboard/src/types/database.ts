@@ -213,9 +213,24 @@ export interface ActivitySource {
   source_scope: string;
   source_trust: ActivitySourceTrust;
   source_language: ActivitySourceLanguage;
+  capture_html?: string | null;
+  capture_metadata?: Record<string, unknown> | null;
+  capture_template_id?: string | null;
+  capture_template_version?: number | null;
   processed_at: string | null;
   created_at: string;
   updated_at: string;
+}
+
+export interface ActivityCaptureTemplate {
+  id: string;
+  source_domain: string;
+  path_pattern: string;
+  name: string;
+  capture_mode: "single_activity" | "activity_list" | "season_overview" | "article" | "generic";
+  content_selector: string | null;
+  remove_selectors: string[];
+  version: number;
 }
 
 export interface ActivitySourceMapping {

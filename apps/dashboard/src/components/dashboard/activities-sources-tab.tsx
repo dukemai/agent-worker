@@ -2,7 +2,7 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { CheckCircle2, ExternalLink } from "lucide-react";
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useState, useSyncExternalStore, type FormEvent } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { ACTIVITY_SOURCE_SCOPE_OPTIONS, isActivitySourceScope } from "@/lib/activity-source-scopes";
+import { buildActivityCaptureBookmarklet } from "@/lib/activity-capture-bookmarklet";
 import { cn } from "@/lib/utils";
 import {
   createActivitySourceMapping,
@@ -23,6 +24,7 @@ import {
   fetchActivitySources,
   importActivitySourceMappings,
   markActivitySourceMappingChecked,
+  resetActivitySourceMappingChecked,
   updateActivitySourceMapping,
   updateActivitySource,
 } from "./activities-api";
@@ -48,6 +50,44 @@ const SOURCE_CATEGORIES: ActivitySourceCategory[] = [
 const SOURCE_TRUST_LEVELS: ActivitySourceTrust[] = ["official", "partner", "community", "unknown"];
 const SOURCE_LANGUAGES: ActivitySourceLanguage[] = ["sv", "en", "mixed", "unknown"];
 const CHECK_FREQUENCIES: ActivitySourceMapping["check_frequency"][] = ["weekly", "monthly", "seasonal"];
+
+const subscribeToOrigin = () => () => undefined;
+const getBrowserOrigin = () => window.location.origin;
+const getServerOrigin = () => "";
+
+function BookmarkletInstaller({ onHint }: { onHint: (message: string) => void }) {
+  const origin = useSyncExternalStore(subscribeToOrigin, getBrowserOrigin, getServerOrigin);
+  const bookmarklet = origin ? buildActivityCaptureBookmarklet(origin) : "#";
+  return (
+    <Button size="sm" variant="outline" asChild>
+      <a
+        href={bookmarklet}
+        draggable
+        aria-label="Save to Summer Activities bookmarklet"
+        title="Drag this button to your browser bookmarks bar"
+        onClick={(event) => {
+          event.preventDefault();
+          onHint("Drag “Save to Summer Activities” to your browser bookmarks bar.");
+        }}
+        onDragStart={(event) => {
+          const bookmarkTitle = "Save to Summer Activities";
+          const link = document.createElement("a");
+          link.href = bookmarklet;
+          link.textContent = bookmarkTitle;
+          event.dataTransfer.effectAllowed = "link";
+          event.dataTransfer.setData("text/html", link.outerHTML);
+          event.dataTransfer.setData("text/uri-list", bookmarklet);
+          event.dataTransfer.setData("text/plain", bookmarklet);
+          event.dataTransfer.setData("text/x-moz-url", `${bookmarklet}\n${bookmarkTitle}`);
+          event.dataTransfer.setData("text/x-moz-url-data", bookmarklet);
+          event.dataTransfer.setData("text/x-moz-url-desc", bookmarkTitle);
+        }}
+      >
+        Save to Summer Activities
+      </a>
+    </Button>
+  );
+}
 
 type DirectoryStatus = "needs_setup" | "due" | "fresh" | "collected";
 
@@ -133,6 +173,7 @@ function KnownSourceMappings({
   onDelete,
   onAddNotes,
   onMarkChecked,
+  onResetChecked,
   sources,
   deletePending,
 }: {
@@ -143,6 +184,7 @@ function KnownSourceMappings({
   onDelete: (id: string) => void;
   onAddNotes: (mapping: ActivitySourceMapping) => void;
   onMarkChecked: (id: string) => void;
+  onResetChecked: (id: string) => void;
   sources: ActivitySource[];
   deletePending: boolean;
 }) {
@@ -227,6 +269,11 @@ function KnownSourceMappings({
                 <CheckCircle2 className="size-3" aria-hidden />
                 {mapping.last_checked_at ? "Update check" : "Mark checked"}
               </Button>
+              {mapping.last_checked_at ? (
+                <Button type="button" size="xs" variant="ghost" onClick={() => onResetChecked(mapping.id)}>
+                  Reset check
+                </Button>
+              ) : null}
               <Button type="button" size="xs" variant="outline" onClick={() => onEdit(mapping)}>
                 Edit
               </Button>
@@ -280,6 +327,7 @@ export function ActivitiesSourcesTab() {
   const [mappingScope, setMappingScope] = useState("unknown");
   const [mappingTrust, setMappingTrust] = useState<ActivitySourceTrust>("unknown");
   const [mappingLanguage, setMappingLanguage] = useState<ActivitySourceLanguage>("unknown");
+  const [showCompletedSources, setShowCompletedSources] = useState(false);
 
   const sourcesQuery = useQuery({
     queryKey: ["activities", "sources"],
@@ -392,6 +440,10 @@ export function ActivitiesSourcesTab() {
   });
   const markCheckedMutation = useMutation({
     mutationFn: markActivitySourceMappingChecked,
+    onSuccess: async () => queryClient.invalidateQueries({ queryKey: ["activities", "source-mappings"] }),
+  });
+  const resetCheckedMutation = useMutation({
+    mutationFn: resetActivitySourceMappingChecked,
     onSuccess: async () => queryClient.invalidateQueries({ queryKey: ["activities", "source-mappings"] }),
   });
   const importMappingsMutation = useMutation({
@@ -556,10 +608,14 @@ export function ActivitiesSourcesTab() {
                         ? deleteMappingMutation.error.message
                         : markCheckedMutation.error instanceof Error
                           ? markCheckedMutation.error.message
+                          : resetCheckedMutation.error instanceof Error
+                            ? resetCheckedMutation.error.message
                           : importMappingsMutation.error instanceof Error
                             ? importMappingsMutation.error.message
                         : null;
   const sources = sourcesQuery.data?.sources ?? [];
+  const completedSourcesCount = sources.filter((source) => source.status === "processed").length;
+  const visibleSources = showCompletedSources ? sources : sources.filter((source) => source.status !== "processed");
   const sourceMappings = [...(sourceMappingsQuery.data?.mappings ?? [])].sort((a, b) => {
     if (a.source_trust === "official" && b.source_trust !== "official") return -1;
     if (a.source_trust !== "official" && b.source_trust === "official") return 1;
@@ -596,6 +652,7 @@ export function ActivitiesSourcesTab() {
       <div className="flex items-center justify-between gap-3">
         {error ? <p className="text-sm text-red-600">{error}</p> : importMessage ? <p className="text-sm text-muted-foreground">{importMessage}</p> : <span />}
         <div className="flex flex-wrap items-center gap-2">
+          <BookmarkletInstaller onHint={setImportMessage} />
           <Button type="button" size="sm" variant="outline" asChild disabled={importMappingsMutation.isPending}>
             <label className="cursor-pointer">
               {importMappingsMutation.isPending ? "Importing..." : "Import directory JSON"}
@@ -681,6 +738,7 @@ export function ActivitiesSourcesTab() {
         onDelete={(id) => deleteMappingMutation.mutate(id)}
         onAddNotes={openAddNotes}
         onMarkChecked={(id) => markCheckedMutation.mutate(id)}
+        onResetChecked={(id) => resetCheckedMutation.mutate(id)}
         sources={sources}
         deletePending={deleteMappingMutation.isPending}
       />
@@ -815,8 +873,20 @@ export function ActivitiesSourcesTab() {
         </DialogContent>
       </Dialog>
 
-      <div className="grid gap-3">
-        {sources.map((source) => {
+      <section className="space-y-3">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <h2 className="text-sm font-semibold">Extraction queue</h2>
+          {completedSourcesCount > 0 ? (
+            <Button type="button" size="xs" variant="outline" onClick={() => setShowCompletedSources((value) => !value)}>
+              {showCompletedSources ? "Hide completed" : `Show completed (${completedSourcesCount})`}
+            </Button>
+          ) : null}
+        </div>
+        {visibleSources.length === 0 && !sourcesQuery.isLoading ? (
+          <p className="text-sm italic text-muted-foreground">No active queue items.</p>
+        ) : null}
+        <div className="grid gap-3">
+        {visibleSources.map((source) => {
           const canExtract = source.status === "queued" || source.status === "failed";
           const isExtracting = extractMutation.isPending && extractMutation.variables === source.id;
           const official = isOfficialSource(source);
@@ -897,7 +967,8 @@ export function ActivitiesSourcesTab() {
             </Card>
           );
         })}
-      </div>
+        </div>
+      </section>
 
       <Dialog
         open={selectedSourceId !== null}

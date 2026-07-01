@@ -3,6 +3,7 @@ import { handlePostTask } from "./post-task";
 import { handleRunDigest } from "./run-digest";
 import { handleRunGrowingSuggestions } from "./run-growing-suggestions";
 import { handleRunRecipeImportQueue } from "./run-recipe-import-queue";
+import { handleRunActivitySourceQueue } from "./run-activity-source-queue";
 import type { Env } from "../../types/env";
 
 export async function handleFetch(request: Request, env: Env): Promise<Response> {
@@ -18,6 +19,9 @@ export async function handleFetch(request: Request, env: Env): Promise<Response>
   }
   if (pathname === "/run-recipe-import-queue" && method === "POST") {
     return handleRunRecipeImportQueue(request, env);
+  }
+  if (pathname === "/run-activity-source-queue" && method === "POST") {
+    return handleRunActivitySourceQueue(request, env);
   }
   if (pathname === "/process-growing" && method === "POST") {
     return handleProcessGrowing(request, env);

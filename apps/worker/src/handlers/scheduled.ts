@@ -3,6 +3,7 @@ import { runDailyDigest } from "../crons/daily-digest";
 import { runGrowingIngest } from "../crons/growing-ingest";
 import { runGrowingSuggestions } from "../crons/growing-suggestions";
 import { runRecipeImportQueue } from "../crons/recipe-import-queue";
+import { runActivitySourceQueue } from "../crons/activity-source-queue";
 import type { Env } from "../types/env";
 
 export async function handleScheduled(
@@ -18,6 +19,8 @@ export async function handleScheduled(
           await runGrowingSuggestions(env);
         } else if (cron === "15 3 * * *") {
           await runRecipeImportQueue(env, { limit: 5 });
+        } else if (cron === "45 3 * * *") {
+          await runActivitySourceQueue(env, { limit: 3 });
         } else {
           await runGrowingIngest(env);
           await runDailyDigest(env);

@@ -69,6 +69,10 @@ export async function GET() {
   return NextResponse.json({
     today,
     week_end: weekEnd,
+    finder_items: [
+      ...seasonal.filter((item) => isSeasonalStillActionable(item, today)),
+      ...evergreen,
+    ],
     today_items: seasonal.filter((item) => isSeasonalRelevant(item, today, today)).slice(0, 8),
     this_week: thisWeek,
     rainy_day: [

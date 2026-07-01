@@ -15,6 +15,7 @@ async function readApiError(response: Response, fallback: string): Promise<never
 export type ActivitiesSummaryResponse = {
   today: string;
   week_end: string;
+  finder_items: Array<SeasonalActivityInstance | LocalActivity>;
   today_items: SeasonalActivityInstance[];
   this_week: SeasonalActivityInstance[];
   rainy_day: Array<SeasonalActivityInstance | LocalActivity>;
@@ -79,6 +80,16 @@ export async function markActivitySourceMappingChecked(id: string): Promise<{ ma
   return response.json();
 }
 
+export async function resetActivitySourceMappingChecked(id: string): Promise<{ mapping: ActivitySourceMapping }> {
+  const response = await fetch(`/api/activities/source-mappings/${id}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ last_checked_at: null }),
+  });
+  if (!response.ok) await readApiError(response, "Failed to reset source check");
+  return response.json();
+}
+
 export async function createActivitySourceMapping(
   payload: ActivitySourceMappingPayload
 ): Promise<{ mapping: ActivitySourceMapping }> {
@@ -120,6 +131,10 @@ export async function createActivitySource(payload: {
   title: string;
   source_url: string | null;
   raw_markdown: string;
+  capture_html?: string | null;
+  capture_metadata?: Record<string, unknown> | null;
+  capture_template_id?: string | null;
+  capture_template_version?: number | null;
 }): Promise<{ source: ActivitySource }> {
   const response = await fetch("/api/activities/sources", {
     method: "POST",
