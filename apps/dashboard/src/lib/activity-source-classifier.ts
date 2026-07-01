@@ -88,7 +88,11 @@ export function classifyActivitySource(sourceUrl: string | null): ActivitySource
 
 function lookupMapping(domain: string | null, mappings: ActivitySourceMapping[]): ActivitySourceMapping | null {
   if (!domain) return null;
-  return mappings.find((mapping) => domain === mapping.source_domain || domain.endsWith(`.${mapping.source_domain}`)) ?? null;
+  return (
+    mappings
+      .filter((mapping) => domain === mapping.source_domain || domain.endsWith(`.${mapping.source_domain}`))
+      .sort((a, b) => b.source_domain.length - a.source_domain.length)[0] ?? null
+  );
 }
 
 export function classifyActivitySourceWithMappings(

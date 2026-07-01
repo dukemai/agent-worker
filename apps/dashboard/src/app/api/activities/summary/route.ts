@@ -43,7 +43,7 @@ export async function GET() {
     auth.supabase
       .from("seasonal_activity_instances")
       .select(
-        "id, source_id, activity_id, instance_key, season, title, description, valid_from, valid_until, occurrence_dates, time_text, address, area, cost_level, price_text, cost_notes, booking_required, booking_deadline, booking_url, weather_fit, energy_level, age_min, age_max, age_notes, tags, status, favorite, extraction_confidence, created_at, updated_at, activity:local_activities(id, title, activity_type, is_evergreen)"
+        "id, source_id, activity_id, instance_key, season, title, description, valid_from, valid_until, occurrence_dates, time_text, address, area, cost_level, price_text, cost_notes, booking_required, booking_deadline, booking_url, weather_fit, energy_level, age_min, age_max, age_notes, tags, status, favorite, extraction_confidence, created_at, updated_at, activity:local_activities(id, title, activity_type, is_evergreen), source:activity_sources(id, title, source_url, source_name, source_domain)"
       )
       .eq("status", "active")
       .order("valid_from", { ascending: true, nullsFirst: false })
@@ -51,7 +51,7 @@ export async function GET() {
     auth.supabase
       .from("local_activities")
       .select(
-        "id, source_id, activity_key, title, description, activity_type, age_min, age_max, age_notes, address, area, location_url, cost_level, price_text, cost_notes, booking_required, booking_notes, weather_fit, energy_level, usual_duration_minutes, tags, status, is_evergreen, favorite, created_at, updated_at"
+        "id, source_id, activity_key, title, description, activity_type, age_min, age_max, age_notes, address, area, location_url, cost_level, price_text, cost_notes, booking_required, booking_notes, weather_fit, energy_level, usual_duration_minutes, tags, status, is_evergreen, favorite, created_at, updated_at, source:activity_sources(id, title, source_url, source_name, source_domain)"
       )
       .eq("status", "active")
       .eq("is_evergreen", true)
@@ -63,7 +63,7 @@ export async function GET() {
   if (evergreenResult.error) return errorResponse(evergreenResult.error.message, 500);
 
   const seasonal = (seasonalResult.data ?? []) as unknown as SeasonalActivityInstance[];
-  const evergreen = (evergreenResult.data ?? []) as LocalActivity[];
+  const evergreen = (evergreenResult.data ?? []) as unknown as LocalActivity[];
   const thisWeek = seasonal.filter((item) => isSeasonalRelevant(item, today, weekEnd)).slice(0, 12);
 
   return NextResponse.json({

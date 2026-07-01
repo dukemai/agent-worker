@@ -40,10 +40,44 @@ export async function fetchActivitySourceMappings(): Promise<{ mappings: Activit
   return response.json();
 }
 
+export async function importActivitySourceMappings(payload: unknown): Promise<{ imported: number; domains: string[] }> {
+  const response = await fetch("/api/activities/source-mappings/import", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+  if (!response.ok) await readApiError(response, "Failed to import source directory JSON");
+  return response.json();
+}
+
 export type ActivitySourceMappingPayload = Pick<
   ActivitySourceMapping,
-  "source_domain" | "source_name" | "source_category" | "source_scope" | "source_trust" | "source_language"
+  | "source_domain"
+  | "source_name"
+  | "homepage_url"
+  | "activity_listing_url"
+  | "gathering_notes"
+  | "collection_focus"
+  | "collection_instructions"
+  | "check_frequency"
+  | "last_checked_at"
+  | "season_target"
+  | "is_core"
+  | "source_category"
+  | "source_scope"
+  | "source_trust"
+  | "source_language"
 >;
+
+export async function markActivitySourceMappingChecked(id: string): Promise<{ mapping: ActivitySourceMapping }> {
+  const response = await fetch(`/api/activities/source-mappings/${id}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ last_checked_at: new Date().toISOString() }),
+  });
+  if (!response.ok) await readApiError(response, "Failed to mark source as checked");
+  return response.json();
+}
 
 export async function createActivitySourceMapping(
   payload: ActivitySourceMappingPayload

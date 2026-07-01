@@ -84,6 +84,8 @@ export function ActivityCard({
   const dateLabel = seasonal ? formatActivityDate(item) : null;
   const countdown = seasonal ? formatCountdown(getPrimaryActivityDate(item) ?? "") : null;
   const bookingUrl = seasonal ? item.booking_url : item.location_url;
+  const sourceUrl = item.source?.source_url ?? null;
+  const sourceLabel = item.source?.source_name ?? item.source?.title ?? item.source?.source_domain ?? "Original source";
   const priceLabel = item.price_text ?? item.cost_notes;
 
   return (
@@ -140,6 +142,18 @@ export function ActivityCard({
         </p>
       ) : null}
 
+      {sourceUrl ? (
+        <a
+          href={sourceUrl}
+          target="_blank"
+          rel="noreferrer"
+          className="mt-2 inline-flex items-center gap-1 text-xs font-medium text-primary underline underline-offset-2"
+        >
+          Source: {sourceLabel}
+          <ExternalLink className="size-3" aria-hidden />
+        </a>
+      ) : null}
+
       <div className="mt-3 flex flex-wrap gap-1.5 text-xs">
         {item.area ? <Badge variant="outline">{item.area}</Badge> : null}
         {item.address ? <Badge variant="outline">{item.address}</Badge> : null}
@@ -193,6 +207,17 @@ export function ActivityCard({
             ) : null}
             {seasonal && item.time_text ? <p className="text-sm text-muted-foreground">{item.time_text}</p> : null}
             {item.description ? <p className="text-sm leading-relaxed text-muted-foreground">{item.description}</p> : null}
+            {sourceUrl ? (
+              <a
+                href={sourceUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center gap-1 text-sm font-medium text-primary underline underline-offset-2"
+              >
+                Source: {sourceLabel}
+                <ExternalLink className="size-3.5" aria-hidden />
+              </a>
+            ) : null}
             <div className="flex flex-wrap gap-1.5 text-xs">
               {item.area ? <Badge variant="outline">{item.area}</Badge> : null}
               {item.address ? <Badge variant="outline">{item.address}</Badge> : null}
