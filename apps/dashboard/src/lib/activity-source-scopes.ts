@@ -12,6 +12,7 @@ export const ACTIVITY_SOURCE_SCOPE_OPTIONS = [
   { value: "lidingo", label: "Lidingö" },
   { value: "nacka", label: "Nacka" },
   { value: "huddinge", label: "Huddinge" },
+  { value: "haninge", label: "Haninge" },
   { value: "botkyrka", label: "Botkyrka" },
   { value: "ekero", label: "Ekerö" },
   { value: "unknown", label: "Unknown" },

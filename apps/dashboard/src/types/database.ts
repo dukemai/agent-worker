@@ -222,12 +222,29 @@ export interface ActivitySourceMapping {
   id: string;
   source_domain: string;
   source_name: string | null;
+  homepage_url: string | null;
+  activity_listing_url: string | null;
+  gathering_notes: string | null;
+  collection_focus: string | null;
+  collection_instructions: string | null;
+  check_frequency: "weekly" | "monthly" | "seasonal";
+  last_checked_at: string | null;
+  season_target: string;
+  is_core: boolean;
   source_category: ActivitySourceCategory;
   source_scope: string;
   source_trust: ActivitySourceTrust;
   source_language: ActivitySourceLanguage;
   created_at: string;
   updated_at: string;
+}
+
+export interface ActivitySourceReference {
+  id: string;
+  title: string;
+  source_url: string | null;
+  source_name: string | null;
+  source_domain: string | null;
 }
 
 export interface LocalActivity {
@@ -257,6 +274,7 @@ export interface LocalActivity {
   favorite: boolean;
   created_at: string;
   updated_at: string;
+  source?: ActivitySourceReference | null;
 }
 
 export interface SeasonalActivityInstance {
@@ -290,6 +308,7 @@ export interface SeasonalActivityInstance {
   extraction_confidence: ActivityConfidence;
   created_at: string;
   updated_at: string;
+  source?: ActivitySourceReference | null;
   activity?: Pick<LocalActivity, "id" | "title" | "activity_type" | "is_evergreen"> | null;
 }
 

@@ -7,7 +7,7 @@ import type { ActivitySourceCategory, ActivitySourceLanguage, ActivitySourceMapp
 type Params = { params: Promise<{ id: string }> };
 
 const MAPPING_SELECT =
-  "id, source_domain, source_name, source_category, source_scope, source_trust, source_language, created_at, updated_at";
+  "id, source_domain, source_name, homepage_url, activity_listing_url, gathering_notes, collection_focus, collection_instructions, check_frequency, last_checked_at, season_target, is_core, source_category, source_scope, source_trust, source_language, created_at, updated_at";
 const VALID_CATEGORIES = new Set<ActivitySourceCategory>([
   "official_city",
   "municipality",
@@ -21,6 +21,7 @@ const VALID_CATEGORIES = new Set<ActivitySourceCategory>([
 ]);
 const VALID_TRUST = new Set<ActivitySourceTrust>(["official", "partner", "community", "unknown"]);
 const VALID_LANGUAGES = new Set<ActivitySourceLanguage>(["sv", "en", "mixed", "unknown"]);
+const VALID_FREQUENCIES = new Set(["weekly", "monthly", "seasonal"]);
 
 function parseUpdates(
   payload: Record<string, unknown>
@@ -40,6 +41,53 @@ function parseUpdates(
       return { error: "source_name must be a string or null" };
     }
     updates.source_name = typeof payload.source_name === "string" && payload.source_name.trim() ? payload.source_name.trim() : null;
+  }
+  for (const field of ["homepage_url", "activity_listing_url"] as const) {
+    if (!(field in payload)) continue;
+    const value = payload[field];
+    if (value !== null && typeof value !== "string") return { error: `${field} must be a URL or null` };
+    if (typeof value === "string" && value.trim()) {
+      try {
+        const url = new URL(value.trim());
+        if (!['http:', 'https:'].includes(url.protocol)) return { error: `${field} must use http or https` };
+      } catch {
+        return { error: `${field} must be a valid URL` };
+      }
+    }
+    updates[field] = typeof value === "string" && value.trim() ? value.trim() : null;
+  }
+  if ("gathering_notes" in payload) {
+    if (payload.gathering_notes !== null && typeof payload.gathering_notes !== "string") {
+      return { error: "gathering_notes must be a string or null" };
+    }
+    updates.gathering_notes =
+      typeof payload.gathering_notes === "string" && payload.gathering_notes.trim() ? payload.gathering_notes.trim() : null;
+  }
+  for (const field of ["collection_focus", "collection_instructions"] as const) {
+    if (!(field in payload)) continue;
+    const value = payload[field];
+    if (value !== null && typeof value !== "string") return { error: `${field} must be a string or null` };
+    updates[field] = typeof value === "string" && value.trim() ? value.trim() : null;
+  }
+  if ("check_frequency" in payload) {
+    if (typeof payload.check_frequency !== "string" || !VALID_FREQUENCIES.has(payload.check_frequency)) {
+      return { error: "check_frequency is invalid" };
+    }
+    updates.check_frequency = payload.check_frequency as ActivitySourceMapping["check_frequency"];
+  }
+  if ("last_checked_at" in payload) {
+    if (payload.last_checked_at !== null && typeof payload.last_checked_at !== "string") {
+      return { error: "last_checked_at must be a timestamp or null" };
+    }
+    updates.last_checked_at = payload.last_checked_at as string | null;
+  }
+  if ("season_target" in payload) {
+    if (typeof payload.season_target !== "string" || !payload.season_target.trim()) return { error: "season_target is required" };
+    updates.season_target = payload.season_target.trim();
+  }
+  if ("is_core" in payload) {
+    if (typeof payload.is_core !== "boolean") return { error: "is_core must be a boolean" };
+    updates.is_core = payload.is_core;
   }
   if ("source_category" in payload) {
     if (typeof payload.source_category !== "string" || !VALID_CATEGORIES.has(payload.source_category as ActivitySourceCategory)) {

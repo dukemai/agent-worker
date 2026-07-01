@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "season_target": "summer_2026",
+  "sources": [
+    {
+      "source_domain": "example-municipality.se",
+      "source_name": "Example Municipality",
+      "homepage_url": "https://example-municipality.se/",
+      "activity_listing_url": "https://example-municipality.se/summer-activities",
+      "source_category": "municipality",
+      "source_scope": "unknown",
+      "source_trust": "official",
+      "source_language": "sv",
+      "collection_focus": "Summer activities for children, camps, library programs, sports, and registration deadlines.",
+      "collection_instructions": "Check the activity listing and linked program pages. Preserve dates, times, age, place, price, booking details, and original URLs.",
+      "gathering_notes": "Prefer official consolidated pages and current-season information.",
+      "check_frequency": "weekly",
+      "is_core": true
+    }
+  ]
+}
