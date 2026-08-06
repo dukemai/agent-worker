@@ -61,6 +61,7 @@ apps/worker/src/
 │       ├── run-growing-suggestions.ts
 │       ├── run-digest.ts
 │       ├── run-recipe-import-queue.ts
+│       ├── run-activity-source-queue.ts
 │       ├── process-growing.ts
 │       └── post-task.ts   # Generic POST { subject, body, from } → processEmailTask
 ├── crons/
@@ -68,6 +69,7 @@ apps/worker/src/
 │   ├── growing-ingest.ts # Queued growing_sources → Gemini → growing_knowledge + windows
 │   ├── growing-suggestions.ts
 │   ├── recipe-import-queue.ts # Queued recipe markdown → saved_recipes
+│   ├── activity-source-queue.ts # Queued activity Markdown → local + seasonal activities
 │   └── learning-loop.ts
 ├── lib/
 │   ├── process-email-task.ts  # Orchestrates Gemini extraction + @agent/shared promotion-content + Supabase insert
@@ -126,6 +128,7 @@ Gmail
 | Worker → Resend | Daily digest cron | Outbound email |
 | Worker → Supabase | Growing suggestions cron (Sun, Wed) | Write `growing_suggestions_log` |
 | Worker → Supabase | Recipe import queue cron/manual trigger | Read `recipe_import_queue`, write `saved_recipes` |
+| Worker → Supabase | Daily activity source queue/manual trigger | Read `activity_sources`, write `local_activities` + `seasonal_activity_instances` |
 | Dashboard → Supabase | Every API route | Read/Write |
 
 ## Environment Variables
@@ -140,7 +143,7 @@ Gmail
 | `RESEND_API_KEY` | Resend email delivery |
 | `DIGEST_RECIPIENT_EMAIL` | Daily digest recipient |
 | `OPENWEATHER_API_KEY` | Weather forecast for Stockholm |
-| `WORKER_ADMIN_TOKEN` | Bearer token for protected manual worker routes such as `/run-recipe-import-queue` |
+| `WORKER_ADMIN_TOKEN` | Bearer token for protected manual worker routes such as `/run-recipe-import-queue` and `/run-activity-source-queue` |
 
 ### Dashboard (`.env.local`)
 

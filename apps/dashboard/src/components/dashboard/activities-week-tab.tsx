@@ -3,6 +3,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { getISOWeekNumber } from "@agent/shared";
 import { ActivityCard, formatDate, isSeasonalActivity } from "./activities-cards";
+import { ActivitiesFinder } from "./activities-finder";
 import {
   fetchActivitiesSummary,
   updateLocalActivityFavorite,
@@ -87,6 +88,17 @@ export function ActivitiesWeekTab() {
   return (
     <section className="space-y-4">
       {error ? <p className="text-sm text-red-600">{error}</p> : null}
+
+      <ActivitiesFinder
+        items={data.finder_items}
+        today={data.today}
+        onFavoriteChange={(item, favorite) =>
+          isSeasonalActivity(item)
+            ? favoriteSeasonalMutation.mutate({ id: item.id, favorite })
+            : favoriteLocalMutation.mutate({ id: item.id, favorite })
+        }
+        favoriteBusy={favoriteSeasonalMutation.isPending || favoriteLocalMutation.isPending}
+      />
 
       <div className="grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
         <section className="space-y-3">

@@ -24,6 +24,8 @@ import type {
   BirthdayDigestItem,
   ActivityDigestItem,
   TripDigestItem,
+  PlanningDayDigestItem,
+  GrowingDigestMode,
   Task,
 } from "../types";
 
@@ -43,6 +45,8 @@ type Props = {
   birthdayItems: BirthdayDigestItem[];
   tripItems: TripDigestItem[];
   activityItems: ActivityDigestItem[];
+  planningDayItems: PlanningDayDigestItem[];
+  growingMode: GrowingDigestMode;
   narrative: string;
   dashboardUrl: string;
 };
@@ -101,6 +105,8 @@ export function DailyDigestEmail(props: Props) {
     birthdayItems,
     tripItems,
     activityItems,
+    planningDayItems,
+    growingMode,
     narrative,
     dashboardUrl,
   } = props;
@@ -319,33 +325,34 @@ export function DailyDigestEmail(props: Props) {
             </Section>
 
             {/* Tasks Section */}
-            <Section className="mb-[48px]">
+            {(todayTasks.length > 0 || thisWeekTasks.length > 0) && <Section className="mb-[48px]">
               <Heading className="m-0 text-[22px] font-bold text-gray-950 mb-[24px]">
-                Targeted Tasks
+                Your plan
               </Heading>
               
-              <Section className="mb-[32px]">
+              {todayTasks.length > 0 && <Section className="mb-[32px]">
                  <Heading className="m-0 text-[14px] font-bold text-indigo-600 uppercase tracking-wider mb-[12px]">
-                   📅 High Priority
+                   📅 Act now / Today
                  </Heading>
                  <Section className="bg-indigo-50/30 rounded-xl p-[20px] border border-solid border-indigo-100/50">
                    <TaskList tasks={todayTasks} dashboardUrl={dashboardUrl} />
                  </Section>
-              </Section>
+              </Section>}
 
               {thisWeekTasks.length > 0 && (
                 <Section className="mb-[32px]">
                    <Heading className="m-0 text-[14px] font-bold text-blue-600 uppercase tracking-wider mb-[12px]">
-                     📆 Upcoming this Week
+                     📆 This week
                    </Heading>
                    <Section className="bg-blue-50/30 rounded-xl p-[20px] border border-solid border-blue-100/50">
                      <TaskList tasks={thisWeekTasks} dashboardUrl={dashboardUrl} />
                    </Section>
                 </Section>
               )}
-            </Section>
+            </Section>}
 
             {/* Growing Insights */}
+            {growingMode !== "quiet" && (growingSuggestions.length > 0 || relatedKnowledgeForGrowingTasks.length > 0) && (
             <Section className="mb-[48px]">
                 <Row className="mb-[16px]">
                   <Column>
@@ -386,13 +393,6 @@ export function DailyDigestEmail(props: Props) {
                         </Fragment>
                       ))}
                     </Section>
-                  </Section>
-                )}
-                {growingSuggestions.filter(s => s.suggestion_kind !== 'inspiration').length === 0 && (
-                  <Section className="mb-[24px] bg-emerald-50/20 rounded-xl p-[16px] border border-solid border-emerald-100/50">
-                    <Text className="m-0 text-[14px] text-gray-500 italic">
-                      No recommended growing actions for this week yet.
-                    </Text>
                   </Section>
                 )}
 
@@ -459,14 +459,26 @@ export function DailyDigestEmail(props: Props) {
                     </Section>
                   </Section>
                 )}
-                {relatedKnowledgeForGrowingTasks.length === 0 && (
-                  <Section className="mt-[24px] bg-teal-50/20 rounded-xl p-[16px] border border-solid border-teal-100/50">
-                    <Text className="m-0 text-[14px] text-gray-500 italic">
-                      No related growing knowledge matched your current growing tasks.
-                    </Text>
-                  </Section>
-                )}
               </Section>
+            )}
+
+            {planningDayItems.length > 0 && (
+              <Section className="mb-[48px]">
+                <Heading className="m-0 text-[22px] font-bold text-gray-950 mb-[16px]">Coming Up</Heading>
+                <Section className="bg-violet-50/50 rounded-xl p-[20px] border border-solid border-violet-100">
+                  {planningDayItems.map((item, index) => (
+                    <Fragment key={item.id}>
+                      {index > 0 && <Hr className="border-violet-100/50 my-[12px]" />}
+                      <Text className="m-0 font-semibold text-[15px] text-violet-950">{item.title}</Text>
+                      <Text className="m-0 mt-[2px] text-[13px] text-violet-700">
+                        {item.countdown} · {item.category.replace("_", " ")}
+                        {item.endsOn ? ` · ${item.startsOn}–${item.endsOn}` : ` · ${item.startsOn}`}
+                      </Text>
+                    </Fragment>
+                  ))}
+                </Section>
+              </Section>
+            )}
 
             {/* Upcoming Renewals */}
             {renewalItems.length > 0 && (
@@ -568,6 +580,11 @@ export function DailyDigestEmail(props: Props) {
                                 {item.endDate ? ` - ${new Date(item.endDate).toLocaleDateString("sv-SE")}` : ""}
                               </span>
                             </Text>
+                            {item.readinessWarnings.map((warning) => (
+                              <Text key={warning} className="m-0 mt-[6px] text-[13px] font-semibold text-amber-700">
+                                ⚠ {warning}
+                              </Text>
+                            ))}
                          </Column>
                       </Row>
                     </Fragment>
@@ -606,7 +623,9 @@ export function DailyDigestEmail(props: Props) {
                         <span className="ml-[8px] text-[10px] bg-blue-100 text-blue-700 px-[6px] py-[2px] rounded uppercase font-bold tracking-tighter">
                           {item.itemType}
                         </span>
+                        {item.favorite ? <span className="ml-[6px] text-amber-500">★ Favorite</span> : null}
                       </Text>
+                      {item.reason ? <Text className="m-0 mt-[3px] text-[12px] font-semibold text-blue-800">{item.reason}</Text> : null}
                       <Text className="m-0 mt-[3px] text-[13px] text-blue-700 leading-[20px]">
                         {item.dateLabel ? <span>{item.dateLabel}</span> : <span>Reusable fallback</span>}
                         {item.timeText ? <span className="ml-[8px]">{item.timeText}</span> : null}

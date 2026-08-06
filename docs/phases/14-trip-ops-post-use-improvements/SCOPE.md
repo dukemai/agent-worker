@@ -2,7 +2,7 @@
 
 ## Status
 
-Planned for after the Summer Activities phase. This phase captures feedback from using Trip Ops on real trips and should be discussed before implementation.
+Planned for after Phase 13.2 Daily Digest Improvements. This phase captures feedback from using Trip Ops on real trips and should be discussed before implementation.
 
 ## Goal
 

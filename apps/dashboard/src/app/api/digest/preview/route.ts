@@ -10,6 +10,8 @@ import type {
   BirthdayDigestItem,
   ActivityDigestItem,
   TripDigestItem,
+  PlanningDayDigestItem,
+  GrowingDigestMode,
 } from "@agent/shared";
 import { getAuthedSupabase } from "@/lib/api";
 import type { Bucket } from "@/types/database";
@@ -43,12 +45,14 @@ export type DigestPreviewResponse = {
     suggestions: GrowingSuggestionDigestItem[];
     recentKnowledge: RecentGrowingKnowledgeItem[];
     recentWindows: RecentGrowingWindowItem[];
+    mode: GrowingDigestMode;
   };
   learning: DigestLessonItem[];
   promotions: PromotionDigestItem[];
   birthdays: BirthdayDigestItem[];
   trips: TripDigestItem[];
   activities: ActivityDigestItem[];
+  planning_days: PlanningDayDigestItem[];
 };
 
 function getPreviewDate(): string {
@@ -113,12 +117,14 @@ export async function GET(request: Request) {
       suggestions: content.growingSuggestions,
       recentKnowledge: content.recentGrowingKnowledge,
       recentWindows: content.recentGrowingWindows,
+      mode: content.growingMode,
     },
     learning: content.lessons,
     promotions: content.promotionItems,
     birthdays: content.birthdayItems,
     trips: content.tripItems,
     activities: content.activityItems,
+    planning_days: content.planningDayItems,
   };
 
   return NextResponse.json(response);

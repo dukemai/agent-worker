@@ -6,18 +6,18 @@ Planned.
 
 ## Goal
 
-Replace the hard-coded red-day countdown list with a configurable public-days knowledge base that can notify the daily digest about planning-relevant dates.
+Expand the configurable planning-day foundation introduced in Phase 13.2 into a fuller public-days knowledge base.
 
 The default dataset should cover Swedish red days. The family should also be able to add practical dates such as kids returning to school, sportlov, school breaks, bridge days, term starts, local closure days, and other dates that affect household planning.
 
 ## In Scope
 
-- Data model for public days / planning days.
-- Default Swedish red-day seed data.
-- User-managed dates with category, date or date range, lead time, and digest relevance.
+- Extend the planning-day data model and management experience where needed.
+- Maintain and update the default Swedish red-day data.
+- Broader categories, lifecycle, and knowledge-base behavior beyond Phase 13.2's digest settings.
 - Digest selection logic that uses the Phase 13.1 human-scale countdown formatter.
 - Dashboard management UI or a simple admin surface for adding and editing dates.
-- Migration path away from the current hard-coded holiday list.
+- Migration cleanup or enrichment beyond the Phase 13.2 foundation.
 
 ## Out of Scope
 

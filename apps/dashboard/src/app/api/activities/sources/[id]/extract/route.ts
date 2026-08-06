@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { errorResponse, getAuthedSupabase } from "@/lib/api";
-import { extractActivitiesFromMarkdown } from "@/lib/activity-extraction";
+import { extractActivitiesFromMarkdown } from "@agent/shared";
 
 type Params = { params: Promise<{ id: string }> };
 
@@ -24,14 +24,22 @@ export async function POST(_request: Request, { params }: Params) {
 
   if (fetchError) return errorResponse(fetchError.message, 500);
   if (!source) return errorResponse("Source not found", 404);
+  if (source.status !== "queued" && source.status !== "failed") {
+    return errorResponse("Source is not available for extraction", 409);
+  }
 
   const rawMarkdown = typeof source.raw_markdown === "string" ? source.raw_markdown.trim() : "";
   if (!rawMarkdown) return errorResponse("Source Markdown is empty");
 
-  await auth.supabase
+  const { data: claimed, error: claimError } = await auth.supabase
     .from("activity_sources")
     .update({ status: "processing", error_message: null })
-    .eq("id", id);
+    .eq("id", id)
+    .eq("status", source.status)
+    .select("id")
+    .maybeSingle();
+  if (claimError) return errorResponse(claimError.message, 500);
+  if (!claimed) return errorResponse("Source was already claimed for extraction", 409);
 
   try {
     const extracted = await extractActivitiesFromMarkdown(apiKey, {

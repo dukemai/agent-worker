@@ -75,6 +75,7 @@ export interface TripDigestItem {
   endDate: string | null;
   status: string;
   daysLeft: number;
+  readinessWarnings: string[];
 }
 
 export interface ActivityDigestItem {
@@ -92,7 +93,21 @@ export interface ActivityDigestItem {
   bookingDeadline: string | null;
   bookingUrl: string | null;
   tags: string[];
+  favorite: boolean;
+  reason: string | null;
 }
+
+export interface PlanningDayDigestItem {
+  id: string;
+  title: string;
+  category: "red_day" | "school" | "family" | "closure" | "other";
+  startsOn: string;
+  endsOn: string | null;
+  daysLeft: number;
+  countdown: string;
+}
+
+export type GrowingDigestMode = "high_growth" | "harvest" | "quiet";
 
 /** Minimal lesson shape for digest email (profile_type, topic, content). */
 export interface DigestLessonItem {

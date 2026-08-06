@@ -23,6 +23,9 @@ erDiagram
     trips ||--o{ trip_decisions : "tracks"
     trips ||--o{ trip_itinerary_items : "plans"
     trip_options ||--o{ trip_itinerary_items : "can seed"
+    book_inspiration_sessions ||--o{ book_inspiration_candidates : "collects"
+    book_inspiration_sessions ||--o{ book_inspiration_shortlist_entries : "organizes"
+    book_inspiration_candidates ||--o| book_inspiration_shortlist_entries : "ranked as"
 ```
 
 ---
@@ -58,7 +61,14 @@ A curriculum-based system for daily micro-learning.
 | `learning_profile` | Defines topics and current learning progress. | - |
 | `learning_log` | History of daily lessons and user feedback. | `profile_id` -> `learning_profile.id` |
 
-### 4. Trip Ops
+### 4. Daily Digest Preferences
+
+| Table | Purpose | Key Relationships |
+|-------|---------|-------------------|
+| `digest_preferences` | Singleton digest controls: red-day lead window and editable high-growth/harvest period boundaries. | Read by the shared digest builder. |
+| `planning_days` | Editable red days, school dates/ranges, family dates, and closures with lead time and enable state. | Read by the shared digest builder. |
+
+### 5. Trip Ops
 Family travel planning with dedicated user-owned rows and task integration.
 
 | Table | Purpose | Key Relationships |
@@ -163,6 +173,10 @@ Data from the ingestion pipeline (YouTube/Blogs).
 - `feedback` (TEXT): User rating/comments on the lesson quality.
 
 ### 4. Utilities
+
+#### Book inspiration sessions
+
+`book_inspiration_sessions` stores a user-owned intention and editable discovery brief. `book_inspiration_candidates` stores manually captured, source-grounded title facts. `book_inspiration_shortlist_entries` stores Gemini ranking and interpretation separately, with a unique entry per candidate in a session. Deleting a session cascades through its candidates and shortlist; owner-scoped RLS protects all three tables.
 
 #### `family_context`
 A simple key-value store for cross-cutting user preferences.

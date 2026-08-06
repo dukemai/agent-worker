@@ -3,6 +3,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { fetchDigestPreview } from "@/lib/digest-api";
+import { DigestSettingsCard } from "@/components/dashboard/digest-settings-card";
 
 export function DigestPreviewCard() {
   const previewQuery = useQuery({
@@ -25,6 +26,7 @@ export function DigestPreviewCard() {
 
   return (
     <main className="mx-auto w-full max-w-7xl px-4 py-6 space-y-4">
+      <DigestSettingsCard />
       <Card>
         <CardHeader>
           <CardTitle>
@@ -122,4 +124,3 @@ export function DigestPreviewCard() {
     </main>
   );
 }
-

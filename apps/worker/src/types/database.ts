@@ -5,6 +5,7 @@
 export type GrowingSourceStatus = "queued" | "processing" | "done" | "failed";
 export type RecipeImportQueueStatus = "pending" | "processing" | "completed" | "failed";
 export type RecipeDifficulty = "easy" | "medium" | "hard";
+export type ActivitySourceStatus = "queued" | "processing" | "processed" | "failed";
 export type GrowingKnowledgeCategory =
   | "technique"
   | "plant-profile"
@@ -17,6 +18,38 @@ export type GrowingKnowledgeCategory =
 export interface Database {
   public: {
     Tables: {
+      activity_sources: {
+        Row: {
+          id: string; title: string; source_url: string | null; raw_markdown: string; status: ActivitySourceStatus;
+          error_message: string | null; activities_extracted: number; attempts: number; run_after: string;
+          processing_started_at: string | null; processed_at: string | null; created_at: string; updated_at: string;
+        };
+        Insert: Partial<Database["public"]["Tables"]["activity_sources"]["Row"]> & { title: string; raw_markdown: string };
+        Update: Partial<Database["public"]["Tables"]["activity_sources"]["Row"]>;
+      };
+      local_activities: {
+        Row: { id: string; activity_key: string };
+        Insert: {
+          source_id: string; activity_key: string; title: string; description: string | null; activity_type: string;
+          age_min: number | null; age_max: number | null; age_notes: string | null; address: string | null; area: string | null;
+          location_url: string | null; cost_level: string; price_text: string | null; cost_notes: string | null;
+          booking_required: boolean; booking_notes: string | null; weather_fit: string; energy_level: string;
+          usual_duration_minutes: number | null; tags: string[]; status: string; is_evergreen: boolean;
+        };
+        Update: Partial<Database["public"]["Tables"]["local_activities"]["Insert"]>;
+      };
+      seasonal_activity_instances: {
+        Row: { id: string; source_id: string; instance_key: string };
+        Insert: {
+          source_id: string; activity_id: string | null; instance_key: string; season: string; title: string; description: string | null;
+          valid_from: string | null; valid_until: string | null; occurrence_dates: string[]; time_text: string | null;
+          address: string | null; area: string | null; cost_level: string; price_text: string | null; cost_notes: string | null;
+          booking_required: boolean; booking_deadline: string | null; booking_url: string | null; weather_fit: string;
+          energy_level: string; age_min: number | null; age_max: number | null; age_notes: string | null; tags: string[];
+          status: string; extraction_confidence: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["seasonal_activity_instances"]["Insert"]>;
+      };
       growing_sources: {
         Row: {
           id: string;

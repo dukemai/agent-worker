@@ -1,0 +1,131 @@
+{
+  "schema": "dad-ops.planning-days",
+  "version": 1,
+  "planning_days": [
+    {
+      "title": "Terminens första dag",
+      "category": "school",
+      "date_type": "single",
+      "date": "2026-01-07",
+      "enabled": true,
+      "notes": "Många skolor har lagt in en studiedag den 7 januari och börjar istället den 8 januari."
+    },
+    {
+      "title": "Studiedag",
+      "category": "school",
+      "date_type": "single",
+      "date": "2026-02-12",
+      "enabled": true,
+      "notes": null
+    },
+    {
+      "title": "Sportlov",
+      "category": "school",
+      "date_type": "period",
+      "starts_on": "2026-02-23",
+      "ends_on": "2026-02-27",
+      "enabled": true,
+      "notes": "Vecka 9."
+    },
+    {
+      "title": "Påsklov",
+      "category": "school",
+      "date_type": "period",
+      "starts_on": "2026-04-06",
+      "ends_on": "2026-04-10",
+      "enabled": true,
+      "notes": "Vecka 15."
+    },
+    {
+      "title": "Lov vid Kristi himmelsfärds dag",
+      "category": "school",
+      "date_type": "single",
+      "date": "2026-05-15",
+      "enabled": true,
+      "notes": null
+    },
+    {
+      "title": "Läsårsavslutning",
+      "category": "school",
+      "date_type": "single",
+      "date": "2026-06-11",
+      "enabled": true,
+      "notes": null
+    },
+    {
+      "title": "Läsårets första skoldag",
+      "category": "school",
+      "date_type": "single",
+      "date": "2026-08-19",
+      "enabled": true,
+      "notes": null
+    },
+    {
+      "title": "Höstlov",
+      "category": "school",
+      "date_type": "period",
+      "starts_on": "2026-10-26",
+      "ends_on": "2026-10-30",
+      "enabled": true,
+      "notes": null
+    },
+    {
+      "title": "Höstterminens sista dag",
+      "category": "school",
+      "date_type": "single",
+      "date": "2026-12-18",
+      "enabled": true,
+      "notes": null
+    },
+    {
+      "title": "Terminens första dag",
+      "category": "school",
+      "date_type": "single",
+      "date": "2027-01-07",
+      "enabled": true,
+      "notes": "Många skolor har lagt in en studiedag den 7 januari och börjar istället den 8 januari."
+    },
+    {
+      "title": "Studiedag",
+      "category": "school",
+      "date_type": "single",
+      "date": "2027-02-18",
+      "enabled": true,
+      "notes": null
+    },
+    {
+      "title": "Sportlov",
+      "category": "school",
+      "date_type": "period",
+      "starts_on": "2027-03-01",
+      "ends_on": "2027-03-05",
+      "enabled": true,
+      "notes": "Vecka 9."
+    },
+    {
+      "title": "Påsklov",
+      "category": "school",
+      "date_type": "period",
+      "starts_on": "2027-03-29",
+      "ends_on": "2027-04-02",
+      "enabled": true,
+      "notes": "Vecka 13."
+    },
+    {
+      "title": "Lov vid Kristi himmelsfärds dag",
+      "category": "school",
+      "date_type": "single",
+      "date": "2027-05-07",
+      "enabled": true,
+      "notes": null
+    },
+    {
+      "title": "Läsårsavslutning",
+      "category": "school",
+      "date_type": "single",
+      "date": "2027-06-09",
+      "enabled": true,
+      "notes": null
+    }
+  ]
+}

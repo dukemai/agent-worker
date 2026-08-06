@@ -29,6 +29,7 @@ One user: a busy dad in Stockholm who checks email every morning and has fragmen
 | Vietnamese meals | [requirements/vietnamese-meals.md](requirements/vietnamese-meals.md) | Curated Vietnamese meal catalog for recipe inspiration and future tourist app reuse |
 | Promo shopping pipeline (phases) | [requirements/promo-shopping-pipeline-phases.md](requirements/promo-shopping-pipeline-phases.md) | Later sub-phases B–G (crawl, DB, matching, meals) around promos + shared list |
 | Trip Ops | [requirements/trip-ops.md](requirements/trip-ops.md) | `/trips`; logistics, structured participants, curated preferences, decisions, itinerary blocks, and trip tasks |
+| Inspiration Sources | [requirements/inspiration-sources.md](requirements/inspiration-sources.md) | `/inspirations`; trusted book discovery sources and source-health visibility |
 | Learning | [requirements/learning.md](requirements/learning.md) | Topic/category lessons; multi-agent specialization → Phase 12 (`docs/phases/12-learning-agents/`) |
 
 ## Data Schema (Supabase)
@@ -50,6 +51,7 @@ One user: a busy dad in Stockholm who checks email every morning and has fragmen
 | `shared_shopping_lists` / `shared_shopping_list_items` | (planned) opaque `public_slug`; items: label, line state, optional `source_recipe_id` | Output of prepare; shareable buy list |
 | `recipe_share_links` | opaque `public_slug`, `scope_type`, optional `recipe_id` / `food_type_id`, `disabled_at` | Read-only public recipe or food-style share links |
 | `vietnamese_meals` / `vietnamese_meal_recipe_links` | canonical meal rows, typed tag arrays, recipe links | Vietnamese meal inspiration catalog |
+| `book_inspiration_sessions` / `book_inspiration_candidates` / `book_inspiration_shortlist_entries` | intention and brief, source-grounded candidates, separate LLM ranking | Resumable book discovery and shortlist workflow |
 
 Renewals: `tasks` with `metadata.item_type = "renewal"`. Promotions: `tasks` with `metadata.email_type = "promotion"`.
 

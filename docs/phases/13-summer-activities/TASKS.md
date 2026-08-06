@@ -13,4 +13,8 @@
 - [x] Add per-source collection missions, check cadence, user-curated seasonal targets, freshness tracking, and coverage progress.
 - [x] Add validated JSON upload for AI-compiled source directories with domain-based upsert.
 - [x] Add per-directory-source notes intake that creates a queued Markdown source.
+- [x] Add deterministic Week-tab Activity Finder with phrase parsing, quick intentions, structured filters, ranked reasons, and full active-catalog access.
+- [x] Add bookmarklet website capture, authenticated review, sanitized HTML provenance, template matching, and queue handoff.
+- [x] Add daily Worker processing for queued activity sources with atomic claims, stale recovery, retries, and protected manual trigger.
+- [x] Add direct manual entry for anytime Library activities and date-bound Seasonal activities without extraction.
 - [x] Verify dashboard build.

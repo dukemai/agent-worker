@@ -1,0 +1,31 @@
+{
+  "schema": "dad-ops.planning-days",
+  "version": 1,
+  "planning_days": [
+    {
+      "title": "School starts",
+      "category": "school",
+      "date_type": "single",
+      "date": "2026-08-18",
+      "enabled": true,
+      "notes": null
+    },
+    {
+      "title": "Sportlov",
+      "category": "school",
+      "date_type": "period",
+      "starts_on": "2027-03-01",
+      "ends_on": "2027-03-05",
+      "enabled": true,
+      "notes": "Adjust to the municipality school calendar."
+    },
+    {
+      "title": "Allhelgonadagen",
+      "category": "red_day",
+      "date_type": "single",
+      "date": "2026-10-31",
+      "enabled": true,
+      "notes": null
+    }
+  ]
+}

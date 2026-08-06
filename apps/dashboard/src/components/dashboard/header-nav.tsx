@@ -19,6 +19,7 @@ const recipeChildLinks = [
 
 const moreLinks = [
   { href: "/activities", label: "Summer Activities" },
+  { href: "/inspirations", label: "Inspirations" },
   { href: "/trips", label: "Trip Ops" },
   { href: "/trips/preferences", label: "Trip preferences" },
   { href: "/learning", label: "Learning" },

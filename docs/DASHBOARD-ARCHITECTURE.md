@@ -55,6 +55,7 @@ dashboard/src/
 | `/learning` | Learning | `GET/POST /api/learning/profiles`, feedback, log |
 | `/context` | Context | `GET/PUT /api/context`, `GET/PUT /api/context/[key]` |
 | `/growing` | Growing | `GET/POST /api/growing/sources`, `GET /api/growing/knowledge`, `GET /api/growing/weekly`, profile, convert, process |
+| `/digest` | Digest preview and settings | `GET /api/digest/preview`, CRUD via `/api/digest/settings` |
 | `/recipes` | Recipes hub | Cook/search/plan, Manage library/import/generate, Collect family ideas, Share read-only recipe links |
 | `/recipes/[id]/cook` | Focused recipe cooking view | `GET /api/recipes/[id]/cook`, optional `PATCH /api/recipes/[id]` for owner feedback |
 | `/recipes/shared/[slug]` | Public recipe share | `GET /api/public/recipe-shares/[slug]` via anon RPC |
@@ -63,6 +64,7 @@ dashboard/src/
 | `/trips/shared/[slug]` | Public trip share | `GET /api/public/trip-shares/[slug]` via anon RPC |
 | `/trips/preferences` | Trip preference admin | `GET/POST /api/trip-preference-suggestions`, `PATCH/DELETE /api/trip-preference-suggestions/[id]` |
 | `/vietnamese-meals` | Vietnamese meals | `GET/POST /api/vietnamese-meals`, enrichment, recipe suggestions, recipe links |
+| `/inspirations` | Book Inspirations | Persisted discovery sessions, Google/source browsing, candidate capture, and Gemini-organized shortlist via `/api/inspirations/*` |
 
 ## Auth
 

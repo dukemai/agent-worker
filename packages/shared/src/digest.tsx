@@ -10,6 +10,8 @@ import type {
   RecentGrowingWindowItem,
   BirthdayDigestItem,
   ActivityDigestItem,
+  PlanningDayDigestItem,
+  GrowingDigestMode,
   TripDigestItem,
   Task,
 } from "./types";
@@ -271,7 +273,7 @@ export async function fetchUpcomingTrips(
 
   if (error || !data) return [];
 
-  return (data as any[])
+  const trips = (data as any[])
     .filter((row) => typeof row.start_date === "string" && typeof row.title === "string")
     .map((row) => ({
       id: row.id,
@@ -281,10 +283,23 @@ export async function fetchUpcomingTrips(
       endDate: typeof row.end_date === "string" ? row.end_date : null,
       status: typeof row.status === "string" ? row.status : "planning",
       daysLeft: utcCalendarDaysUntilDue(row.start_date, now),
+      readinessWarnings: [],
     }))
     .filter((item) => item.daysLeft >= 0 && item.daysLeft <= 45)
     .sort((a, b) => a.daysLeft - b.daysLeft)
     .slice(0, 5);
+
+  if (trips.length === 0) return trips;
+  const { data: itinerary } = await supabase
+    .from("trip_itinerary_items")
+    .select("trip_id, day_number")
+    .in("trip_id", trips.map((trip) => trip.id))
+    .eq("day_number", 1);
+  const withDayOne = new Set(((itinerary ?? []) as any[]).map((row) => row.trip_id));
+  return trips.map((trip) => ({
+    ...trip,
+    readinessWarnings: trip.daysLeft <= 21 && !withDayOne.has(trip.id) ? ["Day 1 itinerary is missing"] : [],
+  }));
 }
 
 function formatActivityDateLabel(row: any): string | null {
@@ -327,13 +342,13 @@ export async function fetchActivityDigestItems(
     supabase
       .from("seasonal_activity_instances")
       .select(
-        "id, title, description, valid_from, valid_until, occurrence_dates, time_text, address, area, cost_level, booking_required, booking_deadline, booking_url, weather_fit, tags, status"
+        "id, title, description, valid_from, valid_until, occurrence_dates, time_text, address, area, cost_level, booking_required, booking_deadline, booking_url, weather_fit, tags, status, favorite"
       )
       .eq("status", "active")
       .limit(80),
     supabase
       .from("local_activities")
-      .select("id, title, description, address, area, cost_level, booking_required, location_url, weather_fit, tags, status")
+      .select("id, title, description, address, area, cost_level, booking_required, location_url, weather_fit, tags, status, favorite")
       .eq("status", "active")
       .eq("is_evergreen", true)
       .limit(30),
@@ -348,11 +363,12 @@ export async function fetchActivityDigestItems(
       const deadlineB = typeof b.booking_deadline === "string" ? b.booking_deadline : "9999-12-31";
       const dateA = typeof a.valid_from === "string" ? a.valid_from : "9999-12-31";
       const dateB = typeof b.valid_from === "string" ? b.valid_from : "9999-12-31";
-      return deadlineA.localeCompare(deadlineB) || dateA.localeCompare(dateB);
+      return Number(b.favorite === true) - Number(a.favorite === true) || deadlineA.localeCompare(deadlineB) || dateA.localeCompare(dateB);
     });
 
   const evergreen = ((evergreenResult.data ?? []) as any[])
     .filter((row) => !options?.rainForecast || row.weather_fit === "indoor" || row.weather_fit === "mixed")
+    .sort((a, b) => Number(b.favorite === true) - Number(a.favorite === true))
     .slice(0, 2);
 
   const picked: ActivityDigestItem[] = [];
@@ -381,6 +397,8 @@ export async function fetchActivityDigestItems(
         bookingDeadline: row.booking_deadline ?? null,
         bookingUrl: row.booking_url ?? null,
         tags: Array.isArray(row.tags) ? row.tags : [],
+        favorite: row.favorite === true,
+        reason: row.favorite === true ? "Favorite happening today" : "Happening today",
       })
     );
 
@@ -402,6 +420,8 @@ export async function fetchActivityDigestItems(
         bookingDeadline: row.booking_deadline ?? null,
         bookingUrl: row.booking_url ?? null,
         tags: Array.isArray(row.tags) ? row.tags : [],
+        favorite: row.favorite === true,
+        reason: row.favorite === true ? "Favorite that needs booking" : "Booking needed",
       })
     );
 
@@ -421,6 +441,8 @@ export async function fetchActivityDigestItems(
       bookingDeadline: row.booking_deadline ?? null,
       bookingUrl: row.booking_url ?? null,
       tags: Array.isArray(row.tags) ? row.tags : [],
+      favorite: row.favorite === true,
+      reason: row.favorite === true ? "Favorite for this week" : "Relevant this week",
     })
   );
 
@@ -440,6 +462,8 @@ export async function fetchActivityDigestItems(
       bookingDeadline: null,
       bookingUrl: row.location_url ?? null,
       tags: Array.isArray(row.tags) ? row.tags : [],
+      favorite: row.favorite === true,
+      reason: row.favorite === true ? "Favorite fallback" : options?.rainForecast ? "Weather-friendly fallback" : "Evergreen fallback",
     })
   );
 
@@ -481,14 +505,66 @@ const SWEDISH_HOLIDAYS = [
   { name: "Nyårsdagen", date: "2027-01-01", is_red_day: true },
 ];
 
-function getNextHoliday(now = new Date()) {
+function getNextHoliday(now = new Date(), leadDays = 21) {
   for (const h of SWEDISH_HOLIDAYS) {
     const holidayDate = new Date(`${h.date}T00:00:00Z`);
-    if (utcCalendarDaysUntilDue(h.date, now) >= 0) {
+    const days = utcCalendarDaysUntilDue(h.date, now);
+    if (days >= 0 && days <= leadDays) {
       return { ...h, date: holidayDate };
     }
   }
   return null;
+}
+
+type DigestPreferences = {
+  redDayLeadDays: number;
+  highGrowthStart: string;
+  highGrowthEnd: string;
+  harvestStart: string;
+  harvestEnd: string;
+};
+
+const DEFAULT_DIGEST_PREFERENCES: DigestPreferences = {
+  redDayLeadDays: 21,
+  highGrowthStart: "04-01",
+  highGrowthEnd: "07-31",
+  harvestStart: "08-01",
+  harvestEnd: "10-15",
+};
+
+async function fetchDigestPreferences(supabase: SupabaseClient): Promise<DigestPreferences> {
+  const { data, error } = await supabase.from("digest_preferences").select("*").eq("singleton", true).maybeSingle();
+  if (error || !data) return DEFAULT_DIGEST_PREFERENCES;
+  return {
+    redDayLeadDays: typeof data.red_day_lead_days === "number" ? data.red_day_lead_days : 21,
+    highGrowthStart: data.high_growth_start ?? "04-01",
+    highGrowthEnd: data.high_growth_end ?? "07-31",
+    harvestStart: data.harvest_start ?? "08-01",
+    harvestEnd: data.harvest_end ?? "10-15",
+  };
+}
+
+function isMonthDayBetween(value: string, start: string, end: string): boolean {
+  return start <= end ? value >= start && value <= end : value >= start || value <= end;
+}
+
+function resolveGrowingMode(now: Date, preferences: DigestPreferences): GrowingDigestMode {
+  const monthDay = now.toISOString().slice(5, 10);
+  if (isMonthDayBetween(monthDay, preferences.highGrowthStart, preferences.highGrowthEnd)) return "high_growth";
+  if (isMonthDayBetween(monthDay, preferences.harvestStart, preferences.harvestEnd)) return "harvest";
+  return "quiet";
+}
+
+async function fetchPlanningDayItems(supabase: SupabaseClient, now: Date, redDayLeadDays: number): Promise<PlanningDayDigestItem[]> {
+  const today = now.toISOString().slice(0, 10);
+  const horizon = addUtcDays(now, 180).toISOString().slice(0, 10);
+  const { data, error } = await supabase.from("planning_days").select("id, title, category, starts_on, ends_on").eq("enabled", true).gte("starts_on", today).lte("starts_on", horizon).order("starts_on");
+  if (error || !data) return [];
+  return (data as any[]).map((row) => {
+    const daysLeft = utcCalendarDaysUntilDue(row.starts_on, now);
+    const leadDays = row.category === "red_day" ? redDayLeadDays : 21;
+    return { id: row.id, title: row.title, category: row.category, startsOn: row.starts_on, endsOn: row.ends_on ?? null, daysLeft, countdown: formatHumanScaleCountdown(daysLeft) ?? "", leadDays };
+  }).filter((row) => row.daysLeft >= 0 && row.daysLeft <= row.leadDays && row.countdown).slice(0, 5);
 }
 
 /** Calendar-day difference: due date minus today in UTC (aligns with YYYY-MM-DD due dates from the DB). */
@@ -564,6 +640,8 @@ export async function generateBriefingNarrative(
   birthdayItems: BirthdayDigestItem[],
   tripItems: TripDigestItem[],
   activityItems: ActivityDigestItem[],
+  planningDayItems: PlanningDayDigestItem[],
+  redDayLeadDays: number,
   rainForecast: boolean
 ): Promise<string> {
   const now = new Date();
@@ -582,7 +660,7 @@ export async function generateBriefingNarrative(
   const lines: string[] = [];
 
   // 1) Countdown to Swedish Holiday
-  const nextHoliday = getNextHoliday(now);
+  const nextHoliday = planningDayItems.length === 0 ? getNextHoliday(now, redDayLeadDays) : null;
   if (nextHoliday) {
     const days = utcCalendarDaysUntilDue(nextHoliday.date.toISOString().slice(0, 10), now);
     const countdown = formatHumanScaleCountdown(days);
@@ -593,6 +671,11 @@ export async function generateBriefingNarrative(
     } else if (countdown) {
       lines.push(`Det är ${countdown} kvar till ${nextHoliday.name}.`);
     }
+  }
+
+  for (const day of planningDayItems) {
+    if (day.daysLeft === 0) lines.push(`Idag börjar ${day.title}.`);
+    else if (day.daysLeft === 1) lines.push(`Imorgon börjar ${day.title}.`);
   }
 
   // 1b) Birthday countdowns (Focus on next 7 days in briefing)
@@ -616,6 +699,9 @@ export async function generateBriefingNarrative(
       lines.push(
         `Det är ${trip.daysLeft} ${trip.daysLeft === 1 ? "dag" : "dagar"} kvar till resan till ${label}.`
       );
+    }
+    for (const warning of trip.readinessWarnings) {
+      lines.push(`Förbered resan till ${label}: ${warning}.`);
     }
   }
 
@@ -667,7 +753,11 @@ export async function generateBriefingNarrative(
     lines.push([todayPart, weekPart, laterPart].filter(Boolean).join(" "));
   }
 
-  lines.push("Scrolla igenom listorna nedan och välj 1–3 saker som verkligen spelar roll idag.");
+  if (totalCount > 0) {
+    lines.push("Scrolla igenom listorna nedan och välj 1–3 saker som verkligen spelar roll idag.");
+  } else {
+    lines.push("Det här ser ut som en lugn dag. Du behöver inte fylla den med nya måsten.");
+  }
 
   return lines.join("\n\n");
 }
@@ -693,6 +783,8 @@ export async function buildEmailHtml(
   birthdayItems: BirthdayDigestItem[],
   tripItems: TripDigestItem[],
   activityItems: ActivityDigestItem[],
+  planningDayItems: PlanningDayDigestItem[],
+  growingMode: GrowingDigestMode,
   narrative: string,
   dashboardUrl: string
 ): Promise<string> {
@@ -721,6 +813,8 @@ export async function buildEmailHtml(
       narrative={narrative}
       tripItems={tripItems}
       activityItems={activityItems}
+      planningDayItems={planningDayItems}
+      growingMode={growingMode}
       dashboardUrl={dashboardUrl}
     />
   );
@@ -759,6 +853,8 @@ export type DigestEmailContent = {
   birthdayItems: BirthdayDigestItem[];
   tripItems: TripDigestItem[];
   activityItems: ActivityDigestItem[];
+  planningDayItems: PlanningDayDigestItem[];
+  growingMode: GrowingDigestMode;
   growingSuggestions: GrowingSuggestionDigestItem[];
   recentGrowingKnowledge: RecentGrowingKnowledgeItem[];
   recentGrowingWindows: RecentGrowingWindowItem[];
@@ -776,20 +872,29 @@ export async function loadDigestEmailContent(
 ): Promise<DigestEmailContent> {
   const lessons = options.lessons ?? [];
 
-  const [todayTasks, thisWeekTasks, laterTasks, birthdayItems, tripItems, activityItems] = await Promise.all([
+  const preferences = await fetchDigestPreferences(supabase);
+  const [todayTasks, thisWeekTasks, laterTasks, birthdayItems, tripItems, activityItems, planningDayItems] = await Promise.all([
     fetchPendingTasksForBucket(supabase, "today_tasks"),
     fetchPendingTasksForBucket(supabase, "this_week_tasks"),
     fetchPendingTasksForBucket(supabase, "later_tasks"),
     fetchUpcomingBirthdays(supabase),
     fetchUpcomingTrips(supabase),
     fetchActivityDigestItems(supabase, { rainForecast: options.rainForecast }),
+    fetchPlanningDayItems(supabase, new Date(), preferences.redDayLeadDays),
   ]);
   const allTasks = [...todayTasks, ...thisWeekTasks, ...laterTasks];
   const promotionItems = extractPromotionItems(allTasks);
   const renewalItems = extractRenewalItems(allTasks);
+  const growingMode = resolveGrowingMode(new Date(), preferences);
 
   let growingSuggestions: GrowingSuggestionDigestItem[] = await fetchWeeklyGrowingSuggestions(supabase);
-  if (growingSuggestions.length === 0 && options.ensureWeeklySuggestionsWhenEmpty) {
+  if (growingMode === "quiet") growingSuggestions = [];
+  if (growingMode === "harvest") {
+    const harvestPattern = /harvest|skörd|pick|plock|preserv|förvar|torka|frys/i;
+    const harvestFocused = growingSuggestions.filter((item) => harvestPattern.test(`${item.title} ${item.details}`));
+    growingSuggestions = (harvestFocused.length > 0 ? harvestFocused : growingSuggestions).slice(0, 2);
+  }
+  if (growingMode !== "quiet" && growingSuggestions.length === 0 && options.ensureWeeklySuggestionsWhenEmpty) {
     try {
       const profile = await ensureGrowingProfile(supabase);
       const generated = await generateWeeklySuggestions(supabase, profile);
@@ -806,6 +911,11 @@ export async function loadDigestEmailContent(
     } catch (err) {
       console.warn("Growing suggestions generation during digest failed, continuing:", err);
     }
+  }
+  if (growingMode === "harvest") {
+    const harvestPattern = /harvest|skörd|pick|plock|preserv|förvar|torka|frys/i;
+    const harvestFocused = growingSuggestions.filter((item) => harvestPattern.test(`${item.title} ${item.details}`));
+    growingSuggestions = (harvestFocused.length > 0 ? harvestFocused : growingSuggestions).slice(0, 2);
   }
 
   // "Related Knowledge" in the email: derived from unfinished growing tasks linked to `growing_windows` via `window_id`.
@@ -828,6 +938,8 @@ export async function loadDigestEmailContent(
   } catch (err) {
     console.warn("Supporting knowledge for digest failed, continuing:", err);
   }
+  if (growingMode === "quiet") relatedGrowingKnowledge = [];
+  if (growingMode === "harvest") relatedGrowingKnowledge = relatedGrowingKnowledge.slice(0, 2);
 
   const recentGrowingWindows: RecentGrowingWindowItem[] = [];
 
@@ -845,6 +957,8 @@ export async function loadDigestEmailContent(
         birthdayItems,
         tripItems,
         activityItems,
+        planningDayItems,
+        preferences.redDayLeadDays,
         options.rainForecast
       );
     } catch (err) {
@@ -865,6 +979,8 @@ export async function loadDigestEmailContent(
     birthdayItems,
     tripItems,
     activityItems,
+    planningDayItems,
+    growingMode,
     growingSuggestions,
     recentGrowingKnowledge: relatedGrowingKnowledge,
     recentGrowingWindows,
@@ -894,6 +1010,8 @@ export async function buildDigestEmailHtml(
     content.birthdayItems,
     content.tripItems,
     content.activityItems,
+    content.planningDayItems,
+    content.growingMode,
     content.narrative,
     dashboardUrl
   );

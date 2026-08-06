@@ -2,7 +2,7 @@
 
 ## Status
 
-Active.
+Done. See [RETRO.md](RETRO.md).
 
 ## Goal
 
@@ -32,4 +32,3 @@ Build a Summer Activities workflow for kids: collect Markdown suggestions, extra
 - The dashboard shows what can be done this week.
 - The daily digest includes a concise Summer Activities section.
 - Activities can be dismissed from the dashboard.
-
