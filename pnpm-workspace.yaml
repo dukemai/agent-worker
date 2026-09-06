@@ -1,4 +1,13 @@
 packages:
-  - "."
-  - "apps/*"
-  - "packages/*"
+  - .
+  - apps/*
+  - packages/*
+
+ignoredBuiltDependencies:
+  - msw
+  - sharp
+  - unrs-resolver
+  - workerd
+
+onlyBuiltDependencies:
+  - esbuild
