@@ -1,8 +1,9 @@
 import { createClient } from "@supabase/supabase-js";
-import { buildDigestEmailHtml, loadDigestEmailContent } from "@agent/shared";
+import { buildDigestEmailHtml, loadDigestEmailContent, recordDigestDeliveries, stockholmDate } from "@agent/shared";
 import { getStockholmWeather } from "../lib/weather";
 import { sendEmail } from "../lib/resend";
 import { type GeneratedLesson } from "./learning-loop";
+import type { Env } from "../types/env";
 
 export async function runDailyDigest(env: Env): Promise<void> {
   if (!env.RESEND_API_KEY || !env.DIGEST_RECIPIENT_EMAIL) {
@@ -31,15 +32,30 @@ export async function runDailyDigest(env: Env): Promise<void> {
     weatherSummary,
     rainForecast,
     lessons,
+    targetDate: stockholmDate(),
   });
+
+  if (!content.shouldSend) {
+    console.log(`Daily digest suppressed for ${content.targetDate}: no actionable exceptions`);
+    return;
+  }
 
   const dashboardUrl = "https://agent-workder-dashboard.vercel.app";
 
   const html = await buildDigestEmailHtml(content, dashboardUrl);
 
-  const totalTasks =
-    content.todayTasks.length + content.thisWeekTasks.length + content.laterTasks.length;
-  const subject = `Dad-Ops: ${content.todayTasks.length} today · ${totalTasks} total — ${new Date().toLocaleDateString("sv-SE")}`;
+  const exceptionCount =
+    content.todayTasks.length +
+    content.thisWeekTasks.length +
+    content.renewalItems.length +
+    content.birthdayItems.length +
+    content.tripItems.length +
+    content.activityItems.length +
+    content.planningDayItems.length +
+    content.growingSuggestions.length +
+    content.recentGrowingKnowledge.length +
+    content.promotionItems.length;
+  const subject = `Dad-Ops: ${exceptionCount} ${exceptionCount === 1 ? "exception" : "exceptions"} — ${content.targetDate}`;
 
   await sendEmail(env.RESEND_API_KEY, {
     from: "Dad-Ops Agent <digest@wkalender.app>",
@@ -47,6 +63,7 @@ export async function runDailyDigest(env: Env): Promise<void> {
     subject,
     html,
   });
+  await recordDigestDeliveries(supabase, content.targetDate, content.deliveryItems);
 
   console.log(
     `Daily digest sent to ${env.DIGEST_RECIPIENT_EMAIL} (today: ${content.todayTasks.length}, week: ${content.thisWeekTasks.length}, later: ${content.laterTasks.length})`

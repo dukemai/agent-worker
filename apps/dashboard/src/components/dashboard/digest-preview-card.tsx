@@ -37,6 +37,11 @@ export function DigestPreviewCard() {
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
+          {!data.should_send ? (
+            <p className="rounded-md border border-emerald-200 bg-emerald-50 p-3 text-sm text-emerald-900">
+              This is a quiet day. The scheduled digest would not send an email.
+            </p>
+          ) : null}
           <section>
             <h2 className="text-base font-semibold">Tasks (preview)</h2>
             <div className="mt-2 grid gap-3 md:grid-cols-3">

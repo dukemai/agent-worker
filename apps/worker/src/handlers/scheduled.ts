@@ -5,6 +5,7 @@ import { runGrowingSuggestions } from "../crons/growing-suggestions";
 import { runRecipeImportQueue } from "../crons/recipe-import-queue";
 import { runActivitySourceQueue } from "../crons/activity-source-queue";
 import type { Env } from "../types/env";
+import { stockholmHour } from "@agent/shared";
 
 export async function handleScheduled(
   event: ScheduledEvent,
@@ -21,7 +22,7 @@ export async function handleScheduled(
           await runRecipeImportQueue(env, { limit: 5 });
         } else if (cron === "45 3 * * *") {
           await runActivitySourceQueue(env, { limit: 3 });
-        } else {
+        } else if ((cron === "30 4 * * *" || cron === "30 5 * * *") && stockholmHour() === 6) {
           await runGrowingIngest(env);
           await runDailyDigest(env);
         }

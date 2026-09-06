@@ -296,7 +296,7 @@ export function DailyDigestEmail(props: Props) {
             </Section>
 
             {/* Weather Block */}
-            <Section className="bg-blue-50/50 rounded-xl p-[20px] mb-[32px] border border-solid border-blue-100/50">
+            {rainForecast ? <Section className="bg-blue-50/50 rounded-xl p-[20px] mb-[32px] border border-solid border-blue-100/50">
               <Row>
                 <Column width="40" valign="top" className="pr-[12px]">
                    <Text className="m-0 text-[24px]">🌤</Text>
@@ -305,24 +305,22 @@ export function DailyDigestEmail(props: Props) {
                   <Text className="m-0 text-gray-700 leading-[24px]">
                     <strong>Stockholm Weather:</strong> {weatherSummary}
                   </Text>
-                  {rainForecast && (
-                    <Text className="m-0 mt-[8px] text-blue-700 font-semibold">
-                      ☔ Remind kids to bring rain coats today!
-                    </Text>
-                  )}
+                  <Text className="m-0 mt-[8px] text-blue-700 font-semibold">
+                    ☔ Remind kids to bring rain coats today!
+                  </Text>
                 </Column>
               </Row>
-            </Section>
+            </Section> : null}
 
             {/* Today's Briefing */}
-            <Section className="mb-[40px]">
+            {narrative.trim() ? <Section className="mb-[40px]">
               <Heading className="m-0 text-[14px] font-bold text-indigo-600 uppercase tracking-[0.1em] mb-[12px]">
                 Today&apos;s Briefing
               </Heading>
               <Section className="bg-gray-50 rounded-xl p-[24px] border border-solid border-gray-100">
                 {narrative.split("\n\n").map((p, idx, arr) => renderBriefingParagraph(p, idx, arr))}
               </Section>
-            </Section>
+            </Section> : null}
 
             {/* Tasks Section */}
             {(todayTasks.length > 0 || thisWeekTasks.length > 0) && <Section className="mb-[48px]">

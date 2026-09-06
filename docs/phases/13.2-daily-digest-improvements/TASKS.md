@@ -28,6 +28,9 @@
 - [x] Add upcoming-trip completeness checks, starting with missing day-one itinerary data.
 - [x] Add configurable growing periods and season-aware digest volume/focus.
 - [x] Add compact quiet-day rendering.
+- [x] Suppress quiet-day delivery and unchanged repeated items with delivery-state memory.
+- [x] Apply explicit reminder milestones, favorite-activity rules, promotion caps, and Monday/Friday growing cadence.
+- [x] Use one Stockholm target date for preview, selection, rendering, and DST-safe scheduling.
 - [ ] Add period-end rewind only after its behavior is agreed.
 
 ## Verification
@@ -35,5 +38,6 @@
 - [x] Delivered email and dashboard preview use the same shared content and ordering rules.
 - [x] Dashboard TypeScript and lint pass.
 - [x] Production dashboard build passes.
+- [x] Add deterministic relevance-policy tests for DST, calendar dates, change detection, milestones, and quiet-day sending.
 - [ ] Apply migration `060_daily_digest_preferences.sql` and verify against deployed Supabase data.
 - [ ] Exercise red-day, school date, favorite activity, missing itinerary, and all three growing modes in digest preview.

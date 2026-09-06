@@ -2,6 +2,9 @@
   "name": "@agent/shared",
   "version": "0.1.0",
   "private": true,
+  "scripts": {
+    "test": "node --test --experimental-strip-types src/digest-relevance.test.mjs"
+  },
   "main": "src/index.ts",
   "types": "src/index.ts",
   "dependencies": {

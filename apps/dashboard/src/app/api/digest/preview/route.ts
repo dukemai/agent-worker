@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { buildDigestEmailHtml, loadDigestEmailContent } from "@agent/shared";
+import { addCalendarDays, buildDigestEmailHtml, loadDigestEmailContent, stockholmDate } from "@agent/shared";
 import type {
   DigestLessonItem,
   GrowingSuggestionDigestItem,
@@ -32,6 +32,7 @@ type DigestWeatherPreview = {
 export type DigestPreviewResponse = {
   date: string;
   generated_at: string;
+  should_send: boolean;
   weather: DigestWeatherPreview;
   narrative: string;
   html: string;
@@ -56,9 +57,7 @@ export type DigestPreviewResponse = {
 };
 
 function getPreviewDate(): string {
-  const now = new Date();
-  now.setUTCDate(now.getUTCDate() + 1);
-  return now.toISOString().slice(0, 10);
+  return addCalendarDays(stockholmDate(), 1);
 }
 
 export async function GET(request: Request) {
@@ -79,6 +78,7 @@ export async function GET(request: Request) {
     weatherSummary,
     rainForecast,
     lessons: [],
+    targetDate: previewDate,
   });
 
   const url = new URL(request.url);
@@ -101,6 +101,7 @@ export async function GET(request: Request) {
   const response: DigestPreviewResponse = {
     date: previewDate,
     generated_at: new Date().toISOString(),
+    should_send: content.shouldSend,
     weather: {
       summary: content.weatherSummary,
       rainForecast: content.rainForecast,

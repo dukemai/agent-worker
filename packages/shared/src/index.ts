@@ -3,6 +3,7 @@
 export * from "./emails";
 export * from "./activity-extraction";
 export * from "./digest";
+export * from "./digest-relevance";
 export * from "./fetch-pending-tasks";
 export * from "./gemini";
 export * from "./growing";

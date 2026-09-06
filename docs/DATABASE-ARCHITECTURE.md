@@ -67,6 +67,7 @@ A curriculum-based system for daily micro-learning.
 |-------|---------|-------------------|
 | `digest_preferences` | Singleton digest controls: red-day lead window and editable high-growth/harvest period boundaries. | Read by the shared digest builder. |
 | `planning_days` | Editable red days, school dates/ranges, family dates, and closures with lead time and enable state. | Read by the shared digest builder. |
+| `digest_item_delivery_state` | Last delivered material-content hash, date, and count per stable digest item key. | Suppresses unchanged repeat content; updated only after successful email delivery. |
 
 ### 5. Trip Ops
 Family travel planning with dedicated user-owned rows and task integration.

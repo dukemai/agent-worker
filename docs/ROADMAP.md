@@ -88,6 +88,7 @@
 - [x] Review the current digest as a morning decision surface and identify its highest-friction sections
 - [x] Implement task-led horizons, three-week planning-day visibility, favorite activities, trip-readiness reminders, season-aware growing, and quiet-day behavior
 - [x] Add editable digest settings and shared preview/delivery behavior
+- [x] Add relevance memory, milestone reminders, a no-send quiet-day gate, and DST-safe Stockholm delivery
 
 ### Phase 14: Trip Ops Post-Use Improvements — planned after Daily Digest Improvements
 - [ ] Fast access to current/relevant trips and a read-first trip run sheet

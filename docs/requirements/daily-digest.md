@@ -62,6 +62,22 @@ The email is task-led and ordered by decision horizon:
 
 Quiet days should remain short and calm. The system should not promote low-signal content merely to fill every section.
 
+### Relevance Memory And Send Gate
+
+The digest is an exception surface, not a daily inventory. Successful deliveries record a stable item key and a hash of the material content that was shown. Unchanged items stay suppressed until a defined reminder milestone; changed items become eligible again. Failed deliveries do not advance this state.
+
+- A quiet day sends no email.
+- New or materially changed normal tasks may appear once; due-today and overdue tasks remain interruptive.
+- Renewals use T-30, T-14, T-7, T-2, T-1, and due-day milestones.
+- Birthdays use T-14, T-7, T-2, T-1, and the birthday.
+- Trips use T-14, T-7, T-3, T-1, and departure day, plus material plan/readiness changes.
+- Planning days use their first eligible appearance and T-21, T-14, T-7, T-2, T-1, and start-day milestones where applicable.
+- Activities are limited to favorites and appear for today, an imminent booking deadline, or Thursday-through-Saturday weekend planning.
+- Growing content appears only on Monday and Friday and only when pending and not already shown unchanged.
+- Promotions are capped at three and repeat only after a material change.
+
+All selection uses one explicit Stockholm target date shared by preview, narrative, and delivery. Cron runs at both possible UTC offsets and sends only when the local Stockholm hour is 06:30.
+
 ## Favorite Activities
 
 Activities marked as favorites should be eligible for the digest when they are timely: occurring today or soon, ending soon, approaching a booking deadline, or fitting the coming weekend. The digest should include only a small number and state why each appears now.
