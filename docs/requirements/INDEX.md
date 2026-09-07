@@ -6,6 +6,7 @@ Doc routing for feature-specific specs. Use [GLOSSARY.md](../GLOSSARY.md) for do
 |-----|----------|
 | [ingestion.md](ingestion.md) | Email pipeline, task extraction, bucketing |
 | [daily-digest.md](daily-digest.md) | Morning email, sections, cron |
+| [weekly-planning.md](weekly-planning.md) | Sunday planning email for meals, shopping, tasks, and family dates |
 | [dashboard.md](dashboard.md) | App layout, sections, interactions |
 | [renewals.md](renewals.md) | Dual-date, escalation, recurrence |
 | [growing.md](growing.md) | Sources, windows, suggestions, profile |

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { addCalendarDays, buildDigestEmailHtml, loadDigestEmailContent, stockholmDate } from "@agent/shared";
 import type {
   DigestLessonItem,
+  DigestSendReason,
   GrowingSuggestionDigestItem,
   PromotionDigestItem,
   RecentGrowingKnowledgeItem,
@@ -33,6 +34,7 @@ export type DigestPreviewResponse = {
   date: string;
   generated_at: string;
   should_send: boolean;
+  send_reasons: DigestSendReason[];
   weather: DigestWeatherPreview;
   narrative: string;
   html: string;
@@ -102,6 +104,7 @@ export async function GET(request: Request) {
     date: previewDate,
     generated_at: new Date().toISOString(),
     should_send: content.shouldSend,
+    send_reasons: content.sendReasons,
     weather: {
       summary: content.weatherSummary,
       rainForecast: content.rainForecast,

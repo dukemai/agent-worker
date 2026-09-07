@@ -73,10 +73,13 @@ The digest is an exception surface, not a daily inventory. Successful deliveries
 - Trips use T-14, T-7, T-3, T-1, and departure day, plus material plan/readiness changes.
 - Planning days use their first eligible appearance and T-21, T-14, T-7, T-2, T-1, and start-day milestones where applicable.
 - Activities are limited to favorites and appear for today, an imminent booking deadline, or Thursday-through-Saturday weekend planning.
+- Summer Activities taper from a recognized autumn school-start planning date: at most two items in the first school week, at most one today/imminent-booking item in weeks two and three, then none after three weeks. Without a recognized school-start date, the normal activity rules remain in effect.
 - Growing content appears only on Monday and Friday and only when pending and not already shown unchanged.
 - Promotions are capped at three and repeat only after a material change.
 
 All selection uses one explicit Stockholm target date shared by preview, narrative, and delivery. Cron runs at both possible UTC offsets and sends only when the local Stockholm hour is 06:30.
+
+Every sent digest begins with a compact **Why this was sent** summary built from the same filtered payload that controls the send gate. The dashboard preview shows the equivalent **Why this would send** explanation. Routine weekly planning is handled separately by the Sunday [Weekly Planning](weekly-planning.md) email.
 
 ## Favorite Activities
 

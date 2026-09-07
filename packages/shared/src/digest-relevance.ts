@@ -35,6 +35,13 @@ export function addCalendarDays(ymd: string, days: number): string {
   return date.toISOString().slice(0, 10);
 }
 
+export function nextMondayDate(fromYmd: string): string {
+  const date = new Date(`${fromYmd}T12:00:00Z`);
+  const day = date.getUTCDay();
+  const daysAhead = day === 1 ? 7 : (8 - day) % 7;
+  return addCalendarDays(fromYmd, daysAhead);
+}
+
 export function calendarDaysBetween(fromYmd: string, toYmd: string): number {
   const toUtc = Date.parse(`${toYmd}T00:00:00Z`);
   const fromUtc = Date.parse(`${fromYmd}T00:00:00Z`);
@@ -65,6 +72,20 @@ export function isNewOrChanged(
 
 export function isReminderMilestone(daysLeft: number, milestones: readonly number[]): boolean {
   return milestones.includes(daysLeft);
+}
+
+export type SummerActivityPhase = "full" | "taper" | "essential_only" | "off";
+
+export function resolveSummerActivityPhase(
+  targetDate: string,
+  schoolStartDate: string | null
+): SummerActivityPhase {
+  if (!schoolStartDate) return "full";
+  const daysSinceSchoolStart = calendarDaysBetween(schoolStartDate, targetDate);
+  if (daysSinceSchoolStart < 0) return "full";
+  if (daysSinceSchoolStart <= 6) return "taper";
+  if (daysSinceSchoolStart <= 20) return "essential_only";
+  return "off";
 }
 
 export function isDigestSendWorthy(input: {

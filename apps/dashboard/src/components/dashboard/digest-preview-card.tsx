@@ -42,6 +42,14 @@ export function DigestPreviewCard() {
               This is a quiet day. The scheduled digest would not send an email.
             </p>
           ) : null}
+          {data.send_reasons.length > 0 ? (
+            <p className="rounded-md border border-indigo-200 bg-indigo-50 p-3 text-sm text-indigo-950">
+              <span className="font-semibold">Why this would send:</span>{" "}
+              {data.send_reasons
+                .map((reason) => `${reason.count}× ${reason.label}`)
+                .join(" · ")}
+            </p>
+          ) : null}
           <section>
             <h2 className="text-base font-semibold">Tasks (preview)</h2>
             <div className="mt-2 grid gap-3 md:grid-cols-3">

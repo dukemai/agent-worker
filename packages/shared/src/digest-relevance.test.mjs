@@ -7,6 +7,8 @@ import {
   isDigestSendWorthy,
   isNewOrChanged,
   isReminderMilestone,
+  nextMondayDate,
+  resolveSummerActivityPhase,
   stockholmDate,
   stockholmHour,
 } from "./digest-relevance.ts";
@@ -22,6 +24,8 @@ test("Stockholm target date and hour follow daylight saving time", () => {
 test("calendar helpers do not depend on runtime timezone", () => {
   assert.equal(addCalendarDays("2026-12-31", 1), "2027-01-01");
   assert.equal(calendarDaysBetween("2026-09-03", "2026-09-10"), 7);
+  assert.equal(nextMondayDate("2026-09-06"), "2026-09-07");
+  assert.equal(nextMondayDate("2026-09-07"), "2026-09-14");
 });
 
 test("unchanged items are suppressed while material changes are eligible", () => {
@@ -36,6 +40,16 @@ test("unchanged items are suppressed while material changes are eligible", () =>
 test("reminders appear only at explicit milestones", () => {
   assert.equal(isReminderMilestone(7, [14, 7, 2, 0]), true);
   assert.equal(isReminderMilestone(6, [14, 7, 2, 0]), false);
+});
+
+test("summer activities taper after school begins", () => {
+  assert.equal(resolveSummerActivityPhase("2026-08-17", "2026-08-18"), "full");
+  assert.equal(resolveSummerActivityPhase("2026-08-18", "2026-08-18"), "taper");
+  assert.equal(resolveSummerActivityPhase("2026-08-24", "2026-08-18"), "taper");
+  assert.equal(resolveSummerActivityPhase("2026-08-25", "2026-08-18"), "essential_only");
+  assert.equal(resolveSummerActivityPhase("2026-09-07", "2026-08-18"), "essential_only");
+  assert.equal(resolveSummerActivityPhase("2026-09-08", "2026-08-18"), "off");
+  assert.equal(resolveSummerActivityPhase("2026-09-08", null), "full");
 });
 
 test("quiet days do not send, but a real exception does", () => {

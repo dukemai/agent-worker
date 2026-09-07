@@ -12,3 +12,4 @@ export * from "./promotions";
 export * from "./recipe-food-types";
 export * from "./types";
 export * from "./utils";
+export * from "./weekly-planning";

@@ -109,6 +109,12 @@ export interface PlanningDayDigestItem {
 
 export type GrowingDigestMode = "high_growth" | "harvest" | "quiet";
 
+export interface DigestSendReason {
+  code: string;
+  label: string;
+  count: number;
+}
+
 /** Minimal lesson shape for digest email (profile_type, topic, content). */
 export interface DigestLessonItem {
   profile_type: string;

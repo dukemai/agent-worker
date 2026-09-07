@@ -2,6 +2,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { render } from "@react-email/render";
 import type {
   DigestLessonItem,
+  DigestSendReason,
   GrowingSuggestionDigestItem,
   GrowingTaskDigestItem,
   PromotionDigestItem,
@@ -35,6 +36,7 @@ import {
   isDigestSendWorthy,
   isNewOrChanged,
   isReminderMilestone,
+  resolveSummerActivityPhase,
   stockholmDate,
   type DigestDeliveryItem,
   type DigestItemState,
@@ -579,6 +581,29 @@ async function fetchPlanningDayItems(supabase: SupabaseClient, now: Date, redDay
   }).filter((row) => row.daysLeft >= 0 && row.daysLeft <= row.leadDays && row.countdown).slice(0, 5);
 }
 
+const SCHOOL_START_TITLE_PATTERN = /school starts?|back to school|first school day|skolstart|första skoldag|terminens första dag|läsårets första skoldag/i;
+
+export async function fetchAutumnSchoolStartDate(
+  supabase: SupabaseClient,
+  targetDate: string
+): Promise<string | null> {
+  const year = targetDate.slice(0, 4);
+  const { data, error } = await supabase
+    .from("planning_days")
+    .select("title, starts_on")
+    .eq("enabled", true)
+    .eq("category", "school")
+    .gte("starts_on", `${year}-07-01`)
+    .lte("starts_on", `${year}-09-30`)
+    .lte("starts_on", targetDate)
+    .order("starts_on", { ascending: false });
+  if (error || !data) return null;
+  const schoolStart = (data as { title: string; starts_on: string }[]).find((row) =>
+    SCHOOL_START_TITLE_PATTERN.test(row.title)
+  );
+  return schoolStart?.starts_on ?? null;
+}
+
 /** Calendar-day difference: due date minus today in UTC (aligns with YYYY-MM-DD due dates from the DB). */
 function utcCalendarDaysUntilDue(ymd: string, now: Date): number {
   const [y, m, d] = ymd.split("-").map(Number);
@@ -698,7 +723,8 @@ export async function buildEmailHtml(
   growingMode: GrowingDigestMode,
   narrative: string,
   dashboardUrl: string,
-  targetDate = stockholmDate()
+  targetDate = stockholmDate(),
+  sendReasons: DigestSendReason[] = []
 ): Promise<string> {
   const date = new Date(`${targetDate}T12:00:00Z`).toLocaleDateString("sv-SE", {
     weekday: "long",
@@ -728,6 +754,7 @@ export async function buildEmailHtml(
       planningDayItems={planningDayItems}
       growingMode={growingMode}
       dashboardUrl={dashboardUrl}
+      sendReasons={sendReasons}
     />
   );
 }
@@ -758,6 +785,7 @@ export type LoadDigestEmailContentOptions = {
 export type DigestEmailContent = {
   targetDate: string;
   shouldSend: boolean;
+  sendReasons: DigestSendReason[];
   deliveryItems: DigestDeliveryItem[];
   weatherSummary: string;
   rainForecast: boolean;
@@ -820,7 +848,7 @@ export async function loadDigestEmailContent(
     return picked;
   };
 
-  const [rawTodayTasks, rawThisWeekTasks, laterTasks, rawBirthdayItems, rawTripItems, rawActivityItems, rawPlanningDayItems] = await Promise.all([
+  const [rawTodayTasks, rawThisWeekTasks, laterTasks, rawBirthdayItems, rawTripItems, rawActivityItems, rawPlanningDayItems, schoolStartDate] = await Promise.all([
     fetchPendingTasksForBucket(supabase, "today_tasks"),
     fetchPendingTasksForBucket(supabase, "this_week_tasks"),
     fetchPendingTasksForBucket(supabase, "later_tasks"),
@@ -828,6 +856,7 @@ export async function loadDigestEmailContent(
     fetchUpcomingTrips(supabase, targetDate),
     fetchActivityDigestItems(supabase, { rainForecast: options.rainForecast, targetDate }),
     fetchPlanningDayItems(supabase, targetNow, preferences.redDayLeadDays),
+    fetchAutumnSchoolStartDate(supabase, targetDate),
   ]);
   const selectTask = (task: Task) => {
     if (task.metadata?.item_type === "renewal" || task.metadata?.item_type === "growing" || task.metadata?.email_type === "promotion") return false;
@@ -868,15 +897,19 @@ export async function loadDigestEmailContent(
   );
   const dayOfWeek = targetNow.getUTCDay();
   const isWeekendPlanningDay = dayOfWeek === 4 || dayOfWeek === 5 || dayOfWeek === 6;
+  const summerActivityPhase = resolveSummerActivityPhase(targetDate, schoolStartDate);
   const eligibleActivityItems = rawActivityItems.filter((item) => {
     const happensToday = item.dateLabel?.includes(targetDate) === true;
     const deadlineDays = item.bookingDeadline ? calendarDaysBetween(targetDate, item.bookingDeadline) : null;
     const urgentBooking = deadlineDays !== null && deadlineDays >= 0 && deadlineDays <= 2;
+    if (summerActivityPhase === "off") return false;
+    if (summerActivityPhase === "essential_only") return happensToday || urgentBooking;
     return happensToday || urgentBooking || isWeekendPlanningDay;
   });
   const activityItems: ActivityDigestItem[] = [];
+  const activityLimit = summerActivityPhase === "taper" ? 2 : summerActivityPhase === "essential_only" ? 1 : 3;
   for (const item of eligibleActivityItems) {
-    if (activityItems.length >= 3) break;
+    if (activityItems.length >= activityLimit) break;
     const happensToday = item.dateLabel?.includes(targetDate) === true;
     const deadlineDays = item.bookingDeadline ? calendarDaysBetween(targetDate, item.bookingDeadline) : null;
     const urgentBooking = deadlineDays !== null && deadlineDays >= 0 && deadlineDays <= 2;
@@ -979,7 +1012,7 @@ export async function loadDigestEmailContent(
     }
   }
 
-  const shouldSend = isDigestSendWorthy({
+  const sendReasonCounts = {
     rainForecast: options.rainForecast,
     todayTasks: todayTasks.length,
     thisWeekTasks: thisWeekTasks.length,
@@ -991,11 +1024,25 @@ export async function loadDigestEmailContent(
     growingSuggestions: growingSuggestions.length,
     growingKnowledge: relatedGrowingKnowledge.length,
     promotions: promotionItems.length,
-  });
+  };
+  const shouldSend = isDigestSendWorthy(sendReasonCounts);
+  const sendReasons: DigestSendReason[] = [
+    { code: "rain", label: "rain may affect the family routine", count: options.rainForecast ? 1 : 0 },
+    { code: "today_tasks", label: "new, changed, or urgent task for today", count: todayTasks.length },
+    { code: "week_tasks", label: "new or changed task for this week", count: thisWeekTasks.length },
+    { code: "renewals", label: "renewal reminder reached a milestone", count: renewalItems.length },
+    { code: "birthdays", label: "birthday reminder reached a milestone", count: birthdayItems.length },
+    { code: "trips", label: "trip reminder or readiness change", count: tripItems.length },
+    { code: "activities", label: "timely favorite activity", count: activityItems.length },
+    { code: "planning_days", label: "school, closure, or family planning date", count: planningDayItems.length },
+    { code: "growing", label: "current growing action or knowledge", count: growingSuggestions.length + relatedGrowingKnowledge.length },
+    { code: "promotions", label: "new or changed promotion", count: promotionItems.length },
+  ].filter((reason) => reason.count > 0);
 
   return {
     targetDate,
     shouldSend,
+    sendReasons,
     deliveryItems,
     weatherSummary: options.weatherSummary,
     rainForecast: options.rainForecast,
@@ -1069,6 +1116,7 @@ export async function buildDigestEmailHtml(
     content.growingMode,
     content.narrative,
     dashboardUrl,
-    content.targetDate
+    content.targetDate,
+    content.sendReasons
   );
 }

@@ -15,6 +15,7 @@ import {
 import React, { Fragment } from "react";
 import type {
   DigestLessonItem,
+  DigestSendReason,
   GrowingSuggestionDigestItem,
   GrowingTaskDigestItem,
   PromotionDigestItem,
@@ -49,6 +50,7 @@ type Props = {
   growingMode: GrowingDigestMode;
   narrative: string;
   dashboardUrl: string;
+  sendReasons: DigestSendReason[];
 };
 
 function TaskList({ tasks, dashboardUrl }: { tasks: Task[]; dashboardUrl: string }) {
@@ -109,6 +111,7 @@ export function DailyDigestEmail(props: Props) {
     growingMode,
     narrative,
     dashboardUrl,
+    sendReasons,
   } = props;
 
   const hasNewKnowledge =
@@ -294,6 +297,19 @@ export function DailyDigestEmail(props: Props) {
                 {date}
               </Text>
             </Section>
+
+            {sendReasons.length > 0 ? (
+              <Section className="mb-[28px] rounded-xl border border-solid border-indigo-100 bg-indigo-50/50 p-[18px]">
+                <Text className="m-0 text-[12px] font-bold uppercase tracking-wider text-indigo-700">
+                  Why this was sent
+                </Text>
+                <Text className="m-0 mt-[6px] text-[14px] leading-[21px] text-gray-700">
+                  {sendReasons
+                    .map((reason) => `${reason.count}× ${reason.label}`)
+                    .join(" · ")}
+                </Text>
+              </Section>
+            ) : null}
 
             {/* Weather Block */}
             {rainForecast ? <Section className="bg-blue-50/50 rounded-xl p-[20px] mb-[32px] border border-solid border-blue-100/50">

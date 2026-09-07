@@ -89,6 +89,7 @@
 - [x] Implement task-led horizons, three-week planning-day visibility, favorite activities, trip-readiness reminders, season-aware growing, and quiet-day behavior
 - [x] Add editable digest settings and shared preview/delivery behavior
 - [x] Add relevance memory, milestone reminders, a no-send quiet-day gate, and DST-safe Stockholm delivery
+- [x] Explain every daily send and move routine planning into a Sunday evening weekly email
 
 ### Phase 14: Trip Ops Post-Use Improvements — planned after Daily Digest Improvements
 - [ ] Fast access to current/relevant trips and a read-first trip run sheet

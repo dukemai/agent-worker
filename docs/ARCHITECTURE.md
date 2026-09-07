@@ -66,6 +66,7 @@ apps/worker/src/
 │       └── post-task.ts   # Generic POST { subject, body, from } → processEmailTask
 ├── crons/
 │   ├── daily-digest.ts   # Fetch tasks, weather, runLearningLoop, build email, Resend
+│   ├── weekly-planning.ts # Sunday meals, shopping, tasks, and family planning email
 │   ├── growing-ingest.ts # Queued growing_sources → Gemini → growing_knowledge + windows
 │   ├── growing-suggestions.ts
 │   ├── recipe-import-queue.ts # Queued recipe markdown → saved_recipes

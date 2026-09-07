@@ -30,6 +30,9 @@
 - [x] Add compact quiet-day rendering.
 - [x] Suppress quiet-day delivery and unchanged repeated items with delivery-state memory.
 - [x] Apply explicit reminder milestones, favorite-activity rules, promotion caps, and Monday/Friday growing cadence.
+- [x] Gradually phase Summer Activities out for three weeks after a configured autumn school-start date.
+- [x] Show a shared “Why this was sent” explanation in delivered email and preview.
+- [x] Separate routine meals, shopping, tasks, and family dates into a Sunday weekly planning email.
 - [x] Use one Stockholm target date for preview, selection, rendering, and DST-safe scheduling.
 - [ ] Add period-end rewind only after its behavior is agreed.
 

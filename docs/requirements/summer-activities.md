@@ -112,6 +112,8 @@ Seasonal instances should capture:
 
 ## Digest Behavior
 
+Summer activity volume follows the configured school calendar. A recognized autumn school-start planning day begins a gradual phase-out: the first seven days allow at most two otherwise-eligible favorites, days 8–21 allow at most one activity happening today or needing imminent booking, and later days omit the section. This affects only the digest; the activity library remains available in the dashboard.
+
 The morning digest should include at most a few high-signal items:
 
 - fixed-time activities today
