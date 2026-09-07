@@ -7,7 +7,7 @@ Morning email sent at 06:30 Stockholm time. Primary decision surface for the day
 ## Workflow
 
 1. Cloudflare Cron Trigger runs daily at 05:30 UTC (06:30 Stockholm).
-2. Worker fetches pending tasks, Stockholm weather, learning lessons, promotions, renewals, and growing suggestions.
+2. Worker fetches pending tasks, Stockholm weather, current learning program days, promotions, renewals, and growing suggestions.
 3. Gemini generates a narrative briefing (weather-aware, e.g., rain = remind kids about rain coats).
 4. A single structured email is sent via Resend.
 
@@ -19,7 +19,7 @@ Morning email sent at 06:30 Stockholm time. Primary decision surface for the day
 - **Garden This Week** — Converted growing tasks + weekly ideas *(included only on Mondays and Fridays)*
 - **New Growing Knowledge** — Recent tips from videos/articles (last 24h) *(included only on Mondays and Fridays)*
 - **Upcoming Renewals** — T-30 to T-1
-- **Today's Learning** — Bite-sized lessons
+- **Today's Learning** — Current day from each active uploaded program, repeated until marked done
 - **Deals for You** — Matched promotions
 - **Upcoming Trips** — Trips starting in the next 45 days, with countdowns highlighted in the briefing during the final 14 days
 

@@ -18,7 +18,7 @@ erDiagram
     growing_sources ||--o{ growing_knowledge : "provides"
     growing_sources ||--o{ growing_windows : "defines"
     
-    learning_profile ||--o{ learning_log : "tracks"
+    learning_programs ||--o{ learning_program_days : "tracks"
     trips ||--o{ trip_options : "collects"
     trips ||--o{ trip_decisions : "tracks"
     trips ||--o{ trip_itinerary_items : "plans"
@@ -58,8 +58,8 @@ A curriculum-based system for daily micro-learning.
 
 | Table | Purpose | Key Relationships |
 |-------|---------|-------------------|
-| `learning_profile` | Defines topics and current learning progress. | - |
-| `learning_log` | History of daily lessons and user feedback. | `profile_id` -> `learning_profile.id` |
+| `learning_programs` | Uploaded curriculum and explicit current-day pointer. | - |
+| `learning_program_days` | Full numbered content and resource sequence. | `program_id` -> `learning_programs.id` (cascade) |
 
 ### 4. Daily Digest Preferences
 
@@ -165,13 +165,16 @@ Data from the ingestion pipeline (YouTube/Blogs).
 
 ### 3. Learning Domain
 
-#### `learning_profile`
-- `topic`: The subject being learned.
-- `curriculum_outline` (JSONB): The AI-generated path for this topic.
+#### `learning_programs`
+- `title`, `topic`, `total_days` (1–365), `current_day` (starts at 1).
+- `status`: active, paused, completed, archived. Only marking a day done advances progress; the last day completes the program.
+- `created_at`, `updated_at`; existing timestamp trigger and authenticated full-access RLS.
 
-#### `learning_log`
-- `content` (TEXT): The generated lesson text.
-- `feedback` (TEXT): User rating/comments on the lesson quality.
+#### `learning_program_days`
+- Unique `(program_id, day_number)`; cascading foreign key to program.
+- `title`, `content` (text), `resources` (JSON array), `created_at`.
+- Full curriculum uploaded together; all active programs contribute their current day to the digest repeatedly until completion.
+- Migration 062 creates both tables. Optional legacy deletion lives outside migrations in `supabase/manual/063_drop_legacy_learning.sql` for later manual application.
 
 ### 4. Utilities
 

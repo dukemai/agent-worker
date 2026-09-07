@@ -115,9 +115,7 @@ export interface DigestSendReason {
   count: number;
 }
 
-/** Minimal lesson shape for digest email (profile_type, topic, content). */
-export interface DigestLessonItem {
-  profile_type: string;
-  topic: string;
-  content: string;
+export interface LearningProgramDigestItem {
+  programId: string; programTitle: string; dayNumber: number; totalDays: number;
+  dayTitle: string; content: string; resources: string[];
 }

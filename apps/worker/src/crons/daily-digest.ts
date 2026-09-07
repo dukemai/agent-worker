@@ -2,7 +2,6 @@ import { createClient } from "@supabase/supabase-js";
 import { buildDigestEmailHtml, loadDigestEmailContent, recordDigestDeliveries, stockholmDate } from "@agent/shared";
 import { getStockholmWeather } from "../lib/weather";
 import { sendEmail } from "../lib/resend";
-import { type GeneratedLesson } from "./learning-loop";
 import type { Env } from "../types/env";
 
 export async function runDailyDigest(env: Env): Promise<void> {
@@ -11,9 +10,6 @@ export async function runDailyDigest(env: Env): Promise<void> {
   }
 
   const supabase = createClient(env.SUPABASE_URL, env.SUPABASE_SERVICE_KEY);
-
-  // Generate today's learning lessons first so digest can include them.
-  const lessons: GeneratedLesson[] = [];
 
   let weatherSummary = "Weather unavailable";
   let rainForecast = false;
@@ -31,7 +27,6 @@ export async function runDailyDigest(env: Env): Promise<void> {
     ensureWeeklySuggestionsWhenEmpty: true,
     weatherSummary,
     rainForecast,
-    lessons,
     targetDate: stockholmDate(),
   });
 

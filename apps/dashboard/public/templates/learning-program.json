@@ -1,0 +1,27 @@
+{
+  "schema": "dad-ops.learning-program",
+  "version": 1,
+  "title": "Learn Spanish basics",
+  "topic": "Spanish",
+  "total_days": 3,
+  "days": [
+    {
+      "day_number": 1,
+      "title": "Greetings",
+      "content": "Today: hola, buenos días, ¿cómo estás?",
+      "resources": []
+    },
+    {
+      "day_number": 2,
+      "title": "Numbers 1-10",
+      "content": "Count from uno to diez.",
+      "resources": []
+    },
+    {
+      "day_number": 3,
+      "title": "Basic questions",
+      "content": "Ask and answer ¿cómo te llamas? and ¿de dónde eres?",
+      "resources": []
+    }
+  ]
+}

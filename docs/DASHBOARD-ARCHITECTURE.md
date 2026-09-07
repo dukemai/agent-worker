@@ -22,7 +22,7 @@ dashboard/src/
 │   │   ├── auth/            # Auth callback
 │   │   ├── context/         # Family context CRUD
 │   │   ├── growing/         # Growing: sources, knowledge, weekly, profile, convert
-│   │   ├── learning/        # Learning profiles, feedback, log
+│   │   ├── learning/        # Learning program upload, browse, progress
 │   │   ├── reminders/      # Renewal reminders
 │   │   └── tasks/          # Tasks + bucket moves
 │   ├── auth/                # Auth confirm/callback pages
@@ -52,7 +52,7 @@ dashboard/src/
 | Route | Page | Main API surface |
 |-------|------|------------------|
 | `/` | Tasks | `GET/POST /api/tasks`, `POST /api/tasks/[id]/move` |
-| `/learning` | Learning | `GET/POST /api/learning/profiles`, feedback, log |
+| `/learning` | Learning | `/api/learning/programs`, import, status, advance |
 | `/context` | Context | `GET/PUT /api/context`, `GET/PUT /api/context/[key]` |
 | `/growing` | Growing | `GET/POST /api/growing/sources`, `GET /api/growing/knowledge`, `GET /api/growing/weekly`, profile, convert, process |
 | `/digest` | Digest preview and settings | `GET /api/digest/preview`, CRUD via `/api/digest/settings` |
@@ -85,7 +85,7 @@ Manual “process” flows (e.g. growing extract or recipe import queue runs) go
 ## Feature Areas
 
 - **Tasks**: Buckets (today / this week / later), renewals; move between buckets via `/api/tasks/[id]/move`.
-- **Learning**: Profiles, lesson log, feedback; stored in Supabase with RLS.
+- **Learning**: Full uploaded curricula, day browser, and explicit completion; stored in Supabase with RLS.
 - **Context**: Key-value store for family context; CRUD via `/api/context` and `/api/context/[key]`.
 - **Growing**: Sources (YouTube URLs), knowledge library, weekly suggestions, profile; optional `GROWING_WORKER_URL` for manual extraction.
 - **Recipes**: Hub at `/recipes` with **Cook**, **Manage**, **Collect**, and

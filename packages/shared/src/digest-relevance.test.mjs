@@ -65,7 +65,9 @@ test("quiet days do not send, but a real exception does", () => {
     growingSuggestions: 0,
     growingKnowledge: 0,
     promotions: 0,
+    learningPrograms: 0,
   };
   assert.equal(isDigestSendWorthy(quiet), false);
+  assert.equal(isDigestSendWorthy({ ...quiet, learningPrograms: 1 }), true);
   assert.equal(isDigestSendWorthy({ ...quiet, planningDays: 1 }), true);
 });

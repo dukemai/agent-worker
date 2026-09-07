@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { addCalendarDays, buildDigestEmailHtml, loadDigestEmailContent, stockholmDate } from "@agent/shared";
 import type {
-  DigestLessonItem,
+  LearningProgramDigestItem,
   DigestSendReason,
   GrowingSuggestionDigestItem,
   PromotionDigestItem,
@@ -50,7 +50,7 @@ export type DigestPreviewResponse = {
     recentWindows: RecentGrowingWindowItem[];
     mode: GrowingDigestMode;
   };
-  learning: DigestLessonItem[];
+  learning: LearningProgramDigestItem[];
   promotions: PromotionDigestItem[];
   birthdays: BirthdayDigestItem[];
   trips: TripDigestItem[];
@@ -79,7 +79,6 @@ export async function GET(request: Request) {
     ensureWeeklySuggestionsWhenEmpty: false,
     weatherSummary,
     rainForecast,
-    lessons: [],
     targetDate: previewDate,
   });
 
@@ -123,7 +122,7 @@ export async function GET(request: Request) {
       recentWindows: content.recentGrowingWindows,
       mode: content.growingMode,
     },
-    learning: content.lessons,
+    learning: content.learningProgramItems,
     promotions: content.promotionItems,
     birthdays: content.birthdayItems,
     trips: content.tripItems,

@@ -14,7 +14,7 @@ import {
 } from "@react-email/components";
 import React, { Fragment } from "react";
 import type {
-  DigestLessonItem,
+  LearningProgramDigestItem,
   DigestSendReason,
   GrowingSuggestionDigestItem,
   GrowingTaskDigestItem,
@@ -37,7 +37,7 @@ type Props = {
   todayTasks: Task[];
   thisWeekTasks: Task[];
   laterTasks: Task[];
-  lessons: DigestLessonItem[];
+  learningProgramItems: LearningProgramDigestItem[];
   promotionItems: PromotionDigestItem[];
   renewalItems: RenewalDigestItem[];
   growingSuggestions: GrowingSuggestionDigestItem[];
@@ -98,7 +98,7 @@ export function DailyDigestEmail(props: Props) {
     todayTasks,
     thisWeekTasks,
     laterTasks,
-    lessons,
+    learningProgramItems,
     promotionItems,
     renewalItems,
     growingSuggestions,
@@ -659,6 +659,20 @@ export function DailyDigestEmail(props: Props) {
               </Section>
             )}
 
+            {learningProgramItems.length > 0 && (
+              <Section className="mb-[24px] bg-white rounded-[16px] p-[24px]">
+                <Heading className="text-[20px] text-gray-900">Today’s Learning</Heading>
+                {learningProgramItems.map(item => (
+                  <Section key={item.programId}>
+                    <Text className="text-[12px] text-gray-500">{item.programTitle} — Day {item.dayNumber} of {item.totalDays}</Text>
+                    <Heading as="h3" className="text-[16px]">{item.dayTitle}</Heading>
+                    <Text style={{ whiteSpace: "pre-wrap" }}>{item.content}</Text>
+                    {item.resources.map((resource, i) => <Text key={i}>{/^https?:\/\//i.test(resource) ? <a href={resource}>{resource}</a> : resource}</Text>)}
+                    <Text><a href={`${dashboardUrl}/learning`}>Browse program and mark day done</a></Text>
+                  </Section>
+                ))}
+              </Section>
+            )}
             {/* Deals */}
             {promotionItems.length > 0 && (
               <Section className="mb-[48px]">

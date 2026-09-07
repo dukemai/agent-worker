@@ -30,7 +30,7 @@ One user: a busy dad in Stockholm who checks email every morning and has fragmen
 | Promo shopping pipeline (phases) | [requirements/promo-shopping-pipeline-phases.md](requirements/promo-shopping-pipeline-phases.md) | Later sub-phases B–G (crawl, DB, matching, meals) around promos + shared list |
 | Trip Ops | [requirements/trip-ops.md](requirements/trip-ops.md) | `/trips`; logistics, structured participants, curated preferences, decisions, itinerary blocks, and trip tasks |
 | Inspiration Sources | [requirements/inspiration-sources.md](requirements/inspiration-sources.md) | `/inspirations`; trusted book discovery sources and source-health visibility |
-| Learning | [requirements/learning.md](requirements/learning.md) | Topic/category lessons; multi-agent specialization → Phase 12 (`docs/phases/12-learning-agents/`) |
+| Learning | [requirements/learning.md](requirements/learning.md) | Uploaded full curricula with explicit day progress |
 
 ## Data Schema (Supabase)
 
@@ -38,8 +38,8 @@ One user: a busy dad in Stockholm who checks email every morning and has fragmen
 |-------|-------------|---------|
 | `tasks` | id, title, original_body, due_date, status, metadata(jsonb), source | All tasks and reminders |
 | `today_tasks` / `this_week_tasks` / `later_tasks` | task_id (FK) | Bucket membership |
-| `learning_profile` | id, topic, profile_type, current_level, daily_goal, status | Learning curriculum settings |
-| `learning_log` | id, profile_id (FK), content, feedback | AI-generated lessons + feedback |
+| `learning_programs` | id, title, topic, total_days, current_day, status | Uploaded curriculum progress |
+| `learning_program_days` | id, program_id (FK), day_number, title, content, resources | Full curriculum sequence |
 | `family_context` | key, value, last_updated | User preferences (shopping list, plant list, interests) |
 | `growing_profiles` | id, city, space_type, experience_level, interests[] | Gardening preferences |
 | `growing_sources` | id, url, transcript, status | YouTube/blog sources |

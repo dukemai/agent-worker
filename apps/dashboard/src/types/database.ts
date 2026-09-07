@@ -1,8 +1,6 @@
 export type TaskStatus = "pending" | "done";
 export type TaskSource = "email" | "manual" | "growing";
 export type Bucket = "today" | "this_week" | "later";
-export type LearningStatus = "active" | "paused";
-export type LearningProfileType = "topic" | "category";
 export type GrowingSuggestionKind = "action" | "inspiration";
 export type GrowingSuggestionStatus = "pending" | "dismissed" | "converted" | "done";
 export type GrowingSourceStatus = "queued" | "processing" | "done" | "failed";
@@ -81,29 +79,13 @@ export interface TaskWithBucket extends Task {
   bucket: Bucket;
 }
 
-export interface LearningProfile {
-  id: string;
-  topic: string;
-  profile_type: LearningProfileType;
-  current_level: string | null;
-  daily_goal: string | null;
-  target_duration_minutes: number;
-  status: LearningStatus;
-  curriculum_outline: unknown | null;
-  created_at: string;
-  updated_at: string;
+export type LearningProgramStatus = "active" | "paused" | "completed" | "archived";
+export interface LearningProgramDay {
+  id: string; program_id: string; day_number: number; title: string; content: string; resources: string[]; created_at: string;
 }
-
-export interface LearningLogEntry {
-  id: string;
-  profile_id: string;
-  content: string;
-  feedback: string | null;
-  created_at: string;
-  profile?: {
-    topic: string;
-    profile_type: LearningProfileType;
-  } | null;
+export interface LearningProgram {
+  id: string; title: string; topic: string; total_days: number; current_day: number;
+  status: LearningProgramStatus; created_at: string; updated_at: string; days?: LearningProgramDay[];
 }
 
 export interface FamilyContext {

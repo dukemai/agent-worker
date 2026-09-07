@@ -100,6 +100,7 @@ export function isDigestSendWorthy(input: {
   growingSuggestions: number;
   growingKnowledge: number;
   promotions: number;
+  learningPrograms: number;
 }): boolean {
   const { rainForecast, ...counts } = input;
   return rainForecast || Object.values(counts).some((value) => value > 0);

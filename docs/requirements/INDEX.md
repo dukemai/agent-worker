@@ -26,4 +26,4 @@ Doc routing for feature-specific specs. Use [GLOSSARY.md](../GLOSSARY.md) for do
 | [trip-content-factory.md](trip-content-factory.md) | Deferred Trip Ops content-creation pipeline: research leads, multi-angle sorting, knowledge graph links, and destination content scaffolds |
 | [summer-activities.md](summer-activities.md) | Kids summer activity extraction: reusable local activity library, seasonal instances, weekly panel, and digest suggestions |
 | [inspiration-sources.md](inspiration-sources.md) | Curated book and future film discovery sources; health, scoped search, and inspiration-session direction |
-| [learning.md](learning.md) | Profiles, lessons, feedback (deferred items) |
+| [learning.md](learning.md) | Uploaded curricula, explicit progress, daily program content |

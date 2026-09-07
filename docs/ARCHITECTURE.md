@@ -41,7 +41,7 @@ Consumed by both the Worker and the Dashboard via the workspace dependency and T
 | Area | Contents | Used by |
 |------|----------|---------|
 | **types/** | `digest`, `growing`, `email-content` — Task, BucketRow, PromotionDigestItem, GrowingSourceRow, BuiltEmailContent, etc. | Worker crons/handlers, Dashboard (when building digest/growing UI or email preview) |
-| **prompts/** | `TASK_EXTRACTION`, `DAILY_BRIEFING`, `LEARNING_LESSON`, `GROWING_KNOWLEDGE_EXTRACTION` | Worker (process-email-task, daily-digest, learning-loop, growing-ingest) |
+| **prompts/** | `TASK_EXTRACTION`, `DAILY_BRIEFING`, `GROWING_KNOWLEDGE_EXTRACTION` | Worker (process-email-task, daily-digest, growing-ingest) |
 | **email/** | `promotion-content` — `buildTaskContentFromExtraction`, `buildFallbackTaskContent` (promotion vs normal task from extraction) | Worker process-email-task; Dashboard (e.g. email preview) |
 | **gemini.ts** | `getTaskExtractionFromEmail`, `extractGrowingKnowledge` + extraction result types | Worker process-email-task, growing-ingest |
 | **fetch-pending-tasks.ts** | `fetchPendingTasksForBucket(supabase, bucketTable)` | Worker daily-digest; Dashboard (e.g. digest preview) |
@@ -65,13 +65,12 @@ apps/worker/src/
 │       ├── process-growing.ts
 │       └── post-task.ts   # Generic POST { subject, body, from } → processEmailTask
 ├── crons/
-│   ├── daily-digest.ts   # Fetch tasks, weather, runLearningLoop, build email, Resend
+│   ├── daily-digest.ts   # Fetch tasks, weather, learning program days, build email, Resend
 │   ├── weekly-planning.ts # Sunday meals, shopping, tasks, and family planning email
 │   ├── growing-ingest.ts # Queued growing_sources → Gemini → growing_knowledge + windows
 │   ├── growing-suggestions.ts
 │   ├── recipe-import-queue.ts # Queued recipe markdown → saved_recipes
 │   ├── activity-source-queue.ts # Queued activity Markdown → local + seasonal activities
-│   └── learning-loop.ts
 ├── lib/
 │   ├── process-email-task.ts  # Orchestrates Gemini extraction + @agent/shared promotion-content + Supabase insert
 │   ├── weather.ts
@@ -124,7 +123,7 @@ Gmail
 |-------------|---------|-----------|
 | Gmail → Worker | Email forwarding / Apps Script | Inbound |
 | Worker → Supabase | Every email processed | Write |
-| Worker → Gemini | Task extraction, lesson generation, digest narrative | Request/Response |
+| Worker → Gemini | Task extraction, digest narrative | Request/Response |
 | Worker → OpenWeather | Daily digest cron | Request/Response |
 | Worker → Resend | Daily digest cron | Outbound email |
 | Worker → Supabase | Growing suggestions cron (Sun, Wed) | Write `growing_suggestions_log` |

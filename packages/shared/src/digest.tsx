@@ -1,7 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { render } from "@react-email/render";
 import type {
-  DigestLessonItem,
+  LearningProgramDigestItem,
   DigestSendReason,
   GrowingSuggestionDigestItem,
   GrowingTaskDigestItem,
@@ -701,8 +701,8 @@ export async function generateBriefingNarrative(
 /**
  * Builds the full HTML body for the daily digest email.
  * Includes date (sv-SE), weather block, briefing narrative, task sections (today / this week / later),
- * optional inspirations section, new growing knowledge, renewals, learning lessons, and deals.
- * dashboardUrl is used for the footer link. Lessons use DigestLessonItem (profile_type, topic, content).
+ * optional inspirations section, new growing knowledge, renewals, learning program days, and deals.
+ * dashboardUrl is used for the footer link. Learning programs deliver their explicitly selected current day.
  */
 export async function buildEmailHtml(
   weatherSummary: string,
@@ -710,7 +710,7 @@ export async function buildEmailHtml(
   todayTasks: Task[],
   thisWeekTasks: Task[],
   laterTasks: Task[],
-  lessons: DigestLessonItem[],
+  learningProgramItems: LearningProgramDigestItem[],
   promotionItems: PromotionDigestItem[],
   renewalItems: RenewalDigestItem[],
   growingSuggestions: GrowingSuggestionDigestItem[],
@@ -741,7 +741,7 @@ export async function buildEmailHtml(
       todayTasks={todayTasks}
       thisWeekTasks={thisWeekTasks}
       laterTasks={laterTasks}
-      lessons={lessons}
+      learningProgramItems={learningProgramItems}
       promotionItems={promotionItems}
       renewalItems={renewalItems}
       birthdayItems={birthdayItems}
@@ -772,7 +772,6 @@ export type LoadDigestEmailContentOptions = {
   rainForecast: boolean;
   /** Stockholm calendar date represented by this digest. */
   targetDate?: string;
-  lessons?: DigestLessonItem[];
   /**
    * If set, used as the briefing narrative instead of the template from {@link generateBriefingNarrative}.
    */
@@ -792,7 +791,7 @@ export type DigestEmailContent = {
   todayTasks: Task[];
   thisWeekTasks: Task[];
   laterTasks: Task[];
-  lessons: DigestLessonItem[];
+  learningProgramItems: LearningProgramDigestItem[];
   promotionItems: PromotionDigestItem[];
   renewalItems: RenewalDigestItem[];
   birthdayItems: BirthdayDigestItem[];
@@ -815,7 +814,6 @@ export async function loadDigestEmailContent(
   supabase: SupabaseClient,
   options: LoadDigestEmailContentOptions
 ): Promise<DigestEmailContent> {
-  const lessons = options.lessons ?? [];
   const targetDate = options.targetDate ?? stockholmDate();
   const targetNow = new Date(`${targetDate}T12:00:00Z`);
 
@@ -848,7 +846,7 @@ export async function loadDigestEmailContent(
     return picked;
   };
 
-  const [rawTodayTasks, rawThisWeekTasks, laterTasks, rawBirthdayItems, rawTripItems, rawActivityItems, rawPlanningDayItems, schoolStartDate] = await Promise.all([
+  const [rawTodayTasks, rawThisWeekTasks, laterTasks, rawBirthdayItems, rawTripItems, rawActivityItems, rawPlanningDayItems, schoolStartDate, rawLearningProgramItems] = await Promise.all([
     fetchPendingTasksForBucket(supabase, "today_tasks"),
     fetchPendingTasksForBucket(supabase, "this_week_tasks"),
     fetchPendingTasksForBucket(supabase, "later_tasks"),
@@ -857,7 +855,9 @@ export async function loadDigestEmailContent(
     fetchActivityDigestItems(supabase, { rainForecast: options.rainForecast, targetDate }),
     fetchPlanningDayItems(supabase, targetNow, preferences.redDayLeadDays),
     fetchAutumnSchoolStartDate(supabase, targetDate),
+    fetchActiveLearningProgramItems(supabase),
   ]);
+  const learningProgramItems = rawLearningProgramItems.filter(item => includeFresh(`learning-program:${item.programId}:${item.dayNumber}`, { title: item.dayTitle, content: item.content }, true));
   const selectTask = (task: Task) => {
     if (task.metadata?.item_type === "renewal" || task.metadata?.item_type === "growing" || task.metadata?.email_type === "promotion") return false;
     const daysLeft = task.due_date ? calendarDaysBetween(targetDate, task.due_date.slice(0, 10)) : null;
@@ -1024,9 +1024,11 @@ export async function loadDigestEmailContent(
     growingSuggestions: growingSuggestions.length,
     growingKnowledge: relatedGrowingKnowledge.length,
     promotions: promotionItems.length,
+    learningPrograms: learningProgramItems.length,
   };
   const shouldSend = isDigestSendWorthy(sendReasonCounts);
   const sendReasons: DigestSendReason[] = [
+    { code: "learning", label: "current learning program day", count: learningProgramItems.length },
     { code: "rain", label: "rain may affect the family routine", count: options.rainForecast ? 1 : 0 },
     { code: "today_tasks", label: "new, changed, or urgent task for today", count: todayTasks.length },
     { code: "week_tasks", label: "new or changed task for this week", count: thisWeekTasks.length },
@@ -1049,7 +1051,7 @@ export async function loadDigestEmailContent(
     todayTasks,
     thisWeekTasks,
     laterTasks,
-    lessons,
+    learningProgramItems,
     promotionItems,
     renewalItems,
     birthdayItems,
@@ -1103,7 +1105,7 @@ export async function buildDigestEmailHtml(
     content.todayTasks,
     content.thisWeekTasks,
     content.laterTasks,
-    content.lessons,
+    content.learningProgramItems,
     content.promotionItems,
     content.renewalItems,
     content.growingSuggestions,
@@ -1119,4 +1121,16 @@ export async function buildDigestEmailHtml(
     content.targetDate,
     content.sendReasons
   );
+}
+
+export async function fetchActiveLearningProgramItems(supabase: SupabaseClient): Promise<LearningProgramDigestItem[]> {
+  const { data: programs, error } = await supabase.from("learning_programs").select("id, title, total_days, current_day").eq("status", "active").order("created_at");
+  if (error) throw error;
+  const items = await Promise.all((programs ?? []).map(async program => {
+    const { data: day, error: dayError } = await supabase.from("learning_program_days").select("day_number, title, content, resources").eq("program_id", program.id).eq("day_number", program.current_day).maybeSingle();
+    if (dayError) throw dayError;
+    if (!day) return null;
+    return { programId: program.id, programTitle: program.title, dayNumber: day.day_number, totalDays: program.total_days, dayTitle: day.title, content: day.content, resources: Array.isArray(day.resources) ? day.resources.filter((r: unknown): r is string => typeof r === "string") : [] } as LearningProgramDigestItem;
+  }));
+  return items.filter((item): item is LearningProgramDigestItem => item !== null);
 }

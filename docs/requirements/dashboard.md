@@ -8,7 +8,7 @@ Mobile-first Next.js app. Primary interface for viewing and acting on tasks.
 
 - **Tasks** — Today / This Week / Later buckets
 - **Renewals** — Expiration reminders with escalation
-- **Learning** — Topic/category lessons
+- **Learning** — Uploaded curricula, day browser, explicit completion
 - **Context** — Family preferences (shopping list, plant list, interests)
 - **Promo grocery watchlist** — Route `/promo-grocery-watchlist`; explicit grocery promo intent (`family_context.promo_watchlist`) for flyer/page matching (Phase 8)
 - **Recipes hub** — Route `/recipes`; four sections: **Cook** (search visible recipes, plan, cooking), **Manage** (library, generate/import/edit, food-style ingredient mapping, ingredient sources, Vietnamese meals), **Collect** (family recipe ideas/review), and **Share** (read-only recipe/style links).
