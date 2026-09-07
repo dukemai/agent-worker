@@ -1,0 +1,222 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=Geist:wght@400;500;600;700&display=swap">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <style>
+    :root{
+      --bg:#faf6f0; --surface:#ffffff; --surface-2:#f4ede3;
+      --ink:#241f19; --ink-soft:#6b6259; --line:#e8ded0;
+      --amber:#c96f34; --amber-soft:#f4e1cf; --teal:#3d6e68; --teal-soft:#dfe9e6;
+      --shadow: 0 1px 2px rgba(36,31,25,0.04), 0 8px 24px -12px rgba(36,31,25,0.14);
+    }
+    *{box-sizing:border-box;}
+    body{margin:0;font-family:'Geist',system-ui,sans-serif;background:var(--bg);color:var(--ink);}
+    h1,h2,h3{font-family:'Newsreader',Georgia,serif;font-weight:500;margin:0;}
+    a{color:var(--amber);text-decoration:none;} a:hover{color:#a85a26;}
+    .chip{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:4px 10px;font-size:12px;font-weight:600;letter-spacing:.01em;}
+    .card{background:var(--surface);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);}
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:40px;padding:0 16px;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;border:1px solid transparent;}
+    .btn-ghost{background:var(--surface);border:1px solid var(--line);color:var(--ink);}
+    .bar-track{height:6px;border-radius:999px;background:var(--surface-2);overflow:hidden;}
+    .bar-fill{height:100%;border-radius:999px;background:var(--amber);}
+  </style>
+</helmet>
+
+<div style="width:1440px;min-height:1500px;background:var(--bg);display:flex;flex-direction:column;">
+
+  <!-- Nav -->
+  <div style="height:68px;flex-shrink:0;background:var(--surface);border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 40px;">
+    <div style="display:flex;align-items:center;gap:36px;">
+      <div style="display:flex;align-items:baseline;gap:2px;">
+        <h1 style="font-size:20px;color:var(--ink);">Dad</h1>
+        <h1 style="font-size:20px;color:var(--amber);">·Ops</h1>
+      </div>
+      <div style="display:flex;align-items:center;gap:4px;">
+        <div style="height:40px;padding:0 14px;border-radius:10px;display:flex;align-items:center;font-size:14px;color:var(--ink-soft);">Tasks</div>
+        <div style="height:40px;padding:0 14px;border-radius:10px;display:flex;align-items:center;font-size:14px;color:var(--ink-soft);">Summer Activities</div>
+        <div style="height:40px;padding:0 14px;border-radius:10px;display:flex;align-items:center;font-size:14px;color:var(--ink-soft);">Trip Ops</div>
+        <div style="height:40px;padding:0 14px;border-radius:10px;background:var(--surface-2);display:flex;align-items:center;font-size:14px;font-weight:600;color:var(--ink);">Learning</div>
+        <div style="height:40px;padding:0 14px;border-radius:10px;display:flex;align-items:center;gap:4px;font-size:14px;color:var(--ink-soft);">
+          More
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </div>
+      </div>
+    </div>
+    <div style="width:36px;height:36px;border-radius:999px;background:var(--surface-2);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:var(--ink-soft);">DM</div>
+  </div>
+
+  <!-- Page header -->
+  <div style="padding:36px 40px 24px 40px;">
+    <div style="font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:6px;">Learning</div>
+    <h2 style="font-size:32px;color:var(--ink);">Upload a curriculum, learn one day at a time</h2>
+  </div>
+
+  <div style="padding:0 40px 48px 40px;display:flex;flex-direction:column;gap:28px;max-width:1360px;">
+
+    <!-- Upload panel -->
+    <div class="card" style="padding:28px;display:flex;align-items:center;justify-content:space-between;gap:24px;">
+      <div style="display:flex;align-items:center;gap:20px;">
+        <div style="width:52px;height:52px;border-radius:14px;background:var(--amber-soft);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#c96f34" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+        </div>
+        <div>
+          <div style="font-size:16px;font-weight:600;margin-bottom:4px;">Import a new program</div>
+          <div style="font-size:14px;color:var(--ink-soft);">Ask an AI to write a full N-day curriculum as JSON, then drop it here. <a href="#">Download the template</a> to see the exact format.</div>
+        </div>
+      </div>
+      <div class="btn" style="background:var(--ink);color:var(--bg);flex-shrink:0;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+        Upload JSON
+      </div>
+    </div>
+
+    <!-- Programs list -->
+    <div style="display:flex;flex-direction:column;gap:14px;">
+
+      <!-- Program 1 - expanded / active -->
+      <div class="card" style="padding:0;overflow:hidden;">
+        <div style="padding:22px 26px;display:flex;align-items:center;justify-content:space-between;gap:20px;">
+          <div style="display:flex;align-items:center;gap:16px;flex:1;">
+            <div style="width:44px;height:44px;border-radius:12px;background:var(--teal-soft);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3d6e68" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+            </div>
+            <div style="flex:1;">
+              <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+                <div style="font-size:17px;font-weight:600;">Spanish Basics</div>
+                <span class="chip" style="background:var(--teal-soft);color:var(--teal);">Active</span>
+                <span style="font-size:13px;color:var(--ink-soft);">Spanish</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:10px;width:280px;">
+                <div class="bar-track" style="flex:1;">
+                  <div class="bar-fill" style="width:13%;"></div>
+                </div>
+                <span style="font-size:12px;color:var(--ink-soft);white-space:nowrap;">Day 4 of 30</span>
+              </div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <div class="btn btn-ghost">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="4" width="4" height="16"></rect><rect x="14" y="4" width="4" height="16"></rect></svg>
+              Pause
+            </div>
+            <div class="btn btn-ghost">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="21 8 21 21 3 21 3 8"></polyline><rect x="1" y="3" width="22" height="5"></rect><line x1="10" y1="12" x2="14" y2="12"></line></svg>
+              Archive
+            </div>
+          </div>
+        </div>
+
+        <div style="height:1px;background:var(--line);"></div>
+
+        <!-- Day browser -->
+        <div style="display:flex;">
+          <div style="width:220px;flex-shrink:0;border-right:1px solid var(--line);max-height:360px;overflow:hidden;padding:10px 0;">
+            <div style="padding:8px 18px;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-soft);">All days</div>
+            <div style="display:flex;flex-direction:column;">
+              <div style="padding:10px 18px;display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink-soft);">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3d6e68" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                Day 1 — Greetings
+              </div>
+              <div style="padding:10px 18px;display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink-soft);">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3d6e68" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                Day 2 — Numbers 1–10
+              </div>
+              <div style="padding:10px 18px;display:flex;align-items:center;gap:8px;font-size:13px;color:var(--ink-soft);">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3d6e68" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                Day 3 — Days of the week
+              </div>
+              <div style="padding:10px 18px;background:var(--amber-soft);display:flex;align-items:center;justify-content:space-between;">
+                <span style="font-size:13px;font-weight:600;color:var(--ink);">Day 4 — Basic questions</span>
+                <span class="chip" style="background:var(--amber);color:#fff;padding:2px 8px;font-size:10px;">Today</span>
+              </div>
+              <div style="padding:10px 18px;font-size:13px;color:#b4a998;">Day 5 — Family words</div>
+              <div style="padding:10px 18px;font-size:13px;color:#b4a998;">Day 6 — Colors &amp; shapes</div>
+              <div style="padding:10px 18px;font-size:13px;color:#b4a998;">Day 7 — Ordering food</div>
+            </div>
+          </div>
+
+          <div style="flex:1;padding:26px 30px;">
+            <div style="font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--amber);margin-bottom:8px;">Day 4 of 30</div>
+            <h3 style="font-size:22px;margin-bottom:14px;">Basic questions</h3>
+            <p style="font-size:14px;line-height:1.7;color:var(--ink);max-width:560px;margin:0 0 18px 0;">
+              Today you'll learn to ask and answer <em>¿cómo te llamas?</em> and <em>¿de dónde eres?</em> —
+              practice both with a partner or out loud, then try introducing yourself in one short paragraph.
+            </p>
+            <div style="margin-bottom:22px;">
+              <div style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-soft);margin-bottom:8px;">Resources</div>
+              <div style="font-size:13px;color:var(--amber);">spanish-basic-questions.mp3 &nbsp;·&nbsp; conjugation cheat sheet</div>
+            </div>
+            <div class="btn" style="background:var(--teal);color:#fff;">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              Mark day done
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Program 2 - collapsed / paused -->
+      <div class="card" style="padding:22px 26px;display:flex;align-items:center;justify-content:space-between;gap:20px;">
+        <div style="display:flex;align-items:center;gap:16px;flex:1;">
+          <div style="width:44px;height:44px;border-radius:12px;background:var(--surface-2);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6b6259" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 6v6l4 2"></path></svg>
+          </div>
+          <div style="flex:1;">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+              <div style="font-size:17px;font-weight:600;">Deep Learning Fundamentals</div>
+              <span class="chip" style="background:var(--surface-2);color:var(--ink-soft);">Paused</span>
+              <span style="font-size:13px;color:var(--ink-soft);">Machine learning</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;width:280px;">
+              <div class="bar-track" style="flex:1;">
+                <div class="bar-fill" style="width:60%;background:#b4a998;"></div>
+              </div>
+              <span style="font-size:12px;color:var(--ink-soft);white-space:nowrap;">Day 12 of 20</span>
+            </div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div class="btn" style="background:var(--ink);color:var(--bg);">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+            Resume
+          </div>
+          <div class="btn btn-ghost">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="21 8 21 21 3 21 3 8"></polyline><rect x="1" y="3" width="22" height="5"></rect><line x1="10" y1="12" x2="14" y2="12"></line></svg>
+            Archive
+          </div>
+        </div>
+      </div>
+
+      <!-- Program 3 - completed -->
+      <div class="card" style="padding:22px 26px;display:flex;align-items:center;justify-content:space-between;gap:20px;opacity:.7;">
+        <div style="display:flex;align-items:center;gap:16px;flex:1;">
+          <div style="width:44px;height:44px;border-radius:12px;background:var(--surface-2);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6b6259" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+          </div>
+          <div style="flex:1;">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;">
+              <div style="font-size:17px;font-weight:600;">Piano Practice Basics</div>
+              <span class="chip" style="background:var(--surface-2);color:var(--ink-soft);">Completed</span>
+              <span style="font-size:13px;color:var(--ink-soft);">Music</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;width:280px;">
+              <div class="bar-track" style="flex:1;">
+                <div class="bar-fill" style="width:100%;background:#b4a998;"></div>
+              </div>
+              <span style="font-size:12px;color:var(--ink-soft);white-space:nowrap;">Day 14 of 14</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

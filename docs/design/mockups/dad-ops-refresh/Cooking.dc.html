@@ -1,0 +1,185 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=Geist:wght@400;500;600;700&display=swap">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <style>
+    :root{
+      --bg:#faf6f0; --surface:#ffffff; --surface-2:#f4ede3;
+      --ink:#241f19; --ink-soft:#6b6259; --line:#e8ded0;
+      --amber:#c96f34; --amber-soft:#f4e1cf; --teal:#3d6e68; --teal-soft:#dfe9e6;
+      --emerald:#3f7a4f; --emerald-soft:#e1efe2; --rose:#b45050; --rose-soft:#f3dede;
+      --shadow: 0 1px 2px rgba(36,31,25,0.04), 0 8px 24px -12px rgba(36,31,25,0.14);
+    }
+    *{box-sizing:border-box;}
+    body{margin:0;font-family:'Geist',system-ui,sans-serif;background:var(--bg);color:var(--ink);}
+    h1,h2,h3{font-family:'Newsreader',Georgia,serif;font-weight:500;margin:0;}
+    a{color:var(--amber);text-decoration:none;} a:hover{color:#a85a26;}
+    .chip{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:4px 10px;font-size:12px;font-weight:600;letter-spacing:.01em;}
+    .card{background:var(--surface);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);}
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:40px;padding:0 16px;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;border:1px solid transparent;}
+    .btn-ghost{background:transparent;border:1px solid var(--line);color:var(--ink);}
+    .bar-track{height:6px;border-radius:999px;background:var(--surface-2);overflow:hidden;}
+    .bar-fill{height:100%;border-radius:999px;}
+    .style-card{border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:10px;}
+  </style>
+</helmet>
+
+<div style="width:1440px;min-height:1520px;background:var(--bg);display:flex;flex-direction:column;">
+
+  <!-- Nav -->
+  <div style="height:68px;flex-shrink:0;background:var(--surface);border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 40px;">
+    <div style="display:flex;align-items:center;gap:36px;">
+      <div style="display:flex;align-items:baseline;gap:2px;">
+        <h1 style="font-size:20px;color:var(--ink);">Dad</h1>
+        <h1 style="font-size:20px;color:var(--amber);">·Ops</h1>
+      </div>
+      <div style="display:flex;align-items:center;gap:4px;">
+        <div style="height:40px;padding:0 14px;border-radius:10px;display:flex;align-items:center;font-size:14px;color:var(--ink-soft);">Tasks</div>
+        <div style="height:40px;padding:0 14px;border-radius:10px;display:flex;align-items:center;font-size:14px;color:var(--ink-soft);">Trip Ops</div>
+        <div style="height:40px;padding:0 14px;border-radius:10px;display:flex;align-items:center;font-size:14px;color:var(--ink-soft);">Learning</div>
+        <div style="height:40px;padding:0 14px;border-radius:10px;display:flex;align-items:center;font-size:14px;color:var(--ink-soft);">Growing</div>
+        <div style="height:40px;padding:0 14px;border-radius:10px;background:var(--surface-2);display:flex;align-items:center;font-size:14px;font-weight:600;color:var(--ink);">Recipes</div>
+        <div style="height:40px;padding:0 14px;border-radius:10px;display:flex;align-items:center;gap:4px;font-size:14px;color:var(--ink-soft);">
+          More
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </div>
+      </div>
+    </div>
+    <div style="width:36px;height:36px;border-radius:999px;background:var(--surface-2);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:var(--ink-soft);">DM</div>
+  </div>
+
+  <!-- Page header -->
+  <div style="padding:36px 40px 0 40px;">
+    <div style="font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:6px;">Recipes</div>
+    <h2 style="font-size:32px;color:var(--ink);">Family recipe collaboration</h2>
+  </div>
+
+  <!-- Tabs -->
+  <div style="padding:24px 40px 0 40px;display:flex;align-items:center;gap:4px;border-bottom:1px solid var(--line);">
+    <div style="padding:0 16px 14px 4px;font-size:14px;color:var(--ink-soft);">Manage recipes</div>
+    <div style="padding:0 4px 14px 4px;margin-left:12px;font-size:14px;font-weight:600;color:var(--ink);border-bottom:2px solid var(--amber);">Collect ideas</div>
+    <div style="padding:0 16px 14px 16px;margin-left:12px;font-size:14px;color:var(--ink-soft);">Share recipes</div>
+  </div>
+
+  <div style="padding:28px 40px 48px 40px;display:flex;flex-direction:column;gap:24px;">
+
+    <!-- Household + invite -->
+    <div class="card" style="padding:24px;">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:20px;flex-wrap:wrap;">
+        <div>
+          <p style="font-size:14px;color:var(--ink-soft);margin:0 0 16px 0;max-width:520px;">A shared space for reviewing food styles and recipes the family wants to cook.</p>
+          <div style="border:1px solid var(--line);border-radius:12px;padding:12px 16px;display:inline-flex;flex-direction:column;gap:2px;">
+            <div style="font-size:14px;font-weight:600;">The Mai Household</div>
+            <div style="font-size:13px;color:var(--ink-soft);">Your role: owner &nbsp;·&nbsp; Members: 4</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:10px;flex-shrink:0;">
+          <div class="btn btn-ghost">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            Search recipes
+          </div>
+          <div class="btn" style="background:var(--amber);color:#fff;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            Add recipe idea
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Style overview -->
+    <div class="card" style="padding:24px;">
+      <h3 style="font-size:18px;margin-bottom:4px;">Recipe style overview</h3>
+      <p style="font-size:13px;color:var(--ink-soft);margin:0 0 18px 0;">Shared saved recipes by food style. Target 20–40 per style.</p>
+      <div style="display:grid;grid-template-columns:repeat(4, minmax(0, 1fr));gap:14px;">
+
+        <div class="style-card" style="background:var(--rose-soft);">
+          <div style="font-size:13px;font-weight:600;min-height:34px;">Baking &amp; desserts</div>
+          <div style="display:flex;align-items:baseline;justify-content:space-between;">
+            <span style="font-size:26px;font-weight:600;font-family:'Newsreader',serif;">6</span>
+            <span style="font-size:11px;color:var(--ink-soft);">target 20–40</span>
+          </div>
+          <div class="bar-track"><div class="bar-fill" style="width:15%;background:var(--rose);"></div></div>
+        </div>
+
+        <div class="style-card" style="background:var(--amber-soft);">
+          <div style="font-size:13px;font-weight:600;min-height:34px;">Asian weeknight</div>
+          <div style="display:flex;align-items:baseline;justify-content:space-between;">
+            <span style="font-size:26px;font-weight:600;font-family:'Newsreader',serif;">18</span>
+            <span style="font-size:11px;color:var(--ink-soft);">target 20–40</span>
+          </div>
+          <div class="bar-track"><div class="bar-fill" style="width:45%;background:var(--amber);"></div></div>
+        </div>
+
+        <div class="style-card" style="background:#eef3d9;">
+          <div style="font-size:13px;font-weight:600;min-height:34px;">Quick weeknight</div>
+          <div style="display:flex;align-items:baseline;justify-content:space-between;">
+            <span style="font-size:26px;font-weight:600;font-family:'Newsreader',serif;">24</span>
+            <span style="font-size:11px;color:var(--ink-soft);">target 20–40</span>
+          </div>
+          <div class="bar-track"><div class="bar-fill" style="width:60%;background:#8ca63c;"></div></div>
+        </div>
+
+        <div class="style-card" style="background:var(--emerald-soft);">
+          <div style="font-size:13px;font-weight:600;min-height:34px;">Swedish husmanskost</div>
+          <div style="display:flex;align-items:baseline;justify-content:space-between;">
+            <span style="font-size:26px;font-weight:600;font-family:'Newsreader',serif;">34</span>
+            <span style="font-size:11px;color:var(--ink-soft);">target 20–40</span>
+          </div>
+          <div class="bar-track"><div class="bar-fill" style="width:85%;background:var(--emerald);"></div></div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Review queue -->
+    <div class="card" style="padding:24px;">
+      <h3 style="font-size:18px;margin-bottom:4px;">Review queue</h3>
+      <p style="font-size:13px;color:var(--ink-soft);margin:0 0 18px 0;">Recipe ideas submitted by household members. 5 done hidden.</p>
+
+      <div style="display:flex;flex-direction:column;gap:14px;">
+
+        <article style="border:1px solid var(--line);border-radius:14px;padding:18px;">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:12px;">
+            <div>
+              <div style="font-size:15px;font-weight:600;margin-bottom:4px;">Miso-glazed salmon traybake</div>
+              <div style="font-size:12px;color:var(--ink-soft);">Sep 5, 8:12 PM &nbsp;·&nbsp; looks good</div>
+            </div>
+            <div class="btn btn-ghost" style="height:34px;padding:0 12px;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"></circle><circle cx="19" cy="12" r="1"></circle><circle cx="5" cy="12" r="1"></circle></svg>
+              Actions
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(4, 1fr);gap:8px;margin-bottom:12px;max-width:420px;">
+            <div style="aspect-ratio:1;border-radius:10px;background:var(--surface-2);"></div>
+            <div style="aspect-ratio:1;border-radius:10px;background:var(--surface-2);"></div>
+          </div>
+          <p style="font-size:13px;line-height:1.6;color:var(--ink);margin:0;">Saw this on a video Saturday — glaze looked quick enough for a weeknight. Emma would probably eat the salmon plain, glaze on the side.</p>
+        </article>
+
+        <article style="border:1px solid var(--line);border-radius:14px;padding:18px;">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:8px;">
+            <div>
+              <div style="font-size:15px;font-weight:600;margin-bottom:4px;">Grandma's cardamom buns</div>
+              <div style="font-size:12px;color:var(--ink-soft);">Sep 3, 6:40 PM &nbsp;·&nbsp; want to try</div>
+            </div>
+            <div class="btn" style="background:var(--teal);color:#fff;height:34px;padding:0 12px;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l1.9 4.6 4.6.4-3.5 3 1 4.5-4-2.4-4 2.4 1-4.5-3.5-3 4.6-.4z"></path></svg>
+              Complete with AI
+            </div>
+          </div>
+          <p style="font-size:13px;line-height:1.6;color:var(--ink);margin:0;">Family recipe, needs the ingredient list written out properly — only have it as a handwritten card right now.</p>
+        </article>
+
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

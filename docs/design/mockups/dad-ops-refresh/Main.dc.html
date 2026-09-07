@@ -1,0 +1,180 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=Geist:wght@400;500;600;700&display=swap">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <style>
+    :root{
+      --bg:#faf6f0; --surface:#ffffff; --surface-2:#f4ede3;
+      --ink:#241f19; --ink-soft:#6b6259; --line:#e8ded0;
+      --amber:#c96f34; --amber-soft:#f4e1cf; --teal:#3d6e68; --teal-soft:#dfe9e6;
+      --shadow: 0 1px 2px rgba(36,31,25,0.04), 0 8px 24px -12px rgba(36,31,25,0.14);
+    }
+    *{box-sizing:border-box;}
+    body{margin:0;font-family:'Geist',system-ui,sans-serif;background:var(--bg);color:var(--ink);}
+    h1,h2,h3{font-family:'Newsreader',Georgia,serif;font-weight:500;margin:0;}
+    a{color:var(--amber);text-decoration:none;} a:hover{color:#a85a26;}
+    .chip{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:4px 10px;font-size:12px;font-weight:600;letter-spacing:.01em;}
+    .card{background:var(--surface);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);}
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:40px;padding:0 16px;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;border:1px solid transparent;}
+  </style>
+</helmet>
+
+<div style="width:1440px;min-height:1040px;background:var(--bg);display:flex;flex-direction:column;">
+
+  <!-- Nav -->
+  <div style="height:68px;flex-shrink:0;background:var(--surface);border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 40px;">
+    <div style="display:flex;align-items:center;gap:36px;">
+      <div style="display:flex;align-items:baseline;gap:2px;">
+        <h1 style="font-size:20px;color:var(--ink);">Dad</h1>
+        <h1 style="font-size:20px;color:var(--amber);">·Ops</h1>
+      </div>
+      <div style="display:flex;align-items:center;gap:4px;">
+        <div style="height:40px;padding:0 14px;border-radius:10px;background:var(--surface-2);display:flex;align-items:center;font-size:14px;font-weight:600;color:var(--ink);">Tasks</div>
+        <div style="height:40px;padding:0 14px;border-radius:10px;display:flex;align-items:center;font-size:14px;color:var(--ink-soft);">Summer Activities</div>
+        <div style="height:40px;padding:0 14px;border-radius:10px;display:flex;align-items:center;font-size:14px;color:var(--ink-soft);">Trip Ops</div>
+        <div style="height:40px;padding:0 14px;border-radius:10px;display:flex;align-items:center;font-size:14px;color:var(--ink-soft);">Learning</div>
+        <div style="height:40px;padding:0 14px;border-radius:10px;display:flex;align-items:center;gap:4px;font-size:14px;color:var(--ink-soft);">
+          More
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </div>
+      </div>
+    </div>
+    <div style="width:36px;height:36px;border-radius:999px;background:var(--surface-2);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:var(--ink-soft);">DM</div>
+  </div>
+
+  <!-- Page header -->
+  <div style="padding:36px 40px 24px 40px;display:flex;align-items:flex-end;justify-content:space-between;">
+    <div>
+      <div style="font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:6px;">Friday, September 4</div>
+      <h2 style="font-size:32px;color:var(--ink);">Today's board</h2>
+    </div>
+    <div class="btn" style="background:var(--ink);color:var(--bg);">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+      Add task
+    </div>
+  </div>
+
+  <!-- Main content -->
+  <div style="flex:1;display:flex;gap:24px;padding:0 40px 40px 40px;align-items:flex-start;">
+
+    <!-- Board -->
+    <div style="flex:3;display:grid;grid-template-columns:repeat(3, minmax(0, 1fr));gap:20px;">
+
+      <!-- Today column -->
+      <div style="display:flex;flex-direction:column;gap:14px;">
+        <div style="display:flex;align-items:center;gap:8px;padding:0 4px;">
+          <span style="font-size:13px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;color:var(--ink);">Today</span>
+          <span class="chip" style="background:var(--amber-soft);color:var(--amber);">3</span>
+        </div>
+
+        <div class="card" style="padding:16px;display:flex;flex-direction:column;gap:10px;">
+          <span class="chip" style="background:var(--teal-soft);color:var(--teal);align-self:flex-start;">Renewal</span>
+          <div style="font-size:15px;font-weight:500;line-height:1.4;">Confirm car insurance renewal quote</div>
+          <span class="chip" style="background:var(--surface-2);color:var(--ink-soft);align-self:flex-start;">Due today</span>
+        </div>
+
+        <div class="card" style="padding:16px;display:flex;flex-direction:column;gap:10px;">
+          <span class="chip" style="background:#eee3f5;color:#7a4fa3;align-self:flex-start;">Family</span>
+          <div style="font-size:15px;font-weight:500;line-height:1.4;">Pack swim bags for pool afternoon</div>
+        </div>
+
+        <div class="card" style="padding:16px;display:flex;flex-direction:column;gap:10px;">
+          <span class="chip" style="background:var(--surface-2);color:var(--ink-soft);align-self:flex-start;">Errand</span>
+          <div style="font-size:15px;font-weight:500;line-height:1.4;">Pick up prescription on the way home</div>
+        </div>
+      </div>
+
+      <!-- This week column -->
+      <div style="display:flex;flex-direction:column;gap:14px;">
+        <div style="display:flex;align-items:center;gap:8px;padding:0 4px;">
+          <span style="font-size:13px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;color:var(--ink);">This week</span>
+          <span class="chip" style="background:var(--surface-2);color:var(--ink-soft);">2</span>
+        </div>
+
+        <div class="card" style="padding:16px;display:flex;flex-direction:column;gap:10px;">
+          <span class="chip" style="background:#dfe6f5;color:#3c5ba0;align-self:flex-start;">Trip</span>
+          <div style="font-size:15px;font-weight:500;line-height:1.4;">Book restaurant for Friday night in Visby</div>
+          <span class="chip" style="background:var(--surface-2);color:var(--ink-soft);align-self:flex-start;">Wed</span>
+        </div>
+
+        <div class="card" style="padding:16px;display:flex;flex-direction:column;gap:10px;">
+          <span class="chip" style="background:#e2f0df;color:#4a7a3c;align-self:flex-start;">Garden</span>
+          <div style="font-size:15px;font-weight:500;line-height:1.4;">Move tomato seedlings to bigger pots</div>
+        </div>
+      </div>
+
+      <!-- Later column -->
+      <div style="display:flex;flex-direction:column;gap:14px;">
+        <div style="display:flex;align-items:center;gap:8px;padding:0 4px;">
+          <span style="font-size:13px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;color:var(--ink);">Later</span>
+          <span class="chip" style="background:var(--surface-2);color:var(--ink-soft);">4</span>
+        </div>
+
+        <div class="card" style="padding:16px;display:flex;flex-direction:column;gap:10px;opacity:.85;">
+          <span class="chip" style="background:var(--surface-2);color:var(--ink-soft);align-self:flex-start;">Home</span>
+          <div style="font-size:15px;font-weight:500;line-height:1.4;">Book chimney sweep for autumn</div>
+        </div>
+
+        <div class="card" style="padding:16px;display:flex;flex-direction:column;gap:10px;opacity:.85;">
+          <span class="chip" style="background:var(--surface-2);color:var(--ink-soft);align-self:flex-start;">Recipes</span>
+          <div style="font-size:15px;font-weight:500;line-height:1.4;">Plan menu for the cousins' visit</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right rail -->
+    <div style="flex:1;display:flex;flex-direction:column;gap:20px;min-width:300px;">
+
+      <div class="card" style="padding:20px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+          <h3 style="font-size:16px;">Renewals</h3>
+          <span style="font-size:12px;color:var(--ink-soft);">See all</span>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:12px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;">
+            <div style="font-size:14px;">Car insurance</div>
+            <span class="chip" style="background:var(--amber-soft);color:var(--amber);">Today</span>
+          </div>
+          <div style="height:1px;background:var(--line);"></div>
+          <div style="display:flex;align-items:center;justify-content:space-between;">
+            <div style="font-size:14px;">Home broadband</div>
+            <span class="chip" style="background:var(--surface-2);color:var(--ink-soft);">12 days</span>
+          </div>
+          <div style="height:1px;background:var(--line);"></div>
+          <div style="display:flex;align-items:center;justify-content:space-between;">
+            <div style="font-size:14px;">Gym membership</div>
+            <span class="chip" style="background:var(--surface-2);color:var(--ink-soft);">27 days</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="padding:20px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+          <h3 style="font-size:16px;">Birthdays</h3>
+          <span style="font-size:12px;color:var(--ink-soft);">See all</span>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:12px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;">
+            <div style="font-size:14px;">Emma turns 9</div>
+            <span class="chip" style="background:var(--teal-soft);color:var(--teal);">2 days</span>
+          </div>
+          <div style="height:1px;background:var(--line);"></div>
+          <div style="display:flex;align-items:center;justify-content:space-between;">
+            <div style="font-size:14px;">Farmor</div>
+            <span class="chip" style="background:var(--surface-2);color:var(--ink-soft);">3 weeks</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>
