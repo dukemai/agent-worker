@@ -105,3 +105,7 @@ export function isDigestSendWorthy(input: {
   const { rainForecast, ...counts } = input;
   return rainForecast || Object.values(counts).some((value) => value > 0);
 }
+
+export function formatDailyDigestSubject(itemCount: number, targetDate: string): string {
+  return `Dad-Ops: ${itemCount} ${itemCount === 1 ? "thing" : "things"} for today — ${targetDate}`;
+}

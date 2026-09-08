@@ -45,19 +45,20 @@ export function TaskCard({ task, bucket, markDoneLoading = false, onMove, onMark
     enabled: detailsOpen && isGrowingTask && typeof growingWindowId === "string" && growingWindowId.length > 0,
     staleTime: 60_000,
   });
+  const itemType = typeof task.metadata?.item_type === "string" ? task.metadata.item_type : null;
+  const sourceLabel = itemType === "renewal" ? "Renewal" : task.source === "growing" ? "Garden" : itemType === "trip" ? "Trip" : null;
+  const sourceStyle = itemType === "renewal" ? "bg-[#dfe9e6] text-[#3d6e68]" : task.source === "growing" ? "bg-[#e2f0df] text-[#4a7a3c]" : itemType === "trip" ? "bg-[#dfe6f5] text-[#3c5ba0]" : "bg-muted text-muted-foreground";
 
   return (
     <article
       className={cn(
-        "rounded-lg border p-3 transition-colors",
-        isDone
-          ? "border-emerald-200/80 bg-emerald-50/70 dark:border-emerald-900/45 dark:bg-emerald-950/30"
-          : "border-amber-200/70 bg-amber-50/90 shadow-sm dark:border-amber-900/35 dark:bg-amber-950/20"
+        "rounded-2xl border bg-card p-4 shadow-[0_1px_2px_rgba(36,31,25,0.04),0_8px_24px_-12px_rgba(36,31,25,0.14)] transition-all hover:-translate-y-0.5 hover:shadow-[0_2px_4px_rgba(36,31,25,0.06),0_12px_30px_-12px_rgba(36,31,25,0.18)]",
+        isDone && "opacity-60"
       )}
     >
-      {task.metadata?.item_type === "renewal" ? (
-        <Badge variant="outline" className="mb-2 text-[10px] font-normal uppercase tracking-wide">
-          renewal
+      {sourceLabel ? (
+        <Badge className={cn("mb-2 border-0 px-2.5 py-1 text-[11px] font-semibold shadow-none", sourceStyle)}>
+          {sourceLabel}
         </Badge>
       ) : null}
 
@@ -81,11 +82,11 @@ export function TaskCard({ task, bucket, markDoneLoading = false, onMove, onMark
           )}
         </Button>
 
-        <div className="min-w-0 flex-1 space-y-2">
+        <div className="min-w-0 flex-1 space-y-2.5">
           <div className="flex items-start justify-between gap-2">
             <h3
               className={cn(
-                "leading-snug font-medium",
+                "font-sans text-[15px] leading-snug font-medium",
                 isDone && "text-muted-foreground line-through decoration-muted-foreground/80"
               )}
             >
@@ -120,16 +121,14 @@ export function TaskCard({ task, bucket, markDoneLoading = false, onMove, onMark
             </div>
           </div>
 
-          <p className="text-xs text-muted-foreground">
-            Due: {task.due_date ? new Date(task.due_date).toLocaleString() : "No due date"}
-          </p>
+          {task.due_date ? <p className="w-fit rounded-full bg-muted px-2.5 py-1 text-xs font-medium text-muted-foreground">Due {new Date(task.due_date).toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" })}</p> : null}
           {task.metadata?.item_type === "renewal" && typeof task.metadata.expires_on === "string" ? (
             <p className="text-xs text-muted-foreground">
               Expires: {new Date(task.metadata.expires_on).toLocaleDateString()}
             </p>
           ) : null}
 
-          <div className="flex flex-wrap gap-1 pt-0.5">
+          <div className="flex flex-wrap gap-1 pt-0.5 opacity-70 transition-opacity hover:opacity-100">
             {BUCKETS.filter((b) => b !== bucket).map((target) => (
               <Button
                 key={target}

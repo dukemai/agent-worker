@@ -1,11 +1,12 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Trash2 } from "lucide-react";
+import { SlidersHorizontal, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import type { Task } from "@/types/database";
+import { cn } from "@/lib/utils";
 import { BUCKET_LABELS, type Bucket, type TasksByBucket } from "./types";
 import { TaskCard } from "./TaskCard";
 
@@ -92,15 +93,17 @@ export function BucketCard({
       : null;
 
   return (
-    <Card className="border-0 bg-transparent shadow-none gap-3 py-0">
-      <CardHeader className="px-0 pb-2 pt-0 space-y-2">
-        <CardTitle className="text-base font-semibold tracking-tight">
+    <Card className="gap-3 border-0 bg-transparent py-0 shadow-none">
+      <CardHeader className="space-y-3 px-1 pt-0 pb-0">
+        <CardTitle className="flex items-center gap-2 font-sans text-[13px] font-bold uppercase tracking-[0.03em]">
           {BUCKET_LABELS[bucket]}
           {countLabel ? (
-            <span className="ml-1.5 font-normal text-muted-foreground tabular-nums">{countLabel}</span>
+            <span className={cn("inline-flex min-w-7 items-center justify-center rounded-full px-2 py-1 text-xs font-semibold tracking-normal tabular-nums", bucket === "today" ? "bg-[#f4e1cf] text-primary" : "bg-muted text-muted-foreground")}>{countLabel.replace(/[()]/g, "")}</span>
           ) : null}
         </CardTitle>
-        <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
+        <details className="group text-xs text-muted-foreground">
+          <summary className="flex w-fit cursor-pointer list-none items-center gap-1.5 hover:text-foreground [&::-webkit-details-marker]:hidden"><SlidersHorizontal className="size-3.5" /> View options</summary>
+          <div className="mt-2 flex flex-col gap-2 rounded-xl border bg-card p-2 sm:flex-row sm:flex-wrap sm:items-center">
           <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v as TaskStatusFilter)}>
             <SelectTrigger className="h-8 w-full min-w-0 sm:w-[130px] text-xs" aria-label={`${BUCKET_LABELS[bucket]} status filter`}>
               <SelectValue placeholder="Status" />
@@ -134,9 +137,10 @@ export function BucketCard({
               Clean {doneCount} Done
             </Button>
           )}
-        </div>
+          </div>
+        </details>
       </CardHeader>
-      <CardContent className="space-y-3 px-0">
+      <CardContent className="space-y-3.5 px-0">
         {loading ? (
           <p className="text-sm text-muted-foreground">Loading tasks…</p>
         ) : totalInBucket === 0 ? (

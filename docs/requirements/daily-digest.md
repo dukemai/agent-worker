@@ -81,6 +81,8 @@ All selection uses one explicit Stockholm target date shared by preview, narrati
 
 Every sent digest begins with a compact **Why this was sent** summary built from the same filtered payload that controls the send gate. The dashboard preview shows the equivalent **Why this would send** explanation. Routine weekly planning is handled separately by the Sunday [Weekly Planning](weekly-planning.md) email.
 
+The email subject uses calm user-facing wording such as `Dad-Ops: 3 things for today`; internal “exception” terminology is not exposed. Its count is derived from the same send reasons, including weather-only sends.
+
 ## Favorite Activities
 
 Activities marked as favorites should be eligible for the digest when they are timely: occurring today or soon, ending soon, approaching a booking deadline, or fitting the coming weekend. The digest should include only a small number and state why each appears now.

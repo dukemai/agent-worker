@@ -158,7 +158,7 @@ export function TasksBoard() {
     <>
       {displayError ? <p className="text-sm text-red-600">{displayError}</p> : null}
 
-      <section className="md:hidden">
+      <section className="lg:hidden">
         <Tabs value={activeBucket} onValueChange={(value) => setActiveBucket(value as Bucket)}>
           <TabsList className="grid w-full grid-cols-3">
             {BUCKETS.map((bucket) => (
@@ -185,7 +185,7 @@ export function TasksBoard() {
         </Tabs>
       </section>
 
-      <section className="hidden gap-4 md:grid md:grid-cols-3">
+      <section className="hidden gap-5 lg:grid lg:grid-cols-3">
         {BUCKETS.map((bucket) => (
           <BucketCard
             key={bucket}

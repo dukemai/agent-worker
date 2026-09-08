@@ -4,6 +4,7 @@ import {
   addCalendarDays,
   calendarDaysBetween,
   deliveryItem,
+  formatDailyDigestSubject,
   isDigestSendWorthy,
   isNewOrChanged,
   isReminderMilestone,
@@ -70,4 +71,9 @@ test("quiet days do not send, but a real exception does", () => {
   assert.equal(isDigestSendWorthy(quiet), false);
   assert.equal(isDigestSendWorthy({ ...quiet, learningPrograms: 1 }), true);
   assert.equal(isDigestSendWorthy({ ...quiet, planningDays: 1 }), true);
+});
+
+test("daily subject uses calm user-facing wording", () => {
+  assert.equal(formatDailyDigestSubject(1, "2026-09-08"), "Dad-Ops: 1 thing for today — 2026-09-08");
+  assert.equal(formatDailyDigestSubject(3, "2026-09-08"), "Dad-Ops: 3 things for today — 2026-09-08");
 });

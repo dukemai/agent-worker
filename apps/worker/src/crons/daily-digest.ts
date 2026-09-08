@@ -1,5 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
-import { buildDigestEmailHtml, loadDigestEmailContent, recordDigestDeliveries, stockholmDate } from "@agent/shared";
+import { buildDigestEmailHtml, formatDailyDigestSubject, loadDigestEmailContent, recordDigestDeliveries, stockholmDate } from "@agent/shared";
 import { getStockholmWeather } from "../lib/weather";
 import { sendEmail } from "../lib/resend";
 import type { Env } from "../types/env";
@@ -39,18 +39,8 @@ export async function runDailyDigest(env: Env): Promise<void> {
 
   const html = await buildDigestEmailHtml(content, dashboardUrl);
 
-  const exceptionCount =
-    content.todayTasks.length +
-    content.thisWeekTasks.length +
-    content.renewalItems.length +
-    content.birthdayItems.length +
-    content.tripItems.length +
-    content.activityItems.length +
-    content.planningDayItems.length +
-    content.growingSuggestions.length +
-    content.recentGrowingKnowledge.length +
-    content.promotionItems.length;
-  const subject = `Dad-Ops: ${exceptionCount} ${exceptionCount === 1 ? "exception" : "exceptions"} — ${content.targetDate}`;
+  const itemCount = content.sendReasons.reduce((total, reason) => total + reason.count, 0);
+  const subject = formatDailyDigestSubject(itemCount, content.targetDate);
 
   await sendEmail(env.RESEND_API_KEY, {
     from: "Dad-Ops Agent <digest@wkalender.app>",
