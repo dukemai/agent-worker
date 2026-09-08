@@ -1,7 +1,7 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { Sprout } from "lucide-react";
+import { Settings2 } from "lucide-react";
 import { useState, type FormEvent } from "react";
 import { createGrowingProfile, fetchWeeklyGrowing, updateGrowingProfile } from "@/lib/growing-api";
 import { Button } from "@/components/ui/button";
@@ -29,6 +29,24 @@ const EMPTY_PROFILE_FORM: GrowingProfileForm = {
 };
 
 const selectInDialogClass = "z-[200]";
+
+function seasonLabel() {
+  const month = new Date().getMonth() + 1;
+  if (month >= 3 && month <= 5) return "Early season";
+  if (month >= 6 && month <= 8) return "High-growth season";
+  if (month >= 9 && month <= 10) return "Harvest season";
+  return "Quiet season";
+}
+
+export function GrowingProfileSummary() {
+  const weeklyQuery = useQuery({ queryKey: ["growing", "weekly"], queryFn: fetchWeeklyGrowing });
+  const profile = weeklyQuery.data?.profile;
+  if (!profile) return null;
+  return <div className="flex flex-wrap gap-2">
+    {[profile.city, profile.space_type, profile.experience_level].filter(Boolean).map((value) => <span key={value} className="rounded-full bg-muted px-2.5 py-1 text-xs font-semibold capitalize text-muted-foreground">{value}</span>)}
+    <span className="rounded-full bg-[#e1efe2] px-2.5 py-1 text-xs font-semibold text-[#3f7a4f]">{seasonLabel()}</span>
+  </div>;
+}
 
 export function GrowingContextCard() {
   const queryClient = useQueryClient();
@@ -84,28 +102,8 @@ export function GrowingContextCard() {
     }
   }
 
-  const interestsList =
-    profile && Array.isArray((profile as any).interests)
-      ? ((profile as any).interests as string[]).filter(Boolean)
-      : [];
-
-  const compactSummary = (() => {
-    if (!profile) return null;
-    const locationParts: string[] = [];
-    if (profile.city) locationParts.push(profile.city);
-    if (profile.country_code) locationParts.push(profile.country_code);
-    const location = locationParts.join(", ");
-    const mainParts: string[] = [];
-    if (location) mainParts.push(location);
-    mainParts.push(profile.space_type);
-    mainParts.push(profile.experience_level);
-    const summary = mainParts.join(" · ");
-    const interestsSummary = interestsList.slice(0, 3).join(", ");
-    return interestsSummary ? `${summary} · ${interestsSummary}` : summary;
-  })();
-
   return (
-    <div className="flex flex-col items-end gap-1 text-right">
+    <div>
       <Dialog
         open={open}
         onOpenChange={(next) => {
@@ -116,9 +114,9 @@ export function GrowingContextCard() {
         }}
       >
         <DialogTrigger asChild>
-          <Button type="button" variant="outline" className="gap-2">
-            <Sprout className="size-4" aria-hidden />
-            Growing context
+          <Button type="button" variant="outline" className="h-10 gap-2 rounded-[10px] bg-transparent px-4 shadow-none">
+            <Settings2 className="size-4" aria-hidden />
+            Growing profile
           </Button>
         </DialogTrigger>
         <DialogContent className="max-h-[min(90vh,720px)] overflow-y-auto sm:max-w-lg" showCloseButton>
@@ -256,9 +254,6 @@ export function GrowingContextCard() {
       </DialogContent>
       </Dialog>
 
-      {compactSummary ? (
-        <p className="max-w-xs text-xs text-muted-foreground">{compactSummary}</p>
-      ) : null}
     </div>
   );
 }

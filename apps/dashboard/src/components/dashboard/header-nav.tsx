@@ -20,7 +20,6 @@ const recipeChildLinks = [
 ] as const;
 
 const moreLinks = [
-  { href: "/growing", label: "Growing" },
   { href: "/digest", label: "Preview email" },
   { href: "/inspirations", label: "Inspirations" },
   { href: "/trips/preferences", label: "Trip preferences" },
@@ -33,6 +32,7 @@ const primaryLinks = [
   { href: "/activities", label: "Summer Activities" },
   { href: "/trips", label: "Trip Ops" },
   { href: "/learning", label: "Learning" },
+  { href: "/growing", label: "Growing" },
 ] as const;
 
 const collaboratorLinks = [
@@ -87,7 +87,7 @@ export function DashboardNav({
 
   return (
     <>
-      <nav className="hidden items-center gap-1 md:flex" aria-label="Main">
+      <nav className="hidden min-w-0 flex-1 items-center gap-1 lg:flex" aria-label="Main">
         {primaryLinks.map((item) => (
           <Link
             key={item.href}
@@ -123,7 +123,7 @@ export function DashboardNav({
           </div>
         </details>
 
-        {signedIn ? <details className="relative ml-2">
+        {signedIn ? <details className="relative ml-auto pl-4">
           <summary className="flex size-9 cursor-pointer list-none items-center justify-center rounded-full bg-muted text-xs font-semibold text-muted-foreground hover:text-foreground [&::-webkit-details-marker]:hidden" aria-label="Account menu">
             {initials}
           </summary>
@@ -135,7 +135,7 @@ export function DashboardNav({
         )}
       </nav>
 
-      <details className="relative ml-auto md:hidden">
+      <details className="relative ml-auto lg:hidden">
         <summary className="flex size-10 cursor-pointer list-none items-center justify-center rounded-[10px] border bg-card text-sm [&::-webkit-details-marker]:hidden" aria-label="Open navigation">
           <Menu className="size-5" />
         </summary>

@@ -22,7 +22,7 @@ export async function DashboardHeader({ showNav = true }: { showNav?: boolean } 
   return (
     <header className="border-b bg-card">
       <div className="mx-auto flex h-[68px] w-full max-w-[1440px] items-center justify-between gap-6 px-5 sm:px-8 lg:px-10">
-        <div className="flex min-w-0 items-center gap-8 lg:gap-9">
+        <div className="flex min-w-0 flex-1 items-center gap-8 lg:gap-9">
           <Link href="/" className="shrink-0 font-serif text-xl font-medium tracking-tight" aria-label="Dad Ops home">
             Dad<span className="text-primary">·Ops</span>
           </Link>
