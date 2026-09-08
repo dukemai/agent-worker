@@ -69,7 +69,6 @@ export function TripOverview({ trip, onError, onDone }: { trip: Trip; onError: (
     <TripSection
       title="Known logistics"
       icon={<MapPinned className="size-4" aria-hidden />}
-      className="border-0 pt-0"
       meta={(
         <p className="text-sm text-muted-foreground">
           {formatTripDuration(isEditing ? draft.start_date : trip.start_date ?? "", isEditing ? draft.end_date : trip.end_date ?? "")}
@@ -202,18 +201,18 @@ function TripLogisticsSummary({ trip, preferenceCatalog }: { trip: Trip; prefere
         rows={[...participants, ...(trip.participants ? [["Participant notes", trip.participants] as [string, string]] : [])]}
         compact
       />
-      <section className="space-y-2 rounded-md border bg-background p-2.5">
+      <section className="flex flex-col gap-2 rounded-[14px] border bg-muted/25 p-3.5">
         <SelectedPreferencesList groups={preferenceGroups} />
         {preferenceGroups.length === 0 ? <p className="text-sm text-muted-foreground">No selected preferences yet.</p> : null}
       </section>
-      <section className="space-y-2 rounded-md border bg-background p-2.5">
+      <section className="flex flex-col gap-2 rounded-[14px] border bg-muted/25 p-3.5">
         <h3 className="text-sm font-semibold text-muted-foreground">Transport and stay</h3>
         <ExtractedLogistics details={trip.logistics_details} />
         {isEmptyRecord(trip.logistics_details) ? (
           <p className="text-sm text-muted-foreground">No extracted logistics yet.</p>
         ) : null}
       </section>
-      <section className="space-y-2 rounded-md border bg-background p-2.5">
+      <section className="flex flex-col gap-2 rounded-[14px] border bg-muted/25 p-3.5">
         <h3 className="text-sm font-semibold text-muted-foreground">Planning context</h3>
         <div className="grid gap-2">
           {trip.already_done ? <SummaryValue label="Already done / avoid repeating" value={trip.already_done} /> : null}

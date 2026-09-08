@@ -36,7 +36,7 @@ export function TripDecisionsPanel({ tripId, decisions, onError, onDone }: Panel
   const taskMutation = useTripTaskMutation(tripId, onError, onDone);
 
   return (
-    <TripSection title="Decisions" className="border-0 pt-0" contentClassName="space-y-3">
+    <TripSection title="Decisions" contentClassName="space-y-3">
         <form className="flex gap-2" onSubmit={(event) => { event.preventDefault(); createMutation.mutate(); }}>
           <Input value={title} onChange={(event) => setTitle(event.target.value)} placeholder="Decision to make..." aria-label="Decision title" />
           <Button type="submit" size="icon" disabled={createMutation.isPending} aria-label="Add decision">
@@ -101,7 +101,6 @@ export function TripTasksPanel({ tasks, onError, onDone }: { tasks: Task[]; onEr
         </>
       )}
       icon={<ClipboardList className="size-4" aria-hidden />}
-      className="border-0 pt-0"
       contentClassName="grid gap-2 md:grid-cols-2"
     >
         {tasks.length === 0 ? <p className="text-sm text-muted-foreground">No trip tasks yet.</p> : null}

@@ -143,7 +143,6 @@ export function TripKnowledgePanel({
         </>
       )}
       icon={<BookOpenText className="size-4" aria-hidden />}
-      className="border-0 pt-0"
       actions={(
         <Button type="button" variant="outline" size="sm" onClick={() => starterMutation.mutate()} disabled={starterMutation.isPending}>
           <Sparkles className="size-4" aria-hidden />

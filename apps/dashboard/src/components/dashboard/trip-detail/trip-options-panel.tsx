@@ -126,7 +126,6 @@ export function TripOptionsPanel({
           <Badge variant="secondary">{options.length === 1 ? "1 option" : `${options.length} options`}</Badge>
         </>
       )}
-      className="border-0 pt-0"
       meta={(
         <div className="flex flex-wrap gap-2">
           <Button type="button" size="sm" variant={statusFilter === "all" ? "default" : "outline"} onClick={() => setStatusFilter("all")}>

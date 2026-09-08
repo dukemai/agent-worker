@@ -213,7 +213,6 @@ export function TripItineraryPanel({
     <TripSection
       title="Itinerary blocks"
       icon={<CalendarPlus className="size-4" aria-hidden />}
-      className="border-0 pt-0"
       actions={(
         <div className="flex flex-wrap gap-2">
           <Button type="button" size="sm" onClick={() => setIsAddDialogOpen(true)}>

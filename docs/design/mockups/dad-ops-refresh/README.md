@@ -6,6 +6,7 @@ Source files for the visual-direction mockup referenced in [`docs/DESIGN-SYSTEM.
 - `Learning.dc.html` — Learning Programs screen (upload, program list, day browser).
 - `Growing.dc.html` — Growing Season Tracker, "This Week" tab (recommended actions + supporting knowledge).
 - `Cooking.dc.html` — Family recipe collaboration, "Collect ideas" tab (style overview + review queue).
+- `Trips.dc.html` — Trip Ops board (Ideas/Planning/Upcoming/Archived Kanban, new-trip form, countdowns and readiness warnings).
 - `canvas.json` — layout manifest for the artboards.
 
 These are static, view-only mockups (no wired-up interactions) authored as Claude Design Components. Live, interactive version: https://claude.ai/code/artifact/6aeaf45d-db3d-46e1-9534-9aae65c45834

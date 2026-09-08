@@ -10,10 +10,10 @@ import type { Bucket } from "@/types/database";
 
 export function SummaryGroup({ title, rows, empty, compact = false }: { title: string; rows: [string, string][]; empty?: string; compact?: boolean }) {
   return (
-    <section className={`${compact ? "space-y-2 p-2.5" : "space-y-3 p-3"} rounded-md border bg-background`}>
+    <section className={`${compact ? "p-3.5" : "p-4"} flex flex-col gap-3 rounded-[14px] border bg-muted/25`}>
       <h3 className="text-sm font-semibold text-muted-foreground">{title}</h3>
       {rows.length > 0 ? (
-        <div className={compact ? "space-y-2" : "grid gap-3 md:grid-cols-2"}>
+        <div className={compact ? "flex flex-col gap-2.5" : "grid gap-3 md:grid-cols-2"}>
           {rows.map(([label, value]) => <SummaryValue key={label} label={label} value={value} />)}
         </div>
       ) : (
@@ -41,11 +41,11 @@ export function TripSection({
   contentClassName?: string;
 }) {
   return (
-    <section className={className}>
+    <section className={`rounded-2xl border bg-card p-5 shadow-[0_1px_2px_rgba(36,31,25,0.04),0_8px_24px_-12px_rgba(36,31,25,0.14)] sm:p-6 ${className}`}>
       <div className="flex flex-wrap items-start justify-between gap-3">
-        <div className="space-y-1">
-          <h2 className="flex items-center gap-2 text-base font-semibold">
-            {icon}
+        <div className="flex flex-col gap-1">
+          <h2 className="flex items-center gap-2.5 text-lg">
+            {icon ? <span className="flex size-8 items-center justify-center rounded-[9px] bg-[#f4e1cf] text-primary">{icon}</span> : null}
             {title}
           </h2>
           {meta}
