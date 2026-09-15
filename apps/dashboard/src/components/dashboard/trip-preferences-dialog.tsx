@@ -22,7 +22,9 @@ import type { TripPreferenceCategory } from "@/types/database";
 export function TripPreferencesDialog({
   selected,
   onApply,
+  triggerLabel = "Suggest preferences",
 }: {
+  triggerLabel?: string;
   selected: string[];
   onApply: (preferences: string[]) => void;
 }) {
@@ -57,7 +59,7 @@ export function TripPreferencesDialog({
       <DialogTrigger asChild>
         <Button type="button" variant="outline">
           <Sparkles className="size-4" aria-hidden />
-          Suggest preferences
+          {triggerLabel}
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-3xl">

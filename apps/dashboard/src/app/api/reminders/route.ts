@@ -38,16 +38,17 @@ function getBucketForDueDate(dueDateIso: string): Bucket {
   return "later";
 }
 
-function getReminderGroup(dueDateIso: string): "critical" | "urgent" | "soon" {
+function getReminderGroup(dueDateIso: string): "critical" | "urgent" | "soon" | "later" {
   const now = Date.now();
   const due = new Date(dueDateIso).getTime();
   const days = Math.floor((due - now) / (1000 * 60 * 60 * 24));
   if (days <= 1) return "critical";
   if (days <= 7) return "urgent";
-  return "soon";
+  if (days <= 30) return "soon";
+  return "later";
 }
 
-export async function GET() {
+export async function GET(request: Request) {
   const auth = await getAuthedSupabase();
   if (auth.error || !auth.supabase) {
     return auth.error;
@@ -66,6 +67,7 @@ export async function GET() {
     return errorResponse(error.message, 500);
   }
 
+  const includeAll = new URL(request.url).searchParams.get("scope") === "all";
   const reminders = ((data ?? []) as ReminderTask[])
     .filter((task) => task.due_date)
     .map((task) => {
@@ -78,7 +80,7 @@ export async function GET() {
         group: getReminderGroup(due),
       };
     })
-    .filter((task) => task.days_left <= 30);
+    .filter((task) => includeAll || task.days_left <= 30);
 
   return NextResponse.json({
     reminders,
@@ -86,6 +88,7 @@ export async function GET() {
       critical: reminders.filter((r) => r.group === "critical"),
       urgent: reminders.filter((r) => r.group === "urgent"),
       soon: reminders.filter((r) => r.group === "soon"),
+      later: reminders.filter((r) => r.group === "later"),
     },
   });
 }

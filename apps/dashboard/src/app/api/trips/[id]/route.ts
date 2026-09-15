@@ -114,6 +114,14 @@ export async function PATCH(request: Request, { params }: Params) {
     updates.selected_preferences = selectedPreferences;
   }
 
+  if (payload.logistics_details !== undefined) {
+    const details = payload.logistics_details;
+    if (details !== null && (typeof details !== "object" || Array.isArray(details) || JSON.stringify(details).length > 50000)) {
+      return errorResponse("logistics_details must be an object of at most 50,000 characters or null");
+    }
+    updates.logistics_details = details;
+  }
+
   if (Object.keys(updates).length === 0) {
     return errorResponse("No valid fields to update");
   }

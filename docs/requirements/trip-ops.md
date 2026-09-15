@@ -353,3 +353,7 @@ Success criteria:
 **Phase 14: Trip Ops Post-Use Improvements**
 
 After real trip usage, the next Trip Ops phase should focus on fast access, itinerary-aware digest behavior, event-risk alerts, opening-hours validation, archive/knowledge capture, and weekend discovery. See [Phase 14 scope](../phases/14-trip-ops-post-use-improvements/SCOPE.md).
+
+### Trip detail logistics presentation
+
+The Logistics tab follows `design/mockups/dad-ops-refresh/TripDetail.dc.html`: paired trip-basics/participants and preferences/transport panels, with full-width planning context. Selected preferences render as chips; freeform transport notes remain visible alongside extracted details. Non-archived trips without a day-1 itinerary show a readiness banner that opens the Itinerary tab. Editing, archiving/restoring, and public sharing retain their existing API flows.

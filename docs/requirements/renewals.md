@@ -14,6 +14,8 @@ Track passport, subscription, membership, permit, insurance expiration. Stored a
 
 No separate table. Renewals are `tasks` with `metadata.item_type = "renewal"`.
 
+The Renewals page lists every pending renewal, grouped by urgency. The home dashboard renewal panel and the Today board's Later column only show renewals whose renew-by date is within 30 days. Other Later tasks are unaffected.
+
 ## Related
 
 - [Dashboard](dashboard.md) — renewal section

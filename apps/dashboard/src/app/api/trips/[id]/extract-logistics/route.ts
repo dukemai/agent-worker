@@ -1,5 +1,6 @@
 import { extractTripLogistics } from "@agent/shared";
 import { NextResponse } from "next/server";
+import { cleanText, parseDateOnly } from "@/lib/trip-ops";
 import { errorResponse, getAuthedSupabase } from "@/lib/api";
 
 type Params = { params: Promise<{ id: string }> };
@@ -14,7 +15,7 @@ export async function POST(request: Request, { params }: Params) {
   }
 
   const { id } = await params;
-  const payload = (await request.json().catch(() => ({}))) as { logistics?: unknown };
+  const payload = (await request.json().catch(() => ({}))) as { logistics?: unknown; preview?: unknown; title?: unknown; destination?: unknown; start_date?: unknown; end_date?: unknown };
   const { data: trip, error: tripError } = await auth.supabase
     .from("trips")
     .select("id, title, destination, start_date, end_date, logistics")
@@ -31,15 +32,17 @@ export async function POST(request: Request, { params }: Params) {
   let details: Awaited<ReturnType<typeof extractTripLogistics>>;
   try {
     details = await extractTripLogistics(apiKey, {
-      title: trip.title,
-      destination: trip.destination,
-      start_date: trip.start_date,
-      end_date: trip.end_date,
+      title: payload.preview === true ? cleanText(payload.title, 160) || trip.title : trip.title,
+      destination: payload.preview === true ? cleanText(payload.destination, 160) ?? trip.destination : trip.destination,
+      start_date: payload.preview === true && payload.start_date !== undefined ? parseDateOnly(payload.start_date) ?? null : trip.start_date,
+      end_date: payload.preview === true && payload.end_date !== undefined ? parseDateOnly(payload.end_date) ?? null : trip.end_date,
       logistics,
     });
   } catch (error) {
     return errorResponse(error instanceof Error ? error.message : "Failed to extract logistics", 500);
   }
+
+  if (payload.preview === true) return NextResponse.json({ logistics_details: details });
 
   const { data: updatedTrip, error: updateError } = await auth.supabase
     .from("trips")

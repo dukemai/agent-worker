@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
-import { Archive, ArrowLeft, CalendarDays, MapPin, RotateCcw } from "lucide-react";
+import { AlertTriangle, Archive, ArrowLeft, CalendarDays, MapPin, RotateCcw } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -21,6 +21,7 @@ export function TripDetailDashboard({ tripId }: { tripId: string }) {
   const queryClient = useQueryClient();
   const queryKey = ["trip", tripId];
   const detailQuery = useQuery({ queryKey, queryFn: () => fetchTripDetail(tripId) });
+  const [activeTab, setActiveTab] = useState("logistics");
   const [error, setError] = useState<string | null>(null);
 
   const lifecycleMutation = useMutation({
@@ -50,7 +51,7 @@ export function TripDetailDashboard({ tripId }: { tripId: string }) {
 
   return (
     <main className="mx-auto w-full max-w-[1440px] px-5 pb-12 sm:px-8 lg:px-10">
-      <div className="flex flex-wrap items-end justify-between gap-5 py-8 sm:py-9">
+      <div className="flex flex-wrap items-end justify-between gap-5 pt-7 pb-6">
         <div className="flex flex-col gap-3">
           <Button asChild variant="ghost" size="sm" className="h-auto w-fit gap-1.5 px-0 text-muted-foreground hover:bg-transparent hover:text-foreground">
             <Link href="/trips">
@@ -64,7 +65,7 @@ export function TripDetailDashboard({ tripId }: { tripId: string }) {
             <div className="mt-3 flex flex-wrap items-center gap-2">
               <Badge variant="secondary" className="gap-1.5 capitalize"><MapPin className="size-3.5" aria-hidden />{detail.trip.destination || "No destination"}</Badge>
               <Badge variant="secondary" className="gap-1.5"><CalendarDays className="size-3.5" aria-hidden />{formatDates(detail.trip)}</Badge>
-              <Badge className="border-0 bg-[#dfe9e6] capitalize text-[#3d6e68] shadow-none">{detail.trip.status}</Badge>
+              <Badge className="border-0 bg-[#dfe9e6] capitalize text-[#3d6e68] shadow-none dark:bg-teal-950 dark:text-teal-200">{detail.trip.status}</Badge>
             </div>
           </div>
         </div>
@@ -73,7 +74,7 @@ export function TripDetailDashboard({ tripId }: { tripId: string }) {
             <Button
               type="button"
               variant="outline"
-              size="sm"
+              size="default"
               disabled={lifecycleMutation.isPending}
               onClick={() => lifecycleMutation.mutate("planning")}
             >
@@ -84,7 +85,7 @@ export function TripDetailDashboard({ tripId }: { tripId: string }) {
             <Button
               type="button"
               variant="outline"
-              size="sm"
+              size="default"
               disabled={lifecycleMutation.isPending}
               onClick={() => {
                 if (window.confirm(`Archive “${detail.trip.title}”? You can restore it later.`)) {
@@ -101,8 +102,17 @@ export function TripDetailDashboard({ tripId }: { tripId: string }) {
       </div>
       {error ? <p className="mb-5 rounded-xl border border-destructive/30 bg-destructive/5 p-3 text-sm text-destructive">{error}</p> : null}
 
-      <Tabs defaultValue="logistics" className="gap-0">
-        <div className="border-b">
+      {detail.trip.status !== "archived" && !detail.itinerary.some((item) => item.day_number === 1) ? (
+        <div role="status" className="mb-6 flex items-center gap-3 rounded-[14px] border border-[#e6c6c6] bg-[#f3dede] px-[18px] py-3.5 text-sm text-[#7a3a3a] dark:border-rose-900 dark:bg-rose-950 dark:text-rose-200">
+          <AlertTriangle className="size-[18px] shrink-0" aria-hidden />
+          <p>Day-1 itinerary is still missing — worth filling in before departure.{" "}
+            <button type="button" className="rounded-sm underline underline-offset-2 focus-visible:outline-2 focus-visible:outline-offset-4" onClick={() => setActiveTab("itinerary")}>Go to Itinerary</button>
+          </p>
+        </div>
+      ) : null}
+
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="min-w-0 gap-0">
+        <div className="overflow-x-auto border-b">
         <TabsList className="h-auto w-full justify-start gap-1 overflow-x-auto rounded-none bg-transparent p-0">
           <TabsTrigger className="rounded-none border-b-2 border-transparent px-1 pb-3.5 shadow-none data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none" value="logistics">Logistics</TabsTrigger>
           <TabsTrigger className="rounded-none border-b-2 border-transparent px-4 pb-3.5 shadow-none data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:shadow-none" value="knowledge">Knowledge</TabsTrigger>
@@ -113,7 +123,7 @@ export function TripDetailDashboard({ tripId }: { tripId: string }) {
         </div>
 
         <TabsContent value="logistics" className="pt-7">
-          <TripOverview trip={detail.trip} onError={setError} onDone={invalidate} />
+          <TripOverview trip={detail.trip} />
         </TabsContent>
 
         <TabsContent value="knowledge" className="pt-7">

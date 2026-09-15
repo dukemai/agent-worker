@@ -1,0 +1,175 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&family=Geist:wght@400;500;600;700&display=swap">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <style>
+    :root{
+      --bg:#faf6f0; --surface:#ffffff; --surface-2:#f4ede3;
+      --ink:#241f19; --ink-soft:#6b6259; --line:#e8ded0;
+      --amber:#c96f34; --amber-soft:#f4e1cf; --teal:#3d6e68; --teal-soft:#dfe9e6;
+      --rose:#b45050; --rose-soft:#f3dede;
+      --shadow: 0 1px 2px rgba(36,31,25,0.04), 0 8px 24px -12px rgba(36,31,25,0.14);
+    }
+    *{box-sizing:border-box;}
+    body{margin:0;font-family:'Geist',system-ui,sans-serif;background:var(--bg);color:var(--ink);}
+    h1,h2,h3{font-family:'Newsreader',Georgia,serif;font-weight:500;margin:0;}
+    a{color:var(--amber);text-decoration:none;} a:hover{color:#a85a26;}
+    .chip{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:4px 10px;font-size:12px;font-weight:600;letter-spacing:.01em;}
+    .card{background:var(--surface);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);}
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:40px;padding:0 16px;border-radius:10px;font-size:13px;font-weight:600;cursor:pointer;border:1px solid transparent;}
+    .btn-ghost{background:transparent;border:1px solid var(--line);color:var(--ink);}
+    .panel{border-radius:14px;background:var(--surface-2);padding:16px;display:flex;flex-direction:column;gap:10px;}
+    .row{display:flex;align-items:baseline;justify-content:space-between;gap:12px;font-size:13px;}
+  </style>
+</helmet>
+
+<div style="width:1440px;min-height:1360px;background:var(--bg);display:flex;flex-direction:column;">
+
+  <!-- Nav -->
+  <div style="height:68px;flex-shrink:0;background:var(--surface);border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 40px;">
+    <div style="display:flex;align-items:center;gap:36px;">
+      <div style="display:flex;align-items:baseline;gap:2px;">
+        <h1 style="font-size:20px;color:var(--ink);">Dad</h1>
+        <h1 style="font-size:20px;color:var(--amber);">·Ops</h1>
+      </div>
+      <div style="display:flex;align-items:center;gap:4px;">
+        <div style="height:40px;padding:0 14px;border-radius:10px;display:flex;align-items:center;font-size:14px;color:var(--ink-soft);">Tasks</div>
+        <div style="height:40px;padding:0 14px;border-radius:10px;background:var(--surface-2);display:flex;align-items:center;font-size:14px;font-weight:600;color:var(--ink);">Trip Ops</div>
+        <div style="height:40px;padding:0 14px;border-radius:10px;display:flex;align-items:center;font-size:14px;color:var(--ink-soft);">Learning</div>
+        <div style="height:40px;padding:0 14px;border-radius:10px;display:flex;align-items:center;font-size:14px;color:var(--ink-soft);">Growing</div>
+        <div style="height:40px;padding:0 14px;border-radius:10px;display:flex;align-items:center;font-size:14px;color:var(--ink-soft);">Recipes</div>
+        <div style="height:40px;padding:0 14px;border-radius:10px;display:flex;align-items:center;gap:4px;font-size:14px;color:var(--ink-soft);">
+          More
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </div>
+      </div>
+    </div>
+    <div style="width:36px;height:36px;border-radius:999px;background:var(--surface-2);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:var(--ink-soft);">DM</div>
+  </div>
+
+  <div style="padding:0 40px;display:flex;flex-direction:column;">
+
+    <!-- Back link -->
+    <div style="padding-top:28px;display:flex;align-items:center;gap:6px;font-size:13px;color:var(--ink-soft);">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+      Trip Ops
+    </div>
+
+    <!-- Header -->
+    <div style="padding:14px 0 24px 0;display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:20px;">
+      <div>
+        <div style="font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:6px;">Trip workspace</div>
+        <h1 style="font-size:32px;margin-bottom:12px;">Gotland family trip</h1>
+        <div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px;">
+          <span class="chip" style="background:var(--surface-2);color:var(--ink);">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 6-9 13-9 13S3 16 3 10a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+            Gotland
+          </span>
+          <span class="chip" style="background:var(--surface-2);color:var(--ink);">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+            Sep 20 – Sep 27
+          </span>
+          <span class="chip" style="background:var(--teal-soft);color:var(--teal);">planning</span>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div class="btn btn-ghost">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="18" height="4"></rect><path d="M12 8v13"></path><path d="M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7"></path><path d="M7.5 8a2.5 2.5 0 0 1 0-5C11 3 12 8 12 8s1-5 4.5-5a2.5 2.5 0 0 1 0 5"></path></svg>
+          Archive trip
+        </div>
+        <div class="btn" style="background:var(--amber);color:#fff;">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
+          Share
+        </div>
+      </div>
+    </div>
+
+    <!-- Readiness warning -->
+    <div style="border-radius:14px;background:var(--rose-soft);border:1px solid #e6c6c6;padding:14px 18px;display:flex;align-items:center;gap:12px;margin-bottom:24px;">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#b45050" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+      <div style="font-size:14px;color:#7a3a3a;">Day-1 itinerary is still missing — worth filling in before departure. <span style="text-decoration:underline;cursor:pointer;">Go to Itinerary</span></div>
+    </div>
+
+    <!-- Tabs -->
+    <div style="display:flex;align-items:center;gap:4px;border-bottom:1px solid var(--line);margin-bottom:28px;">
+      <div style="padding:0 4px 14px 4px;font-size:14px;font-weight:600;color:var(--ink);border-bottom:2px solid var(--amber);">Logistics</div>
+      <div style="padding:0 16px 14px 16px;font-size:14px;color:var(--ink-soft);">Knowledge</div>
+      <div style="padding:0 16px 14px 16px;font-size:14px;color:var(--ink-soft);">Options</div>
+      <div style="padding:0 16px 14px 16px;font-size:14px;color:var(--ink-soft);">Itinerary</div>
+      <div style="padding:0 16px 14px 16px;font-size:14px;color:var(--ink-soft);">Work</div>
+    </div>
+
+    <!-- Logistics content -->
+    <div class="card" style="padding:24px;margin-bottom:48px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div style="width:32px;height:32px;border-radius:9px;background:var(--amber-soft);display:flex;align-items:center;justify-content:center;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#c96f34" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 6-9 13-9 13S3 16 3 10a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+          </div>
+          <h3 style="font-size:18px;">Known logistics</h3>
+        </div>
+        <div style="display:flex;align-items:center;gap:14px;">
+          <span style="font-size:13px;color:var(--ink-soft);">7 nights</span>
+          <div class="btn btn-ghost" style="height:34px;padding:0 12px;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5z"></path></svg>
+            Edit
+          </div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(2, minmax(0, 1fr));gap:14px;">
+
+        <div class="panel">
+          <h4 style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-soft);margin:0;">Trip basics</h4>
+          <div class="row"><span style="color:var(--ink-soft);">Trip title</span><span style="font-weight:500;">Gotland family trip</span></div>
+          <div class="row"><span style="color:var(--ink-soft);">Destination</span><span style="font-weight:500;">Gotland</span></div>
+          <div class="row"><span style="color:var(--ink-soft);">Start date</span><span style="font-weight:500;">2026-09-20</span></div>
+          <div class="row"><span style="color:var(--ink-soft);">End date</span><span style="font-weight:500;">2026-09-27</span></div>
+        </div>
+
+        <div class="panel">
+          <h4 style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-soft);margin:0;">Participants</h4>
+          <div class="row"><span style="color:var(--ink-soft);">Adults</span><span style="font-weight:500;">2</span></div>
+          <div class="row"><span style="color:var(--ink-soft);">Kids</span><span style="font-weight:500;">2</span></div>
+          <div class="row"><span style="color:var(--ink-soft);">Kid ages</span><span style="font-weight:500;">5, 8</span></div>
+        </div>
+
+        <div class="panel">
+          <h4 style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-soft);margin:0 0 2px 0;">Preferences</h4>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;">
+            <span class="chip" style="background:var(--teal-soft);color:var(--teal);">Beach</span>
+            <span class="chip" style="background:var(--teal-soft);color:var(--teal);">Museums</span>
+            <span class="chip" style="background:var(--teal-soft);color:var(--teal);">Easy hikes</span>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h4 style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-soft);margin:0;">Transport and stay</h4>
+          <div class="row"><span style="color:var(--ink-soft);">Ferry</span><span style="font-weight:500;">Nynäshamn → Visby</span></div>
+          <div class="row"><span style="color:var(--ink-soft);">Stay</span><span style="font-weight:500;">Cabin near Tofta</span></div>
+          <div class="row"><span style="color:var(--ink-soft);">Car</span><span style="font-weight:500;">Rental, pickup at ferry port</span></div>
+        </div>
+
+        <div class="panel" style="grid-column:span 2;">
+          <h4 style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-soft);margin:0;">Planning context</h4>
+          <div style="font-size:13px;line-height:1.6;">
+            <span style="color:var(--ink-soft);">Already done / avoid repeating — </span>Skipped Kneippbyn last visit, don't need to repeat.
+          </div>
+          <div style="font-size:13px;line-height:1.6;">
+            <span style="color:var(--ink-soft);">Preference notes — </span>Keep travel days light, no more than two activities per day.
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

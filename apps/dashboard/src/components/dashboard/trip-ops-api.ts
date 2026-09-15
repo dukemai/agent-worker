@@ -70,7 +70,7 @@ export async function fetchTripDetail(id: string): Promise<TripDetail> {
   return (await response.json()) as TripDetail;
 }
 
-export async function updateTrip(id: string, payload: Partial<CreateTripPayload & Pick<Trip, "status" | "notes">>): Promise<Trip> {
+export async function updateTrip(id: string, payload: Partial<CreateTripPayload & Pick<Trip, "status" | "notes" | "logistics_details">>): Promise<Trip> {
   const response = await fetch(`/api/trips/${id}`, {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
@@ -450,4 +450,13 @@ export async function updateTripPreferenceSuggestion(
 export async function deleteTripPreferenceSuggestion(id: string): Promise<void> {
   const response = await fetch(`/api/trip-preference-suggestions/${id}`, { method: "DELETE" });
   if (!response.ok) await readApiError(response, "Failed to delete trip preference suggestion");
+}
+
+export async function previewTripLogistics(id: string, draft: CreateTripPayload): Promise<Record<string, unknown>> {
+  const response = await fetch(`/api/trips/${id}/extract-logistics`, {
+    method: "POST", headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ ...draft, preview: true }),
+  });
+  if (!response.ok) await readApiError(response, "Failed to extract logistics");
+  return ((await response.json()) as { logistics_details: Record<string, unknown> }).logistics_details;
 }

@@ -26,7 +26,7 @@ Approved direction for a warmer, more editorial look, replacing the stock shadcn
   - Shadow: a two-layer soft shadow — a 1px hairline (`0 1px 2px rgba(ink, 0.04)`) plus a diffuse ambient layer (`0 8px 24px -12px rgba(ink, 0.14)`) — instead of relying mainly on `border` for definition. Borders stay, but thinner/lighter (`--border` above), doing less of the visual work.
 - **Chips/tags**: avoid the "rounded card + colored left-border accent bar" pattern for category tags — prefer a small pill `Badge`-style chip (soft background + accent-colored text, fully rounded) placed inline in the card header, not a border stripe down the side.
 
-Reference mockup: [`docs/design/mockups/dad-ops-refresh/`](design/mockups/dad-ops-refresh/) (Home board, Learning programs, Growing season tracker, Recipes, and Trip Ops screens), approved 2026-09-07. Live version: https://claude.ai/code/artifact/6aeaf45d-db3d-46e1-9534-9aae65c45834
+Reference mockup: [`docs/design/mockups/dad-ops-refresh/`](design/mockups/dad-ops-refresh/) (Home board, Learning programs, Growing season tracker, Recipes, Trip Ops, and Trip Detail screens), approved 2026-09-07. Live version: https://claude.ai/artifact/ECkmK1W5aihGJY5KQ5uAy1
 
 ### Color system
 

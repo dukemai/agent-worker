@@ -4,7 +4,8 @@
     { "file": "Learning.dc.html", "x": 1560, "y": 0, "w": 1440, "h": 1500 },
     { "file": "Growing.dc.html", "x": 3120, "y": 0, "w": 1440, "h": 1400 },
     { "file": "Cooking.dc.html", "x": 4680, "y": 0, "w": 1440, "h": 1520 },
-    { "file": "Trips.dc.html", "x": 6240, "y": 0, "w": 1440, "h": 1180 }
+    { "file": "Trips.dc.html", "x": 6240, "y": 0, "w": 1440, "h": 1180 },
+    { "file": "TripDetail.dc.html", "x": 7800, "y": 0, "w": 1440, "h": 1360 }
   ],
   "launch": { "view": "canvas" }
 }

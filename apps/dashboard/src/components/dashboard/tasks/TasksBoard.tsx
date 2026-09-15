@@ -8,6 +8,16 @@ import { fetchBucket, readApiError } from "./api";
 import { BucketCard } from "./BucketCard";
 import { BUCKETS, BUCKET_LABELS, EMPTY_TASKS, type Bucket, type TasksByBucket } from "./types";
 
+const RENEWAL_PREVIEW_DAYS = 30;
+
+function isRenewalVisibleOnBoard(task: Task, now = Date.now()) {
+  if (task.metadata?.item_type !== "renewal") return true;
+  if (!task.due_date) return false;
+
+  const dueAt = new Date(task.due_date).getTime();
+  return Number.isFinite(dueAt) && dueAt - now <= RENEWAL_PREVIEW_DAYS * 86_400_000;
+}
+
 function getTasksQueryError(
   todayError: unknown,
   thisWeekError: unknown,
@@ -32,7 +42,7 @@ export function TasksBoard() {
   const tasks: TasksByBucket = {
     today: todayQuery.data ?? EMPTY_TASKS.today,
     this_week: thisWeekQuery.data ?? EMPTY_TASKS.this_week,
-    later: laterQuery.data ?? EMPTY_TASKS.later,
+    later: (laterQuery.data ?? EMPTY_TASKS.later).filter((task) => isRenewalVisibleOnBoard(task)),
   };
   const loadingByBucket: Record<Bucket, boolean> = {
     today: todayQuery.isLoading,

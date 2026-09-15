@@ -10,13 +10,14 @@ import type { ReminderGroup } from "./types";
 function getGroupLabel(group: ReminderGroup) {
   if (group === "critical") return "Critical (<=1d)";
   if (group === "urgent") return "Urgent (<=7d)";
-  return "Soon (<=30d)";
+  if (group === "soon") return "Soon (<=30d)";
+  return "Later (>30d)";
 }
 
 export function RenewalsCard() {
   const queryClient = useQueryClient();
   const [error, setError] = useState<string | null>(null);
-  const renewalsQuery = useQuery({ queryKey: ["renewals"], queryFn: fetchRenewals });
+  const renewalsQuery = useQuery({ queryKey: ["renewals", "all"], queryFn: () => fetchRenewals("all") });
   const renewals = renewalsQuery.data ?? [];
   const loading = renewalsQuery.isLoading;
   const displayError = error ?? (renewalsQuery.error instanceof Error ? renewalsQuery.error.message : null);
@@ -49,7 +50,7 @@ export function RenewalsCard() {
     await reminderActionMutation.mutateAsync({ reminderId, action });
   }
 
-  const groups: ReminderGroup[] = ["critical", "urgent", "soon"];
+  const groups: ReminderGroup[] = ["critical", "urgent", "soon", "later"];
 
   return (
     <Card>
@@ -60,10 +61,10 @@ export function RenewalsCard() {
         {loading ? <p className="text-sm text-muted-foreground">Loading renewals...</p> : null}
         {displayError ? <p className="text-sm text-red-600">{displayError}</p> : null}
         {!loading && renewals.length === 0 ? (
-          <p className="text-sm text-muted-foreground">No upcoming renewals in the next 30 days.</p>
+          <p className="text-sm text-muted-foreground">No renewals saved yet.</p>
         ) : null}
         {!loading && renewals.length > 0 ? (
-          <div className="grid gap-3 md:grid-cols-3">
+          <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
             {groups.map((group) => {
               const items = renewals.filter((r) => r.group === group);
               return (

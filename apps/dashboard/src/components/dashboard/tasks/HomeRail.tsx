@@ -23,7 +23,7 @@ function dueLabel(days: number) {
 }
 
 export function HomeRail() {
-  const renewals = useQuery({ queryKey: ["renewals"], queryFn: fetchRenewals });
+  const renewals = useQuery({ queryKey: ["renewals", "upcoming"], queryFn: () => fetchRenewals("upcoming") });
   const birthdays = useQuery({ queryKey: ["birthdays"], queryFn: () => fetchBirthdays({ status: "active" }) });
   const upcomingBirthdays = [...(birthdays.data ?? [])]
     .sort((a, b) => daysUntil(a.birthday_month, a.birthday_day) - daysUntil(b.birthday_month, b.birthday_day))

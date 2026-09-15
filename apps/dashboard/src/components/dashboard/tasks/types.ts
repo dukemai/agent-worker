@@ -14,7 +14,7 @@ export type ReminderType =
 
 export type Recurrence = "none" | "yearly" | "monthly";
 
-export type ReminderGroup = "critical" | "urgent" | "soon";
+export type ReminderGroup = "critical" | "urgent" | "soon" | "later";
 export type ReminderAction = "complete" | "snooze";
 
 export type ReminderItem = {

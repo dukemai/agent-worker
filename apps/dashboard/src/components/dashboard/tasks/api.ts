@@ -10,8 +10,10 @@ export async function fetchBucket(bucket: Bucket): Promise<Task[]> {
   return json.tasks;
 }
 
-export async function fetchRenewals(): Promise<ReminderItem[]> {
-  const response = await fetch("/api/reminders", { cache: "no-store" });
+export async function fetchRenewals(scope: "upcoming" | "all" = "upcoming"): Promise<ReminderItem[]> {
+  const response = await fetch(scope === "all" ? "/api/reminders?scope=all" : "/api/reminders", {
+    cache: "no-store",
+  });
   if (!response.ok) {
     throw new Error("Failed to fetch reminders");
   }
