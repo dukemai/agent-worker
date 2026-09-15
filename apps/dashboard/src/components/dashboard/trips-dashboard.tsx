@@ -23,15 +23,19 @@ const statusLabels: Record<Trip["status"], string> = {
 export function TripsDashboard() {
   const queryClient = useQueryClient();
   const [draft, setDraft] = useState({
-    title: "Gotland family trip",
-    destination: "Gotland",
+    title: "",
+    destination: "",
     start_date: "",
     end_date: "",
     logistics: "",
     participants: "",
+    adult_count: "0",
+    kid_count: "0",
+    kid_ages: "",
     already_done: "",
     preferences: "",
   });
+  const [detailsOpen, setDetailsOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const tripsQuery = useQuery({ queryKey: ["trips"], queryFn: fetchTrips });
@@ -73,55 +77,96 @@ export function TripsDashboard() {
             className="grid gap-3 md:grid-cols-2"
             onSubmit={(event) => {
               event.preventDefault();
+              const kidAges = draft.kid_ages.split(/[,\s]+/).filter(Boolean).map(Number);
+              if (kidAges.some((age) => !Number.isInteger(age) || age < 0 || age > 18)) {
+                setDetailsOpen(true);
+                setError("Enter kid ages as whole numbers from 0 to 18, separated by commas.");
+                return;
+              }
+              setError(null);
               createMutation.mutate({
                 ...draft,
+                adult_count: Number(draft.adult_count),
+                kid_count: Number(draft.kid_count),
+                kid_ages: kidAges,
+                selected_preferences: [],
                 start_date: draft.start_date || null,
                 end_date: draft.end_date || null,
               });
             }}
           >
-            <Input className="h-[42px] rounded-[10px] shadow-none" value={draft.title} onChange={(event) => setDraft({ ...draft, title: event.target.value })} aria-label="Trip title" />
-            <Input
-              className="h-[42px] rounded-[10px] shadow-none"
-              value={draft.destination}
-              onChange={(event) => setDraft({ ...draft, destination: event.target.value })}
-              aria-label="Destination"
-            />
-            <Input
-              className="h-[42px] rounded-[10px] shadow-none"
-              type="date"
-              value={draft.start_date}
-              onChange={(event) => setDraft({ ...draft, start_date: event.target.value })}
-              aria-label="Start date"
-            />
-            <Input
-              className="h-[42px] rounded-[10px] shadow-none"
-              type="date"
-              value={draft.end_date}
-              onChange={(event) => setDraft({ ...draft, end_date: event.target.value })}
-              aria-label="End date"
-            />
-            <Textarea
-              value={draft.logistics}
-              onChange={(event) => setDraft({ ...draft, logistics: event.target.value })}
-              placeholder="Ferry, accommodation, car, arrival/departure"
-              className="min-h-16 rounded-[10px] shadow-none md:col-span-2"
-              aria-label="Known logistics"
-            />
-            <Textarea
-              value={draft.already_done}
-              onChange={(event) => setDraft({ ...draft, already_done: event.target.value })}
-              placeholder="Already visited / avoid repeating"
-              className="min-h-16 rounded-[10px] shadow-none"
-              aria-label="Already done"
-            />
-            <Textarea
-              value={draft.preferences}
-              onChange={(event) => setDraft({ ...draft, preferences: event.target.value })}
-              placeholder="Family preferences, kid energy, weather tolerance"
-              className="min-h-16 rounded-[10px] shadow-none"
-              aria-label="Preferences"
-            />
+            <label className="grid gap-1.5 text-sm font-medium md:col-span-2" htmlFor="new-trip-title">
+              Trip title
+              <Input id="new-trip-title" className="h-[42px] rounded-[10px] shadow-none" required maxLength={160} placeholder="e.g. Gotland family trip" value={draft.title} onChange={(event) => setDraft({ ...draft, title: event.target.value })} />
+            </label>
+            <details className="md:col-span-2" open={detailsOpen} onToggle={(event) => setDetailsOpen(event.currentTarget.open)} onInvalidCapture={() => setDetailsOpen(true)}>
+              <summary className="cursor-pointer text-sm text-muted-foreground">Optional details · destination, dates, participants</summary>
+              <div className="mt-3 grid gap-3 md:grid-cols-2">
+                <Input
+                  className="h-[42px] rounded-[10px] shadow-none"
+                  placeholder="Destination"
+                  value={draft.destination}
+                  onChange={(event) => setDraft({ ...draft, destination: event.target.value })}
+                  aria-label="Destination"
+                />
+                <Input
+                  className="h-[42px] rounded-[10px] shadow-none"
+                  type="date"
+                  value={draft.start_date}
+                  onChange={(event) => setDraft({ ...draft, start_date: event.target.value })}
+                  aria-label="Start date"
+                />
+                <Input
+                  className="h-[42px] rounded-[10px] shadow-none"
+                  type="date"
+                  value={draft.end_date}
+                  onChange={(event) => setDraft({ ...draft, end_date: event.target.value })}
+                  aria-label="End date"
+                />
+                <fieldset className="grid min-w-0 gap-3 md:col-span-2">
+                  <legend className="mb-2 text-sm font-medium">Participants</legend>
+                  <div className="grid gap-3 sm:grid-cols-3">
+                    <label className="grid gap-1.5 text-sm" htmlFor="new-trip-adults">
+                      Adults
+                      <Input id="new-trip-adults" type="number" min={0} max={50} value={draft.adult_count} onChange={(event) => setDraft({ ...draft, adult_count: event.target.value })} />
+                    </label>
+                    <label className="grid gap-1.5 text-sm" htmlFor="new-trip-kids">
+                      Kids
+                      <Input id="new-trip-kids" type="number" min={0} max={50} value={draft.kid_count} onChange={(event) => setDraft({ ...draft, kid_count: event.target.value })} />
+                    </label>
+                    <label className="grid gap-1.5 text-sm" htmlFor="new-trip-kid-ages">
+                      Kid ages
+                      <Input id="new-trip-kid-ages" placeholder="e.g. 5, 8" value={draft.kid_ages} onChange={(event) => setDraft({ ...draft, kid_ages: event.target.value })} />
+                    </label>
+                  </div>
+                  <label className="grid gap-1.5 text-sm" htmlFor="new-trip-participants">
+                    Participant notes
+                    <Textarea id="new-trip-participants" value={draft.participants} onChange={(event) => setDraft({ ...draft, participants: event.target.value })} placeholder="Who’s coming? Add names or any helpful notes." className="min-h-16 rounded-[10px] shadow-none" />
+                  </label>
+                </fieldset>
+                <Textarea
+                  value={draft.logistics}
+                  onChange={(event) => setDraft({ ...draft, logistics: event.target.value })}
+                  placeholder="Ferry, accommodation, car, arrival/departure"
+                  className="min-h-16 rounded-[10px] shadow-none md:col-span-2"
+                  aria-label="Known logistics"
+                />
+                <Textarea
+                  value={draft.already_done}
+                  onChange={(event) => setDraft({ ...draft, already_done: event.target.value })}
+                  placeholder="Already visited / avoid repeating"
+                  className="min-h-16 rounded-[10px] shadow-none"
+                  aria-label="Already done"
+                />
+                <Textarea
+                  value={draft.preferences}
+                  onChange={(event) => setDraft({ ...draft, preferences: event.target.value })}
+                  placeholder="Family preferences, kid energy, weather tolerance"
+                  className="min-h-16 rounded-[10px] shadow-none"
+                  aria-label="Preferences"
+                />
+              </div>
+            </details>
             {error ? <p className="text-sm text-destructive md:col-span-2">{error}</p> : null}
             <div className="md:col-span-2">
               <Button className="h-10 rounded-[10px] px-4 shadow-none" type="submit" disabled={createMutation.isPending}>

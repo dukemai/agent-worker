@@ -57,6 +57,8 @@ For group trips, useful fields include:
 The first version can keep this lightweight and editable by the primary user.
 The MVP stores freeform participant notes plus structured `adult_count`, `kid_count`, and `kid_ages` so suggestions can reason about the family shape without needing named people.
 
+The New trip form initially shows only the required trip title and Create trip action. An expandable Optional details section contains destination, dates, logistics, preferences, and a labeled Participants section with adult and kid counts, comma-separated kid ages, and participant notes. These values are saved when the trip is created; kid ages must be whole numbers from 0 to 18.
+
 ### Preferences
 
 Preferences combine freeform notes with curated reusable suggestions. The user can manage suggestion presets in `/trips/preferences`, then apply active suggestions from the trip detail page.
