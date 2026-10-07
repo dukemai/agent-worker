@@ -668,7 +668,7 @@ export function DailyDigestEmail(props: Props) {
                     <Heading as="h3" className="text-[16px]">{item.dayTitle}</Heading>
                     <Text style={{ whiteSpace: "pre-wrap" }}>{item.content}</Text>
                     {item.resources.map((resource, i) => <Text key={i}>{/^https?:\/\//i.test(resource) ? <a href={resource}>{resource}</a> : resource}</Text>)}
-                    <Text><a href={`${dashboardUrl}/learning`}>Browse program and mark day done</a></Text>
+                    <Text><a href={`${dashboardUrl}/learning/programs/${encodeURIComponent(item.programId)}/days/${item.dayNumber}`}>Continue lesson</a></Text>
                   </Section>
                 ))}
               </Section>

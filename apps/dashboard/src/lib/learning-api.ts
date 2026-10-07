@@ -1,4 +1,4 @@
-import type { LearningProgram, LearningProgramStatus } from "@/types/database";
+import type { LearningProgram, LearningProgramDay, LearningProgramStatus } from "@/types/database";
 async function request<T>(path = "", options?: RequestInit): Promise<T> {
   const response = await fetch(`/api/learning/programs${path}`, options);
   const data = await response.json();
@@ -8,6 +8,7 @@ async function request<T>(path = "", options?: RequestInit): Promise<T> {
 const json = (method: string, payload: unknown): RequestInit => ({ method, headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) });
 export const fetchLearningPrograms = () => request<{ programs: LearningProgram[] }>();
 export const fetchLearningProgram = (id: string) => request<{ program: LearningProgram }>(`/${id}`);
+export const fetchLearningProgramDay = (id: string, dayNumber: number) => request<{ program: LearningProgram; day: LearningProgramDay }>(`/${id}/days/${dayNumber}`);
 export const importLearningProgram = (payload: unknown) => request<{ program: LearningProgram; days_imported: number }>("/import", json("POST", payload));
 export const updateLearningProgramStatus = (id: string, status: Exclude<LearningProgramStatus, "completed">) => request<{ program: LearningProgram }>(`/${id}`, json("PATCH", { status }));
 export const advanceLearningProgram = (id: string, current_day?: number) => request<{ program: LearningProgram }>(`/${id}/advance`, json("POST", { current_day }));

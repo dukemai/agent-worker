@@ -52,7 +52,9 @@ dashboard/src/
 | Route | Page | Main API surface |
 |-------|------|------------------|
 | `/` | Tasks | `GET/POST /api/tasks`, `POST /api/tasks/[id]/move` |
-| `/learning` | Learning | `/api/learning/programs`, import, status, advance |
+| `/learning` | Current lessons and progress | `/api/learning/programs`, day detail, advance |
+| `/learning/programs` | Curriculum management | `/api/learning/programs`, import, status |
+| `/learning/programs/[programId]/days/[dayNumber]` | Stable lesson reader and digest deep-link target | day detail, advance |
 | `/context` | Context | `GET/PUT /api/context`, `GET/PUT /api/context/[key]` |
 | `/growing` | Growing | `GET/POST /api/growing/sources`, `GET /api/growing/knowledge`, `GET /api/growing/weekly`, profile, convert, process |
 | `/digest` | Digest preview and settings | `GET /api/digest/preview`, CRUD via `/api/digest/settings` |
