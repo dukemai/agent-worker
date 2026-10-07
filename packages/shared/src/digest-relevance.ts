@@ -48,6 +48,10 @@ export function calendarDaysBetween(fromYmd: string, toYmd: string): number {
   return Math.round((toUtc - fromUtc) / 86_400_000);
 }
 
+export function isDueOnOrBefore(dueDate: string | null, targetDate: string): boolean {
+  return dueDate !== null && calendarDaysBetween(targetDate, dueDate.slice(0, 10)) <= 0;
+}
+
 /** Stable, non-cryptographic hash used only to notice material content changes. */
 export function digestContentHash(value: unknown): string {
   const input = JSON.stringify(value);

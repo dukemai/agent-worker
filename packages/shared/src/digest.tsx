@@ -34,6 +34,7 @@ import {
   calendarDaysBetween,
   deliveryItem,
   isDigestSendWorthy,
+  isDueOnOrBefore,
   isNewOrChanged,
   isReminderMilestone,
   resolveSummerActivityPhase,
@@ -846,7 +847,7 @@ export async function loadDigestEmailContent(
     return picked;
   };
 
-  const [rawTodayTasks, rawThisWeekTasks, laterTasks, rawBirthdayItems, rawTripItems, rawActivityItems, rawPlanningDayItems, schoolStartDate, rawLearningProgramItems] = await Promise.all([
+  const [rawTodayTasks, rawThisWeekTasks, rawLaterTasks, rawBirthdayItems, rawTripItems, rawActivityItems, rawPlanningDayItems, schoolStartDate, rawLearningProgramItems] = await Promise.all([
     fetchPendingTasksForBucket(supabase, "today_tasks"),
     fetchPendingTasksForBucket(supabase, "this_week_tasks"),
     fetchPendingTasksForBucket(supabase, "later_tasks"),
@@ -864,9 +865,20 @@ export async function loadDigestEmailContent(
     const force = daysLeft !== null && daysLeft <= 0;
     return includeFresh(`task:${task.id}`, { title: task.title, dueDate: task.due_date }, force);
   };
-  const todayTasks = rawTodayTasks.filter(selectTask);
+  const urgentLaterTasks = rawLaterTasks.filter(
+    (task) =>
+      task.metadata?.item_type !== "renewal" &&
+      task.metadata?.item_type !== "growing" &&
+      task.metadata?.email_type !== "promotion" &&
+      isDueOnOrBefore(task.due_date, targetDate)
+  );
+  // A bucket is an organizational choice, not a notification policy. Once a Later
+  // task reaches its deadline, promote it into the digest's Act now / Today section.
+  const todayTasks = [...rawTodayTasks.filter(selectTask), ...urgentLaterTasks.filter(selectTask)];
   const thisWeekTasks = rawThisWeekTasks.filter(selectTask);
-  const allRawTasks = [...rawTodayTasks, ...rawThisWeekTasks, ...laterTasks];
+  const urgentLaterTaskIds = new Set(urgentLaterTasks.map((task) => task.id));
+  const laterTasks = rawLaterTasks.filter((task) => !urgentLaterTaskIds.has(task.id));
+  const allRawTasks = [...rawTodayTasks, ...rawThisWeekTasks, ...rawLaterTasks];
   const promotionItems = takeFresh(
     extractPromotionItems(allRawTasks),
     3,

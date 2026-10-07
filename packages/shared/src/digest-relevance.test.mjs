@@ -6,6 +6,7 @@ import {
   deliveryItem,
   formatDailyDigestSubject,
   isDigestSendWorthy,
+  isDueOnOrBefore,
   isNewOrChanged,
   isReminderMilestone,
   nextMondayDate,
@@ -41,6 +42,13 @@ test("unchanged items are suppressed while material changes are eligible", () =>
 test("reminders appear only at explicit milestones", () => {
   assert.equal(isReminderMilestone(7, [14, 7, 2, 0]), true);
   assert.equal(isReminderMilestone(6, [14, 7, 2, 0]), false);
+});
+
+test("a task deadline triggers on the due date and while overdue", () => {
+  assert.equal(isDueOnOrBefore("2026-09-30T21:59:00.000Z", "2026-09-30"), true);
+  assert.equal(isDueOnOrBefore("2026-09-29T21:59:00.000Z", "2026-09-30"), true);
+  assert.equal(isDueOnOrBefore("2026-10-01T21:59:00.000Z", "2026-09-30"), false);
+  assert.equal(isDueOnOrBefore(null, "2026-09-30"), false);
 });
 
 test("summer activities taper after school begins", () => {

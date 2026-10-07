@@ -19,7 +19,7 @@ Morning email sent at 06:30 Stockholm time. Primary decision surface for the day
 - **Garden This Week** — Converted growing tasks + weekly ideas *(included only on Mondays and Fridays)*
 - **New Growing Knowledge** — Recent tips from videos/articles (last 24h) *(included only on Mondays and Fridays)*
 - **Upcoming Renewals** — T-30 to T-1
-- **Today's Learning** — Current day from each active uploaded program, repeated until marked done
+- **Today's Learning** — Current day from each active uploaded program, repeated until marked done, with a direct link to that program day
 - **Deals for You** — Matched promotions
 - **Upcoming Trips** — Trips starting in the next 45 days, with countdowns highlighted in the briefing during the final 14 days
 
@@ -68,6 +68,7 @@ The digest is an exception surface, not a daily inventory. Successful deliveries
 
 - A quiet day sends no email.
 - New or materially changed normal tasks may appear once; due-today and overdue tasks remain interruptive.
+- A pending task in the Later bucket moves into the digest's **Act now / Today** section when its due date arrives, and continues to trigger the morning email while overdue until it is completed or rescheduled.
 - Renewals use T-30, T-14, T-7, T-2, T-1, and due-day milestones.
 - Birthdays use T-14, T-7, T-2, T-1, and the birthday.
 - Trips use T-14, T-7, T-3, T-1, and departure day, plus material plan/readiness changes.
